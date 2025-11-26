@@ -1,0 +1,130 @@
+{
+  "id": "rosary_guide",
+  "title": "Guía para Rezar el Rosario",
+  "description": "El rosario es una oración tradicional que nos ayuda a meditar en los misterios de la vida de Jesús y María. Esta guía te acompañará paso a paso.",
+  "mysteries": [
+    {
+      "id": "joyful",
+      "name": "Misterios Gozosos",
+      "day": "Lunes y Sábado",
+      "mysteries": [
+        "La Anunciación del Ángel a María",
+        "La Visitación de María a su prima Isabel",
+        "El Nacimiento de Jesús en Belén",
+        "La Presentación de Jesús en el Templo",
+        "El Niño Jesús perdido y hallado en el Templo"
+      ]
+    },
+    {
+      "id": "sorrowful",
+      "name": "Misterios Dolorosos",
+      "day": "Martes y Viernes",
+      "mysteries": [
+        "La Oración de Jesús en el Huerto",
+        "La Flagelación de Jesús",
+        "La Coronación de Espinas",
+        "Jesús carga con la Cruz",
+        "La Crucifixión y Muerte de Jesús"
+      ]
+    },
+    {
+      "id": "glorious",
+      "name": "Misterios Gloriosos",
+      "day": "Miércoles y Domingo",
+      "mysteries": [
+        "La Resurrección de Jesús",
+        "La Ascensión de Jesús al Cielo",
+        "La Venida del Espíritu Santo",
+        "La Asunción de María al Cielo",
+        "La Coronación de María como Reina"
+      ]
+    },
+    {
+      "id": "luminous",
+      "name": "Misterios Luminosos",
+      "day": "Jueves",
+      "mysteries": [
+        "El Bautismo de Jesús en el Jordán",
+        "Las Bodas de Caná",
+        "El Anuncio del Reino de Dios",
+        "La Transfiguración",
+        "La Institución de la Eucaristía"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "order": 1,
+      "title": "Señal de la Cruz",
+      "prayer": "En el nombre del Padre, y del Hijo, y del Espíritu Santo. Amén.",
+      "repetitions": 1
+    },
+    {
+      "order": 2,
+      "title": "Credo",
+      "prayer": "Creo en Dios, Padre todopoderoso, Creador del cielo y de la tierra. Creo en Jesucristo, su único Hijo, nuestro Señor...",
+      "repetitions": 1
+    },
+    {
+      "order": 3,
+      "title": "Padre Nuestro",
+      "prayer": "Padre nuestro que estás en el cielo, santificado sea tu nombre. Venga tu reino. Hágase tu voluntad en la tierra como en el cielo...",
+      "repetitions": 1
+    },
+    {
+      "order": 4,
+      "title": "Tres Avemarías",
+      "prayer": "Dios te salve, María, llena eres de gracia, el Señor es contigo. Bendita tú eres entre todas las mujeres...",
+      "repetitions": 3
+    },
+    {
+      "order": 5,
+      "title": "Gloria",
+      "prayer": "Gloria al Padre, y al Hijo, y al Espíritu Santo. Como era en el principio, ahora y siempre, por los siglos de los siglos. Amén.",
+      "repetitions": 1
+    },
+    {
+      "order": 6,
+      "title": "Primer Misterio",
+      "prayer": "Meditamos en el primer misterio [nombre del misterio]. Padre nuestro... Diez Avemarías... Gloria...",
+      "repetitions": 10
+    },
+    {
+      "order": 7,
+      "title": "Segundo Misterio",
+      "prayer": "Meditamos en el segundo misterio [nombre del misterio]. Padre nuestro... Diez Avemarías... Gloria...",
+      "repetitions": 10
+    },
+    {
+      "order": 8,
+      "title": "Tercer Misterio",
+      "prayer": "Meditamos en el tercer misterio [nombre del misterio]. Padre nuestro... Diez Avemarías... Gloria...",
+      "repetitions": 10
+    },
+    {
+      "order": 9,
+      "title": "Cuarto Misterio",
+      "prayer": "Meditamos en el cuarto misterio [nombre del misterio]. Padre nuestro... Diez Avemarías... Gloria...",
+      "repetitions": 10
+    },
+    {
+      "order": 10,
+      "title": "Quinto Misterio",
+      "prayer": "Meditamos en el quinto misterio [nombre del misterio]. Padre nuestro... Diez Avemarías... Gloria...",
+      "repetitions": 10
+    },
+    {
+      "order": 11,
+      "title": "Salve",
+      "prayer": "Dios te salve, Reina y Madre de misericordia, vida, dulzura y esperanza nuestra. Dios te salve...",
+      "repetitions": 1
+    },
+    {
+      "order": 12,
+      "title": "Oración Final",
+      "prayer": "Oh Dios, cuyo Hijo Unigénito, con su vida, muerte y resurrección, nos ha merecido el premio de la salvación eterna...",
+      "repetitions": 1
+    }
+  ]
+}
+

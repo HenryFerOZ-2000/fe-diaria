@@ -1,0 +1,43 @@
+[
+  {
+    "id": 1,
+    "name": "San José",
+    "feastDay": "19 de marzo",
+    "description": "Patrono de la Iglesia Universal, esposo de María y padre adoptivo de Jesús. Es conocido como el santo del trabajo y la protección de la familia.",
+    "prayer": "Oh, glorioso San José, que fuiste elegido por Dios para ser el padre adoptivo de Jesús y el esposo de la Santísima Virgen María, te pedimos que intercedas por nosotros ante el trono de Dios. Ayúdanos en nuestras necesidades y guíanos en el camino de la virtud. Amén.",
+    "tags": ["trabajo", "familia", "protección"]
+  },
+  {
+    "id": 2,
+    "name": "Santa María",
+    "feastDay": "1 de enero",
+    "description": "Madre de Jesús y Madre de la Iglesia. Es venerada como la más perfecta discípula de Cristo y ejemplo de fe y humildad.",
+    "prayer": "Dios te salve, María, llena eres de gracia, el Señor es contigo. Bendita tú eres entre todas las mujeres, y bendito es el fruto de tu vientre, Jesús. Santa María, Madre de Dios, ruega por nosotros pecadores, ahora y en la hora de nuestra muerte. Amén.",
+    "tags": ["madre", "intercesión", "fe"]
+  },
+  {
+    "id": 3,
+    "name": "San Francisco de Asís",
+    "feastDay": "4 de octubre",
+    "description": "Fundador de la Orden Franciscana, conocido por su amor a la naturaleza, la pobreza y la paz. Patrono de los animales y del medio ambiente.",
+    "prayer": "Señor, hazme instrumento de tu paz. Donde haya odio, siembre yo amor. Donde haya ofensa, siembre yo perdón. Donde haya discordia, siembre yo unión. Oh, Maestro, que no busque tanto ser consolado como consolar, ser comprendido como comprender, ser amado como amar.",
+    "tags": ["paz", "naturaleza", "pobreza"]
+  },
+  {
+    "id": 4,
+    "name": "Santa Teresa de Ávila",
+    "feastDay": "15 de octubre",
+    "description": "Doctora de la Iglesia, reformadora del Carmelo y mística española. Conocida por sus escritos sobre la oración y la vida espiritual.",
+    "prayer": "Nada te turbe, nada te espante. Todo se pasa, Dios no se muda. La paciencia todo lo alcanza. Quien a Dios tiene, nada le falta. Solo Dios basta.",
+    "tags": ["oración", "mística", "reforma"]
+  },
+  {
+    "id": 5,
+    "name": "San Juan Bautista",
+    "feastDay": "24 de junio",
+    "description": "Precursor de Jesús, bautizó a Cristo en el río Jordán. Conocido por su vida de penitencia y su llamado a la conversión.",
+    "prayer": "San Juan Bautista, precursor del Señor, que preparaste el camino para la venida de Cristo, ayúdanos a preparar nuestros corazones para recibir a Jesús. Que podamos vivir con la misma valentía y fidelidad que tú mostraste. Amén.",
+    "tags": ["conversión", "preparación", "valentía"]
+  }
+]
+

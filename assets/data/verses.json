@@ -1,0 +1,3402 @@
+[
+  {
+    "id": 1,
+    "text": "El Señor ilumina tu camino y te sostiene; no temas, su luz te acompaña hoy.",
+    "reference": "Salmo 27:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 2,
+    "text": "Cristo te deja una paz suave y firme; descansa el corazón en su promesa.",
+    "reference": "Juan 14:27",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 3,
+    "text": "Entrégale tus pasos al Señor; Él endereza tus sendas cuando confías en Él.",
+    "reference": "Proverbios 3:5-6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 4,
+    "text": "Los que esperan en Dios renuevan fuerza; hoy te levanta como águila en vuelo.",
+    "reference": "Isaías 40:31",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 5,
+    "text": "La fe ve lo invisible y abraza la promesa; camina seguro en la palabra de Dios.",
+    "reference": "Hebreos 11:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 6,
+    "text": "Bajo sus alas encuentras abrigo; su fidelidad te cubre como escudo.",
+    "reference": "Salmo 91:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 7,
+    "text": "Nada puede separarte del amor de Dios; su cariño te rodea hoy y siempre.",
+    "reference": "Romanos 8:38-39",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 8,
+    "text": "Sé valiente y no te asustes; el Señor tu Dios va contigo donde tú vayas.",
+    "reference": "Josué 1:9",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 9,
+    "text": "No olvides sus bondades; levanta un susurro de gratitud por su fidelidad.",
+    "reference": "Salmo 103:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 10,
+    "text": "Si te falta sabiduría, pídesela a Dios; Él da con generosidad y guía tu mente.",
+    "reference": "Santiago 1:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 11,
+    "text": "Dios suple lo necesario; confía, su mano no se acorta para ayudarte.",
+    "reference": "Filipenses 4:19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 12,
+    "text": "La paz de Dios guarda tu corazón; descansa en su cuidado que supera todo pensar.",
+    "reference": "Filipenses 4:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 13,
+    "text": "Que el Dios de la esperanza te llene de gozo y paz al confiar en Él.",
+    "reference": "Romanos 15:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 14,
+    "text": "Dios es tu amparo y fortaleza; ayuda presente en cualquier dificultad.",
+    "reference": "Salmo 46:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 15,
+    "text": "Para el que confía en Dios, todo es posible; Él sostiene tu pequeño paso de fe.",
+    "reference": "Marcos 9:23",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 16,
+    "text": "El nombre del Señor es torre segura; corre a Él y encontrarás resguardo.",
+    "reference": "Proverbios 18:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 17,
+    "text": "El amor inicia en Dios; Él te amó primero y te sostiene con ternura.",
+    "reference": "1 Juan 4:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 18,
+    "text": "El Señor está cerca del corazón quebrado; Él levanta a quien se siente débil.",
+    "reference": "Salmo 34:18",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 19,
+    "text": "Da gracias en todo; aun en lo pequeño, Dios te rodea con su cuidado.",
+    "reference": "1 Tesalonicenses 5:18",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 20,
+    "text": "Del Señor proviene la sabiduría; su palabra enciende tu entendimiento.",
+    "reference": "Proverbios 2:6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 21,
+    "text": "Busca primero el Reino; lo que necesitas vendrá en su tiempo y bondad.",
+    "reference": "Mateo 6:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 22,
+    "text": "Permite que la paz de Cristo gobierne tu corazón; camina en serenidad hoy.",
+    "reference": "Colosenses 3:15",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 23,
+    "text": "Cada mañana renuevas tu esperanza; grande es su fidelidad contigo.",
+    "reference": "Lamentaciones 3:22-23",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 24,
+    "text": "Su gracia te basta; en tu debilidad, su poder te sostiene con firmeza.",
+    "reference": "2 Corintios 12:9",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 25,
+    "text": "Una fe pequeña mueve montañas; confía y da el paso que hoy te pide Dios.",
+    "reference": "Mateo 17:20",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 26,
+    "text": "El Señor te guarda al salir y al volver; su cuidado no se adormece.",
+    "reference": "Salmo 121:7-8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 27,
+    "text": "Su amor permanece para siempre; celebra su bondad en tu día a día.",
+    "reference": "Salmo 136:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 28,
+    "text": "No temas, Dios te sostiene con su mano fiel; te fortalece y te ayuda.",
+    "reference": "Isaías 41:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 29,
+    "text": "Este es el día que hizo el Señor; alegra tu corazón y da gracias.",
+    "reference": "Salmo 118:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 30,
+    "text": "Dichoso quien halla sabiduría; su senda conduce a paz y buen juicio.",
+    "reference": "Proverbios 3:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 31,
+    "text": "No te faltará el sustento; el Señor pastorea tu vida con cuidado fiel.",
+    "reference": "Salmo 37:25",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 32,
+    "text": "En paz te acuestas y descansas; el Señor te guarda con cuidado tierno.",
+    "reference": "Salmo 4:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 33,
+    "text": "Dios conserva en calma a quien fija su mente en Él, porque confía.",
+    "reference": "Isaías 26:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 34,
+    "text": "El Señor es tu roca y refugio; en Él encuentras sostén y fuerza.",
+    "reference": "Salmo 18:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 35,
+    "text": "La fe crece al oír la palabra; alimenta tu corazón con su verdad.",
+    "reference": "Romanos 10:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 36,
+    "text": "El Señor te cubre a tu lado; ni el sol ni la noche te dañarán.",
+    "reference": "Salmo 121:5-6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 37,
+    "text": "Con amor eterno te ha amado; por eso extiende su bondad sobre ti.",
+    "reference": "Jeremías 31:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 38,
+    "text": "Esfuérzate y cobra ánimo; el Señor sostiene a quien espera en Él.",
+    "reference": "Salmo 31:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 39,
+    "text": "Hazlo todo con gratitud; que cada acto sea un himno sencillo al Señor.",
+    "reference": "Colosenses 3:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 40,
+    "text": "El principio de la sabiduría es honrar a Dios; ábrele la puerta hoy.",
+    "reference": "Proverbios 1:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 41,
+    "text": "Quien busca al Señor no carece de bien; confía en su cuidado fiel.",
+    "reference": "Salmo 34:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 42,
+    "text": "En Cristo tienes paz con Dios; reposa en la amistad que Él te regala.",
+    "reference": "Romanos 5:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 43,
+    "text": "Espera en su palabra; tu alma encuentra aliento en sus promesas.",
+    "reference": "Salmo 130:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 44,
+    "text": "Con Cristo puedes avanzar; su fuerza sostiene tu paso cansado.",
+    "reference": "Filipenses 4:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 45,
+    "text": "Dios te amó y te dio a su Hijo; su amor abre un camino de vida.",
+    "reference": "Juan 3:16",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 46,
+    "text": "Caminas por fe, no por vista; Dios dirige lo que aún no ves.",
+    "reference": "2 Corintios 5:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 47,
+    "text": "El ángel del Señor acampa a tu alrededor; estás guardado por su mano.",
+    "reference": "Salmo 34:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 48,
+    "text": "Es bueno agradecer al Señor; proclama su fidelidad en tu mañana y noche.",
+    "reference": "Salmo 92:1-2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 49,
+    "text": "La sabiduría es lo principal; abrázala y hallarás senda segura.",
+    "reference": "Proverbios 4:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 50,
+    "text": "El Padre sabe dar cosas buenas; pide con confianza y corazón sencillo.",
+    "reference": "Mateo 7:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 51,
+    "text": "La justicia de Dios produce paz; fruto de quietud y confianza para tu alma.",
+    "reference": "Isaías 32:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 52,
+    "text": "La esperanza en Cristo es ancla firme; te sostiene en cualquier marea.",
+    "reference": "Hebreos 6:19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 53,
+    "text": "El gozo del Señor es tu fuerza; deja que su alegría te renueve hoy.",
+    "reference": "Nehemías 8:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 54,
+    "text": "Vives por la fe en el Hijo de Dios; su amor guía tu latido.",
+    "reference": "Gálatas 2:20",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 55,
+    "text": "Aunque atravieses valle oscuro, no temas; Él va contigo y te consuela.",
+    "reference": "Salmo 23:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 56,
+    "text": "Que conozcas cuán ancho y profundo es su amor; te llena y sostiene.",
+    "reference": "Efesios 3:18-19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 57,
+    "text": "Entrega tu carga al Señor; Él te sostiene y no te deja caer.",
+    "reference": "Salmo 55:22",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 58,
+    "text": "Da gracias al Dios del cielo; su amor permanece y no se agota.",
+    "reference": "Salmo 136:26",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 59,
+    "text": "La sabiduría de arriba es amable y pacífica; pide esa luz para tu día.",
+    "reference": "Santiago 3:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 60,
+    "text": "Ora confiando en Dios; Él escucha el corazón que cree y espera.",
+    "reference": "Mateo 21:22",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 61,
+    "text": "El Señor te da fuerza y paz suave; camina hoy en su calma.",
+    "reference": "Salmo 29:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 62,
+    "text": "A los cansados da aliento; su mano levanta tu ánimo abatido.",
+    "reference": "Isaías 40:29",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 63,
+    "text": "Espera en el Señor; cobra ánimo, Él afirma tu corazón.",
+    "reference": "Salmo 27:14",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 64,
+    "text": "Cuando sientas temor, pon tu confianza en Dios y descansa.",
+    "reference": "Salmo 56:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 65,
+    "text": "El Señor es tu escudo y tu gloria; levanta tu cabeza con ternura.",
+    "reference": "Salmo 3:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 66,
+    "text": "Dios mostró su amor por ti; aun sin merecer, te abrazó en gracia.",
+    "reference": "Romanos 5:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 67,
+    "text": "Bendice al Señor en todo tiempo; su alabanza suaviza tu día.",
+    "reference": "Salmo 34:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 68,
+    "text": "Honrar a Dios abre puertas a la sabiduría que guía en lo diario.",
+    "reference": "Salmo 111:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 69,
+    "text": "Si cuida de las aves, cuidará de ti; confía en su bondad fiel.",
+    "reference": "Mateo 6:26",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 70,
+    "text": "Que el Señor de la paz te dé paz siempre, en todo sentido.",
+    "reference": "2 Tesalonicenses 3:16",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 71,
+    "text": "Fortalécete y espera; el Señor sostiene a quien le aguarda.",
+    "reference": "Salmo 31:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 72,
+    "text": "El Señor es tu fuerza y tu cántico; Él es tu salvación.",
+    "reference": "Éxodo 15:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 73,
+    "text": "Cree cuando ores; confía y recibirás conforme a su voluntad buena.",
+    "reference": "Marcos 11:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 74,
+    "text": "Pon tu camino en manos de Dios; confía y Él actuará.",
+    "reference": "Salmo 37:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 75,
+    "text": "Ningún arma prosperará contra ti; el Señor te sostiene firme.",
+    "reference": "Isaías 54:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 76,
+    "text": "Como padre que compadece, así el Señor se inclina hacia ti.",
+    "reference": "Salmo 103:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 77,
+    "text": "En el mundo hay aflicción, pero en Cristo tienes victoria y aliento.",
+    "reference": "Juan 16:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 78,
+    "text": "Den gracias al Señor; su amor leal no se agota.",
+    "reference": "Salmo 107:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 79,
+    "text": "Pon tus planes en manos de Dios; Él afirmará lo que emprendas.",
+    "reference": "Proverbios 16:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 80,
+    "text": "Dios puede abundar en gracia para suplir lo que te hace falta.",
+    "reference": "2 Corintios 9:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 81,
+    "text": "Gran paz tienen los que aman su ley; no tropiezan fácilmente.",
+    "reference": "Salmo 119:165",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 82,
+    "text": "Dios piensa en tu bien; su plan te da esperanza y futuro.",
+    "reference": "Jeremías 29:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 83,
+    "text": "Aunque falle tu fuerza, Dios es la roca de tu corazón.",
+    "reference": "Salmo 73:26",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 84,
+    "text": "Fija la mirada en Jesús, autor y consumador de tu fe.",
+    "reference": "Hebreos 12:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 85,
+    "text": "Dios es tu salvación; confía y no temas, Él es tu canción.",
+    "reference": "Isaías 12:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 86,
+    "text": "Tu ayuda viene del Señor; no permitirá que resbale tu pie.",
+    "reference": "Salmo 121:2-3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 87,
+    "text": "Dios se goza sobre ti con cánticos; te renovará con su amor.",
+    "reference": "Sofonías 3:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 88,
+    "text": "Espera en Dios; aún volverás a alabar su ayuda y salvación.",
+    "reference": "Salmo 42:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 89,
+    "text": "Dad gracias al Señor; bueno es y su amor perdura.",
+    "reference": "1 Crónicas 16:34",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 90,
+    "text": "Sé pronto para escuchar, tardo en hablar; la calma guarda tu paso.",
+    "reference": "Santiago 1:19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 91,
+    "text": "Dios te conduce a aguas de reposo; su presencia tranquiliza tu alma.",
+    "reference": "Salmo 23:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 92,
+    "text": "El Señor toma tu mano y te dice: no temas, Yo te ayudo.",
+    "reference": "Isaías 41:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 93,
+    "text": "El Señor es tu fuerza y tu escudo; en Él tu corazón se apoya y canta.",
+    "reference": "Salmo 28:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 94,
+    "text": "Nada es imposible para Dios; confía en su poder y bondad.",
+    "reference": "Lucas 1:37",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 95,
+    "text": "Como los montes rodean a Jerusalén, así el Señor te rodea siempre.",
+    "reference": "Salmo 125:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 96,
+    "text": "Mira cuán grande amor nos dio el Padre: te llama su hijo amado.",
+    "reference": "1 Juan 3:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 97,
+    "text": "Aún verás la bondad de Dios en la tierra de los vivos; espera en Él.",
+    "reference": "Salmo 27:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 98,
+    "text": "Entra con gratitud a su presencia; tu corazón se alegra ante su rostro.",
+    "reference": "Salmo 100:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 99,
+    "text": "No te apoyes en tu propia opinión; teme a Dios y apártate del mal.",
+    "reference": "Proverbios 3:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 100,
+    "text": "Dios abre su mano y sacia tu necesidad con su bondad.",
+    "reference": "Salmo 145:16",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 101,
+    "text": "El Señor te concede paz; todo lo bueno que logras, Él lo realiza en ti.",
+    "reference": "Isaías 26:12",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 102,
+    "text": "Que tu amor, Señor, descanse sobre nosotros, porque esperamos en ti.",
+    "reference": "Salmo 33:22",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 103,
+    "text": "Dios te ciñe de poder y allana tus pasos con firmeza.",
+    "reference": "Salmo 18:32",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 104,
+    "text": "No temas; solo cree. Jesús sostiene tu corazón con esperanza.",
+    "reference": "Marcos 5:36",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 105,
+    "text": "Confía en Él en todo tiempo; derrama delante de Él tu corazón.",
+    "reference": "Salmo 62:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 106,
+    "text": "Tu ayuda viene del Señor, creador del cielo y la tierra.",
+    "reference": "Salmo 121:1-2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 107,
+    "text": "Si Dios te dio a su Hijo, ¿cómo no te dará también lo demás?",
+    "reference": "Romanos 8:32",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 108,
+    "text": "Cuando clamas, Dios te responde y fortalece tu alma valiente.",
+    "reference": "Salmo 138:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 109,
+    "text": "Te alabo, Señor, con todo mi corazón; contaré tus maravillas.",
+    "reference": "Salmo 9:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 110,
+    "text": "La sabiduría entrará en tu corazón y te guardará el buen juicio.",
+    "reference": "Proverbios 2:10-11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 111,
+    "text": "Deléitate en el Señor y Él concederá los deseos justos de tu corazón.",
+    "reference": "Salmo 37:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 112,
+    "text": "Amar su palabra te da gran paz; tropiezas menos cuando la guardas.",
+    "reference": "Salmo 119:165",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 113,
+    "text": "Dios obra para bien en los que le aman; confía en su propósito.",
+    "reference": "Romanos 8:28",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 114,
+    "text": "A quien no tiene fuerzas, Él se las multiplica con ternura.",
+    "reference": "Isaías 40:29",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 115,
+    "text": "Bienaventurados los que creen sin ver; su confianza honra a Dios.",
+    "reference": "Juan 20:29",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 116,
+    "text": "Dios es tu refugio y fortaleza; en Él descansa tu confianza hoy.",
+    "reference": "Salmo 91:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 117,
+    "text": "Muchas aflicciones tiene el justo, pero de todas le librará el Señor.",
+    "reference": "Salmo 34:19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 118,
+    "text": "Dios, rico en misericordia, te dio vida por su gran amor.",
+    "reference": "Efesios 2:4-5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 119,
+    "text": "Esfuérzate; Él fortalece a quienes esperan en su bondad.",
+    "reference": "Salmo 31:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 120,
+    "text": "Presenta tus peticiones con gratitud; su paz guardará tu corazón.",
+    "reference": "Filipenses 4:6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 121,
+    "text": "Si te falta sabiduría, pídela a Dios; Él da generosamente y guía tu mente.",
+    "reference": "Santiago 1:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 122,
+    "text": "En Cristo tienes paz; confía, Él venció al mundo por ti.",
+    "reference": "Juan 16:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 123,
+    "text": "La esperanza no defrauda; el amor de Dios llena tu corazón.",
+    "reference": "Romanos 5:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 124,
+    "text": "Te amo, Señor, mi fuerza; en tu poder descansa mi debilidad.",
+    "reference": "Salmo 18:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 125,
+    "text": "Mantén firme la esperanza; fiel es quien hizo la promesa.",
+    "reference": "Hebreos 10:23",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 126,
+    "text": "Unos confían en fuerzas humanas; tú recuerda el nombre del Señor.",
+    "reference": "Salmo 20:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 127,
+    "text": "Dios enviará sus ángeles para cuidarte en tus caminos.",
+    "reference": "Salmo 91:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 128,
+    "text": "Por gracia eres salvo; su amor te alcanza y sostiene.",
+    "reference": "Efesios 2:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 129,
+    "text": "El Señor es tu luz y salvación; ¿a quién temerás?",
+    "reference": "Salmo 27:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 130,
+    "text": "Persevera en la oración con gratitud; Dios escucha tu voz.",
+    "reference": "Colosenses 4:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 131,
+    "text": "Honrar a Dios abre la puerta de la sabiduría verdadera.",
+    "reference": "Proverbios 9:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 132,
+    "text": "Dios no niega el bien a los que caminan en integridad.",
+    "reference": "Salmo 84:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 133,
+    "text": "Que el Señor te mire con favor y te conceda paz hoy.",
+    "reference": "Números 6:26",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 134,
+    "text": "Y ahora, Señor, ¿qué esperaré? Mi esperanza está en ti.",
+    "reference": "Salmo 39:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 135,
+    "text": "Al esperar en Dios, tus fuerzas se renuevan como alas de águila.",
+    "reference": "Isaías 40:31",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 136,
+    "text": "Para Dios todo es posible; entrega a Él lo que no puedes.",
+    "reference": "Marcos 10:27",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 137,
+    "text": "No temerás malas noticias; tu corazón está firme en el Señor.",
+    "reference": "Salmo 112:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 138,
+    "text": "El Señor te guardará de todo mal; cuidará tu vida.",
+    "reference": "Salmo 121:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 139,
+    "text": "Dios es amor; permanece en Él y su amor permanece en ti.",
+    "reference": "1 Juan 4:16",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 140,
+    "text": "Todo lo puedes en Cristo; su fuerza te levanta hoy.",
+    "reference": "Filipenses 4:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 141,
+    "text": "Den gracias al Señor; Él sacia tu vida con lo bueno.",
+    "reference": "Salmo 107:8-9",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 142,
+    "text": "Guarda la prudencia; será vida y adorno para tu camino.",
+    "reference": "Proverbios 3:21-22",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 143,
+    "text": "Tu Padre sabe lo que necesitas; descansa en su cuidado fiel.",
+    "reference": "Mateo 6:31-32",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 144,
+    "text": "Amar su palabra te da gran paz; camina sin tropiezos.",
+    "reference": "Salmo 119:165",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 145,
+    "text": "Que el Dios de la esperanza te llene de gozo y paz al creer.",
+    "reference": "Romanos 15:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 146,
+    "text": "Dios te ciñe de poder; afirma tu senda cuando flaqueas.",
+    "reference": "Salmo 18:32",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 147,
+    "text": "Vives por la fe en el Hijo; su amor guía tu día.",
+    "reference": "Gálatas 2:20",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 148,
+    "text": "Entrega tu carga al Señor; Él te sostiene y no te deja caer.",
+    "reference": "Salmo 55:22",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 149,
+    "text": "El nombre del Señor es torre segura; corre a Él y estarás a salvo.",
+    "reference": "Proverbios 18:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 150,
+    "text": "Si Dios está contigo, ¿quién contra ti? Camina en su amor.",
+    "reference": "Romanos 8:31",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 151,
+    "text": "Espera en Dios; aún alabarás su salvación y su ayuda.",
+    "reference": "Salmo 42:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 152,
+    "text": "Den gracias al Señor, porque Él es bueno; su amor no falla.",
+    "reference": "Salmo 118:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 153,
+    "text": "Del Señor proviene la sabiduría; su boca da conocimiento.",
+    "reference": "Proverbios 2:6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 154,
+    "text": "Dios suplirá lo que necesitas conforme a su riqueza en gloria.",
+    "reference": "Filipenses 4:19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 155,
+    "text": "Que la paz de Cristo gobierne tu corazón hoy y siempre.",
+    "reference": "Colosenses 3:15",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 156,
+    "text": "Mi alma espera en su palabra; en Él encuentro aliento.",
+    "reference": "Salmo 130:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 157,
+    "text": "Su gracia te basta; su poder se perfecciona en tu debilidad.",
+    "reference": "2 Corintios 12:9",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 158,
+    "text": "Sin fe es imposible agradar a Dios; acércate creyendo.",
+    "reference": "Hebreos 11:6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 159,
+    "text": "Cuando temes, confía en Dios; su fidelidad te sostiene.",
+    "reference": "Salmo 56:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 160,
+    "text": "El Señor es tu sombra protectora; Él guarda tu paso.",
+    "reference": "Salmo 121:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 161,
+    "text": "Dios te amó primero; su amor inicia todo lo bueno en ti.",
+    "reference": "1 Juan 4:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 162,
+    "text": "Sé fuerte y valiente; Dios está contigo donde vayas.",
+    "reference": "Josué 1:9",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 163,
+    "text": "No olvides sus beneficios; el Señor es fiel contigo.",
+    "reference": "Salmo 103:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 164,
+    "text": "La sabiduría de lo alto es pura, pacífica y amable.",
+    "reference": "Santiago 3:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 165,
+    "text": "Busca primero a Dios; lo demás vendrá por añadidura.",
+    "reference": "Mateo 6:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 166,
+    "text": "En Cristo tienes paz con Dios; camina en su amistad.",
+    "reference": "Romanos 5:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 167,
+    "text": "Que te llene de gozo y paz al creer, por el Espíritu Santo.",
+    "reference": "Romanos 15:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 168,
+    "text": "Dios es tu amparo; siempre listo para ayudarte.",
+    "reference": "Salmo 46:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 169,
+    "text": "Una fe pequeña puede mover lo grande cuando confías en Dios.",
+    "reference": "Mateo 17:20",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 170,
+    "text": "Reconócelo en tus caminos; Él endereza tu senda.",
+    "reference": "Proverbios 3:5-6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 171,
+    "text": "El ángel del Señor te rodea y te defiende.",
+    "reference": "Salmo 34:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 172,
+    "text": "Nada podrá separarte del amor de Dios en Cristo.",
+    "reference": "Romanos 8:39",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 173,
+    "text": "Esfuérzate; Él fortalece a los que confían en Él.",
+    "reference": "Salmo 31:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 174,
+    "text": "Da gracias en todo; Dios te acompaña en cada paso.",
+    "reference": "1 Tesalonicenses 5:18",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 175,
+    "text": "Abraza la sabiduría; te guardará en el buen camino.",
+    "reference": "Proverbios 4:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 176,
+    "text": "No te faltará; el Señor cuida a los suyos.",
+    "reference": "Salmo 37:25",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 177,
+    "text": "Dios guarda en perfecta paz al que confía en Él.",
+    "reference": "Isaías 26:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 178,
+    "text": "Grande es su fidelidad; cada amanecer te renueva.",
+    "reference": "Lamentaciones 3:22-23",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 179,
+    "text": "Él te reviste de poder y afirma tus pasos.",
+    "reference": "Salmo 18:32",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 180,
+    "text": "Cree al orar; Dios responde en su buen tiempo.",
+    "reference": "Marcos 11:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 181,
+    "text": "Derrama tu corazón ante Él; Dios es tu refugio.",
+    "reference": "Salmo 62:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 182,
+    "text": "Quien habita al abrigo de Dios descansa bajo su sombra protectora.",
+    "reference": "Salmo 91:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 183,
+    "text": "Si te dio a su Hijo, ¿cómo no te dará también lo demás?",
+    "reference": "Romanos 8:32",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 184,
+    "text": "No temas; Dios te sostiene con su mano fiel y te ayuda.",
+    "reference": "Isaías 41:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 185,
+    "text": "Da gracias al Señor; su amor no se agota jamás.",
+    "reference": "Salmo 136:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 186,
+    "text": "Pide sabiduría; Dios da sin reproche y guía tus decisiones.",
+    "reference": "Santiago 1:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 187,
+    "text": "El Padre celestial da cosas buenas a quienes piden con fe.",
+    "reference": "Mateo 7:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 188,
+    "text": "La paz de Dios cuida tu mente y tu corazón en Cristo Jesús.",
+    "reference": "Filipenses 4:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 189,
+    "text": "Tu esperanza en Cristo es ancla firme en toda tormenta.",
+    "reference": "Hebreos 6:19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 190,
+    "text": "El gozo del Señor es tu fuerza; deja que su alegría te renueve.",
+    "reference": "Nehemías 8:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 191,
+    "text": "Cree cuando ores; recibirás conforme a su voluntad buena.",
+    "reference": "Mateo 21:22",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 192,
+    "text": "Confía en Dios de todo corazón; Él endereza tus caminos.",
+    "reference": "Proverbios 3:5-6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 193,
+    "text": "El Señor guarda tu salida y tu entrada hoy y siempre.",
+    "reference": "Salmo 121:7-8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 194,
+    "text": "Permanece en el amor de Dios; su amor permanece en ti.",
+    "reference": "1 Juan 4:16",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 195,
+    "text": "Dios está cerca del que tiene el corazón quebrantado.",
+    "reference": "Salmo 34:18",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 196,
+    "text": "Hazlo todo dando gracias; honra a Dios con tus obras.",
+    "reference": "Colosenses 3:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 197,
+    "text": "Encomienda a Dios tus planes; Él afirmará lo que emprendas.",
+    "reference": "Proverbios 16:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 198,
+    "text": "Dios puede hacer que sobre toda gracia para todo lo necesario.",
+    "reference": "2 Corintios 9:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 199,
+    "text": "Cristo te da su paz; no se turbe tu corazón ni tenga miedo.",
+    "reference": "Juan 14:27",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 200,
+    "text": "Que el Dios de la esperanza te llene de alegría al creer.",
+    "reference": "Romanos 15:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 201,
+    "text": "El Señor es roca y fortaleza; en Él te apoyas sin temor.",
+    "reference": "Salmo 18:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 202,
+    "text": "Fija la mirada en Jesús, quien perfecciona tu fe.",
+    "reference": "Hebreos 12:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 203,
+    "text": "Derrama tu corazón ante Él; Dios es tu refugio seguro.",
+    "reference": "Salmo 62:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 204,
+    "text": "Aunque atravieses valle oscuro, Él está contigo y te consuela.",
+    "reference": "Salmo 23:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 205,
+    "text": "Conoce cuánto te ama Dios; su amor te llena por completo.",
+    "reference": "Efesios 3:18-19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 206,
+    "text": "En Cristo tienes victoria; cobra ánimo en su palabra.",
+    "reference": "Juan 16:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 207,
+    "text": "Da gracias por su bondad; su amor fiel te sostiene.",
+    "reference": "Salmo 107:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 208,
+    "text": "Honrar a Dios te guía a la sabiduría cotidiana.",
+    "reference": "Proverbios 1:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 209,
+    "text": "Dios abre su mano y sacia tu necesidad con bondad.",
+    "reference": "Salmo 145:16",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 210,
+    "text": "La justicia de Dios trae paz y confianza a tu vida.",
+    "reference": "Isaías 32:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 211,
+    "text": "Sus planes buscan tu bien; confía en su futuro para ti.",
+    "reference": "Jeremías 29:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 212,
+    "text": "Dios es la roca de tu corazón, tu porción para siempre.",
+    "reference": "Salmo 73:26",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 213,
+    "text": "La paz de Cristo es para ti hoy; deja que calme tu corazón.",
+    "reference": "Juan 14:27",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 214,
+    "text": "Entrega tu camino al Señor; confía y Él hará lo necesario.",
+    "reference": "Salmo 37:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 215,
+    "text": "Dios da fuerzas al cansado; renueva tu paso con su ayuda.",
+    "reference": "Isaías 40:29",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 216,
+    "text": "Agradar a Dios es confiar en Él; acércate creyendo y espera.",
+    "reference": "Hebreos 11:6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 217,
+    "text": "El Señor te protege; ni el sol ni la noche te dañarán.",
+    "reference": "Salmo 121:5-6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 218,
+    "text": "Dios mostró su amor por ti; su gracia te sostiene siempre.",
+    "reference": "Romanos 5:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 219,
+    "text": "Sé valiente; no temas, el Señor está contigo en tu camino.",
+    "reference": "Josué 1:9",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 220,
+    "text": "Recuerda sus bondades; la gratitud ilumina tu jornada.",
+    "reference": "Salmo 103:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 221,
+    "text": "Pide sabiduría; Dios da con generosidad y buen consejo.",
+    "reference": "Santiago 1:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 222,
+    "text": "Busca primero a Dios; lo demás llegará en su tiempo fiel.",
+    "reference": "Mateo 6:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 223,
+    "text": "Su paz cuida tu mente y corazón; descansa en Cristo.",
+    "reference": "Filipenses 4:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 224,
+    "text": "Dios de esperanza te llena de gozo cuando confías.",
+    "reference": "Romanos 15:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 225,
+    "text": "El gozo del Señor te fortalece; sonríe y avanza en fe.",
+    "reference": "Nehemías 8:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 226,
+    "text": "Cree cuando ores; Dios responde con amor perfecto.",
+    "reference": "Marcos 11:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 227,
+    "text": "Cuando temas, apóyate en Dios; Él no falla.",
+    "reference": "Salmo 56:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 228,
+    "text": "Dios es tu escudo y levanta tu cabeza con ternura.",
+    "reference": "Salmo 3:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 229,
+    "text": "Permanece en el amor de Dios; te guarda y te guía.",
+    "reference": "1 Juan 4:16",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 230,
+    "text": "Dios está cerca del que sufre; Él sana tu corazón.",
+    "reference": "Salmo 34:18",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 231,
+    "text": "Da gracias en todo; Dios camina contigo a cada paso.",
+    "reference": "1 Tesalonicenses 5:18",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 232,
+    "text": "Del Señor viene la sabiduría; escucha su voz hoy.",
+    "reference": "Proverbios 2:6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 233,
+    "text": "No te faltará lo necesario; Dios cuida de los suyos.",
+    "reference": "Salmo 37:25",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 234,
+    "text": "Deja que su paz gobierne tu corazón con calma.",
+    "reference": "Colosenses 3:15",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 235,
+    "text": "Cada mañana renueva su amor; en Él hay esperanza.",
+    "reference": "Lamentaciones 3:22-23",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 236,
+    "text": "Dios te reviste de fuerza y afirma tus pasos.",
+    "reference": "Salmo 18:32",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 237,
+    "text": "Mira a Jesús; Él perfecciona tu fe cada día.",
+    "reference": "Hebreos 12:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 238,
+    "text": "Abre tu corazón ante Él; es tu refugio seguro.",
+    "reference": "Salmo 62:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 239,
+    "text": "Aunque el valle sea oscuro, Dios te acompaña y consuela.",
+    "reference": "Salmo 23:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 240,
+    "text": "Su amor te llena por completo; confía en su abrazo fiel.",
+    "reference": "Efesios 3:18-19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 241,
+    "text": "Cristo venció; ten ánimo, no estás solo.",
+    "reference": "Juan 16:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 242,
+    "text": "Agradece su bondad; su amor constante te sostiene.",
+    "reference": "Salmo 107:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 243,
+    "text": "Honrar a Dios abre camino a una vida sensata y clara.",
+    "reference": "Proverbios 1:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 244,
+    "text": "El pan de cada día viene de Dios; confía en su cuidado tierno.",
+    "reference": "Mateo 6:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 245,
+    "text": "Dios habla paz a su pueblo; escucha su voz que calma.",
+    "reference": "Salmo 85:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 246,
+    "text": "Espera en Dios; aún alabarás su ayuda y salvación.",
+    "reference": "Salmo 42:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 247,
+    "text": "Esfuérzate y cobra ánimo; Dios sostiene a quien confía.",
+    "reference": "Salmo 31:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 248,
+    "text": "La fe crece al oír su palabra; aliméntate de su verdad.",
+    "reference": "Romanos 10:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 249,
+    "text": "Dios es tu salvación; confía y no temas, Él te fortalece.",
+    "reference": "Isaías 12:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 250,
+    "text": "No dejará que resbale tu pie; su cuidado no se duerme.",
+    "reference": "Salmo 121:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 251,
+    "text": "Nada puede separarte del amor de Dios en Cristo.",
+    "reference": "Romanos 8:39",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 252,
+    "text": "Di a tu corazón: no temas; mira a tu Dios que te salva.",
+    "reference": "Isaías 35:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 253,
+    "text": "Bueno es dar gracias al Señor y cantar a su nombre.",
+    "reference": "Salmo 92:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 254,
+    "text": "Dichoso quien halla sabiduría; su senda es paz y bien.",
+    "reference": "Proverbios 3:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 255,
+    "text": "Quien busca al Señor no carece de bien; descansa en Él.",
+    "reference": "Salmo 34:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 256,
+    "text": "Dios da perfecta paz al que confía y fija su mente en Él.",
+    "reference": "Isaías 26:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 257,
+    "text": "La Escritura da consuelo y esperanza a tu corazón.",
+    "reference": "Romanos 15:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 258,
+    "text": "El Señor te reviste de poder; afirma tus pasos cada día.",
+    "reference": "Salmo 18:32",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 259,
+    "text": "Al que cree, todo le es posible; confía en el Señor.",
+    "reference": "Marcos 9:23",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 260,
+    "text": "Solo Él es roca y salvación; no resbalarás grandemente.",
+    "reference": "Salmo 62:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 261,
+    "text": "Bajo sus alas hallarás abrigo; su fidelidad te cubre.",
+    "reference": "Salmo 91:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 262,
+    "text": "Con amor eterno te amó; por eso te sigue mostrando bondad.",
+    "reference": "Jeremías 31:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 263,
+    "text": "En Cristo hay victoria; cobra ánimo en su palabra fiel.",
+    "reference": "Juan 16:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 264,
+    "text": "Que la paz gobierne tu corazón y la gratitud tu voz.",
+    "reference": "Colosenses 3:15",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 265,
+    "text": "Obtén sabiduría; te guardará en decisiones y pasos.",
+    "reference": "Proverbios 4:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 266,
+    "text": "Dios hará que abunde lo necesario para toda buena obra.",
+    "reference": "2 Corintios 9:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 267,
+    "text": "Tienes paz con Dios por medio de Cristo; camina confiado.",
+    "reference": "Romanos 5:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 268,
+    "text": "Espera en el Señor; en Él hay amor y completa redención.",
+    "reference": "Salmo 130:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 269,
+    "text": "Espera en Dios; fortalece tu corazón y persevera.",
+    "reference": "Salmo 27:14",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 270,
+    "text": "Vives por fe en el Hijo de Dios; su amor te guía.",
+    "reference": "Gálatas 2:20",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 271,
+    "text": "El nombre del Señor es torre segura; corre a Él y descansa.",
+    "reference": "Proverbios 18:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 272,
+    "text": "No temerás mal alguno; su vara y cayado te infunden aliento.",
+    "reference": "Salmo 23:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 273,
+    "text": "Dios, rico en misericordia, te dio vida por su gran amor.",
+    "reference": "Efesios 2:4-5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 274,
+    "text": "La paz que Cristo te da no se agota; recibe su calma hoy.",
+    "reference": "Juan 14:27",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 275,
+    "text": "Confía en el Señor y haz el bien; habitarás seguro.",
+    "reference": "Salmo 37:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 276,
+    "text": "Dios es tu amparo y fortaleza; ayuda presente en la angustia.",
+    "reference": "Salmo 46:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 277,
+    "text": "La fe ve lo que no se ve; abraza su promesa con calma.",
+    "reference": "Hebreos 11:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 278,
+    "text": "No te alcanzará el mal; el Señor es tu resguardo fiel.",
+    "reference": "Salmo 91:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 279,
+    "text": "Nada te separa del amor de Dios; camina en esa certeza.",
+    "reference": "Romanos 8:38-39",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 280,
+    "text": "Dile a tu corazón: no temas; tu Dios viene a salvarte.",
+    "reference": "Isaías 35:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 281,
+    "text": "Entra con gratitud a su presencia; Él es bueno.",
+    "reference": "Salmo 100:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 282,
+    "text": "Dios da sabiduría; su palabra ilumina tu entendimiento.",
+    "reference": "Proverbios 2:6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 283,
+    "text": "Dios suplirá lo que te falte; confía en su fidelidad.",
+    "reference": "Filipenses 4:19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 284,
+    "text": "En Cristo tienes paz con Dios; vive en su amistad.",
+    "reference": "Romanos 5:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 285,
+    "text": "Sus planes buscan tu bien; espera en su futuro.",
+    "reference": "Jeremías 29:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 286,
+    "text": "Los que esperan en Dios renuevan su vigor como águilas.",
+    "reference": "Isaías 40:31",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 287,
+    "text": "Cree cuando ores; Dios responde a su tiempo.",
+    "reference": "Marcos 11:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 288,
+    "text": "Derrama tu corazón ante Él; es refugio seguro.",
+    "reference": "Salmo 62:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 289,
+    "text": "Su nombre es torre fuerte; el justo corre y está a salvo.",
+    "reference": "Proverbios 18:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 290,
+    "text": "El amor comienza en Dios; Él te amó primero.",
+    "reference": "1 Juan 4:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 291,
+    "text": "Espera y cobra ánimo; Él fortalece tu corazón.",
+    "reference": "Salmo 27:14",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 292,
+    "text": "Agradece en todo; Dios obra aun en lo pequeño.",
+    "reference": "1 Tesalonicenses 5:18",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 293,
+    "text": "La sabiduría de arriba es pura y pacífica; abrázala.",
+    "reference": "Santiago 3:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 294,
+    "text": "Tu Padre sabe dar cosas buenas; pide con fe.",
+    "reference": "Mateo 7:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 295,
+    "text": "Dios guarda en paz al que en Él confía.",
+    "reference": "Isaías 26:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 296,
+    "text": "Que te llene de esperanza al creer por su Espíritu.",
+    "reference": "Romanos 15:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 297,
+    "text": "Su gracia te basta; su poder se perfecciona en ti.",
+    "reference": "2 Corintios 12:9",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 298,
+    "text": "Vives por fe en el Hijo; su amor te guía.",
+    "reference": "Gálatas 2:20",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 299,
+    "text": "Cuando temes, confía en Dios; Él es fiel.",
+    "reference": "Salmo 56:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 300,
+    "text": "No temerás en el valle; Él te acompaña y consuela.",
+    "reference": "Salmo 23:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 301,
+    "text": "Dios, rico en misericordia, te dio vida por amor.",
+    "reference": "Efesios 2:4-5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 302,
+    "text": "Cristo venció; ten ánimo en su victoria por ti.",
+    "reference": "Juan 16:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 303,
+    "text": "Da gracias al Señor; su amor permanece.",
+    "reference": "Salmo 107:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 304,
+    "text": "Honrar a Dios es inicio de la sabiduría; avanza en su luz.",
+    "reference": "Proverbios 1:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 305,
+    "text": "Mi esperanza está en el Señor; en su palabra descansa mi alma.",
+    "reference": "Salmo 39:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 306,
+    "text": "Dios me ciñe de poder y hace perfecto mi camino.",
+    "reference": "Salmo 18:32",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 307,
+    "text": "Para el que cree, todo es posible; confía en Dios.",
+    "reference": "Marcos 9:23",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 308,
+    "text": "Solo Él es mi roca y salvación; no resbalaré.",
+    "reference": "Salmo 62:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 309,
+    "text": "El Señor me guardará de todo mal; Él cuida mi vida.",
+    "reference": "Salmo 121:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 310,
+    "text": "Nada me separará del amor de Dios en Cristo Jesús.",
+    "reference": "Romanos 8:39",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 311,
+    "text": "No temas; Dios te fortalece, te ayuda y te sostiene.",
+    "reference": "Isaías 41:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 312,
+    "text": "Dad gracias en todo; esta es la voluntad de Dios.",
+    "reference": "1 Tesalonicenses 5:18",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 313,
+    "text": "Del Señor proviene la sabiduría; Él da conocimiento.",
+    "reference": "Proverbios 2:6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 314,
+    "text": "Buscad primero su reino; todo lo demás será añadido.",
+    "reference": "Mateo 6:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 315,
+    "text": "Justificados por la fe, tenemos paz con Dios por Cristo.",
+    "reference": "Romanos 5:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 316,
+    "text": "La Escritura trae consuelo y esperanza a nuestro corazón.",
+    "reference": "Romanos 15:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 317,
+    "text": "Su gracia me basta; su poder se perfecciona en mi debilidad.",
+    "reference": "2 Corintios 12:9",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 318,
+    "text": "Puestos los ojos en Jesús, autor y consumador de la fe.",
+    "reference": "Hebreos 12:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 319,
+    "text": "Confía en el Señor de todo corazón; Él endereza tus veredas.",
+    "reference": "Proverbios 3:5-6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 320,
+    "text": "Bajo sus alas hallas abrigo; su fidelidad es escudo.",
+    "reference": "Salmo 91:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 321,
+    "text": "En esto consiste el amor: Dios nos amó primero en Cristo.",
+    "reference": "1 Juan 4:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 322,
+    "text": "En el mundo tendréis aflicción; confiad, yo he vencido.",
+    "reference": "Juan 16:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 323,
+    "text": "Dad gracias al Señor, porque es bueno; su amor es eterno.",
+    "reference": "Salmo 107:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 324,
+    "text": "La sabiduría de lo alto es pura, pacífica, amable y sincera.",
+    "reference": "Santiago 3:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 325,
+    "text": "Mi Dios suplirá todo lo que os falta conforme a su riqueza.",
+    "reference": "Filipenses 4:19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 326,
+    "text": "Tú guardarás en completa paz al que en ti confía.",
+    "reference": "Isaías 26:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 327,
+    "text": "En su palabra he esperado; en Él halla reposo mi alma.",
+    "reference": "Salmo 130:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 328,
+    "text": "Espera en el Señor; esfuérzate y Él fortalecerá tu corazón.",
+    "reference": "Salmo 27:14",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 329,
+    "text": "Todo lo que pidáis orando, creed que lo recibiréis.",
+    "reference": "Marcos 11:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 330,
+    "text": "Confiad en Él en todo tiempo; derramad vuestro corazón.",
+    "reference": "Salmo 62:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 331,
+    "text": "Aunque ande en valle de sombra, no temeré; tú estás conmigo.",
+    "reference": "Salmo 23:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 332,
+    "text": "Conoced el amor de Cristo, que excede a todo conocimiento.",
+    "reference": "Efesios 3:18-19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 333,
+    "text": "Cobrad ánimo; Él fortalece a todos los que esperan en Él.",
+    "reference": "Salmo 31:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 334,
+    "text": "Hacedlo todo en el nombre del Señor, dando gracias a Dios.",
+    "reference": "Colosenses 3:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 335,
+    "text": "Gloria a Dios en las alturas; su paz alcanza tu corazón hoy.",
+    "reference": "Lucas 2:14",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 336,
+    "text": "Cuando temo, confío en ti; tu fidelidad me sostiene.",
+    "reference": "Salmo 56:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 337,
+    "text": "Los que esperan en el Señor renuevan fuerzas; caminan sin cansarse.",
+    "reference": "Isaías 40:31",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 338,
+    "text": "Dios recompensa a quien le busca; acércate con fe sencilla.",
+    "reference": "Hebreos 11:6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 339,
+    "text": "El Señor guardará tu salida y tu entrada, ahora y siempre.",
+    "reference": "Salmo 121:7-8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 340,
+    "text": "Dios te amó y dio a su Hijo; en Él hallas vida y esperanza.",
+    "reference": "Juan 3:16",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 341,
+    "text": "En el mundo hay aflicción, pero en Cristo tienes victoria.",
+    "reference": "Juan 16:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 342,
+    "text": "Entrad por sus puertas con acción de gracias; Él es fiel.",
+    "reference": "Salmo 100:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 343,
+    "text": "Si te falta sabiduría, pídela; Dios da generosamente y guía.",
+    "reference": "Santiago 1:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 344,
+    "text": "Mi Dios suplirá lo que te falte, conforme a su riqueza en gloria.",
+    "reference": "Filipenses 4:19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 345,
+    "text": "Justificado por la fe, tienes paz con Dios por medio de Cristo.",
+    "reference": "Romanos 5:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 346,
+    "text": "Que te llene de esperanza y paz al creer, por su Espíritu.",
+    "reference": "Romanos 15:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 347,
+    "text": "Dios te da fuerzas y allana tu camino en su bondad.",
+    "reference": "Salmo 18:32",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 348,
+    "text": "Cree al orar; Dios escucha y obra con amor perfecto.",
+    "reference": "Marcos 11:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 349,
+    "text": "Confía en el Señor; Él endereza tus sendas.",
+    "reference": "Proverbios 3:5-6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 350,
+    "text": "Aunque el valle oscurezca, su vara y cayado te consuelan.",
+    "reference": "Salmo 23:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 351,
+    "text": "Por su gran amor, Dios te dio vida con Cristo.",
+    "reference": "Efesios 2:4-5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 352,
+    "text": "No temas, no desmayes; Él te sostiene con su mano fiel.",
+    "reference": "Isaías 41:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 353,
+    "text": "Dad gracias al Señor; bueno es, su amor es eterno.",
+    "reference": "Salmo 107:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 354,
+    "text": "La sabiduría es principal; abrázala y anda seguro.",
+    "reference": "Proverbios 4:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 355,
+    "text": "Tu Padre sabe dar cosas buenas; pide con fe y paz.",
+    "reference": "Mateo 7:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 356,
+    "text": "Al que en Él confía, Dios lo guarda en completa paz.",
+    "reference": "Isaías 26:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 357,
+    "text": "La esperanza en Cristo es ancla firme y segura.",
+    "reference": "Hebreos 6:19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 358,
+    "text": "Su gracia te basta; su poder se perfecciona en ti.",
+    "reference": "2 Corintios 12:9",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 359,
+    "text": "Vives por la fe en el Hijo; su amor guía tu paso.",
+    "reference": "Gálatas 2:20",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 360,
+    "text": "Derrama tu corazón ante Él; es tu refugio.",
+    "reference": "Salmo 62:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 361,
+    "text": "Bajo sus alas hallas abrigo; su fidelidad te cubre.",
+    "reference": "Salmo 91:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 362,
+    "text": "Si Dios es por ti, ¿quién contra ti? Descansa en su amor.",
+    "reference": "Romanos 8:31",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 363,
+    "text": "Cobrad ánimo; el Señor fortalece a los que esperan en Él.",
+    "reference": "Salmo 31:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 364,
+    "text": "Haced todo dando gracias; honrad a Dios en lo cotidiano.",
+    "reference": "Colosenses 3:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 365,
+    "text": "El temor del Señor es principio de la sabiduría; andad en su luz.",
+    "reference": "Proverbios 1:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 366,
+    "text": "El Señor da fortaleza a su pueblo; el Señor bendice a su pueblo con paz.",
+    "reference": "Salmo 29:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 367,
+    "text": "El día que temo, yo en ti confío.",
+    "reference": "Salmo 56:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 368,
+    "text": "El Señor es tu fortaleza; hace tus pies como de cierva para andar en alturas.",
+    "reference": "Habacuc 3:19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 369,
+    "text": "La esperanza no defrauda, porque el amor de Dios ha sido derramado en tu corazón.",
+    "reference": "Romanos 5:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 370,
+    "text": "Da gracias al Señor, porque es bueno; porque para siempre es su misericordia.",
+    "reference": "Salmo 136:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 371,
+    "text": "El Señor va delante de ti; no te dejará ni te desamparará. No temas ni te intimides.",
+    "reference": "Deuteronomio 31:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 372,
+    "text": "Si te falta sabiduría, pídela a Dios, quien la da generosamente.",
+    "reference": "Santiago 1:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 373,
+    "text": "El Señor es tu pastor; nada te faltará.",
+    "reference": "Salmo 23:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 374,
+    "text": "La paz de Dios guardará tu corazón y tus pensamientos en Cristo Jesús.",
+    "reference": "Filipenses 4:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 375,
+    "text": "Encomienda al Señor tu camino; confía en Él, y Él actuará.",
+    "reference": "Salmo 37:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 376,
+    "text": "No temas, porque yo estoy contigo; yo te fortaleceré y te ayudaré.",
+    "reference": "Isaías 41:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 377,
+    "text": "Yo sé los planes que tengo para ti: planes de bienestar y no de mal, para darte un futuro y una esperanza.",
+    "reference": "Jeremías 29:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 378,
+    "text": "Entra por sus puertas con acción de gracias, por sus atrios con alabanza.",
+    "reference": "Salmo 100:4",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 379,
+    "text": "En el mundo tendrás aflicción; pero confía, yo he vencido al mundo.",
+    "reference": "Juan 16:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 380,
+    "text": "Reconócelo en todos tus caminos, y Él enderezará tus sendas.",
+    "reference": "Proverbios 3:6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 381,
+    "text": "Busca primero el reino de Dios y su justicia, y todo te será añadido.",
+    "reference": "Mateo 6:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 382,
+    "text": "Que la paz de Cristo gobierne en tu corazón.",
+    "reference": "Colosenses 3:15",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 383,
+    "text": "Los que confían en el Señor son como el monte Sion, que no se mueve, sino que permanece para siempre.",
+    "reference": "Salmo 125:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 384,
+    "text": "Fortalécete en el Señor y en el poder de su fuerza.",
+    "reference": "Efesios 6:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 385,
+    "text": "Que el Dios de esperanza te llene de todo gozo y paz en el creer.",
+    "reference": "Romanos 15:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 386,
+    "text": "Da gracias en todo, porque esta es la voluntad de Dios para contigo en Cristo Jesús.",
+    "reference": "1 Tesalonicenses 5:18",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 387,
+    "text": "Él da esfuerzo al cansado, y multiplica las fuerzas al que no tiene ningunas.",
+    "reference": "Isaías 40:29",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 388,
+    "text": "Porque el Señor da la sabiduría; de su boca viene el conocimiento y la inteligencia.",
+    "reference": "Proverbios 2:6",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 389,
+    "text": "Mi Dios suplirá todo lo que os falta conforme a sus riquezas en gloria en Cristo Jesús.",
+    "reference": "Filipenses 4:19",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 390,
+    "text": "Tú guardarás en completa paz a aquel cuyo pensamiento en Ti persevera, porque en Ti ha confiado.",
+    "reference": "Isaías 26:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 391,
+    "text": "Dios es nuestro amparo y fortaleza, nuestro pronto auxilio en las tribulaciones. Por tanto, no temeremos.",
+    "reference": "Salmo 46:1-2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 392,
+    "text": "Bástate mi gracia; porque mi poder se perfecciona en la debilidad.",
+    "reference": "2 Corintios 12:9",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 393,
+    "text": "Por la misericordia del Señor no hemos sido consumidos; nuevas son cada mañana; grande es su fidelidad.",
+    "reference": "Lamentaciones 3:22-23",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 394,
+    "text": "Bendice, alma mía, al Señor, y no olvides ninguno de sus beneficios.",
+    "reference": "Salmo 103:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 395,
+    "text": "Esfuérzate y sé valiente; no temas ni desmayes, porque el Señor tu Dios estará contigo.",
+    "reference": "Josué 1:9",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 396,
+    "text": "La sabiduría de lo alto es primeramente pura, después pacífica, amable, llena de misericordia.",
+    "reference": "Santiago 3:17",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 397,
+    "text": "No quitará el bien a los que andan en integridad.",
+    "reference": "Salmo 84:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 398,
+    "text": "Mi paz os doy; no como el mundo la da. No se turbe vuestro corazón.",
+    "reference": "Juan 14:27",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 399,
+    "text": "Encomienda al Señor tus obras, y tus pensamientos serán afirmados.",
+    "reference": "Proverbios 16:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 400,
+    "text": "Dios es el que me ciñe de poder, y quien hace perfecto mi camino.",
+    "reference": "Salmo 18:32",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 401,
+    "text": "Mantengamos firme la profesión de nuestra esperanza sin vacilar, porque fiel es el que prometió.",
+    "reference": "Hebreos 10:23",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 402,
+    "text": "Sed agradecidos; que la paz de Cristo gobierne en vuestros corazones.",
+    "reference": "Colosenses 3:15",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 403,
+    "text": "Esforzaos todos vosotros los que esperáis en el Señor, y tome aliento vuestro corazón.",
+    "reference": "Salmo 31:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 404,
+    "text": "Sabiduría ante todo; adquiere sabiduría, y sobre todas tus posesiones adquiere inteligencia.",
+    "reference": "Proverbios 4:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 405,
+    "text": "Vuestro Padre que está en los cielos dará buenas cosas a los que se las pidan.",
+    "reference": "Mateo 7:11",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 406,
+    "text": "El Dios de paz sea con todos vosotros.",
+    "reference": "Romanos 15:33",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 407,
+    "text": "No tendrá temor de malas noticias; su corazón está firme, confiado en el Señor.",
+    "reference": "Salmo 112:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 408,
+    "text": "Mi carne y mi corazón desfallecen; mas la roca de mi corazón y mi porción es Dios para siempre.",
+    "reference": "Salmo 73:26",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 409,
+    "text": "Nos hizo renacer para una esperanza viva por la resurrección de Jesucristo.",
+    "reference": "1 Pedro 1:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 410,
+    "text": "Alabad al Señor, porque él es bueno; porque para siempre es su misericordia.",
+    "reference": "Salmo 107:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 411,
+    "text": "Espera en el Señor; esfuérzate, y aliéntese tu corazón; sí, espera en el Señor.",
+    "reference": "Salmo 27:14",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 412,
+    "text": "Escucha el consejo y recibe la corrección, para que seas sabio en tu vejez.",
+    "reference": "Proverbios 19:20",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 413,
+    "text": "Dios puede hacer que abunde en vosotros toda gracia, a fin de que, teniendo siempre en todas las cosas todo lo suficiente, abundéis para toda buena obra.",
+    "reference": "2 Corintios 9:8",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 414,
+    "text": "El Señor de paz os dé siempre paz en toda manera.",
+    "reference": "2 Tesalonicenses 3:16",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 415,
+    "text": "Dios es mi salvación; confiaré, y no temeré; porque mi fortaleza y mi canción es el Señor.",
+    "reference": "Isaías 12:2",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 416,
+    "text": "El día que clamé, me respondiste; me fortaleciste con vigor en mi alma.",
+    "reference": "Salmo 138:3",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 417,
+    "text": "Esperé yo en el Señor; esperó mi alma, en su palabra he esperado.",
+    "reference": "Salmo 130:5",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 418,
+    "text": "Estemos agradecidos, y mediante ella sirvamos a Dios agradándole con temor y reverencia.",
+    "reference": "Hebreos 12:28",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 419,
+    "text": "Velad, estad firmes en la fe; portaos varonilmente, y esforzaos.",
+    "reference": "1 Corintios 16:13",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 420,
+    "text": "Lámpara es a mis pies tu palabra, y lumbrera a mi camino.",
+    "reference": "Salmo 119:105",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 421,
+    "text": "Los que buscan al Señor no tendrán falta de ningún bien.",
+    "reference": "Salmo 34:10",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 422,
+    "text": "Justificados por la fe, tenemos paz para con Dios por medio de nuestro Señor Jesucristo.",
+    "reference": "Romanos 5:1",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 423,
+    "text": "Bueno es el Señor, fortaleza en el día de la angustia; y conoce a los que en Él confían.",
+    "reference": "Nahúm 1:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 424,
+    "text": "El Señor es mi fortaleza y mi escudo; en Él confió mi corazón, y fui ayudado.",
+    "reference": "Salmo 28:7",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  },
+  {
+    "id": 425,
+    "text": "Esforzaos todos vosotros los que esperáis en el Señor, y tome aliento vuestro corazón.",
+    "reference": "Salmo 31:24",
+    "book": "",
+    "chapter": 0,
+    "verse": 0
+  }
+]

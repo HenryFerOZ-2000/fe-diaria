@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="#FFFFFFFF"
+    android:gravity="center"
+    android:minHeight="110dp">
+
+    <!-- Icono decorativo -->
+    <ImageView
+        android:id="@+id/widget_icon"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@android:drawable/ic_menu_view"
+        android:contentDescription="@string/widget_icon_description"
+        android:layout_marginBottom="6dp"
+        android:tint="#D4AF37" />
+
+    <!-- Texto del versículo -->
+    <TextView
+        android:id="@+id/widget_verse_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/widget_default_verse"
+        android:textColor="#2C1810"
+        android:textSize="13sp"
+        android:textStyle="normal"
+        android:gravity="center"
+        android:maxLines="4"
+        android:ellipsize="end"
+        android:lineSpacingMultiplier="1.4"
+        android:paddingHorizontal="4dp" />
+
+    <!-- Referencia del versículo -->
+    <TextView
+        android:id="@+id/widget_verse_reference"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/widget_default_reference"
+        android:textColor="#D4AF37"
+        android:textSize="11sp"
+        android:textStyle="bold|italic"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="8dp"
+        android:background="#D4AF3720"
+        android:paddingVertical="4dp" />
+
+</LinearLayout>
+

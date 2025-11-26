@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "title": "Oración de la Noche",
+    "text": "Señor, al finalizar este día, te doy gracias por todas las bendiciones recibidas. Perdona mis faltas y errores de hoy. Te pido que protejas mi descanso y el de mi familia. Que tu paz llene mi corazón y que mañana pueda despertar renovado para servirte mejor. Amén.",
+    "category": "noche",
+    "tags": ["descanso", "gratitud", "protección"]
+  },
+  {
+    "id": 2,
+    "title": "Oración antes de Dormir",
+    "text": "Dios mío, en tus manos encomiendo mi vida y la de mis seres queridos. Gracias por este día que me has regalado. Te pido que durante la noche me protejas de todo mal y que me des un sueño reparador. Que al despertar pueda comenzar un nuevo día con alegría y gratitud. Amén.",
+    "category": "noche",
+    "tags": ["descanso", "protección", "gratitud"]
+  },
+  {
+    "id": 3,
+    "title": "Oración de Paz Nocturna",
+    "text": "Señor, al acostarme esta noche, te pido que alejes de mi mente todas las preocupaciones y ansiedades. Llena mi corazón con tu paz que sobrepasa todo entendimiento. Que pueda descansar confiando en tu cuidado y protección. Bendice también a todos los que amo. Amén.",
+    "category": "noche",
+    "tags": ["paz", "descanso", "consuelo"]
+  },
+  {
+    "id": 4,
+    "title": "Oración de Agradecimiento Nocturna",
+    "text": "Gracias, Señor, por este día que ha terminado. Gracias por la salud, por el trabajo, por la familia, por todas las oportunidades que me diste. Perdona lo que hice mal y ayúdame a ser mejor mañana. Protege mi hogar y a todos los que duermen bajo este techo. Amén.",
+    "category": "noche",
+    "tags": ["gratitud", "protección", "familia"]
+  },
+  {
+    "id": 5,
+    "title": "Oración de Descanso",
+    "text": "Dios de misericordia, al finalizar este día, te entrego todas mis preocupaciones y cargas. Sé que Tú cuidas de mí y de los míos. Te pido un descanso reparador y que mañana pueda despertar con nuevas fuerzas para enfrentar los desafíos del nuevo día. Amén.",
+    "category": "noche",
+    "tags": ["descanso", "confianza", "renovación"]
+  },
+  {
+    "id": 6,
+    "title": "Oración de Protección Nocturna",
+    "text": "Señor, encomiendo mi vida y la de mi familia a tu cuidado esta noche. Protégenos de todo mal, de enfermedades, de accidentes y de cualquier peligro. Que tus ángeles velen sobre nosotros mientras descansamos. Que mañana despertemos sanos y salvos. Amén.",
+    "category": "noche",
+    "tags": ["protección", "familia", "seguridad"]
+  },
+  {
+    "id": 7,
+    "title": "Oración de Perdón Nocturna",
+    "text": "Señor, al terminar este día, reconozco que no siempre actué como debía. Te pido perdón por mis errores, por las palabras que no debí decir, por las acciones que no fueron correctas. Mañana quiero ser mejor, con tu ayuda y guía. Amén.",
+    "category": "noche",
+    "tags": ["perdón", "arrepentimiento", "mejora"]
+  },
+  {
+    "id": 8,
+    "title": "Oración de Esperanza Nocturna",
+    "text": "Dios mío, aunque este día tuvo sus dificultades, sé que Tú estás conmigo. Te pido que durante la noche renueves mis fuerzas y mi esperanza. Que al despertar pueda ver las cosas con nuevos ojos y con la confianza de que contigo todo es posible. Amén.",
+    "category": "noche",
+    "tags": ["esperanza", "renovación", "confianza"]
+  },
+  {
+    "id": 9,
+    "title": "Oración de Consuelo Nocturna",
+    "text": "Señor, si hoy pasé por momentos difíciles o dolorosos, te pido que me consueles esta noche. Sé que Tú conoces mi corazón y mis necesidades. Dame la paz que solo Tú puedes dar y la seguridad de que todo pasará. Amén.",
+    "category": "noche",
+    "tags": ["consuelo", "paz", "esperanza"]
+  },
+  {
+    "id": 10,
+    "title": "Oración de Bendición Nocturna",
+    "text": "Padre celestial, bendice esta noche de descanso. Bendice a mi familia, a mis amigos, a todos los que amo. Bendice también a quienes están pasando por dificultades. Que todos podamos descansar en tu amor y despertar renovados. Amén.",
+    "category": "noche",
+    "tags": ["bendición", "familia", "amor"]
+  }
+]

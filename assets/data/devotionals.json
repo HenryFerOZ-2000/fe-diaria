@@ -1,0 +1,123 @@
+[
+  {
+    "id": 1,
+    "title": "Confía en el Señor",
+    "verse": "Confía en el Señor de todo corazón y no te apoyes en tu propia inteligencia.",
+    "verseReference": "Proverbios 3:5",
+    "reflection": "En los momentos de incertidumbre, es fácil querer controlar todo con nuestra propia sabiduría. Sin embargo, Dios nos invita a confiar completamente en Él, reconociendo que Su plan es perfecto y que Él conoce el camino que debemos seguir.",
+    "tags": ["confianza", "fe", "sabiduría"]
+  },
+  {
+    "id": 2,
+    "title": "La paz que sobrepasa",
+    "verse": "Y la paz de Dios, que sobrepasa todo entendimiento, guardará vuestros corazones y vuestros pensamientos.",
+    "verseReference": "Filipenses 4:7",
+    "reflection": "La paz que viene de Dios no es como la paz del mundo. Es una paz profunda que calma nuestros corazones incluso en medio de las tormentas de la vida. Cuando entregamos nuestras preocupaciones a Dios, Él nos da esta paz que trasciende toda comprensión humana.",
+    "tags": ["paz", "consuelo", "esperanza"]
+  },
+  {
+    "id": 3,
+    "title": "Nuevas fuerzas",
+    "verse": "Pero los que esperan en el Señor renovarán sus fuerzas; levantarán alas como las águilas; correrán y no se cansarán, caminarán y no se fatigarán.",
+    "verseReference": "Isaías 40:31",
+    "reflection": "Cuando nos sentimos agotados física, emocional o espiritualmente, Dios promete renovar nuestras fuerzas. No es una fuerza temporal, sino una renovación completa que nos permite seguir adelante con esperanza y vigor.",
+    "tags": ["fuerza", "renovación", "esperanza"]
+  },
+  {
+    "id": 4,
+    "title": "El amor perfecto",
+    "verse": "En el amor no hay temor, sino que el amor perfecto echa fuera el temor.",
+    "verseReference": "1 Juan 4:18",
+    "reflection": "El miedo puede paralizarnos y robarnos la paz. Pero cuando comprendemos el amor perfecto de Dios por nosotros, ese amor disipa nuestros temores. Saber que somos amados incondicionalmente nos da la valentía para enfrentar cualquier situación.",
+    "tags": ["amor", "valentía", "libertad"]
+  },
+  {
+    "id": 5,
+    "title": "Buscad primero",
+    "verse": "Buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas.",
+    "verseReference": "Mateo 6:33",
+    "reflection": "A menudo nos preocupamos por nuestras necesidades materiales y nos olvidamos de lo más importante: buscar a Dios. Cuando ponemos a Dios en primer lugar, Él se encarga de proveer todo lo que necesitamos según Su perfecta voluntad.",
+    "tags": ["prioridades", "confianza", "provisión"]
+  },
+  {
+    "id": 6,
+    "title": "Todo es posible",
+    "verse": "Jesús le dijo: Si puedes creer, al que cree todo le es posible.",
+    "verseReference": "Marcos 9:23",
+    "reflection": "La fe tiene un poder transformador. No se trata de creer en nuestras propias capacidades, sino de creer en el poder de Dios que obra a través de nosotros. Con fe, incluso lo imposible se vuelve posible.",
+    "tags": ["fe", "posibilidades", "milagros"]
+  },
+  {
+    "id": 7,
+    "title": "Luz en la oscuridad",
+    "verse": "El Señor es mi luz y mi salvación; ¿de quién temeré?",
+    "verseReference": "Salmos 27:1",
+    "reflection": "En los momentos más oscuros de nuestra vida, Dios es nuestra luz. Él ilumina nuestro camino y nos guía hacia la salvación. Con Él como nuestra luz, no hay nada que debamos temer.",
+    "tags": ["luz", "protección", "valentía"]
+  },
+  {
+    "id": 8,
+    "title": "Gozo en la tribulación",
+    "verse": "Hermanos, tened por sumo gozo cuando os halléis en diversas pruebas.",
+    "verseReference": "Santiago 1:2",
+    "reflection": "Las pruebas y dificultades son parte de la vida, pero podemos encontrar gozo en ellas porque sabemos que producen paciencia, carácter y esperanza. Dios usa nuestras pruebas para fortalecernos y acercarnos más a Él.",
+    "tags": ["gozo", "fortaleza", "crecimiento"]
+  },
+  {
+    "id": 9,
+    "title": "El buen pastor",
+    "verse": "El Señor es mi pastor; nada me faltará.",
+    "verseReference": "Salmos 23:1",
+    "reflection": "Dios es nuestro pastor perfecto que cuida de cada una de nuestras necesidades. Como un buen pastor, Él nos guía, nos protege y nos provee. Con Él como nuestro pastor, podemos estar seguros de que nada nos faltará.",
+    "tags": ["provisión", "cuidado", "protección"]
+  },
+  {
+    "id": 10,
+    "title": "Renovados cada día",
+    "verse": "Por tanto, no desmayamos. Aunque nuestro hombre exterior se va desgastando, el interior se renueva de día en día.",
+    "verseReference": "2 Corintios 4:16",
+    "reflection": "Aunque nuestro cuerpo físico puede cansarse y desgastarse, nuestro espíritu se renueva constantemente cuando confiamos en Dios. Cada día es una oportunidad para experimentar Su renovación y fortaleza.",
+    "tags": ["renovación", "fortaleza", "esperanza"]
+  },
+  {
+    "id": 11,
+    "title": "Más que vencedores",
+    "verse": "Antes, en todas estas cosas somos más que vencedores por medio de aquel que nos amó.",
+    "verseReference": "Romanos 8:37",
+    "reflection": "No somos simples sobrevivientes, sino más que vencedores a través de Cristo. Su amor nos da la victoria sobre cualquier circunstancia, problema o dificultad que enfrentemos en la vida.",
+    "tags": ["victoria", "amor", "triunfo"]
+  },
+  {
+    "id": 12,
+    "title": "Planes de bienestar",
+    "verse": "Porque yo sé los planes que tengo para vosotros, planes de bienestar y no de mal, para daros un futuro y una esperanza.",
+    "verseReference": "Jeremías 29:11",
+    "reflection": "Dios tiene planes perfectos para cada uno de nosotros. Aunque a veces no entendamos el camino por el que nos lleva, podemos confiar en que Sus planes son para nuestro bienestar y nos conducen a un futuro lleno de esperanza.",
+    "tags": ["planes", "esperanza", "futuro"]
+  },
+  {
+    "id": 13,
+    "title": "Oración eficaz",
+    "verse": "La oración eficaz del justo puede mucho.",
+    "verseReference": "Santiago 5:16",
+    "reflection": "La oración no es solo palabras al aire, sino una comunicación poderosa con Dios. Cuando oramos con fe y con un corazón justo, nuestras oraciones tienen un poder transformador que puede cambiar situaciones y tocar vidas.",
+    "tags": ["oración", "poder", "fe"]
+  },
+  {
+    "id": 14,
+    "title": "Agradecidos siempre",
+    "verse": "Dad gracias en todo, porque esta es la voluntad de Dios para con vosotros.",
+    "verseReference": "1 Tesalonicenses 5:18",
+    "reflection": "La gratitud no depende de nuestras circunstancias, sino de nuestra actitud. Dios nos invita a ser agradecidos en todo momento, reconociendo Sus bendiciones incluso en medio de las dificultades.",
+    "tags": ["gratitud", "actitud", "bendición"]
+  },
+  {
+    "id": 15,
+    "title": "Siempre con nosotros",
+    "verse": "He aquí, yo estoy con vosotros todos los días, hasta el fin del mundo.",
+    "verseReference": "Mateo 28:20",
+    "reflection": "Jesús prometió estar con nosotros siempre, en cada momento de nuestra vida. No estamos solos en nuestro caminar. Su presencia constante nos da fuerza, consuelo y la seguridad de que nunca nos abandonará.",
+    "tags": ["presencia", "compañía", "consuelo"]
+  }
+]
+

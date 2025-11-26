@@ -1,0 +1,59 @@
+[
+  {
+    "id": 1,
+    "intention": "salud",
+    "title": "Oración por la Salud",
+    "text": "Señor, te pido que bendigas y restaures la salud de [nombre]. Tú eres el médico de médicos y conoces cada célula de nuestro cuerpo. Te pido sanidad física, emocional y espiritual. Que tu poder sanador se manifieste y que [nombre] pueda experimentar tu amor y cuidado en este momento de necesidad. Amén.",
+    "tags": ["salud", "sanidad", "curación"]
+  },
+  {
+    "id": 2,
+    "intention": "trabajo",
+    "title": "Oración por el Trabajo",
+    "text": "Dios mío, te pido que bendigas mi trabajo y el de todos los que laboran. Ayúdanos a ser diligentes, honestos y a trabajar como para Ti. Proporciónanos las oportunidades necesarias y la sabiduría para tomar buenas decisiones. Que nuestro trabajo sea una forma de servirte y de bendecir a otros. Amén.",
+    "tags": ["trabajo", "provisión", "bendición"]
+  },
+  {
+    "id": 3,
+    "intention": "exámenes",
+    "title": "Oración para Exámenes",
+    "text": "Señor, mientras me preparo para este examen, te pido que me des claridad mental, calma y confianza. Ayúdame a recordar lo que he estudiado y a mantener la tranquilidad. Sé que Tú me has dado la capacidad de aprender y que estás conmigo en este momento. Confío en tu ayuda. Amén.",
+    "tags": ["exámenes", "estudios", "sabiduría"]
+  },
+  {
+    "id": 4,
+    "intention": "familia",
+    "title": "Oración por la Familia",
+    "text": "Dios de amor, bendice a mi familia. Protege a cada uno de sus miembros, guárdalos de todo mal y llénalos de tu paz y amor. Ayúdanos a amarnos unos a otros, a perdonarnos y a apoyarnos mutuamente. Que nuestro hogar sea un lugar donde reine tu presencia y tu bendición. Amén.",
+    "tags": ["familia", "protección", "amor"]
+  },
+  {
+    "id": 5,
+    "intention": "hijos",
+    "title": "Oración por la Protección de los Hijos",
+    "text": "Señor, te encomiendo a mis hijos. Protégelos de todo mal, de enfermedades, de accidentes y de malas influencias. Guíalos por el camino correcto y ayúdalos a tomar buenas decisiones. Que crezcan en sabiduría, en estatura y en favor contigo y con los demás. Amén.",
+    "tags": ["hijos", "protección", "bendición"]
+  },
+  {
+    "id": 6,
+    "intention": "finanzas",
+    "title": "Oración por las Finanzas",
+    "text": "Dios proveedor, te pido que bendigas nuestras finanzas. Ayúdanos a ser buenos administradores de lo que nos has dado. Proporciónanos lo necesario para cubrir nuestras necesidades y para poder ayudar a otros. Enséñanos a confiar en tu provisión y a ser generosos con los demás. Amén.",
+    "tags": ["finanzas", "provisión", "bendición"]
+  },
+  {
+    "id": 7,
+    "intention": "relaciones",
+    "title": "Oración por las Relaciones",
+    "text": "Señor, te pido que bendigas mis relaciones con familia, amigos y conocidos. Ayúdame a ser paciente, comprensivo y amoroso. Restaura las relaciones que están rotas y fortalece las que están bien. Que pueda ser un instrumento de tu amor y paz en la vida de los demás. Amén.",
+    "tags": ["relaciones", "amor", "paz"]
+  },
+  {
+    "id": 8,
+    "intention": "decisión",
+    "title": "Oración para una Decisión Importante",
+    "text": "Dios mío, tengo una decisión importante que tomar. Te pido sabiduría y dirección. Ilumina mi mente para que pueda ver claramente el camino que debo seguir. Que mi decisión esté alineada con tu voluntad y que traiga bendición a mi vida y a la de otros. Amén.",
+    "tags": ["decisión", "sabiduría", "dirección"]
+  }
+]
+

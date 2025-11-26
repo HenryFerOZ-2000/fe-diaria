@@ -1,0 +1,75 @@
+[
+  {
+    "id": 1,
+    "emotion": "ansioso",
+    "title": "Oración para la Ansiedad",
+    "text": "Señor, en este momento de ansiedad y preocupación, te pido que calmes mi corazón. Sé que Tú estás en control de todas las cosas y que nada sucede sin tu conocimiento. Ayúdame a confiar en Ti y a descansar en tu paz que sobrepasa todo entendimiento. Dame la fuerza para enfrentar este momento con fe y esperanza. Amén.",
+    "verse": "No se preocupen por nada; en cambio, oren por todo. Díganle a Dios lo que necesitan y denle gracias por todo lo que él ha hecho.",
+    "verseReference": "Filipenses 4:6",
+    "tags": ["ansiedad", "paz", "confianza"]
+  },
+  {
+    "id": 2,
+    "emotion": "triste",
+    "title": "Oración para la Tristeza",
+    "text": "Dios mío, en este momento de tristeza, sé que Tú estás cerca de los quebrantados de corazón. Te pido que me consueles y me des la fuerza para seguir adelante. Recuerdo que Tú prometiste estar conmigo en todo momento, incluso en los más difíciles. Ayúdame a ver la luz al final del túnel y a confiar en tu amor incondicional. Amén.",
+    "verse": "El Señor está cerca de los quebrantados de corazón, y salva a los contritos de espíritu.",
+    "verseReference": "Salmos 34:18",
+    "tags": ["tristeza", "consuelo", "esperanza"]
+  },
+  {
+    "id": 3,
+    "emotion": "cansado",
+    "text": "Señor, me siento cansado y sin fuerzas. Te pido que renueves mis energías físicas, emocionales y espirituales. Sé que Tú prometiste darnos nuevas fuerzas cuando esperamos en Ti. Ayúdame a descansar en tu presencia y a confiar en que mañana será un nuevo día lleno de oportunidades. Amén.",
+    "title": "Oración para el Cansancio",
+    "verse": "Pero los que esperan en el Señor renovarán sus fuerzas; levantarán alas como las águilas.",
+    "verseReference": "Isaías 40:31",
+    "tags": ["cansancio", "renovación", "fuerza"]
+  },
+  {
+    "id": 4,
+    "emotion": "preocupado",
+    "title": "Oración para la Preocupación",
+    "text": "Dios mío, tengo muchas preocupaciones en mi mente y mi corazón. Te entrego todas estas cargas porque sé que Tú te preocupas por mí. Ayúdame a confiar en tu provisión y en tu cuidado. Dame la paz de saber que Tú estás en control y que todo saldrá bien según tu perfecta voluntad. Amén.",
+    "verse": "Echando toda vuestra ansiedad sobre él, porque él tiene cuidado de vosotros.",
+    "verseReference": "1 Pedro 5:7",
+    "tags": ["preocupación", "confianza", "paz"]
+  },
+  {
+    "id": 5,
+    "emotion": "agradecido",
+    "title": "Oración de Agradecimiento",
+    "text": "Señor, en este momento de gratitud, quiero darte gracias por todas las bendiciones que has derramado sobre mi vida. Gracias por la salud, por la familia, por las oportunidades, por tu amor incondicional. Ayúdame a mantener siempre un corazón agradecido y a reconocer tus bondades en cada día de mi vida. Amén.",
+    "verse": "Dad gracias en todo, porque esta es la voluntad de Dios para con vosotros.",
+    "verseReference": "1 Tesalonicenses 5:18",
+    "tags": ["gratitud", "alabanza", "bendición"]
+  },
+  {
+    "id": 6,
+    "emotion": "feliz",
+    "title": "Oración de Alegría",
+    "text": "Dios mío, te doy gracias por este momento de felicidad y alegría. Sé que toda buena dádiva viene de Ti. Ayúdame a compartir esta alegría con otros y a recordar que la verdadera felicidad se encuentra en tu presencia. Que esta alegría no sea temporal, sino que sea una expresión de la paz que viene de conocerte. Amén.",
+    "verse": "El gozo del Señor es vuestra fortaleza.",
+    "verseReference": "Nehemías 8:10",
+    "tags": ["felicidad", "alegría", "gratitud"]
+  },
+  {
+    "id": 7,
+    "emotion": "confundido",
+    "title": "Oración para la Confusión",
+    "text": "Señor, me siento confundido y no sé qué camino tomar. Te pido sabiduría y dirección. Ilumina mi mente y mi corazón para que pueda entender tu voluntad. Confío en que Tú me guiarás por el camino correcto y que me darás la claridad que necesito en este momento. Amén.",
+    "verse": "Si alguno de vosotros tiene falta de sabiduría, pídala a Dios, el cual da a todos abundantemente.",
+    "verseReference": "Santiago 1:5",
+    "tags": ["confusión", "sabiduría", "dirección"]
+  },
+  {
+    "id": 8,
+    "emotion": "miedo",
+    "title": "Oración para el Miedo",
+    "text": "Dios mío, en este momento de miedo e incertidumbre, te pido que me des valentía y fortaleza. Sé que Tú no me has dado un espíritu de temor, sino de poder, de amor y de dominio propio. Ayúdame a confiar en tu protección y a recordar que contigo no hay nada que deba temer. Amén.",
+    "verse": "Porque no nos ha dado Dios espíritu de cobardía, sino de poder, de amor y de dominio propio.",
+    "verseReference": "2 Timoteo 1:7",
+    "tags": ["miedo", "valentía", "protección"]
+  }
+]
+
