@@ -8,16 +8,16 @@ import 'services/notification_service.dart';
 import 'services/ads_service.dart';
 import 'services/widget_service.dart';
 import 'screens/home_screen.dart';
+import 'screens/chat_screen.dart';
+import 'screens/live_screen.dart';
+import 'screens/prayers_screen.dart';
+import 'screens/bible_screen.dart';
+import 'screens/profile_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/emotion_selection_screen.dart';
 import 'screens/prayer_for_you_screen.dart';
 import 'screens/category_prayers_screen.dart';
 import 'screens/traditional_prayers_religion_selection_screen.dart';
-import 'screens/chatbot_screen.dart';
-import 'screens/live_prayer_screen.dart';
-import 'screens/prayers_screen.dart';
-import 'screens/profile_screen.dart';
-import 'screens/home_today_redesign.dart';
 // import 'services/purchase_service.dart'; // Deshabilitado - opción de pago único removida
 import 'services/content_validator.dart';
 import 'services/daily_content_service.dart';
@@ -90,11 +90,7 @@ class MyApp extends StatelessWidget {
               '/prayer-for-you': (context) => const PrayerForYouScreen(),
               '/category-prayers': (context) => const CategoryPrayersScreen(),
               '/traditional-prayers-religion-selection': (context) => const TraditionalPrayersReligionSelectionScreen(),
-              '/chatbot': (context) => const ChatbotScreen(),
-              '/live-prayer': (context) => const LivePrayerScreen(),
-              '/prayers': (context) => const PrayersScreen(),
               '/profile': (context) => const ProfileScreen(),
-              '/today-redesign': (context) => const HomeTodayRedesign(),
             },
             navigatorObservers: [
               _NotificationNavigatorObserver(),
@@ -135,7 +131,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen>
     with TickerProviderStateMixin {
-  int _currentIndex = 0;
+  int _currentIndex = 2; // Default en "Hoy"
   int? _homeTabIndex;
   late List<AnimationController> _animationControllers;
   late List<Animation<double>> _fadeAnimations;
@@ -161,15 +157,15 @@ class _MainScreenState extends State<MainScreen>
             ))
         .toList();
     // Iniciar animación de la primera pantalla
-    _animationControllers[0].forward();
+    _animationControllers[_currentIndex].forward();
   }
 
   List<Widget> get _screens => [
-    const ChatbotScreen(),
-    const LivePrayerScreen(),
-    HomeScreen(initialTabIndex: _homeTabIndex),
+    const ChatScreen(),
+    const LiveScreen(),
+    HomeScreen(initialTabIndex: _homeTabIndex), // Hoy
     const PrayersScreen(),
-    const ProfileScreen(),
+    const BibleScreen(),
   ];
 
   @override
@@ -228,24 +224,24 @@ class _MainScreenState extends State<MainScreen>
             label: 'Chat',
           ),
           NavigationDestination(
-            icon: const Icon(Icons.radio_button_checked),
+            icon: const Icon(Icons.radio_button_unchecked),
             selectedIcon: const Icon(Icons.radio_button_checked),
             label: 'En Vivo',
           ),
           NavigationDestination(
-            icon: const Icon(Icons.star_outline),
+            icon: const Icon(Icons.star_border),
             selectedIcon: const Icon(Icons.star),
             label: 'Hoy',
           ),
           NavigationDestination(
-            icon: const Icon(Icons.favorite_outline),
+            icon: const Icon(Icons.favorite_border),
             selectedIcon: const Icon(Icons.favorite),
             label: 'Oraciones',
           ),
           NavigationDestination(
-            icon: const Icon(Icons.person_outline),
-            selectedIcon: const Icon(Icons.person),
-            label: 'Perfil',
+            icon: const Icon(Icons.menu_book_outlined),
+            selectedIcon: const Icon(Icons.menu_book),
+            label: 'Biblia',
           ),
         ],
       ),

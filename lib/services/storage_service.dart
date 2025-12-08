@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/verse.dart';
+import '../models/prayer.dart';
 
 /// Servicio de almacenamiento local usando Hive
 /// Gestiona favoritos y configuraciones de la aplicación
@@ -23,6 +24,9 @@ class StorageService {
   static const String _userEmotionKey = 'userEmotion';
   static const String _onboardingCompletedKey = 'onboardingCompleted';
   static const String _traditionalPrayersReligionKey = 'traditionalPrayersReligion'; // 'catolica' o 'cristiana'
+  static const String _streakCountKey = 'streakCount';
+  static const String _lastStreakDateKey = 'lastStreakDate';
+  static const String _savedPrayersKey = 'savedPrayers';
 
   // Monetización
   static const String _adsRemovedKey = 'adsRemoved'; // Pago único realizado
@@ -282,44 +286,57 @@ class StorageService {
     await _settingsBox.put(_novenaLastStepKey, step);
   }
 
-  // Tareas del día (para la pantalla "Hoy")
-  static const String _taskCompletedPrefix = 'task_completed_';
-  static const String _streakKey = 'streak';
-  static const String _lastCompletedDateKey = 'lastCompletedDate';
-  static const String _userEmailKey = 'userEmail';
-
-  bool? getTaskCompleted(String taskId) {
-    return _settingsBox.get('$_taskCompletedPrefix$taskId') as bool?;
+  // Racha diaria
+  int getStreakCount() {
+    return _settingsBox.get(_streakCountKey, defaultValue: 0) as int;
   }
 
-  Future<void> setTaskCompleted(String taskId, bool completed) async {
-    await _settingsBox.put('$_taskCompletedPrefix$taskId', completed);
+  DateTime? getLastStreakDate() {
+    final raw = _settingsBox.get(_lastStreakDateKey, defaultValue: '') as String;
+    if (raw.isEmpty) return null;
+    return DateTime.tryParse(raw);
   }
 
-  int? getStreak() {
-    return _settingsBox.get(_streakKey) as int?;
+  Future<void> saveStreakData({
+    required int streakCount,
+    required DateTime lastDate,
+  }) async {
+    await _settingsBox.put(_streakCountKey, streakCount);
+    await _settingsBox.put(_lastStreakDateKey, lastDate.toIso8601String());
   }
 
-  Future<void> setStreak(int streak) async {
-    await _settingsBox.put(_streakKey, streak);
+  // Oraciones guardadas
+  List<Prayer> getSavedPrayers() {
+    final raw = _settingsBox.get(_savedPrayersKey, defaultValue: <dynamic>[]) as List<dynamic>;
+    return raw
+        .map((item) {
+          try {
+            final map = Map<String, dynamic>.from(item as Map);
+            return Prayer.fromJson(map);
+          } catch (_) {
+            return null;
+          }
+        })
+        .whereType<Prayer>()
+        .toList();
   }
 
-  DateTime? getLastCompletedDate() {
-    final dateString = _settingsBox.get(_lastCompletedDateKey) as String?;
-    if (dateString == null) return null;
-    return DateTime.tryParse(dateString);
+  Future<void> saveSavedPrayers(List<Prayer> prayers) async {
+    final payload = prayers.map((p) => p.toJson()).toList();
+    await _settingsBox.put(_savedPrayersKey, payload);
   }
 
-  Future<void> setLastCompletedDate(DateTime date) async {
-    await _settingsBox.put(_lastCompletedDateKey, date.toIso8601String());
+  Future<void> addSavedPrayer(Prayer prayer) async {
+    final current = getSavedPrayers();
+    current.removeWhere((p) => p.id == prayer.id);
+    current.add(prayer);
+    await saveSavedPrayers(current);
   }
 
-  String? getUserEmail() {
-    return _settingsBox.get(_userEmailKey) as String?;
-  }
-
-  Future<void> setUserEmail(String email) async {
-    await _settingsBox.put(_userEmailKey, email);
+  Future<void> removeSavedPrayer(int id) async {
+    final current = getSavedPrayers();
+    current.removeWhere((p) => p.id == id);
+    await saveSavedPrayers(current);
   }
 }
 

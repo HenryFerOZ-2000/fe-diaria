@@ -4,16 +4,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:async';
+import '../models/prayer.dart';
 import '../providers/app_provider.dart';
+import '../widgets/streak_card.dart';
+import '../controllers/missions_controller.dart';
+import 'mission_read_screen.dart';
 import '../services/ads_service.dart';
 import '../services/share_service.dart';
 import '../services/storage_service.dart';
 import '../services/ads_manager.dart';
 import '../l10n/app_localizations.dart';
-import 'emotion_selection_screen.dart';
-import 'category_prayers_screen.dart';
-import 'traditional_prayers_religion_selection_screen.dart';
-import 'traditional_prayers_categories_screen.dart';
 
 /// Pantalla principal con diseño religioso elegante
 /// Incluye tabs para Versículo del Día y Oración del Día
@@ -40,6 +40,15 @@ class _HomeScreenState extends State<HomeScreen>
   Timer? _dailyRefreshTimer;
   bool _isMorningPrayer = true;
   bool _adsRemoved = false;
+  // Se inicializa aquí para evitar LateInitializationError en hot reload.
+  late final MissionsController _missionsController = MissionsController(
+    missions: [
+      Mission(id: 'verse', title: 'Leer el versículo del día', icon: Icons.menu_book),
+      Mission(id: 'morning', title: 'Leer la oración del día', icon: Icons.wb_sunny),
+      Mission(id: 'night', title: 'Leer la oración de la noche', icon: Icons.nightlight_round),
+      Mission(id: 'family', title: 'Orar por un familiar', icon: Icons.family_restroom),
+    ],
+  );
 
   @override
   void initState() {
@@ -245,7 +254,6 @@ class _HomeScreenState extends State<HomeScreen>
                 padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
                 child: Row(
                   children: [
-                    // Icono decorativo con estilo moderno
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -279,101 +287,17 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
                     ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pushNamed('/profile'),
+                      icon: const Icon(Icons.person_outline),
+                    ),
                   ],
                 ),
               ),
-              // Tabs modernos con diseño limpio
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? colorScheme.surface.withOpacity(0.6)
-                        : Colors.white.withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: colorScheme.outline.withOpacity(0.2),
-                      width: 1,
-                    ),
-                  ),
-                  child: TabBar(
-                    controller: _tabController,
-                    indicator: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      gradient: LinearGradient(
-                        colors: [
-                          colorScheme.primary,
-                          colorScheme.primary.withOpacity(0.8),
-                        ],
-                      ),
-                    ),
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    labelColor: Colors.white,
-                    unselectedLabelColor: colorScheme.onSurface.withOpacity(0.7),
-                    labelStyle: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.3,
-                    ),
-                    unselectedLabelStyle: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    dividerColor: Colors.transparent,
-                    tabs: [
-                      Tab(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.book_rounded, size: 18),
-                            const SizedBox(width: 8),
-                            Flexible(
-                              child: Text(
-                                localizations.homeTitle,
-                                softWrap: true,
-                                overflow: TextOverflow.visible,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Tab(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              _isMorningPrayer ? Icons.wb_sunny : Icons.nightlight_round,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Flexible(
-                              child: Text(
-                                _isMorningPrayer 
-                                    ? localizations.morningPrayer 
-                                    : localizations.eveningPrayer,
-                                softWrap: true,
-                                overflow: TextOverflow.visible,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Contenido de los tabs
+              const SizedBox(height: 8),
+              // Contenido principal (sin tabs)
               Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildVerseTab(context, isDark, localizations),
-                    _buildPrayerTab(context, isDark, localizations),
-                  ],
-                ),
+                child: _buildVerseTab(context, isDark, localizations),
               ),
               // Banner Ad flotante - siempre visible en la parte inferior
               if (!_adsRemoved)
@@ -420,110 +344,31 @@ class _HomeScreenState extends State<HomeScreen>
           );
         }
 
-        final verse = provider.todayVerse;
-        if (verse == null) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 64,
-                  color: isDark
-                      ? const Color(0xFFF5E6D3).withOpacity(0.5)
-                      : const Color(0xFF2C1810).withOpacity(0.5),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  localizations.loadingError,
-                  style: GoogleFonts.merriweather(fontSize: 16),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    provider.loadTodayVerse();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(localizations.retry),
-                ),
-              ],
-            ),
-          );
-        }
-
-        final isFavorite = provider.isFavorite(verse);
-
         return FadeTransition(
           opacity: _fadeAnimation,
           child: SafeArea(
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              physics: const BouncingScrollPhysics(),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Versículo del día - Flexible para ocupar espacio disponible
-                  Expanded(
-                    flex: 6,
-                    child: _buildVerseCard(
-                      context: context,
-                      verse: verse,
-                      isFavorite: isFavorite,
-                      onFavoriteTap: () => provider.toggleFavorite(verse),
-                      onShare: () => _showShareDialog(
-                        text: verse.text,
-                        reference: verse.reference,
-                        context: context,
-                        localizations: localizations,
-                      ),
-                      fontSize: provider.fontSize,
+                  StreakCard(
+                    currentStreak: provider.streakCount,
+                    goalDays: provider.streakGoal,
+                    progressPercent: provider.streakGoal == 0
+                        ? 1
+                        : provider.streakCount / provider.streakGoal,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildMissionsSection(context, provider),
+                  const SizedBox(height: 16),
+                  _buildSavedPrayersSection(
+                    context: context,
+                    prayers: provider.savedPrayers,
                       isDark: isDark,
-                      isCompact: true,
-                    ),
                   ),
-                  const SizedBox(height: 8),
-                  // Botones en dos filas - distribución simétrica
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: _buildPrayerForYouButton(
-                                  context, 
-                                  Theme.of(context).colorScheme, 
-                                  isCompact: true,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: _buildCategoryPrayersButton(
-                                  context, 
-                                  Theme.of(context).colorScheme, 
-                                  isCompact: true,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Expanded(
-                          child: _buildTraditionalPrayersButton(
-                            context, 
-                            Theme.of(context).colorScheme, 
-                            isCompact: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  const SizedBox(height: 12),
                 ],
               ),
             ),
@@ -586,14 +431,12 @@ class _HomeScreenState extends State<HomeScreen>
         return FadeTransition(
           opacity: _prayerFadeAnimation,
           child: SafeArea(
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  // Oración del día - Flexible para ocupar espacio disponible
-                  Expanded(
-                    flex: 6,
-                    child: _buildPrayerCard(
+                  _buildPrayerCard(
                       context: context,
                       prayer: prayer,
                       isMorning: _isMorningPrayer,
@@ -605,47 +448,8 @@ class _HomeScreenState extends State<HomeScreen>
                       fontSize: provider.fontSize,
                       isDark: isDark,
                       localizations: localizations,
-                      isCompact: true,
-                    ),
                   ),
-                  const SizedBox(height: 8),
-                  // Botones en dos filas - distribución simétrica
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: _buildPrayerForYouButton(
-                                  context, 
-                                  Theme.of(context).colorScheme, 
-                                  isCompact: true,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: _buildCategoryPrayersButton(
-                                  context, 
-                                  Theme.of(context).colorScheme, 
-                                  isCompact: true,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Expanded(
-                          child: _buildTraditionalPrayersButton(
-                            context, 
-                            Theme.of(context).colorScheme, 
-                            isCompact: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  const SizedBox(height: 12),
                 ],
               ),
             ),
@@ -655,133 +459,367 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildPrayerForYouButton(BuildContext context, ColorScheme colorScheme, {bool isCompact = false}) {
-    return SizedBox(
+  Widget _buildSavedPrayersSection({
+    required BuildContext context,
+    required List<Prayer> prayers,
+    required bool isDark,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
       width: double.infinity,
-      height: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const EmotionSelectionScreen(),
-            ),
-          );
-        },
-        icon: Icon(Icons.favorite, size: isCompact ? 20 : 32),
-        label: Text(
-          isCompact ? '¿Cómo te sientes hoy?' : '¿Cómo te sientes hoy?\nOración para ti',
-          style: GoogleFonts.inter(
-            fontSize: isCompact ? 14 : 22,
-            fontWeight: FontWeight.w600,
-            height: isCompact ? 1.25 : 1.3,
-          ),
-          textAlign: TextAlign.center,
-          maxLines: isCompact ? 2 : null,
-          overflow: TextOverflow.ellipsis,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark
+            ? colorScheme.surface.withOpacity(0.75)
+            : Colors.white.withOpacity(0.92),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: colorScheme.outline.withOpacity(0.08),
+          width: 1,
         ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: colorScheme.secondary,
-          foregroundColor: Colors.white,
-          padding: isCompact 
-              ? const EdgeInsets.symmetric(vertical: 10, horizontal: 8)
-              : const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(isCompact ? 14 : 20),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.primary.withOpacity(0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
           ),
-          elevation: 4,
+        ],
+      ),
+                    child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+          Row(
+                            children: [
+              Icon(
+                Icons.favorite_border,
+                color: colorScheme.primary,
+                              ),
+                              const SizedBox(width: 8),
+              Text(
+                'Tus oraciones',
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const Spacer(),
+              Icon(
+                Icons.expand_more,
+                color: colorScheme.onSurface.withOpacity(0.4),
+                              ),
+                            ],
+                        ),
+          const SizedBox(height: 12),
+          if (prayers.isEmpty)
+            Text(
+              'Aún no guardas oraciones. Guarda tus favoritas para abrirlas aquí rápidamente.',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
+                color: colorScheme.onSurface.withOpacity(0.7),
+              ),
+            )
+          else
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: prayers
+                  .map((prayer) => _buildSavedPrayerChip(
+                        context: context,
+                        prayer: prayer,
+                      ))
+                  .toList(),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSavedPrayerChip({
+    required BuildContext context,
+    required Prayer prayer,
+  }) {
+    return InkWell(
+      onTap: () => _showSavedPrayerDetail(context, prayer),
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFF9D7DFF),
+              Color(0xFF7BD7FF),
+                      ],
+                    ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF9D7DFF).withOpacity(0.25),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.menu_book_rounded, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                prayer.title,
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.2,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildCategoryPrayersButton(BuildContext context, ColorScheme colorScheme, {bool isCompact = false}) {
-    return SizedBox(
-      width: double.infinity,
-      height: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: () {
-          // Mostrar interstitial al entrar a "Oraciones para…" (no bloquea navegación)
-          AdsManager().tryShowCategoryEntryInterstitial();
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const CategoryPrayersScreen(),
+  void _showSavedPrayerDetail(BuildContext context, Prayer prayer) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.shadow.withOpacity(0.18),
+              blurRadius: 18,
+              offset: const Offset(0, -4),
             ),
-          );
-        },
-        icon: Icon(Icons.menu_book_rounded, size: isCompact ? 20 : 32),
-        label: Text(
-          isCompact ? 'Oraciones para…' : 'Oraciones para…\n(Mi familia, mi salud, etc.)',
-          style: GoogleFonts.inter(
-            fontSize: isCompact ? 14 : 22,
-            fontWeight: FontWeight.w600,
-            height: isCompact ? 1.25 : 1.3,
-          ),
-          textAlign: TextAlign.center,
-          maxLines: isCompact ? 2 : null,
-          overflow: TextOverflow.ellipsis,
+          ],
         ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Colors.white,
-          padding: isCompact 
-              ? const EdgeInsets.symmetric(vertical: 10, horizontal: 8)
-              : const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(isCompact ? 14 : 20),
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colorScheme.outline.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                prayer.title,
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                prayer.text,
+          style: GoogleFonts.inter(
+                  fontSize: 16,
+                  height: 1.6,
+                  color: colorScheme.onSurface.withOpacity(0.9),
+                ),
+                textAlign: TextAlign.justify,
           ),
-          elevation: 4,
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTraditionalPrayersButton(BuildContext context, ColorScheme colorScheme, {bool isCompact = false}) {
-    return SizedBox(
-      width: double.infinity,
-      height: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: () {
-          final religion = StorageService().getTraditionalPrayersReligion();
-          if (religion.isEmpty) {
-            // Si no hay religión seleccionada, mostrar pantalla de selección
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const TraditionalPrayersReligionSelectionScreen(),
-              ),
-            );
-          } else {
-            // Si ya hay religión seleccionada, ir directo a categorías
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const TraditionalPrayersCategoriesScreen(),
-              ),
-            );
-          }
-        },
-        icon: Icon(Icons.church, size: isCompact ? 20 : 32),
-        label: Text(
-          'Oraciones tradicionales',
-          style: GoogleFonts.inter(
-            fontSize: isCompact ? 14 : 22,
-            fontWeight: FontWeight.w600,
-            height: isCompact ? 1.25 : 1.3,
-          ),
-          textAlign: TextAlign.center,
-          maxLines: isCompact ? 2 : null,
-          overflow: TextOverflow.ellipsis,
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.tertiary,
-          foregroundColor: Colors.white,
-          padding: isCompact 
-              ? const EdgeInsets.symmetric(vertical: 10, horizontal: 8)
-              : const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(isCompact ? 14 : 20),
-          ),
-          elevation: 4,
+  void _openMissionRead(BuildContext context, Mission mission, AppProvider provider) {
+    final content = _getMissionContent(mission.id, provider);
+          Navigator.of(context).push(
+            MaterialPageRoute(
+        builder: (_) => MissionReadScreen(
+          title: mission.title,
+          content: content,
+          onCompleted: () {
+            setState(() {
+              _missionsController.completeMission(mission.id);
+            });
+          },
         ),
       ),
+    );
+  }
+
+  String _getMissionContent(String id, AppProvider provider) {
+    switch (id) {
+      case 'verse':
+        return provider.todayVerse?.text ?? 'Versículo del día no disponible por el momento.';
+      case 'morning':
+        return provider.todayMorningPrayer?.text ?? 'Oración del día no disponible por el momento.';
+      case 'night':
+        return provider.todayEveningPrayer?.text ?? 'Oración de la noche no disponible por el momento.';
+      case 'family':
+        return 'Señor, bendice a mi familia, cuida su salud y guíanos en amor. Amén.';
+      default:
+        return 'Contenido no disponible.';
+    }
+  }
+
+  Widget _buildMissionCard(BuildContext context, Mission mission, AppProvider provider) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final completed = mission.completed;
+    final gradients = [
+      [const Color(0xFF3C2A4D), const Color(0xFF6654A6)],
+      [const Color(0xFF6A0F26), const Color(0xFFB83C3C)],
+      [const Color(0xFF1F2A36), const Color(0xFF3B5C6B)],
+      [const Color(0xFF1E3C2F), const Color(0xFF4E8B6F)],
+    ];
+    final idx = _missionsController.missions.indexOf(mission) % gradients.length;
+    final gradient = gradients[idx];
+    final durationText = _missionDurationLabel(mission.id);
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
+      onTap: () => _openMissionRead(context, mission, provider),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: gradient),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.primary.withOpacity(0.18),
+              blurRadius: 14,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                completed ? Icons.check : mission.icon,
+                color: Colors.white,
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    mission.title.toUpperCase(),
+          style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.4,
+                      color: Colors.white.withOpacity(completed ? 0.7 : 1),
+                      decoration: completed ? TextDecoration.lineThrough : TextDecoration.none,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    durationText,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+            fontWeight: FontWeight.w600,
+                      color: Colors.white.withOpacity(0.8),
+          ),
+                  ),
+                ],
+              ),
+            ),
+            Text(
+              completed ? 'HECHO' : 'ABRIR',
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+                fontSize: 12,
+              ),
+          ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _missionDurationLabel(String id) {
+    switch (id) {
+      case 'verse':
+        return '1 MIN';
+      case 'morning':
+        return '2 MIN';
+      case 'night':
+        return '2 MIN';
+      case 'family':
+        return '2 MIN';
+      default:
+        return '';
+    }
+  }
+
+  Widget _buildMissionsSection(BuildContext context, AppProvider provider) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final allDone = _missionsController.isAllCompleted();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.push_pin_outlined, color: colorScheme.primary),
+            const SizedBox(width: 8),
+            Text(
+              'Misiones de hoy',
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSurface,
+              ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        ..._missionsController.missions.map((mission) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _buildMissionCard(context, mission, provider),
+            );
+        }),
+        if (allDone)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              '¡Misiones completadas! Tu racha se actualizó.',
+          style: GoogleFonts.inter(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+              ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -861,12 +899,14 @@ class _HomeScreenState extends State<HomeScreen>
                     const Spacer(),
                     // Botón compartir con texto
                     _buildShareButton(
+                      context: context,
                       onTap: onShare,
                       isDark: isDark,
                       isCompact: isCompact,
                     ),
                     SizedBox(width: isCompact ? 6 : 8),
                     _buildActionButton(
+                      context: context,
                       icon: isFavorite ? Icons.favorite : Icons.favorite_border,
                       onTap: onFavoriteTap,
                       isDark: isDark,
@@ -1027,6 +1067,7 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     ),
                     _buildShareButton(
+                      context: context,
                       onTap: onShare,
                       isDark: isDark,
                       isCompact: isCompact,
@@ -1061,6 +1102,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildShareButton({
+    required BuildContext context,
     required VoidCallback onTap,
     required bool isDark,
     bool isCompact = false,
@@ -1099,6 +1141,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildActionButton({
+    required BuildContext context,
     required IconData icon,
     required VoidCallback onTap,
     required bool isDark,

@@ -20,6 +20,7 @@ class AppProvider extends ChangeNotifier {
   Prayer? _todayEveningPrayer;
   bool _isLoading = true;
   List<Verse> _favorites = [];
+  List<Prayer> _savedPrayers = [];
   bool _darkMode = false;
   bool _notificationEnabled = false;
   String _morningVerseNotificationTime = '09:00'; // AM - Versículo (9:00 AM por defecto)
@@ -30,6 +31,8 @@ class AppProvider extends ChangeNotifier {
   double _fontSize = 1.0;
   bool _readingMode = false;
   bool _soundEnabled = false;
+  int _streakCount = 0;
+  final int _streakGoal = 7;
 
   Verse? get todayVerse => _todayVerse;
   Prayer? get todayMorningPrayer => _todayMorningPrayer;
@@ -70,6 +73,9 @@ class AppProvider extends ChangeNotifier {
   double get fontSize => _fontSize;
   bool get readingMode => _readingMode;
   bool get soundEnabled => _soundEnabled;
+  List<Prayer> get savedPrayers => _savedPrayers;
+  int get streakCount => _streakCount;
+  int get streakGoal => _streakGoal;
   
   // Personalización
   String get userName => _storageService.getUserName();
@@ -108,6 +114,8 @@ class AppProvider extends ChangeNotifier {
       await loadTodayVerse();
       await loadTodayPrayers();
       await loadFavorites();
+      await loadSavedPrayers();
+      await _updateDailyStreak();
       notifyListeners();
     } catch (e) {
       debugPrint('Error loading initial data: $e');
@@ -128,6 +136,8 @@ class AppProvider extends ChangeNotifier {
       } else {
         _todayVerse = await _verseService.getTodayVerse();
       }
+      
+      await _updateDailyStreak();
       
       // Actualizar widgets
       await WidgetService.updateWidget(
@@ -163,6 +173,8 @@ class AppProvider extends ChangeNotifier {
       } else {
         _todayVerse = await _verseService.refreshTodayVerse();
       }
+      
+      await _updateDailyStreak();
       
       // Actualizar widgets
       await WidgetService.updateWidget(
@@ -294,6 +306,62 @@ class AppProvider extends ChangeNotifier {
     _soundEnabled = value;
     await _storageService.setSoundEnabled(value);
     notifyListeners();
+  }
+
+  Future<void> loadSavedPrayers() async {
+    _savedPrayers = _storageService.getSavedPrayers();
+  }
+
+  Future<void> addSavedPrayer(Prayer prayer) async {
+    await _storageService.addSavedPrayer(prayer);
+    await loadSavedPrayers();
+    notifyListeners();
+  }
+
+  Future<void> removeSavedPrayer(int id) async {
+    await _storageService.removeSavedPrayer(id);
+    await loadSavedPrayers();
+    notifyListeners();
+  }
+
+  Future<void> _updateDailyStreak() async {
+    final today = DateTime.now();
+    final lastDate = _storageService.getLastStreakDate();
+    final storedCount = _storageService.getStreakCount();
+
+    if (lastDate == null) {
+      _streakCount = storedCount > 0 ? storedCount : 1;
+    } else if (_isSameDay(today, lastDate)) {
+      _streakCount = storedCount > 0 ? storedCount : 1;
+    } else if (_isYesterday(lastDate, today)) {
+      _streakCount = storedCount + 1;
+    } else {
+      _streakCount = 1;
+    }
+
+    await _storageService.saveStreakData(
+      streakCount: _streakCount,
+      lastDate: today,
+    );
+  }
+
+  Future<void> completeDailyStreak() async {
+    final today = DateTime.now();
+    _streakCount = _storageService.getStreakCount() + 1;
+    await _storageService.saveStreakData(
+      streakCount: _streakCount,
+      lastDate: today,
+    );
+    notifyListeners();
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  bool _isYesterday(DateTime reference, DateTime today) {
+    final yesterday = DateTime(today.year, today.month, today.day - 1);
+    return _isSameDay(reference, yesterday);
   }
 
   // Personalización
