@@ -8,13 +8,16 @@ import 'services/notification_service.dart';
 import 'services/ads_service.dart';
 import 'services/widget_service.dart';
 import 'screens/home_screen.dart';
-import 'screens/settings_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/emotion_selection_screen.dart';
 import 'screens/prayer_for_you_screen.dart';
 import 'screens/category_prayers_screen.dart';
 import 'screens/traditional_prayers_religion_selection_screen.dart';
-import 'screens/categories_screen.dart';
+import 'screens/chatbot_screen.dart';
+import 'screens/live_prayer_screen.dart';
+import 'screens/prayers_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/home_today_redesign.dart';
 // import 'services/purchase_service.dart'; // Deshabilitado - opción de pago único removida
 import 'services/content_validator.dart';
 import 'services/daily_content_service.dart';
@@ -87,6 +90,11 @@ class MyApp extends StatelessWidget {
               '/prayer-for-you': (context) => const PrayerForYouScreen(),
               '/category-prayers': (context) => const CategoryPrayersScreen(),
               '/traditional-prayers-religion-selection': (context) => const TraditionalPrayersReligionSelectionScreen(),
+              '/chatbot': (context) => const ChatbotScreen(),
+              '/live-prayer': (context) => const LivePrayerScreen(),
+              '/prayers': (context) => const PrayersScreen(),
+              '/profile': (context) => const ProfileScreen(),
+              '/today-redesign': (context) => const HomeTodayRedesign(),
             },
             navigatorObservers: [
               _NotificationNavigatorObserver(),
@@ -157,10 +165,11 @@ class _MainScreenState extends State<MainScreen>
   }
 
   List<Widget> get _screens => [
+    const ChatbotScreen(),
+    const LivePrayerScreen(),
     HomeScreen(initialTabIndex: _homeTabIndex),
-    const CategoriesScreen(),
-    const PrayerForYouScreen(),
-    const SettingsScreen(),
+    const PrayersScreen(),
+    const ProfileScreen(),
   ];
 
   @override
@@ -214,24 +223,29 @@ class _MainScreenState extends State<MainScreen>
         animationDuration: const Duration(milliseconds: 300),
         destinations: [
           NavigationDestination(
-            icon: const Icon(Icons.home_outlined),
-            selectedIcon: const Icon(Icons.home),
-            label: 'Inicio',
+            icon: const Icon(Icons.chat_bubble_outline),
+            selectedIcon: const Icon(Icons.chat_bubble),
+            label: 'Chat',
           ),
           NavigationDestination(
-            icon: const Icon(Icons.category_outlined),
-            selectedIcon: const Icon(Icons.category),
-            label: 'Categorías',
+            icon: const Icon(Icons.radio_button_checked),
+            selectedIcon: const Icon(Icons.radio_button_checked),
+            label: 'En Vivo',
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.star_outline),
+            selectedIcon: const Icon(Icons.star),
+            label: 'Hoy',
           ),
           NavigationDestination(
             icon: const Icon(Icons.favorite_outline),
             selectedIcon: const Icon(Icons.favorite),
-            label: 'Oración para ti',
+            label: 'Oraciones',
           ),
           NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings),
-            label: 'Configuración',
+            icon: const Icon(Icons.person_outline),
+            selectedIcon: const Icon(Icons.person),
+            label: 'Perfil',
           ),
         ],
       ),

@@ -281,5 +281,45 @@ class StorageService {
     await _settingsBox.put(_novenaLastDayKey, day);
     await _settingsBox.put(_novenaLastStepKey, step);
   }
+
+  // Tareas del día (para la pantalla "Hoy")
+  static const String _taskCompletedPrefix = 'task_completed_';
+  static const String _streakKey = 'streak';
+  static const String _lastCompletedDateKey = 'lastCompletedDate';
+  static const String _userEmailKey = 'userEmail';
+
+  bool? getTaskCompleted(String taskId) {
+    return _settingsBox.get('$_taskCompletedPrefix$taskId') as bool?;
+  }
+
+  Future<void> setTaskCompleted(String taskId, bool completed) async {
+    await _settingsBox.put('$_taskCompletedPrefix$taskId', completed);
+  }
+
+  int? getStreak() {
+    return _settingsBox.get(_streakKey) as int?;
+  }
+
+  Future<void> setStreak(int streak) async {
+    await _settingsBox.put(_streakKey, streak);
+  }
+
+  DateTime? getLastCompletedDate() {
+    final dateString = _settingsBox.get(_lastCompletedDateKey) as String?;
+    if (dateString == null) return null;
+    return DateTime.tryParse(dateString);
+  }
+
+  Future<void> setLastCompletedDate(DateTime date) async {
+    await _settingsBox.put(_lastCompletedDateKey, date.toIso8601String());
+  }
+
+  String? getUserEmail() {
+    return _settingsBox.get(_userEmailKey) as String?;
+  }
+
+  Future<void> setUserEmail(String email) async {
+    await _settingsBox.put(_userEmailKey, email);
+  }
 }
 

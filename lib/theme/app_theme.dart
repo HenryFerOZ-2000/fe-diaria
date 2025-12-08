@@ -375,8 +375,8 @@ ThemeData get lightTheme {
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: AppColors.surface,
       indicatorColor: AppColors.primaryContainer,
-      labelTextStyle: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return GoogleFonts.poppins(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -629,8 +629,8 @@ ThemeData get darkTheme {
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: AppColors.surfaceDark,
       indicatorColor: AppColors.primaryContainer,
-      labelTextStyle: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return GoogleFonts.poppins(
             fontSize: 12,
             fontWeight: FontWeight.w600,

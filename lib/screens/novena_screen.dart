@@ -5,10 +5,6 @@ import '../services/traditional_prayers_service.dart';
 import '../services/ads_service.dart';
 import '../services/storage_service.dart';
 import '../services/share_service.dart';
-import '../widgets/app_scaffold.dart';
-import '../widgets/custom_button.dart';
-import '../widgets/main_card.dart';
-import '../theme/app_theme.dart';
 
 /// Pantalla principal de la Novena - Selección de día
 class NovenaScreen extends StatefulWidget {
