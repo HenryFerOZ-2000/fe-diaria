@@ -14,6 +14,7 @@ dependencies:
   hive_flutter: ^1.1.0
   flutter_local_notifications: ^17.2.0
   share_plus: ^10.0.2
+  shared_preferences: ^2.2.3
   google_fonts: ^6.2.1
   intl: ^0.19.0
   google_mobile_ads: ^5.1.0
@@ -39,6 +40,12 @@ flutter:
     - assets/verses/
     - assets/prayers/
     - assets/oraciones/
+    - assets/prayers.json
+    - assets/emotion_passages.json
+    - assets/intention_prayers.json
+    - assets/traditional_prayers.json
+    - assets/emotion_prayers.json
+    - assets/prayers.json
 
 flutter_launcher_icons:
   android: true

@@ -1,0 +1,299 @@
+{
+  "salud": [
+    {
+      "id": "sal-001",
+      "title": "Tócanos Señor",
+      "text": "Señor Jesús, médico de cuerpos y almas, te presento esta enfermedad. Toca cada célula con tu mano sanadora, devuelve el equilibrio y quita todo temor. Da sabiduría a los médicos, paciencia en el proceso y paz al corazón. Que tu Espíritu renueve fuerzas y tu amor sostenga cada paso. Amén.",
+      "tags": ["sanidad", "paz", "fortaleza"],
+      "verseRef": "Salmo 103:3"
+    },
+    {
+      "id": "sal-002",
+      "title": "Aliento de Vida",
+      "text": "Padre, Tú soplaste vida en nosotros. Te pido que renueves el aliento en medio del cansancio. Quita inflamación, dolor y fragilidad, y reemplázalos con tu paz. Que cada respiración recuerde tu fidelidad y tu cuidado constante. Amén.",
+      "tags": ["vida", "respirar", "esperanza"],
+      "verseRef": "Génesis 2:7"
+    },
+    {
+      "id": "sal-003",
+      "title": "Descanso Reparador",
+      "text": "Señor, regalo el control y recibo tu descanso. Calma la mente, relaja el cuerpo y permite un sueño reparador. Que tu presencia sea cobija y tu palabra medicina suave. Confío en que velas mientras duermo. Amén.",
+      "tags": ["descanso", "confianza", "calma"],
+      "verseRef": "Salmo 4:8"
+    },
+    {
+      "id": "sal-004",
+      "title": "Fortaleza en la Debilidad",
+      "text": "Jesús, tu gracia se perfecciona en mi debilidad. Cuando falten fuerzas, sé tú mi vigor; cuando tiemble el ánimo, sé tú mi roca. Haz crecer paciencia y esperanza mientras camino hacia la recuperación. Amén.",
+      "tags": ["gracia", "esperanza", "paciencia"],
+      "verseRef": "2 Corintios 12:9"
+    },
+    {
+      "id": "sal-005",
+      "title": "Paz en el Proceso",
+      "text": "Padre, el proceso médico puede ser largo. Dame serenidad para cada cita, valor para cada examen y gratitud por cada avance. Que tu paz guarde mi mente y tu amor me recuerde que no camino solo. Amén.",
+      "tags": ["paz", "valor", "gratitud"],
+      "verseRef": "Filipenses 4:7"
+    }
+  ],
+  "familia": [
+    {
+      "id": "fam-001",
+      "title": "Casa Unida",
+      "text": "Señor, bendice nuestra casa con unidad y respeto. Que tus valores guíen nuestras decisiones, tus palabras inspiren nuestras conversaciones y tu amor sane heridas. Haznos rápidos para perdonar y constantes para servirnos. Amén.",
+      "tags": ["unidad", "perdón", "servicio"],
+      "verseRef": "Colosenses 3:14"
+    },
+    {
+      "id": "fam-002",
+      "title": "Protege Nuestro Hogar",
+      "text": "Padre, coloca un cerco de tu presencia alrededor de esta familia. Guarda nuestras entradas y salidas, protege corazones y pensamientos, y llena cada rincón de tu paz. Que en esta casa se respire fe y esperanza. Amén.",
+      "tags": ["protección", "paz", "fe"],
+      "verseRef": "Salmo 121:8"
+    },
+    {
+      "id": "fam-003",
+      "title": "Sabiduría para Criar",
+      "text": "Dios, danos sabiduría para criar con paciencia y límites sanos. Que nuestras palabras edifiquen y nuestras acciones modelen amor. Ayúdanos a escuchar, enseñar y acompañar con gracia. Amén.",
+      "tags": ["crianza", "paciencia", "amor"],
+      "verseRef": "Proverbios 22:6"
+    },
+    {
+      "id": "fam-004",
+      "title": "Restauración Familiar",
+      "text": "Señor, donde haya distancias o resentimientos, trae restauración. Suaviza corazones, abre diálogo y enséñanos a pedir perdón. Haz nueva nuestra familia en tu amor. Amén.",
+      "tags": ["restauración", "diálogo", "perdón"],
+      "verseRef": "Efesios 4:32"
+    },
+    {
+      "id": "fam-005",
+      "title": "Gracia Cotidiana",
+      "text": "Padre, en lo cotidiano dame gracia para servir y agradecer. Que el cansancio no robe la ternura ni la prisa apague la risa. Haz de nuestro hogar un reflejo sencillo de tu bondad. Amén.",
+      "tags": ["gracia", "ternura", "bondad"],
+      "verseRef": "Salmo 127:1"
+    }
+  ],
+  "trabajo": [
+    {
+      "id": "tra-001",
+      "title": "Excelencia y Ética",
+      "text": "Señor, hoy ofrezco mi trabajo como acto de adoración. Dame excelencia, honestidad y creatividad. Que mis decisiones honren tu nombre y mis manos sirvan con alegría. Amén.",
+      "tags": ["excelencia", "honestidad", "servicio"],
+      "verseRef": "Colosenses 3:23"
+    },
+    {
+      "id": "tra-002",
+      "title": "Puertas y Provisión",
+      "text": "Padre, abre puertas de oportunidad y provisión. Guía mis pasos, conecta con las personas correctas y dame valentía para avanzar. Confío en que eres mi proveedor. Amén.",
+      "tags": ["provisión", "oportunidad", "valentía"],
+      "verseRef": "Salmo 90:17"
+    },
+    {
+      "id": "tra-003",
+      "title": "Paz en la Carga",
+      "text": "Jesús, cuando la carga laboral pesa, enséñame a administrar tiempo y energía. Dame descanso en medio del ritmo y claridad para priorizar. Que tu paz gobierne mis decisiones. Amén.",
+      "tags": ["paz", "prioridad", "descanso"],
+      "verseRef": "Mateo 11:28-29"
+    },
+    {
+      "id": "tra-004",
+      "title": "Integridad",
+      "text": "Señor, guarda mi corazón de la codicia y la mentira. Que la integridad marque cada trato y mi palabra sea confiable. Prefiero tu favor antes que un atajo. Amén.",
+      "tags": ["integridad", "verdad", "confianza"],
+      "verseRef": "Proverbios 10:9"
+    },
+    {
+      "id": "tra-005",
+      "title": "Creatividad y Servicio",
+      "text": "Padre, inspírame con ideas nuevas que bendigan a otros. Hazme sensible a las necesidades de mis compañeros y clientes. Que mi trabajo sirva y aporte valor con amor. Amén.",
+      "tags": ["creatividad", "servicio", "valor"],
+      "verseRef": "1 Pedro 4:10"
+    }
+  ],
+  "proteccion": [
+    {
+      "id": "pro-001",
+      "title": "Bajo Tus Alas",
+      "text": "Señor, me refugio bajo tus alas. Guarda mi mente, cuerpo y espíritu de todo mal. Rodea mi camino con tu presencia y mantén mi corazón firme en tu verdad. Amén.",
+      "tags": ["refugio", "presencia", "verdad"],
+      "verseRef": "Salmo 91:4"
+    },
+    {
+      "id": "pro-002",
+      "title": "Ángeles Alrededor",
+      "text": "Padre, envía tus ángeles para cuidar nuestras salidas y entradas. Que ningún peligro prospere y que tu paz sea el centinela de nuestra casa. Amén.",
+      "tags": ["ángeles", "cuidado", "paz"],
+      "verseRef": "Salmo 34:7"
+    },
+    {
+      "id": "pro-003",
+      "title": "Escudo y Luz",
+      "text": "Señor, sé mi escudo y mi luz. Disipa las tinieblas de la mentira y el temor. Dame discernimiento para apartarme del mal y valentía para caminar en tu camino. Amén.",
+      "tags": ["escudo", "discernimiento", "valentía"],
+      "verseRef": "Salmo 27:1"
+    },
+    {
+      "id": "pro-004",
+      "title": "Protege el Corazón",
+      "text": "Dios, guarda mi corazón de la envidia, el rencor y la desesperanza. Que tu amor sea muro alrededor de mis pensamientos y tu palabra lámpara a mis pies. Amén.",
+      "tags": ["corazón", "amor", "palabra"],
+      "verseRef": "Proverbios 4:23"
+    },
+    {
+      "id": "pro-005",
+      "title": "Refugio en la Tormenta",
+      "text": "Padre, cuando soplan vientos de incertidumbre, escóndeme en tu refugio. Que tu fidelidad sea mi techo y tu gracia mi firmeza. Confío en ti. Amén.",
+      "tags": ["refugio", "fidelidad", "confianza"],
+      "verseRef": "Nahúm 1:7"
+    }
+  ],
+  "pareja": [
+    {
+      "id": "par-001",
+      "title": "Amor que Sirve",
+      "text": "Señor, enséñanos a amarnos sirviendo. Que la paciencia y la ternura guíen nuestras palabras. Sana heridas pasadas y fortalece nuestro pacto en tu amor. Amén.",
+      "tags": ["amor", "paciencia", "pacto"],
+      "verseRef": "1 Corintios 13:4-7"
+    },
+    {
+      "id": "par-002",
+      "title": "Unidad y Respeto",
+      "text": "Padre, haznos uno en propósito y respeto. Que valoremos nuestras diferencias y celebremos los dones del otro. Que tu Espíritu sea el centro de nuestra relación. Amén.",
+      "tags": ["unidad", "respeto", "propósito"],
+      "verseRef": "Efesios 4:2-3"
+    },
+    {
+      "id": "par-003",
+      "title": "Comunicación Clara",
+      "text": "Señor, abre nuestros oídos y suaviza nuestras palabras. Quita orgullo y prisa, y danos claridad para hablar con verdad y amor. Amén.",
+      "tags": ["comunicación", "verdad", "amor"],
+      "verseRef": "Proverbios 15:1"
+    },
+    {
+      "id": "par-004",
+      "title": "Perdón Mutuo",
+      "text": "Jesús, ayúdanos a pedir perdón sin excusas y a otorgarlo sin reservas. Que tu cruz sea recordatorio de la gracia que recibimos y compartimos. Amén.",
+      "tags": ["perdón", "gracia", "reconciliación"],
+      "verseRef": "Colosenses 3:13"
+    },
+    {
+      "id": "par-005",
+      "title": "Fidelidad y Gozo",
+      "text": "Padre, bendice nuestra fidelidad y renueva el gozo de estar juntos. Que celebremos los pequeños detalles y caminemos tomados de tu mano. Amén.",
+      "tags": ["fidelidad", "gozo", "bendición"],
+      "verseRef": "Eclesiastés 4:12"
+    }
+  ],
+  "hijos": [
+    {
+      "id": "hij-001",
+      "title": "Bendice su Camino",
+      "text": "Señor, bendice la vida de mis hijos. Guía sus pasos, protege su corazón y rodéalos de buenas amistades. Que conozcan tu amor temprano y caminen en tu luz. Amén.",
+      "tags": ["bendición", "guía", "amistad"],
+      "verseRef": "Jeremías 29:11"
+    },
+    {
+      "id": "hij-002",
+      "title": "Sabiduría y Carácter",
+      "text": "Padre, derrama sabiduría sobre ellos. Forma en sus vidas carácter firme, compasivo y justo. Que tu palabra sea fundamento y tu Espíritu su maestro. Amén.",
+      "tags": ["sabiduría", "carácter", "justicia"],
+      "verseRef": "Proverbios 1:7"
+    },
+    {
+      "id": "hij-003",
+      "title": "Protección Diaria",
+      "text": "Dios, protege a mis hijos de todo mal, físico y emocional. Guarda su mente de la mentira y su cuerpo del peligro. Que sepan que son amados por ti. Amén.",
+      "tags": ["protección", "verdad", "cuidado"],
+      "verseRef": "Salmo 121:7"
+    },
+    {
+      "id": "hij-004",
+      "title": "Paciencia para Criar",
+      "text": "Señor, dame paciencia y humildad para corregir con amor. Enséñame a escuchar, a guiar y a afirmar su valor. Que tu gracia llene nuestra relación. Amén.",
+      "tags": ["paciencia", "corrección", "gracia"],
+      "verseRef": "Efesios 6:4"
+    },
+    {
+      "id": "hij-005",
+      "title": "Fe Sencilla",
+      "text": "Padre, cultiva en mis hijos una fe sencilla y viva. Que hablen contigo con naturalidad y confíen en tu bondad. Muéstrales tu fidelidad en lo pequeño. Amén.",
+      "tags": ["fe", "confianza", "fidelidad"],
+      "verseRef": "Mateo 19:14"
+    }
+  ],
+  "sabiduria": [
+    {
+      "id": "sab-001",
+      "title": "Corazón Entendido",
+      "text": "Señor, dame un corazón entendido para discernir tu voluntad. Que tu sabiduría guíe mis decisiones y tu temor santo me aparte del mal. Amén.",
+      "tags": ["discernimiento", "decisión", "santidad"],
+      "verseRef": "Proverbios 9:10"
+    },
+    {
+      "id": "sab-002",
+      "title": "Consejo del Cielo",
+      "text": "Padre, busco tu consejo más que mi propia opinión. Silencia el ruido y abre mis oídos a tu voz. Rodea mi vida de consejeros piadosos. Amén.",
+      "tags": ["consejo", "voz de Dios", "humildad"],
+      "verseRef": "Santiago 1:5"
+    },
+    {
+      "id": "sab-003",
+      "title": "Luz para el Camino",
+      "text": "Dios, tu palabra es lámpara a mis pies. Ilumina los siguientes pasos y no permitas que tropiece. Que tu verdad me ancle y tu paz me guíe. Amén.",
+      "tags": ["palabra", "luz", "verdad"],
+      "verseRef": "Salmo 119:105"
+    },
+    {
+      "id": "sab-004",
+      "title": "Humildad para Aprender",
+      "text": "Señor, dame humildad para reconocer lo que no sé. Hazme enseñable, rápido para escuchar y lento para hablar. Que cada experiencia me acerque más a ti. Amén.",
+      "tags": ["humildad", "aprendizaje", "escucha"],
+      "verseRef": "Proverbios 19:20"
+    },
+    {
+      "id": "sab-005",
+      "title": "Decisiones con Paz",
+      "text": "Padre, quiero decidir con tu paz como árbitro. Si no hay paz, enséñame a esperar; si la hay, dame valentía para avanzar. Amén.",
+      "tags": ["decisiones", "paz", "valentía"],
+      "verseRef": "Colosenses 3:15"
+    }
+  ],
+  "prosperidad": [
+    {
+      "id": "prosp-001",
+      "title": "Provisión y Gratitud",
+      "text": "Señor, todo viene de ti. Gracias por la provisión diaria. Ayúdame a administrar con sabiduría, a ser generoso y a confiar en tu cuidado más que en mis recursos. Amén.",
+      "tags": ["provisión", "gratitud", "generosidad"],
+      "verseRef": "Santiago 1:17"
+    },
+    {
+      "id": "prosp-002",
+      "title": "Manos Bendecidas",
+      "text": "Padre, bendice la obra de mis manos. Que el fruto de mi trabajo sea justo y suficiente, y que pueda compartir con quien necesita. Amén.",
+      "tags": ["trabajo", "bendición", "compartir"],
+      "verseRef": "Deuteronomio 28:12"
+    },
+    {
+      "id": "prosp-003",
+      "title": "Corazón Generoso",
+      "text": "Jesús, líbrame de la avaricia y enséñame a dar con alegría. Que mi tesoro esté en tu reino y no en lo pasajero. Amén.",
+      "tags": ["generosidad", "desapego", "reino"],
+      "verseRef": "2 Corintios 9:7"
+    },
+    {
+      "id": "prosp-004",
+      "title": "Guía en Finanzas",
+      "text": "Señor, dame estrategia para ordenar mis finanzas: ahorrar con propósito, evitar deudas innecesarias y sembrar en lo eterno. Sé tú mi consejero. Amén.",
+      "tags": ["finanzas", "estrategia", "propósito"],
+      "verseRef": "Proverbios 21:5"
+    },
+    {
+      "id": "prosp-005",
+      "title": "Suficiencia en Ti",
+      "text": "Padre, mi verdadera riqueza eres tú. Aunque falte o abunde, enséñame a estar contento y a confiar en tu suficiencia. Amén.",
+      "tags": ["contentamiento", "confianza", "suficiencia"],
+      "verseRef": "Filipenses 4:12"
+    }
+  ]
+}
+

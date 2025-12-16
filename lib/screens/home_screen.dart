@@ -8,7 +8,9 @@ import '../models/prayer.dart';
 import '../providers/app_provider.dart';
 import '../widgets/streak_card.dart';
 import '../controllers/missions_controller.dart';
-import 'mission_read_screen.dart';
+import '../controllers/streak_controller.dart';
+import 'reading_screen.dart';
+import '../widgets/racha_celebration_dialog.dart';
 import '../services/ads_service.dart';
 import '../services/share_service.dart';
 import '../services/storage_service.dart';
@@ -40,6 +42,8 @@ class _HomeScreenState extends State<HomeScreen>
   Timer? _dailyRefreshTimer;
   bool _isMorningPrayer = true;
   bool _adsRemoved = false;
+  bool _streakDialogShowing = false;
+  final StreakController _streakController = StreakController();
   // Se inicializa aquí para evitar LateInitializationError en hot reload.
   late final MissionsController _missionsController = MissionsController(
     missions: [
@@ -194,6 +198,7 @@ class _HomeScreenState extends State<HomeScreen>
     _tabController.dispose();
     _animationController.dispose();
     _prayerTransitionController.dispose();
+    _streakController.dispose();
     _bannerAd?.dispose();
     _audioPlayer?.dispose();
     _prayerTimeCheckTimer?.cancel();
@@ -353,12 +358,39 @@ class _HomeScreenState extends State<HomeScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  StreakCard(
-                    currentStreak: provider.streakCount,
-                    goalDays: provider.streakGoal,
-                    progressPercent: provider.streakGoal == 0
-                        ? 1
-                        : provider.streakCount / provider.streakGoal,
+                  ChangeNotifierProvider<StreakController>.value(
+                    value: _streakController,
+                    child: Consumer<StreakController>(
+                      builder: (context, streak, _) {
+                        if (streak.showPopup && !_streakDialogShowing) {
+                          _streakDialogShowing = true;
+                          // Consumir el flag antes de mostrar para evitar múltiples diálogos.
+                          _streakController.consumePopup();
+                          Future.microtask(() {
+                            if (!mounted) return;
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              barrierColor: Colors.black54,
+                              builder: (_) => RachaCelebrationDialog(totalDays: streak.totalDays),
+                            ).then((_) {
+                              if (mounted) {
+                                setState(() {
+                                  _streakDialogShowing = false;
+                                });
+                              } else {
+                                _streakDialogShowing = false;
+                              }
+                            });
+                          });
+                        }
+                        return StreakCardDuolingoStyle(
+                          totalDays: streak.totalDays,
+                          playAnimation: streak.playAnimation,
+                          weekDays: streak.days,
+                        );
+                      },
+                    ),
                   ),
                   const SizedBox(height: 16),
                   _buildMissionsSection(context, provider),
@@ -640,6 +672,29 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
                 textAlign: TextAlign.justify,
           ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton.icon(
+                    onPressed: () {
+                      ShareService.shareAsText(
+                        text: prayer.text,
+                        reference: prayer.title,
+                        title: prayer.title,
+                      );
+                    },
+                    icon: const Icon(Icons.share_outlined),
+                    label: const Text('Compartir'),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                    label: const Text('Cerrar'),
+                  ),
+                ],
+              )
             ],
           ),
         ),
@@ -649,16 +704,29 @@ class _HomeScreenState extends State<HomeScreen>
 
   void _openMissionRead(BuildContext context, Mission mission, AppProvider provider) {
     final content = _getMissionContent(mission.id, provider);
-          Navigator.of(context).push(
-            MaterialPageRoute(
-        builder: (_) => MissionReadScreen(
+    final reference = _getMissionReference(mission.id, provider);
+    final progress = _missionsProgress();
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ReadingScreen(
           title: mission.title,
           content: content,
-          onCompleted: () {
+          reference: reference,
+          backgroundImage: null, // Puedes pasar un AssetImage/NetworkImage si deseas un fondo específico
+          progress: progress,
+          onComplete: () {
             setState(() {
               _missionsController.completeMission(mission.id);
             });
+            if (_missionsController.isAllCompleted()) {
+              provider.completeDailyStreak();
+              _streakController.completeToday(DateTime.now().weekday - 1);
+            }
           },
+          currentMissionId: mission.id,
+          missions: _missionsController.missions,
+          onOpenMission: (nextMission) => _openMissionRead(context, nextMission, provider),
         ),
       ),
     );
@@ -677,6 +745,22 @@ class _HomeScreenState extends State<HomeScreen>
       default:
         return 'Contenido no disponible.';
     }
+  }
+
+  String? _getMissionReference(String id, AppProvider provider) {
+    switch (id) {
+      case 'verse':
+        return provider.todayVerse?.reference;
+      default:
+        return null;
+    }
+  }
+
+  double _missionsProgress() {
+    final total = _missionsController.missions.length;
+    final completed = _missionsController.missions.where((m) => m.completed).length;
+    if (total == 0) return 0.0;
+    return completed / total;
   }
 
   Widget _buildMissionCard(BuildContext context, Mission mission, AppProvider provider) {

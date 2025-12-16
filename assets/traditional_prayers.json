@@ -1,0 +1,49 @@
+[
+  {
+    "id": "padre_nuestro",
+    "title": "Padre Nuestro",
+    "type": "fixed_text",
+    "text": "Padre nuestro, que estás en el cielo, santificado sea tu Nombre; venga a nosotros tu Reino; hágase tu voluntad en la tierra como en el cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación y líbranos del mal. Amén."
+  },
+  {
+    "id": "ave_maria",
+    "title": "Ave María",
+    "type": "fixed_text",
+    "text": "Dios te salve, María, llena eres de gracia; el Señor es contigo. Bendita tú eres entre todas las mujeres, y bendito es el fruto de tu vientre, Jesús. Santa María, Madre de Dios, ruega por nosotros pecadores, ahora y en la hora de nuestra muerte. Amén."
+  },
+  {
+    "id": "credo",
+    "title": "Credo",
+    "type": "fixed_text",
+    "text": "Creo en Dios, Padre todopoderoso, creador del cielo y de la tierra. Creo en Jesucristo, su único Hijo, nuestro Señor, que fue concebido por obra y gracia del Espíritu Santo; nació de Santa María Virgen; padeció bajo el poder de Poncio Pilato; fue crucificado, muerto y sepultado; descendió a los infiernos; al tercer día resucitó de entre los muertos; subió a los cielos y está sentado a la derecha de Dios, Padre todopoderoso. Desde allí ha de venir a juzgar a vivos y muertos. Creo en el Espíritu Santo, la santa Iglesia católica, la comunión de los santos, el perdón de los pecados, la resurrección de la carne y la vida eterna. Amén."
+  },
+  {
+    "id": "espiritu_santo",
+    "title": "Ven Espíritu Santo",
+    "type": "fixed_text",
+    "text": "Ven, Espíritu Santo, llena los corazones de tus fieles y enciende en ellos el fuego de tu amor. Envía tu Espíritu y serán creados. Y renovarás la faz de la tierra. Oh Dios, que has instruido los corazones de tus fieles con la luz del Espíritu Santo, concédenos que, guiados por el mismo Espíritu, vivamos con rectitud y gocemos siempre de su consuelo. Por Jesucristo nuestro Señor. Amén."
+  },
+  {
+    "id": "sanacion",
+    "title": "Oración de Sanación",
+    "type": "fixed_text",
+    "text": "Señor Jesús, tú que recorriste pueblos y aldeas curando toda dolencia, ten compasión de nosotros. Deposito en ti toda enfermedad y debilidad. Renueva mis fuerzas, sana mi alma y mi cuerpo, y hazme vivir en tu paz. Amén."
+  },
+  {
+    "id": "consagracion",
+    "title": "Consagración al Sagrado Corazón",
+    "type": "fixed_text",
+    "text": "Sagrado Corazón de Jesús, en ti confío. Me consagro a tu amor y misericordia. Toma mi vida, mis pensamientos y acciones, y hazlos tuyos. Que tu corazón sea mi refugio y mi camino seguro hacia el Padre. Amén."
+  },
+  {
+    "id": "gratitud_trad",
+    "title": "Cántico de María (Magnificat)",
+    "type": "bible_passage",
+    "book": "LUK",
+    "chapter": 1,
+    "verseStart": 46,
+    "verseEnd": 55,
+    "label": "Lucas 1:46-55"
+  }
+]
+

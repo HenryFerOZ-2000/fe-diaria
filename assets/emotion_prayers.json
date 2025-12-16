@@ -1,0 +1,225 @@
+{
+  "ansiedad": [
+    {
+      "id": "ans-001",
+      "title": "Respira en Tu Paz",
+      "text": "Señor Jesús, respiro hondo y dejo que Tu paz llene mi pecho. Conoces lo que me inquieta. Entrego cada preocupación y recibo Tu calma. Guarda mi mente y mi corazón en Tu amor. Amén.",
+      "tags": ["paz", "confianza", "calma"],
+      "verseRef": "Filipenses 4:6-7"
+    },
+    {
+      "id": "ans-002",
+      "title": "Tormenta en Calma",
+      "text": "Padre, hablas a las tormentas y se aquietan. Habla hoy a mi interior, ordena quietud. Fijo mi mirada en Ti y no en el viento. Tu mano me sostiene. Amén.",
+      "tags": ["quietud", "fe", "sostén"],
+      "verseRef": "Mateo 8:26"
+    },
+    {
+      "id": "ans-003",
+      "title": "Entrega de Cargas",
+      "text": "Jesús, dejo mis cargas a Tus pies. Dame valentía para soltar el control y descanso en Tu gracia. Que Tu yugo ligero reemplace mi agobio. Amén.",
+      "tags": ["descanso", "gracia", "entrega"],
+      "verseRef": "Mateo 11:28-30"
+    },
+    {
+      "id": "ans-004",
+      "title": "Corazón Quieto",
+      "text": "Señor, aquieta mi corazón cuando se acelera. Que Tu paz que sobrepasa entendimiento gobierne mis pensamientos. Confío en Tu fidelidad. Amén.",
+      "tags": ["paz", "fidelidad", "confianza"],
+      "verseRef": "Salmo 46:10"
+    },
+    {
+      "id": "ans-005",
+      "title": "Paso a Paso",
+      "text": "Padre, enséñame a vivir un día a la vez. Dame luz para el siguiente paso y paz para esperar el resto. Camino contigo, no con prisa. Amén.",
+      "tags": ["presente", "paso", "paz"],
+      "verseRef": "Proverbios 3:5-6"
+    }
+  ],
+  "tristeza": [
+    {
+      "id": "tri-001",
+      "title": "Lágrimas en Tus Manos",
+      "text": "Padre, mis lágrimas no se pierden; caen en Tus manos. Acércate con ternura y recuérdame que mi tristeza no es el final. Consuélame y renueva mi esperanza. Amén.",
+      "tags": ["consuelo", "esperanza", "ternura"],
+      "verseRef": "Salmo 56:8"
+    },
+    {
+      "id": "tri-002",
+      "title": "Consuelo Cercano",
+      "text": "Señor, estás cerca del corazón quebrantado. Abraza mi dolor y sé mi refugio. Sana lo que duele y restaura mi ánimo. Amén.",
+      "tags": ["refugio", "sanidad", "ánimo"],
+      "verseRef": "Salmo 34:18"
+    },
+    {
+      "id": "tri-003",
+      "title": "Esperanza que Renace",
+      "text": "Aunque la tristeza pese, tu misericordia es nueva cada mañana. Haz germinar esperanza en lo seco y muéstrame tu bondad en lo pequeño. Amén.",
+      "tags": ["misericordia", "esperanza", "bondad"],
+      "verseRef": "Lamentaciones 3:22-23"
+    },
+    {
+      "id": "tri-004",
+      "title": "Canto en la Noche",
+      "text": "En la noche de mi alma, enséñame a susurrar un canto de confianza. Que tu gozo sea mi fortaleza hasta que amanezca. Amén.",
+      "tags": ["gozo", "fortaleza", "noche"],
+      "verseRef": "Salmo 42:8"
+    },
+    {
+      "id": "tri-005",
+      "title": "Abrazo que Sostiene",
+      "text": "Necesito sentir que no me sueltas. Abraza mi debilidad y lléname de tu consuelo. Tu carácter es mi seguridad. Amén.",
+      "tags": ["abrazo", "seguridad", "consuelo"],
+      "verseRef": "Isaías 41:10"
+    }
+  ],
+  "paz_interior": [
+    {
+      "id": "paz-001",
+      "title": "Paz que Permanece",
+      "text": "Jesús, recibo tu paz, no como el mundo la da. Que permanezca en mí aunque todo se mueva. Sella mi corazón con tu shalom. Amén.",
+      "tags": ["shalom", "corazón", "permanecer"],
+      "verseRef": "Juan 14:27"
+    },
+    {
+      "id": "paz-002",
+      "title": "Quietud Elegida",
+      "text": "Hoy elijo la quietud que viene de confiar en Ti. Apago voces que inquietan y abro espacio para tu voz suave. Llena mi mente de calma. Amén.",
+      "tags": ["quietud", "voz", "calma"],
+      "verseRef": "Salmo 131:2"
+    },
+    {
+      "id": "paz-003",
+      "title": "Casa de Paz",
+      "text": "Haz de mi interior una casa de paz donde tu Espíritu habite cómodo. Ordena lo desordenado y silencia el ruido. Amén.",
+      "tags": ["paz", "orden", "silencio"],
+      "verseRef": "Colosenses 3:15"
+    },
+    {
+      "id": "paz-004",
+      "title": "Respirar Calma",
+      "text": "Inhalo tu paz y exhalo tensión. Que cada respiración sea: confío en Ti. Dirige mi día desde tu descanso. Amén.",
+      "tags": ["respirar", "descanso", "confianza"],
+      "verseRef": "Hechos 17:28"
+    },
+    {
+      "id": "paz-005",
+      "title": "Ancla Firme",
+      "text": "Cuando todo se mueve, ancla mi corazón en Ti. Eres roca y refugio; ninguna tormenta roba la tranquilidad que viene de saber que gobiernas con amor. Amén.",
+      "tags": ["roca", "refugio", "tranquilidad"],
+      "verseRef": "Salmo 18:2"
+    }
+  ],
+  "gratitud": [
+    {
+      "id": "gra-001",
+      "title": "Gracias por Hoy",
+      "text": "Padre, gracias por este día y por tu cuidado en cada detalle. Abre mis ojos para ver tu mano en lo cotidiano. Que la gratitud marque mi actitud. Amén.",
+      "tags": ["cotidiano", "cuidado", "actitud"],
+      "verseRef": "Salmo 118:24"
+    },
+    {
+      "id": "gra-002",
+      "title": "Memoria Agradecida",
+      "text": "Quiero recordar tus beneficios y no olvidarlos. Has sido fiel y proveedor. Traigo a memoria tus rescates y doy gracias. Amén.",
+      "tags": ["memoria", "fidelidad", "provisión"],
+      "verseRef": "Salmo 103:2"
+    },
+    {
+      "id": "gra-003",
+      "title": "Gratitud en lo Pequeño",
+      "text": "Enséñame a agradecer lo sencillo: una sonrisa, un vaso de agua, un mensaje oportuno. Que celebre tu cuidado en los detalles. Amén.",
+      "tags": ["detalles", "cuidado", "celebrar"],
+      "verseRef": "1 Tesalonicenses 5:18"
+    },
+    {
+      "id": "gra-004",
+      "title": "Canta mi Alma",
+      "text": "Que mi alma cante por agradecimiento. Mis labios proclaman: Tú eres bueno. Gracias por tu presencia y perdón. Amén.",
+      "tags": ["alabanza", "bondad", "presencia"],
+      "verseRef": "Salmo 13:6"
+    },
+    {
+      "id": "gra-005",
+      "title": "Lista de Bondades",
+      "text": "Hoy escribo tus bondades. Al nombrarlas, mi corazón se ensancha. Gracias porque has estado conmigo siempre. Amén.",
+      "tags": ["bondad", "recordar", "agradecer"],
+      "verseRef": "Salmo 77:11"
+    }
+  ],
+  "perdon": [
+    {
+      "id": "per-001",
+      "title": "Recibo tu Perdón",
+      "text": "Jesús, gracias por perdonar mis faltas. Recibo tu gracia y dejo la culpa. Que viva en la libertad de ser amado y limpio por Ti. Amén.",
+      "tags": ["gracia", "libertad", "limpieza"],
+      "verseRef": "1 Juan 1:9"
+    },
+    {
+      "id": "per-002",
+      "title": "Perdonar como Tú",
+      "text": "Enséñame a perdonar como Tú me perdonaste. Quita amargura y raíces de resentimiento. Dame un corazón tierno para soltar. Amén.",
+      "tags": ["perdón", "ternura", "libertad"],
+      "verseRef": "Efesios 4:32"
+    },
+    {
+      "id": "per-003",
+      "title": "Liberación Mutua",
+      "text": "Al perdonar libero y me libero. Muéstrame tu corazón por quien me hirió y ayúdame a bendecir. Amén.",
+      "tags": ["libertad", "bendición", "gracia"],
+      "verseRef": "Mateo 5:44"
+    },
+    {
+      "id": "per-004",
+      "title": "Sanar Recuerdos",
+      "text": "Entra con tu amor en los recuerdos que duelen. Reemplaza dolor por paz y enojo por compasión. Transforma mi interior. Amén.",
+      "tags": ["sanidad", "paz", "compasión"],
+      "verseRef": "Salmo 147:3"
+    },
+    {
+      "id": "per-005",
+      "title": "Soltar la Deuda",
+      "text": "Cancelo la deuda emocional que guardaba. Así como Tú cancelaste la mía, suelto lo que creo que me deben. Lléname de tu Espíritu. Amén.",
+      "tags": ["soltar", "deuda", "Espíritu"],
+      "verseRef": "Mateo 18:21-22"
+    }
+  ],
+  "fortaleza": [
+    {
+      "id": "for-001",
+      "title": "Fuerza en Debilidad",
+      "text": "Señor, en mi debilidad tu poder se perfecciona. No confío en mi fuerza sino en la tuya. Levántame con tu Espíritu hoy. Amén.",
+      "tags": ["poder", "Espíritu", "ánimo"],
+      "verseRef": "2 Corintios 12:9-10"
+    },
+    {
+      "id": "for-002",
+      "title": "Roca Segura",
+      "text": "Eres la roca que no se mueve. Cuando todo tiembla me apoyo en Ti. Refuerza mi fe y hazme firme en tus promesas. Amén.",
+      "tags": ["roca", "fe", "promesas"],
+      "verseRef": "Salmo 18:2"
+    },
+    {
+      "id": "for-003",
+      "title": "Ánimo Renovado",
+      "text": "Renueva mi ánimo como el águila. Quita cansancio y dame impulso nuevo. Que tu gozo sea mi fuerza. Amén.",
+      "tags": ["ánimo", "gozo", "renuevo"],
+      "verseRef": "Isaías 40:31"
+    },
+    {
+      "id": "for-004",
+      "title": "Valentía con Gracia",
+      "text": "Dame valentía unida a gracia. No dureza sin amor ni suavidad sin firmeza. Guíame en equilibrio para enfrentar desafíos contigo. Amén.",
+      "tags": ["valentía", "gracia", "equilibrio"],
+      "verseRef": "Josué 1:9"
+    },
+    {
+      "id": "for-005",
+      "title": "Fortaleza Interior",
+      "text": "Fortalece mi interior por tu Espíritu. Que mis raíces vayan profundo en tu amor y resistan cualquier viento. Amén.",
+      "tags": ["raíces", "amor", "Espíritu"],
+      "verseRef": "Efesios 3:16-17"
+    }
+  ]
+}
+

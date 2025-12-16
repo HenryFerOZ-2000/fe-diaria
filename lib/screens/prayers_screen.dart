@@ -5,6 +5,9 @@ import '../providers/app_provider.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/prayer_button.dart';
 import '../models/prayer.dart';
+import 'emotion_passage_read_screen.dart';
+import 'intention_prayer_read_screen.dart';
+import 'traditional_prayer_screen.dart';
 
 class PrayersScreen extends StatelessWidget {
   const PrayersScreen({super.key});
@@ -103,55 +106,265 @@ class PrayersScreen extends StatelessWidget {
 
   List<Widget> _emotionOptions(BuildContext context) {
     return [
-      PrayerButton(icon: Icons.mood_bad, title: 'Ansiedad', onTap: () {}),
+      PrayerButton(
+        icon: Icons.mood_bad,
+        title: 'Ansiedad',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const EmotionPassageReadScreen(emotionKey: 'ansiedad'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.sentiment_dissatisfied, title: 'Tristeza', onTap: () {}),
+      PrayerButton(
+        icon: Icons.sentiment_dissatisfied,
+        title: 'Tristeza',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const EmotionPassageReadScreen(emotionKey: 'tristeza'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.self_improvement, title: 'Paz interior', onTap: () {}),
+      PrayerButton(
+        icon: Icons.self_improvement,
+        title: 'Paz interior',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const EmotionPassageReadScreen(emotionKey: 'paz_interior'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.wb_sunny_outlined, title: 'Gratitud', onTap: () {}),
+      PrayerButton(
+        icon: Icons.wb_sunny_outlined,
+        title: 'Gratitud',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const EmotionPassageReadScreen(emotionKey: 'gratitud'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.volunteer_activism, title: 'Perdón', onTap: () {}),
+      PrayerButton(
+        icon: Icons.volunteer_activism,
+        title: 'Perdón',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const EmotionPassageReadScreen(emotionKey: 'perdon'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.fitness_center, title: 'Fortaleza', onTap: () {}),
+      PrayerButton(
+        icon: Icons.fitness_center,
+        title: 'Fortaleza',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const EmotionPassageReadScreen(emotionKey: 'fortaleza'),
+          ),
+        ),
+      ),
     ];
   }
 
   List<Widget> _intentionOptions(BuildContext context) {
     return [
-      PrayerButton(icon: Icons.local_hospital, title: 'Salud', onTap: () {}),
+      PrayerButton(
+        icon: Icons.local_hospital,
+        title: 'Salud',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const IntentionPrayerReadScreen(categoryKey: 'salud'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.family_restroom, title: 'Familia', onTap: () {}),
+      PrayerButton(
+        icon: Icons.family_restroom,
+        title: 'Familia',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const IntentionPrayerReadScreen(categoryKey: 'familia'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.work_outline, title: 'Trabajo', onTap: () {}),
+      PrayerButton(
+        icon: Icons.work_outline,
+        title: 'Trabajo',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const IntentionPrayerReadScreen(categoryKey: 'trabajo'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.security_outlined, title: 'Protección', onTap: () {}),
+      PrayerButton(
+        icon: Icons.security_outlined,
+        title: 'Protección',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const IntentionPrayerReadScreen(categoryKey: 'proteccion'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.favorite_outline, title: 'Pareja', onTap: () {}),
+      PrayerButton(
+        icon: Icons.favorite_outline,
+        title: 'Pareja',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const IntentionPrayerReadScreen(categoryKey: 'pareja'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.child_friendly, title: 'Hijos', onTap: () {}),
+      PrayerButton(
+        icon: Icons.child_friendly,
+        title: 'Hijos',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const IntentionPrayerReadScreen(categoryKey: 'hijos'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.school_outlined, title: 'Sabiduría', onTap: () {}),
+      PrayerButton(
+        icon: Icons.school_outlined,
+        title: 'Sabiduría',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const IntentionPrayerReadScreen(categoryKey: 'sabiduria'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.savings_outlined, title: 'Prosperidad', onTap: () {}),
+      PrayerButton(
+        icon: Icons.savings_outlined,
+        title: 'Prosperidad',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const IntentionPrayerReadScreen(categoryKey: 'prosperidad'),
+          ),
+        ),
+      ),
     ];
   }
 
   List<Widget> _traditionalOptions(BuildContext context) {
     return [
-      PrayerButton(icon: Icons.menu_book_rounded, title: 'Padre Nuestro', onTap: () {}),
+      PrayerButton(
+        icon: Icons.menu_book_rounded,
+        title: 'Padre Nuestro',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const TraditionalPrayerScreen(prayerId: 'padre_nuestro'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.menu_book_rounded, title: 'Ave María', onTap: () {}),
+      PrayerButton(
+        icon: Icons.menu_book_rounded,
+        title: 'Ave María',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const TraditionalPrayerScreen(prayerId: 'ave_maria'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.menu_book_rounded, title: 'Credo', onTap: () {}),
+      PrayerButton(
+        icon: Icons.menu_book_rounded,
+        title: 'Credo',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const TraditionalPrayerScreen(prayerId: 'credo'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.menu_book_rounded, title: 'Espíritu Santo', onTap: () {}),
+      PrayerButton(
+        icon: Icons.menu_book_rounded,
+        title: 'Espíritu Santo',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const TraditionalPrayerScreen(prayerId: 'espiritu_santo'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.menu_book_rounded, title: 'Sanación', onTap: () {}),
+      PrayerButton(
+        icon: Icons.menu_book_rounded,
+        title: 'Sanación',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const TraditionalPrayerScreen(prayerId: 'sanacion'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.menu_book_rounded, title: 'Consagración', onTap: () {}),
+      PrayerButton(
+        icon: Icons.menu_book_rounded,
+        title: 'Consagración',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const TraditionalPrayerScreen(prayerId: 'consagracion'),
+          ),
+        ),
+      ),
       const SizedBox(height: 10),
-      PrayerButton(icon: Icons.menu_book_rounded, title: 'Gratitud', onTap: () {}),
+      PrayerButton(
+        icon: Icons.menu_book_rounded,
+        title: 'Gratitud',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                const TraditionalPrayerScreen(prayerId: 'gratitud_trad'),
+          ),
+        ),
+      ),
     ];
   }
 

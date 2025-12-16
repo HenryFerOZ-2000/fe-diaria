@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../services/share_service.dart';
 
 class MissionReadScreen extends StatefulWidget {
   final String title;
@@ -43,7 +44,7 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: colorScheme.background.withOpacity(0.98),
+      backgroundColor: colorScheme.surface.withOpacity(0.98),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -119,27 +120,41 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
                   textAlign: TextAlign.justify,
                 ),
                 const SizedBox(height: 18),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      if (!_completed) {
-                        widget.onCompleted();
-                        _completed = true;
-                      }
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(Icons.check_circle_outline),
-                    label: const Text('Cerrar'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () {
+                        ShareService.shareAsText(
+                          text: widget.content,
+                          reference: widget.title,
+                          title: widget.title,
+                        );
+                      },
+                      icon: const Icon(Icons.share_outlined),
+                      label: const Text('Compartir'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        if (!_completed) {
+                          widget.onCompleted();
+                          _completed = true;
+                        }
+                        Navigator.of(context).pop();
+                      },
+                      icon: const Icon(Icons.check_circle_outline),
+                      label: const Text('Cerrar'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                     ),
-                  ),
-                ),
+                  ],
+                )
               ],
             ),
           ),

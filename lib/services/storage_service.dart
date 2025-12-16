@@ -286,6 +286,26 @@ class StorageService {
     await _settingsBox.put(_novenaLastStepKey, step);
   }
 
+  // Utilidades genéricas para almacenaje simple (ej. resaltados)
+  Future<void> setCustomString(String key, String value) async {
+    await _settingsBox.put(key, value);
+  }
+
+  String? getCustomString(String key) {
+    return _settingsBox.get(key) as String?;
+  }
+
+  Future<void> removeCustom(String key) async {
+    await _settingsBox.delete(key);
+  }
+
+  List<String> getKeysWithPrefix(String prefix) {
+    return _settingsBox.keys
+        .where((k) => k.toString().startsWith(prefix))
+        .map((k) => k.toString())
+        .toList();
+  }
+
   // Racha diaria
   int getStreakCount() {
     return _settingsBox.get(_streakCountKey, defaultValue: 0) as int;

@@ -1,0 +1,963 @@
+[
+  {
+    "id": "ans-001",
+    "category": "ansiedad",
+    "title": "Respira en Tu Paz",
+    "text": "Señor Jesús, respiro hondo y dejo que Tu paz llene mi pecho. Tú conoces lo que me inquieta y los pensamientos que corren sin descanso. Te entrego cada preocupación y recibo Tu calma, porque en Tu presencia nada me falta. Sostén mi mente, suaviza mi corazón y guíame paso a paso. Confío en que Tu amor perfecto echa fuera el temor. Gracias porque estás conmigo hoy, ahora y siempre.",
+    "tags": ["calma", "confianza", "respirar", "presencia"],
+    "verseRef": "Filipenses 4:6-7"
+  },
+  {
+    "id": "ans-002",
+    "category": "ansiedad",
+    "title": "Sosiego en la Tormenta",
+    "text": "Padre, cuando siento que las olas de la ansiedad me cubren, recuerdo que Tú calmaste el mar con una palabra. Habla hoy a mi tormenta interior y ordena quietud. Ayúdame a fijar mi mirada en Ti y no en el viento. Enséñame a descansar en Tu fidelidad y a caminar sobre lo incierto sabiendo que Tu mano me sostiene. Amén.",
+    "tags": ["tormenta", "quietud", "fe", "descanso"],
+    "verseRef": "Mateo 8:26"
+  },
+  {
+    "id": "ans-003",
+    "category": "ansiedad",
+    "title": "Entrega de Cargas",
+    "text": "Jesús, a veces mi mente no se detiene y llevo cargas que pesan demasiado. Hoy decido ponerlas a Tus pies. Recibo Tu invitación a hallar descanso en Ti. Dame valentía para soltar el control y humildad para dejar que seas Tú quien dirige. Que Tu yugo ligero reemplace mi agobio y Tu Espíritu me recuerde que no estoy solo. Gracias por Tu cuidado constante.",
+    "tags": ["cargas", "descanso", "ligereza", "cuidado"],
+    "verseRef": "Mateo 11:28-30"
+  },
+  {
+    "id": "ans-004",
+    "category": "ansiedad",
+    "title": "Corazón Quieto",
+    "text": "Señor, aquieta mi corazón cuando se acelera por lo que no entiendo. Dame la gracia de recibir Tu paz que sobrepasa todo entendimiento. Que mis pensamientos se alineen a Tu verdad y no a mis temores. Enséñame a escuchar Tu voz más fuerte que el ruido de la duda. Hoy elijo confiar en Tu carácter bueno y fiel.",
+    "tags": ["quietud", "verdad", "duda", "paz"],
+    "verseRef": "Salmos 46:10"
+  },
+  {
+    "id": "ans-005",
+    "category": "ansiedad",
+    "title": "Descanso Presente",
+    "text": "Padre, me cuesta quedarme en el presente; mi mente corre al mañana. Ayúdame a encontrar descanso en este momento contigo. Tú estás aquí y eso basta. Quiero dejar en Tus manos lo que no puedo controlar y recibir Tu provisión diaria. Enséñame a respirar gracia y a exhalar preocupación. Que Tu Espíritu me guíe con suavidad.",
+    "tags": ["presente", "gracia", "provisión", "calma"],
+    "verseRef": "Mateo 6:34"
+  },
+  {
+    "id": "ans-006",
+    "category": "ansiedad",
+    "title": "Paz que Guarda",
+    "text": "Señor, guarda mi mente y mi corazón en Cristo Jesús. Cuando las noticias y los retos me abruman, quiero recordar que Tú eres mi roca firme. Te pido que Tu paz actúe como un guardián alrededor de mis pensamientos. Que cada latido sea un recordatorio de Tu presencia cercana y Tu amor inamovible.",
+    "tags": ["guardia", "mente", "roca", "amor"],
+    "verseRef": "Filipenses 4:7"
+  },
+  {
+    "id": "ans-007",
+    "category": "ansiedad",
+    "title": "Confianza en el Proceso",
+    "text": "Padre, a veces temo no llegar a tiempo ni cumplir expectativas. Recuérdame que Tú llevas mi historia en Tus manos y que Tu tiempo es perfecto. Dame serenidad para avanzar sin prisa ni pausa, guiado por Tu Espíritu. Que mi identidad descanse en ser amado por Ti y no en mis logros. Gracias porque no me sueltas.",
+    "tags": ["tiempo", "identidad", "proceso", "serenidad"],
+    "verseRef": "Eclesiastés 3:11"
+  },
+  {
+    "id": "ans-008",
+    "category": "ansiedad",
+    "title": "Silencio Fecundo",
+    "text": "Señor, en medio del ruido interior busco un espacio de silencio contigo. Que ese silencio no sea vacío sino lleno de Tu presencia. Háblame en lo suave, calma lo que tiembla en mí. Ayúdame a confiar en Tu palabra más que en mis supuestos. Que el descanso en Ti produzca fruto de paz en mi vida.",
+    "tags": ["silencio", "fruto", "descanso", "presencia"],
+    "verseRef": "1 Reyes 19:12"
+  },
+  {
+    "id": "ans-009",
+    "category": "ansiedad",
+    "title": "Manos Abiertas",
+    "text": "Padre, abro mis manos para soltar lo que temo perder y recibir lo que tienes para mí. Quita la rigidez de mi control y reemplázala con confianza. Enséñame a esperar en Tu bondad, sabiendo que cuidas de mí mejor que yo mismo. Que Tu amor me haga libre de la ansiedad.",
+    "tags": ["soltar", "espera", "bondad", "libertad"],
+    "verseRef": "1 Pedro 5:7"
+  },
+  {
+    "id": "ans-010",
+    "category": "ansiedad",
+    "title": "Ritmo de Gracia",
+    "text": "Señor, quiero caminar al ritmo de Tu gracia, no al de mis urgencias. Toma mis listas y mis pendientes, y ordénalos con Tu sabiduría. Dame gracia para decir sí a lo que viene de Ti y no a lo que roba mi paz. Que Tu Espíritu marque el compás de mi día.",
+    "tags": ["ritmo", "sabiduría", "prioridad", "gracia"],
+    "verseRef": "Salmos 23:2-3"
+  },
+  {
+    "id": "ans-011",
+    "category": "ansiedad",
+    "title": "Protección Mental",
+    "text": "Padre, cubre mi mente con Tu verdad. Renueva mis pensamientos y derriba imaginarios que alimentan el miedo. Que Tu Palabra sea mi ancla y Tu Espíritu mi consuelo. Hoy elijo meditar en lo bueno, lo puro y lo amable. Gracias porque Tu luz disipa mis sombras.",
+    "tags": ["mente", "verdad", "luz", "meditación"],
+    "verseRef": "Filipenses 4:8"
+  },
+  {
+    "id": "ans-012",
+    "category": "ansiedad",
+    "title": "Áncora Segura",
+    "text": "Señor, cuando me siento a la deriva, Tú eres mi ancla segura. No permitirás que me hunda porque Tu mano me sostiene. Dame fortaleza para esperar y fe para creer que lo que no veo Tú ya lo ves. Reposa mi alma en Tu fidelidad.",
+    "tags": ["áncora", "fidelidad", "espera", "fortaleza"],
+    "verseRef": "Hebreos 6:19"
+  },
+  {
+    "id": "ans-013",
+    "category": "ansiedad",
+    "title": "Mirada en Cristo",
+    "text": "Padre, quiero fijar mis ojos en Jesús, autor y consumador de mi fe. Aparta mi vista de los qué pasará y recuérdame lo que ya hiciste por mí. Que Tu cruz me recuerde que el amor venció al temor. Lléname de gratitud que espante la ansiedad.",
+    "tags": ["mirada", "cruz", "gratitud", "fe"],
+    "verseRef": "Hebreos 12:2"
+  },
+  {
+    "id": "ans-014",
+    "category": "ansiedad",
+    "title": "Calma Nocturna",
+    "text": "Señor, al caer la noche mi mente revive cada pendiente. Te entrego mi jornada y mis pensamientos. Que Tu paz custodie mi descanso. Recuérdame que mientras duermo, Tú trabajas. Quiero dormir bajo Tu cuidado, confiando en Tu amor.",
+    "tags": ["noche", "descanso", "cuidado", "sueño"],
+    "verseRef": "Salmos 4:8"
+  },
+  {
+    "id": "ans-015",
+    "category": "ansiedad",
+    "title": "Paso a Paso",
+    "text": "Padre, enséñame a vivir un día a la vez. Si me adelanto, vuelve mis pasos al presente donde estás. Dame luz suficiente para el siguiente paso y paz para esperar el resto. Quiero caminar contigo, no con la prisa del miedo.",
+    "tags": ["presente", "paso", "luz", "paciencia"],
+    "verseRef": "Proverbios 3:5-6"
+  },
+  {
+    "id": "ans-016",
+    "category": "ansiedad",
+    "title": "Reposo en Ti",
+    "text": "Señor, mi alma agitada busca reposo. Encuentro descanso en Tu cercanía. Quiero recostar mi mente en Tu corazón y dejar que Tu amor marque mi ritmo. Calma la tormenta interna y hazme sensible a Tu guía suave.",
+    "tags": ["reposo", "cercanía", "tormenta", "guía"],
+    "verseRef": "Salmos 62:1"
+  },
+  {
+    "id": "ans-017",
+    "category": "ansiedad",
+    "title": "Libre del Miedo",
+    "text": "Padre, Tu amor perfecto echa fuera el temor. Lléname de esa certeza. Que Tu Espíritu me recuerde que soy hijo amado y que nada puede separarme de Tu amor. Reemplaza la ansiedad con la confianza de saberme en Tus manos.",
+    "tags": ["amor", "miedo", "hijo", "confianza"],
+    "verseRef": "1 Juan 4:18"
+  },
+  {
+    "id": "ans-018",
+    "category": "ansiedad",
+    "title": "Descansar en la Suficiencia",
+    "text": "Señor, cuando siento que no soy suficiente, recuérdame que Tu gracia lo es. No dependo de mi rendimiento para ser aceptado. Descanso en lo que hiciste, no en lo que logro. Que esta verdad calme mi ansiedad y me dé libertad para vivir amado.",
+    "tags": ["gracia", "identidad", "suficiencia", "libertad"],
+    "verseRef": "2 Corintios 12:9"
+  },
+  {
+    "id": "ans-019",
+    "category": "ansiedad",
+    "title": "Corazón Enseñable",
+    "text": "Padre, enséñame a reconocer cuándo la ansiedad quiere gobernar. Dame humildad para detenerme, orar y recibir Tu consejo. Que Tu Espíritu me muestre caminos de paz y decisiones guiadas por Tu amor, no por el apuro.",
+    "tags": ["humildad", "consejo", "decisión", "paz"],
+    "verseRef": "Salmos 32:8"
+  },
+  {
+    "id": "ans-020",
+    "category": "ansiedad",
+    "title": "Respirar Esperanza",
+    "text": "Señor, inhalo esperanza y exhalo temor. Tu presencia es aire nuevo para mi vida. Renueva mi mente y llena mis pensamientos de promesas. Que cada respiración me recuerde que Tú eres cercano, bueno y suficiente. Confío en Ti.",
+    "tags": ["esperanza", "respirar", "promesas", "cercanía"],
+    "verseRef": "Lamentaciones 3:22-23"
+  },
+  {
+    "id": "tri-001",
+    "category": "tristeza",
+    "title": "Lágrimas en Tus Manos",
+    "text": "Padre, mis lágrimas no se pierden; cada una cae en Tus manos. Gracias porque no minimizas mi dolor y Te acercas con ternura. Abraza mi corazón herido y recuérdame que mi tristeza no es el final. Que Tu consuelo me renueve y Tu esperanza me sostenga.",
+    "tags": ["consuelo", "lágrimas", "esperanza", "ternura"],
+    "verseRef": "Salmos 56:8"
+  },
+  {
+    "id": "tri-002",
+    "category": "tristeza",
+    "title": "Consuelo Cercano",
+    "text": "Señor, me siento abatido y necesito Tu abrazo. Tú eres cercano al quebrantado de corazón. En Tu presencia encuentro un refugio seguro. Sana lo que duele y dame paciencia mientras restauras. Que Tu amor me envuelva y me recuerde que no camino solo.",
+    "tags": ["quebrantado", "abrazo", "refugio", "restauración"],
+    "verseRef": "Salmos 34:18"
+  },
+  {
+    "id": "tri-003",
+    "category": "tristeza",
+    "title": "Esperanza que Renace",
+    "text": "Padre, aun cuando la tristeza pesa, creo que Tu misericordia es nueva cada mañana. Haz germinar esperanza en los lugares secos de mi corazón. Dame ojos para ver Tu bondad en pequeños detalles. Recuérdame que las noches pasan y Tu luz amanece.",
+    "tags": ["esperanza", "misericordia", "amanecer", "bondad"],
+    "verseRef": "Lamentaciones 3:22-23"
+  },
+  {
+    "id": "tri-004",
+    "category": "tristeza",
+    "title": "Canto en la Noche",
+    "text": "Señor, en medio de la noche de mi alma, enséñame a susurrar un canto de confianza. Tal vez mi voz sea débil, pero Tu oído es atento. Que Tu gozo sea mi fortaleza y Tu Espíritu mi compañía hasta que amanezca.",
+    "tags": ["noche", "canto", "fortaleza", "compañía"],
+    "verseRef": "Salmos 42:8"
+  },
+  {
+    "id": "tri-005",
+    "category": "tristeza",
+    "title": "Abrazo que Sostiene",
+    "text": "Padre, necesito sentir que no me sueltas. Abraza mi debilidad y lléname de Tu consuelo. Aunque no entienda el porqué de este dolor, confío en Tu carácter. Que Tu Espíritu me recuerde que soy amado incluso en mi fragilidad.",
+    "tags": ["abrazo", "fragilidad", "consuelo", "amor"],
+    "verseRef": "Isaías 41:10"
+  },
+  {
+    "id": "tri-006",
+    "category": "tristeza",
+    "title": "Raíces de Gozo",
+    "text": "Señor, planta raíces de gozo en mi corazón triste. Que no dependan de circunstancias, sino de saberme Tu hijo. Nutre esas raíces con Tu Palabra y riega con Tu presencia. Que brote en mí una esperanza firme que resista la sequía.",
+    "tags": ["gozo", "raíces", "hijo", "esperanza"],
+    "verseRef": "Juan 15:11"
+  },
+  {
+    "id": "tri-007",
+    "category": "tristeza",
+    "title": "Luz en el Valle",
+    "text": "Padre, camino por un valle de sombra, pero no estoy solo. Tu vara y Tu cayado me infunden aliento. Guíame por senderos de descanso y fortalece mis pasos. Que Tu luz me acompañe hasta salir de este valle.",
+    "tags": ["valle", "luz", "aliento", "guía"],
+    "verseRef": "Salmos 23:4"
+  },
+  {
+    "id": "tri-008",
+    "category": "tristeza",
+    "title": "Descanso del Alma",
+    "text": "Señor, mi alma cansada busca reposo. Llévame a aguas de quietud donde pueda respirar sin prisa. Limpia mi interior con Tu verdad y devuélveme la alegría de Tu salvación. Gracias porque en Ti hay descanso verdadero.",
+    "tags": ["reposo", "quietud", "verdad", "alegría"],
+    "verseRef": "Salmos 23:2"
+  },
+  {
+    "id": "tri-009",
+    "category": "tristeza",
+    "title": "Sanidad Progresiva",
+    "text": "Padre, reconozco que la sanidad es un camino. Acompáñame en cada paso. Sana memorias, restaura esperanza y fortalece mi fe. Que Tu Espíritu me recuerde que no tengo que apresurarme; Tú eres paciente conmigo.",
+    "tags": ["sanidad", "proceso", "esperanza", "paciencia"],
+    "verseRef": "Filipenses 1:6"
+  },
+  {
+    "id": "tri-010",
+    "category": "tristeza",
+    "title": "Llanto con Esperanza",
+    "text": "Señor, lloro pero no como quien no tiene esperanza. Mis lágrimas riegan la tierra donde plantarás algo nuevo. Sostén mi mirada en Tu promesa de consuelo. Que Tu amor me recuerde que esta tristeza no define mi futuro.",
+    "tags": ["llanto", "promesa", "nuevo", "amor"],
+    "verseRef": "Apocalipsis 21:4"
+  },
+  {
+    "id": "tri-011",
+    "category": "tristeza",
+    "title": "Mesa Preparada",
+    "text": "Padre, aun en medio del dolor, Tú preparas mesa para mí. Me invitas a sentarme, a ser alimentado por Tu gracia. Que en esta mesa reciba fuerza y compañía. Gracias porque me honras aun cuando me siento pequeño.",
+    "tags": ["mesa", "gracia", "compañía", "honra"],
+    "verseRef": "Salmos 23:5"
+  },
+  {
+    "id": "tri-012",
+    "category": "tristeza",
+    "title": "Corazón Acompañado",
+    "text": "Señor, mi corazón se siente solo. Recuérdame que Tu Espíritu habita en mí y que la comunión contigo es real. Muéstrame amistades que reflejen Tu amor y palabras que traigan vida. Que no me aísle, sino que reciba Tu compañía.",
+    "tags": ["compañía", "Espíritu", "amistad", "vida"],
+    "verseRef": "Juan 14:18"
+  },
+  {
+    "id": "tri-013",
+    "category": "tristeza",
+    "title": "Intercambio Santo",
+    "text": "Padre, traigo mi tristeza y Tú me das Tu gozo. Traigo mi desaliento y Tú me vistes de esperanza. Gracias por el intercambio que haces en la cruz. Ayúdame a creer que este cambio es para mí hoy.",
+    "tags": ["intercambio", "gozo", "esperanza", "cruz"],
+    "verseRef": "Isaías 61:3"
+  },
+  {
+    "id": "tri-014",
+    "category": "tristeza",
+    "title": "Paz en el Dolor",
+    "text": "Señor, no niego mi dolor, pero busco Tu paz dentro de él. Quédate conmigo en este lugar y hazme consciente de Tu cercanía. Que Tu paz gobierne mis pensamientos y me sostenga en lo frágil. Gracias porque eres mi refugio seguro.",
+    "tags": ["paz", "dolor", "refugio", "cercanía"],
+    "verseRef": "Colosenses 3:15"
+  },
+  {
+    "id": "tri-015",
+    "category": "tristeza",
+    "title": "Ánimo Renovado",
+    "text": "Padre, levanta mi ánimo. Sopla Tu aliento sobre mi corazón cansado. Recuérdame promesas que me han sostenido antes y que siguen siendo verdad. Dame pasos concretos para caminar hacia la vida que tienes para mí.",
+    "tags": ["ánimo", "aliento", "promesas", "vida"],
+    "verseRef": "Ezequiel 37:5"
+  },
+  {
+    "id": "tri-016",
+    "category": "tristeza",
+    "title": "Mirar Más Allá",
+    "text": "Señor, ayúdame a mirar más allá de la tristeza presente. Dame visión de lo que estás formando en mí. Que la certeza de Tu obra futura me sostenga hoy. Enséñame a esperar con esperanza activa.",
+    "tags": ["visión", "obra", "futuro", "espera"],
+    "verseRef": "Romanos 8:28"
+  },
+  {
+    "id": "tri-017",
+    "category": "tristeza",
+    "title": "Ternura Divina",
+    "text": "Padre, gracias por Tu ternura que no me exige sonreír cuando no puedo. Tú me aceptas como estoy y me sostienes con paciencia. Que Tu suavidad sane mis bordes ásperos y me permita recibir amor.",
+    "tags": ["ternura", "paciencia", "sanidad", "amor"],
+    "verseRef": "Isaías 40:11"
+  },
+  {
+    "id": "tri-018",
+    "category": "tristeza",
+    "title": "Refugio Abierto",
+    "text": "Señor, corro a Ti como a un refugio abierto. No necesito claves ni méritos; solo llegar. Escóndeme bajo Tu sombra hasta que pase esta lluvia. Que en Tu presencia encuentre calor y dirección.",
+    "tags": ["refugio", "sombra", "dirección", "abrigo"],
+    "verseRef": "Salmos 91:1"
+  },
+  {
+    "id": "tri-019",
+    "category": "tristeza",
+    "title": "Alegría Prometida",
+    "text": "Padre, creo que sembrar lágrimas recogerá alegría. Aunque hoy no lo vea, confío en Tu palabra. Dame paciencia para el proceso y fe para seguir sembrando. Tú eres fiel para cumplir.",
+    "tags": ["siembra", "alegría", "proceso", "fidelidad"],
+    "verseRef": "Salmos 126:5"
+  },
+  {
+    "id": "tri-020",
+    "category": "tristeza",
+    "title": "Brazos Extendidos",
+    "text": "Señor, cuando mis fuerzas fallan, extiende Tus brazos y cárgame. Eres mi Padre y no me dejas caer. Que Tu abrazo restaure mi ánimo y Tu voz me recuerde que aún hay camino por delante contigo.",
+    "tags": ["fuerza", "abrazo", "camino", "Padre"],
+    "verseRef": "Deuteronomio 33:27"
+  },
+  {
+    "id": "paz-001",
+    "category": "paz_interior",
+    "title": "Río de Paz",
+    "text": "Padre, deja que Tu paz fluya en mí como un río sereno. Que recorra mis pensamientos y emociones, limpiando la prisa y el ruido. Quiero habitar en la corriente de Tu presencia, donde todo se aquieta. Gracias porque Tu paz no depende de lo externo.",
+    "tags": ["paz", "río", "presencia", "serenidad"],
+    "verseRef": "Isaías 66:12"
+  },
+  {
+    "id": "paz-002",
+    "category": "paz_interior",
+    "title": "Quietud Elegida",
+    "text": "Señor, hoy elijo la quietud que viene de confiar en Ti. Apago voces que inquietan y abro espacio para Tu voz suave. Que Tu Espíritu llene los rincones de mi mente con calma. Eres mi seguridad estable.",
+    "tags": ["quietud", "voz", "calma", "confianza"],
+    "verseRef": "Salmos 131:2"
+  },
+  {
+    "id": "paz-003",
+    "category": "paz_interior",
+    "title": "Paz que Permanece",
+    "text": "Jesús, me dejaste Tu paz, no como el mundo la da. Recibo ese regalo y lo abrazo. Que permanezca en mí aun cuando las circunstancias cambien. Sella mi corazón con Tu shalom completo.",
+    "tags": ["shalom", "regalo", "permanecer", "corazón"],
+    "verseRef": "Juan 14:27"
+  },
+  {
+    "id": "paz-004",
+    "category": "paz_interior",
+    "title": "Casa de Paz",
+    "text": "Padre, haz de mi interior una casa de paz donde Tu Espíritu habite cómodo. Ordena lo que está desordenado, silencia lo que es ruido y enciende Tu luz. Que todo en mí sea un espacio de descanso para Tu presencia.",
+    "tags": ["casa", "orden", "luz", "descanso"],
+    "verseRef": "Colosenses 3:15"
+  },
+  {
+    "id": "paz-005",
+    "category": "paz_interior",
+    "title": "Respirar Calma",
+    "text": "Señor, inhalo Tu paz y exhalo tensión. Quiero hacer de cada respiración una oración sencilla: aquí estoy, confío en Ti. Llena mi cuerpo y mente con serenidad, y dirige mi día desde ese lugar de descanso.",
+    "tags": ["respirar", "serenidad", "día", "confío"],
+    "verseRef": "Hechos 17:28"
+  },
+  {
+    "id": "paz-006",
+    "category": "paz_interior",
+    "title": "Ancla de Paz",
+    "text": "Padre, ancla mi corazón en Tu paz cuando todo se mueve. Eres roca firme, refugio estable. Que ninguna tormenta robe la tranquilidad que viene de saber que Tú gobiernas con amor.",
+    "tags": ["ancla", "roca", "refugio", "tranquilidad"],
+    "verseRef": "Salmos 18:2"
+  },
+  {
+    "id": "paz-007",
+    "category": "paz_interior",
+    "title": "Silencio Que Sana",
+    "text": "Señor, llévame a un silencio que sana. Allí donde me hablas con ternura y limpias mi interior. Que en ese espacio mis preocupaciones se disuelvan y Tu paz me envuelva como manto.",
+    "tags": ["silencio", "manto", "sanidad", "ternura"],
+    "verseRef": "Habacuc 2:20"
+  },
+  {
+    "id": "paz-008",
+    "category": "paz_interior",
+    "title": "Centro Firme",
+    "text": "Jesús, sé el centro firme de mi vida. Cuando me disperso, vuelve mis pasos a Ti. Que todo gire alrededor de Tu amor, produciendo equilibrio y calma. Gracias por sostenerme.",
+    "tags": ["centro", "equilibrio", "amor", "calma"],
+    "verseRef": "Colosenses 1:17"
+  },
+  {
+    "id": "paz-009",
+    "category": "paz_interior",
+    "title": "Reposo Agradecido",
+    "text": "Padre, en reposo y gratitud encuentro paz. Recuento tus bondades y mi alma se tranquiliza. Gracias por cuidar de mí con detalle. Que la gratitud sea llave que abra espacio a Tu calma.",
+    "tags": ["gratitud", "reposo", "bondad", "calma"],
+    "verseRef": "Salmos 116:7"
+  },
+  {
+    "id": "paz-010",
+    "category": "paz_interior",
+    "title": "Paz en Decisiones",
+    "text": "Señor, al tomar decisiones, dame Tu paz como árbitro. Que no sea la urgencia la que mande, sino Tu guía tranquila. Si no hay paz, enséñame a esperar; si la hay, dame valentía para avanzar.",
+    "tags": ["decisión", "guía", "valentía", "espera"],
+    "verseRef": "Colosenses 3:15"
+  },
+  {
+    "id": "paz-011",
+    "category": "paz_interior",
+    "title": "Mesa Serena",
+    "text": "Jesús, invitas a mi corazón a una mesa serena. Te siento cerca, sin prisa. Compartimos silencio y pan de vida. Que esta comunión sostenga mi paz todo el día.",
+    "tags": ["mesa", "comunión", "serenidad", "vida"],
+    "verseRef": "Apocalipsis 3:20"
+  },
+  {
+    "id": "paz-012",
+    "category": "paz_interior",
+    "title": "Amparo Constante",
+    "text": "Padre, Tu amparo constante es mi descanso. Bajo Tu sombra encuentro paz, lejos del desgaste. Enséñame a volver a Ti cada vez que algo me inquieta. Eres seguro siempre.",
+    "tags": ["amparo", "sombra", "descanso", "seguridad"],
+    "verseRef": "Salmos 91:4"
+  },
+  {
+    "id": "paz-013",
+    "category": "paz_interior",
+    "title": "Corazón Estable",
+    "text": "Señor, estabiliza mi corazón cuando se inclina al miedo. Fortalece mis raíces en Tu amor para que no me agite el viento. Que Tu paz sea mi postura diaria.",
+    "tags": ["estabilidad", "raíces", "amor", "postura"],
+    "verseRef": "Efesios 3:17"
+  },
+  {
+    "id": "paz-014",
+    "category": "paz_interior",
+    "title": "Pausa Sagrada",
+    "text": "Jesús, necesito una pausa sagrada en medio del día. Me detengo, respiro y reconozco que Tú eres Dios. Que esta pausa renueve mi mente y devuelva paz a mi ritmo.",
+    "tags": ["pausa", "ritmo", "renuevo", "reconocer"],
+    "verseRef": "Salmos 46:10"
+  },
+  {
+    "id": "paz-015",
+    "category": "paz_interior",
+    "title": "Vigilia en Paz",
+    "text": "Señor, vela mi noche con Tu paz. Que mi descanso sea profundo porque confío en Tu cuidado. Aun dormido, mi corazón se regocija en Tu fidelidad.",
+    "tags": ["noche", "descanso", "fidelidad", "cuidado"],
+    "verseRef": "Salmos 4:8"
+  },
+  {
+    "id": "paz-016",
+    "category": "paz_interior",
+    "title": "Gracia Suficiente",
+    "text": "Padre, Tu gracia me basta y me pacifica. Cuando siento que no llego, recuerdo que Tú suples. Descanso en Tu suficiencia y mi alma se aquieta. Gracias por ser suficiente.",
+    "tags": ["gracia", "suficiencia", "descanso", "quietud"],
+    "verseRef": "2 Corintios 12:9"
+  },
+  {
+    "id": "paz-017",
+    "category": "paz_interior",
+    "title": "Caminar Ligero",
+    "text": "Señor, quiero caminar ligero, sin cargas innecesarias. Muéstrame qué soltar y qué llevar contigo. Que Tu paz sea el equipaje principal de mi jornada.",
+    "tags": ["ligero", "cargas", "jornada", "paz"],
+    "verseRef": "Hebreos 12:1"
+  },
+  {
+    "id": "paz-018",
+    "category": "paz_interior",
+    "title": "Alinea mi Pulso",
+    "text": "Jesús, alinea el pulso de mi corazón con Tu ritmo. Si late muy rápido, apacígualo; si se apaga, reanímalo. Que Tu paz marque mi compás interior.",
+    "tags": ["pulso", "ritmo", "compás", "apaciguar"],
+    "verseRef": "Salmos 27:14"
+  },
+  {
+    "id": "paz-019",
+    "category": "paz_interior",
+    "title": "Paz Activa",
+    "text": "Padre, quiero una paz activa que me mueva a amar y servir. Que no sea pasividad, sino serenidad con propósito. Usa mi paz interior como testimonio de Tu presencia.",
+    "tags": ["propósito", "servir", "testimonio", "serenidad"],
+    "verseRef": "Romanos 14:19"
+  },
+  {
+    "id": "paz-020",
+    "category": "paz_interior",
+    "title": "Refugio Interno",
+    "text": "Señor, construye en mí un refugio interno donde pueda volver en medio del día. Que ese lugar sea Tu Palabra y Tu presencia. Allí descansaré y saldré renovado.",
+    "tags": ["refugio", "palabra", "renuevo", "interior"],
+    "verseRef": "Salmos 119:165"
+  },
+  {
+    "id": "gra-001",
+    "category": "gratitud",
+    "title": "Gracias por Hoy",
+    "text": "Padre, gracias por este día que me regalas. Por el aire, por la vida, por las oportunidades pequeñas. Abre mis ojos para ver Tu mano en lo cotidiano. Que la gratitud marque mi actitud y me llene de gozo.",
+    "tags": ["día", "cotidiano", "gozo", "actitud"],
+    "verseRef": "Salmos 118:24"
+  },
+  {
+    "id": "gra-002",
+    "category": "gratitud",
+    "title": "Memoria Agradecida",
+    "text": "Señor, quiero recordar Tus beneficios y no olvidarlos. Has sido fiel, proveedor y amigo. Traigo a memoria Tus rescates y mi corazón se llena de gratitud. Gracias porque sigues obrando.",
+    "tags": ["memoria", "beneficios", "fidelidad", "agradecer"],
+    "verseRef": "Salmos 103:2"
+  },
+  {
+    "id": "gra-003",
+    "category": "gratitud",
+    "title": "Gratitud en Lo Pequeño",
+    "text": "Padre, enséñame a agradecer las cosas pequeñas: una sonrisa, un vaso de agua, un mensaje oportuno. Que mi corazón celebre lo sencillo y reconozca Tu cuidado en los detalles.",
+    "tags": ["detalles", "sencillo", "cuidado", "celebrar"],
+    "verseRef": "1 Tesalonicenses 5:18"
+  },
+  {
+    "id": "gra-004",
+    "category": "gratitud",
+    "title": "Canta Mi Alma",
+    "text": "Señor, que mi alma cante por agradecimiento. Que mis labios expresen lo que mi corazón sabe: Tú eres bueno. Gracias por Tu presencia, Tu perdón y Tu guía constante.",
+    "tags": ["canto", "bondad", "presencia", "perdón"],
+    "verseRef": "Salmos 13:6"
+  },
+  {
+    "id": "gra-005",
+    "category": "gratitud",
+    "title": "Gracias en la Espera",
+    "text": "Padre, aun en la espera quiero agradecer. Aunque no vea todo resuelto, confío en Tu proceso. Gracias porque estás trabajando y Tu tiempo es perfecto. Mi gratitud descansa en Ti.",
+    "tags": ["espera", "proceso", "tiempo", "confianza"],
+    "verseRef": "Hebreos 10:23"
+  },
+  {
+    "id": "gra-006",
+    "category": "gratitud",
+    "title": "Corazón Abierto",
+    "text": "Señor, abre mi corazón para percibir Tus regalos diarios. No quiero vivir en automático, sino atento a Tu bondad. Gracias por sorprenderme con Tu amor en formas nuevas.",
+    "tags": ["atención", "bondad", "sorpresa", "amor"],
+    "verseRef": "Santiago 1:17"
+  },
+  {
+    "id": "gra-007",
+    "category": "gratitud",
+    "title": "Gratitud que Libera",
+    "text": "Padre, la gratitud rompe cadenas de queja y comparación. Lléname de agradecimiento para vivir ligero. Gracias por lo que soy y lo que tengo en Ti. Eres suficiente.",
+    "tags": ["libertad", "queja", "comparación", "suficiencia"],
+    "verseRef": "Colosenses 2:7"
+  },
+  {
+    "id": "gra-008",
+    "category": "gratitud",
+    "title": "Acción de Gracias",
+    "text": "Señor, hoy decido actuar con gratitud: hablar bien, servir con gozo, dar con generosidad. Que mi agradecimiento sea visible y contagioso. Gracias porque me das más de lo que pido.",
+    "tags": ["acción", "servir", "generosidad", "gozo"],
+    "verseRef": "2 Corintios 9:11"
+  },
+  {
+    "id": "gra-009",
+    "category": "gratitud",
+    "title": "Agradecer la Gracia",
+    "text": "Padre, gracias por Tu gracia inmerecida. No puedo comprarla ni ganarla; solo recibirla. Que mi vida sea respuesta de gratitud a ese regalo. Gracias porque me amas primero.",
+    "tags": ["gracia", "regalo", "respuesta", "amor"],
+    "verseRef": "Efesios 2:8-9"
+  },
+  {
+    "id": "gra-010",
+    "category": "gratitud",
+    "title": "Gracias en Comunidad",
+    "text": "Señor, gracias por la gente que pones a mi lado. Por quienes me animan, corrigen y acompañan. Ayúdame a expresarlo con palabras y gestos. Que la gratitud fortalezca nuestras relaciones.",
+    "tags": ["comunidad", "ánimo", "relaciones", "gestos"],
+    "verseRef": "Hebreos 10:24"
+  },
+  {
+    "id": "gra-011",
+    "category": "gratitud",
+    "title": "Gratitud al Despertar",
+    "text": "Padre, al abrir los ojos quiero que lo primero sea gracias. Gracias por otro amanecer, por Tu misericordia fresca. Que este inicio marque el tono de mi día.",
+    "tags": ["amanecer", "inicio", "misericordia", "tono"],
+    "verseRef": "Salmos 5:3"
+  },
+  {
+    "id": "gra-012",
+    "category": "gratitud",
+    "title": "Gracias en el Trabajo",
+    "text": "Señor, gracias por el trabajo que me das, sea cual sea. Ayúdame a hacerlo con excelencia y gratitud. Que sea un acto de adoración y servicio. Eres mi proveedor.",
+    "tags": ["trabajo", "excelencia", "adoración", "proveedor"],
+    "verseRef": "Colosenses 3:23"
+  },
+  {
+    "id": "gra-013",
+    "category": "gratitud",
+    "title": "Agradecer el Proceso",
+    "text": "Padre, gracias por el proceso que me forma. Aunque duela, confío en que produces carácter. Que mi gratitud no dependa solo del resultado, sino de Tu presencia en el camino.",
+    "tags": ["carácter", "camino", "formación", "presencia"],
+    "verseRef": "Romanos 5:3-5"
+  },
+  {
+    "id": "gra-014",
+    "category": "gratitud",
+    "title": "Lista de Bondades",
+    "text": "Señor, hoy escribo una lista de Tus bondades. Al nombrarlas, mi corazón se ensancha. Gracias por recordarme cuánto has estado conmigo. No quiero olvidarlo.",
+    "tags": ["lista", "recordar", "bondad", "memoria"],
+    "verseRef": "Salmos 77:11"
+  },
+  {
+    "id": "gra-015",
+    "category": "gratitud",
+    "title": "Gracias por la Cruz",
+    "text": "Jesús, gracias por la cruz donde entregaste todo por mí. No hay regalo más grande. Que mi vida entera sea una respuesta agradecida. Que no se me haga común.",
+    "tags": ["cruz", "sacrificio", "respuesta", "adoración"],
+    "verseRef": "Gálatas 2:20"
+  },
+  {
+    "id": "gra-016",
+    "category": "gratitud",
+    "title": "Gratitud y Generosidad",
+    "text": "Padre, que mi gratitud se traduzca en generosidad. Así como recibo, quiero dar. Usa mis manos para bendecir y mi corazón para animar. Gracias porque me confías recursos.",
+    "tags": ["generosidad", "dar", "recursos", "bendecir"],
+    "verseRef": "Hechos 20:35"
+  },
+  {
+    "id": "gra-017",
+    "category": "gratitud",
+    "title": "Gracias en la Debilidad",
+    "text": "Señor, aun en mi debilidad doy gracias. Porque allí se perfecciona Tu poder. No necesito aparentar fuerza; necesito depender de Ti. Gracias por sostenerme.",
+    "tags": ["debilidad", "poder", "dependencia", "sostén"],
+    "verseRef": "2 Corintios 12:10"
+  },
+  {
+    "id": "gra-018",
+    "category": "gratitud",
+    "title": "Corazón Contento",
+    "text": "Padre, dame un corazón contento con lo que tengo. Que la gratitud apague la ansiedad y la codicia. Gracias porque Tú eres mi porción suficiente.",
+    "tags": ["contentamiento", "codicia", "porción", "ansiedad"],
+    "verseRef": "Filipenses 4:11-12"
+  },
+  {
+    "id": "gra-019",
+    "category": "gratitud",
+    "title": "Gracias por la Esperanza",
+    "text": "Señor, gracias por la esperanza viva que me diste en Cristo. No es frágil ni pasajera. Me sostiene en días buenos y malos. Quiero celebrarla hoy.",
+    "tags": ["esperanza", "viva", "celebrar", "Cristo"],
+    "verseRef": "1 Pedro 1:3"
+  },
+  {
+    "id": "gra-020",
+    "category": "gratitud",
+    "title": "Alabanza Constante",
+    "text": "Padre, que la alabanza esté siempre en mi boca. No por obligación, sino por gratitud genuina. Quiero proclamar Tu bondad a otros y contagiar agradecimiento.",
+    "tags": ["alabanza", "boca", "bondad", "genuino"],
+    "verseRef": "Salmos 34:1"
+  },
+  {
+    "id": "per-001",
+    "category": "perdon",
+    "title": "Recibo Tu Perdón",
+    "text": "Jesús, gracias por perdonar mis faltas. Recibo Tu gracia y dejo de cargar culpa. Ayúdame a creer que Tu sangre fue suficiente y que soy limpio en Ti. Que viva desde la libertad del perdón.",
+    "tags": ["culpa", "gracia", "libertad", "limpio"],
+    "verseRef": "1 Juan 1:9"
+  },
+  {
+    "id": "per-002",
+    "category": "perdon",
+    "title": "Perdonar como Tú",
+    "text": "Padre, enséñame a perdonar como Tú me perdonaste. No quiero retener ofensas ni dejar que amargura eche raíces. Dame un corazón tierno y decidido a soltar. Tu perdón me capacita.",
+    "tags": ["ofensa", "amargura", "soltar", "tierno"],
+    "verseRef": "Efesios 4:32"
+  },
+  {
+    "id": "per-003",
+    "category": "perdon",
+    "title": "Liberación Mutua",
+    "text": "Señor, al perdonar libero a otros y me libero a mí mismo. Quiero obedecer aunque cueste. Muéstrame Tu corazón por quien me hirió y ayúdame a orar por bendición sobre él.",
+    "tags": ["libertad", "obediencia", "bendecir", "sanidad"],
+    "verseRef": "Mateo 5:44"
+  },
+  {
+    "id": "per-004",
+    "category": "perdon",
+    "title": "Sanar Recuerdos",
+    "text": "Padre, algunos recuerdos aún duelen. Entra con Tu amor y sana esas zonas. Reemplaza el dolor por paz y la ira por compasión. Que Tu perdón me transforme por dentro.",
+    "tags": ["recuerdos", "sanidad", "compasión", "transformación"],
+    "verseRef": "Salmos 147:3"
+  },
+  {
+    "id": "per-005",
+    "category": "perdon",
+    "title": "Soltar la Deuda",
+    "text": "Señor, declaro cancelada la deuda emocional que guardaba. Así como Tú cancelaste la mía, suelto lo que creo que me deben. Lléname de Tu Espíritu para mantener esta decisión.",
+    "tags": ["deuda", "cancelar", "decisión", "Espíritu"],
+    "verseRef": "Mateo 18:21-22"
+  },
+  {
+    "id": "per-006",
+    "category": "perdon",
+    "title": "Perdón Diario",
+    "text": "Padre, que el perdón sea mi práctica diaria. No quiero dejar que pequeñas heridas crezcan. Dame prontitud para pedir perdón y para otorgarlo. Hazme un pacificador.",
+    "tags": ["diario", "prontitud", "pacificador", "humildad"],
+    "verseRef": "Romanos 12:18"
+  },
+  {
+    "id": "per-007",
+    "category": "perdon",
+    "title": "Libertad del Rencor",
+    "text": "Señor, renuncio al rencor que envenena mi alma. No quiero beber más de ese vaso. Llena el espacio vacío con Tu amor y Tu gozo. Gracias porque me llamas a libertad.",
+    "tags": ["rencor", "renuncia", "amor", "gozo"],
+    "verseRef": "Gálatas 5:1"
+  },
+  {
+    "id": "per-008",
+    "category": "perdon",
+    "title": "Mirar con Misericordia",
+    "text": "Padre, dame ojos de misericordia para ver a quien me hirió. Recuérdame que también yo he fallado y recibí gracia. Que esa conciencia me impulse a perdonar.",
+    "tags": ["misericordia", "gracia", "fallas", "mirada"],
+    "verseRef": "Lucas 6:36"
+  },
+  {
+    "id": "per-009",
+    "category": "perdon",
+    "title": "Perdón y Justicia",
+    "text": "Señor, confío en Tu justicia perfecta. Al perdonar no niego lo sucedido, lo pongo en Tus manos. Sé que Tú juzgas con verdad y me invitas a descansar en Ti.",
+    "tags": ["justicia", "verdad", "descanso", "confianza"],
+    "verseRef": "Romanos 12:19"
+  },
+  {
+    "id": "per-010",
+    "category": "perdon",
+    "title": "Corazón Blando",
+    "text": "Padre, evita que mi corazón se endurezca. Derrite con Tu amor las partes frías y hazme sensible. Prefiero amar que tener la razón. Enséñame a elegir la vida del perdón.",
+    "tags": ["blando", "sensibilidad", "amor", "elegir"],
+    "verseRef": "Ezequiel 36:26"
+  },
+  {
+    "id": "per-011",
+    "category": "perdon",
+    "title": "Perdón y Identidad",
+    "text": "Señor, mi identidad está en ser perdonado y amado, no en mis errores. Que esa verdad me haga seguro y generoso al perdonar a otros. Gracias por llamarme hijo.",
+    "tags": ["identidad", "seguridad", "generosidad", "hijo"],
+    "verseRef": "Colosenses 3:13"
+  },
+  {
+    "id": "per-012",
+    "category": "perdon",
+    "title": "Cerrar Ciclos",
+    "text": "Padre, ayúdame a cerrar ciclos con perdón. No quiero seguir atado a lo que pasó. Dame valentía para hablar cuando sea necesario y silencio cuando edifique. Guía mis pasos.",
+    "tags": ["ciclos", "valentía", "silencio", "guía"],
+    "verseRef": "Proverbios 17:9"
+  },
+  {
+    "id": "per-013",
+    "category": "perdon",
+    "title": "Perdonarme",
+    "text": "Señor, también necesito perdonarme. Acepto Tu gracia sobre mis errores y dejo de castigarme. Enséñame a caminar en libertad y aprender de lo vivido.",
+    "tags": ["auto-perdón", "gracia", "aprendizaje", "libertad"],
+    "verseRef": "Salmos 103:12"
+  },
+  {
+    "id": "per-014",
+    "category": "perdon",
+    "title": "Restaurar Puentes",
+    "text": "Padre, si es posible, restaura puentes rotos. Muéstrame pasos de reconciliación y dame humildad para darlos. Que Tu paz gobierne cada intento.",
+    "tags": ["reconciliación", "puentes", "humildad", "paz"],
+    "verseRef": "Mateo 5:9"
+  },
+  {
+    "id": "per-015",
+    "category": "perdon",
+    "title": "Perdón como Cultivo",
+    "text": "Señor, enséñame a cultivar el perdón como un hábito. Que con el tiempo mi corazón se vuelva rápido para soltar y lento para ofenderse. Haz crecer en mí este fruto.",
+    "tags": ["hábito", "fruto", "soltar", "paciencia"],
+    "verseRef": "Gálatas 5:22-23"
+  },
+  {
+    "id": "per-016",
+    "category": "perdon",
+    "title": "Descansar la Causa",
+    "text": "Padre, dejo la causa en Tus manos. Ya no cargaré con juicios internos. Tú ves todo y juzgas con amor y justicia. Yo elijo paz y perdón.",
+    "tags": ["causa", "juicio", "paz", "elección"],
+    "verseRef": "1 Pedro 2:23"
+  },
+  {
+    "id": "per-017",
+    "category": "perdon",
+    "title": "Perdón y Protección",
+    "text": "Señor, al perdonar no me expongo sin cuidado. Dame sabiduría para poner límites sanos mientras mantengo un corazón limpio. Gracias porque Tu Espíritu guía.",
+    "tags": ["límites", "sabiduría", "limpieza", "guía"],
+    "verseRef": "Proverbios 4:23"
+  },
+  {
+    "id": "per-018",
+    "category": "perdon",
+    "title": "Soltar la Venganza",
+    "text": "Padre, renuncio a la venganza. No quiero planear respuestas ni alimentar enojo. Confío en Tu justicia y recibo Tu paz. Lléname de Tu amor para responder bien.",
+    "tags": ["venganza", "enojo", "justicia", "amor"],
+    "verseRef": "Romanos 12:17-21"
+  },
+  {
+    "id": "per-019",
+    "category": "perdon",
+    "title": "Amar en Lugar de Herir",
+    "text": "Señor, en vez de devolver herida, quiero devolver amor. No es natural, pero es posible contigo. Dame palabras suaves y acciones llenas de gracia. Que Tu amor sea mi fuerza.",
+    "tags": ["amar", "palabras", "gracia", "fuerza"],
+    "verseRef": "1 Corintios 13:7"
+  },
+  {
+    "id": "per-020",
+    "category": "perdon",
+    "title": "Gracia que Fluye",
+    "text": "Padre, que la gracia que recibo fluya sin estancarse. Si la detengo, se pudre; si la comparto, da vida. Hazme un canal de perdón y reconciliación.",
+    "tags": ["canal", "flujo", "vida", "reconciliación"],
+    "verseRef": "2 Corintios 5:18"
+  },
+  {
+    "id": "for-001",
+    "category": "fortaleza",
+    "title": "Fuerza en Debilidad",
+    "text": "Señor, en mi debilidad Tu poder se perfecciona. No confío en mi fuerza, sino en la Tuya. Levántame con Tu Espíritu y dame valentía para el día de hoy. Eres mi fortaleza.",
+    "tags": ["debilidad", "poder", "valentía", "fortaleza"],
+    "verseRef": "2 Corintios 12:9-10"
+  },
+  {
+    "id": "for-002",
+    "category": "fortaleza",
+    "title": "Roca Segura",
+    "text": "Padre, eres la roca que no se mueve. Cuando todo tiembla, me apoyo en Ti. Refuerza mi fe y hazme firme en Tus promesas. Eres mi castillo seguro.",
+    "tags": ["roca", "firmeza", "fe", "promesas"],
+    "verseRef": "Salmos 18:2"
+  },
+  {
+    "id": "for-003",
+    "category": "fortaleza",
+    "title": "Ánimo Renovado",
+    "text": "Señor, renueva mi ánimo como el águila. Quita el cansancio y dame impulso fresco. Que Tu gozo sea mi fuerza y Tu palabra mi combustible.",
+    "tags": ["ánimo", "gozo", "fuerza", "renuevo"],
+    "verseRef": "Isaías 40:31"
+  },
+  {
+    "id": "for-004",
+    "category": "fortaleza",
+    "title": "Levántame Hoy",
+    "text": "Padre, levántame hoy con Tu mano poderosa. Aun si caí, me tomas y me sostienes. No temeré porque Tú estás conmigo. Dame coraje para avanzar.",
+    "tags": ["levantar", "caída", "coraje", "presencia"],
+    "verseRef": "Isaías 41:10"
+  },
+  {
+    "id": "for-005",
+    "category": "fortaleza",
+    "title": "Fortaleza Interior",
+    "text": "Señor, fortalece mi hombre interior por Tu Espíritu. Que mis raíces vayan profundo en Tu amor para resistir cualquier viento. Dame resiliencia santa.",
+    "tags": ["interior", "raíces", "resiliencia", "Espíritu"],
+    "verseRef": "Efesios 3:16-17"
+  },
+  {
+    "id": "for-006",
+    "category": "fortaleza",
+    "title": "Valentía con Gracia",
+    "text": "Padre, dame valentía combinada con gracia. No quiero dureza sin amor ni suavidad sin firmeza. Guíame en equilibrio para enfrentar desafíos con Tu carácter.",
+    "tags": ["valentía", "gracia", "equilibrio", "carácter"],
+    "verseRef": "Josué 1:9"
+  },
+  {
+    "id": "for-007",
+    "category": "fortaleza",
+    "title": "Escudo y Defender",
+    "text": "Señor, sé mi escudo y defensor. Tú cubres mi espalda y mi frente. Confiado en Tu protección, puedo avanzar sin miedo. Gracias por pelear conmigo.",
+    "tags": ["escudo", "defensa", "protección", "avanzar"],
+    "verseRef": "Salmos 3:3"
+  },
+  {
+    "id": "for-008",
+    "category": "fortaleza",
+    "title": "Fortaleza para Servir",
+    "text": "Padre, dame fuerza para servir con alegría. Que el cansancio no robe mi disposición. Renueva mi energía mientras bendigo a otros. Tú eres mi fuente.",
+    "tags": ["servir", "alegría", "fuente", "energía"],
+    "verseRef": "1 Pedro 4:11"
+  },
+  {
+    "id": "for-009",
+    "category": "fortaleza",
+    "title": "Resistir y Perseverar",
+    "text": "Señor, enséñame a resistir en el día malo y perseverar hasta el final. Viste mi vida con Tu armadura y mantén mi mirada en Ti. Eres mi comandante fiel.",
+    "tags": ["resistir", "perseverar", "armadura", "mirada"],
+    "verseRef": "Efesios 6:13"
+  },
+  {
+    "id": "for-010",
+    "category": "fortaleza",
+    "title": "Corazón Intrépido",
+    "text": "Padre, dame un corazón intrépido que confíe en Tu poder. Que no me paralice el miedo, sino que avance sabiendo que estás cerca. Tú eres mi valentía.",
+    "tags": ["intrépido", "miedo", "confianza", "cercanía"],
+    "verseRef": "Salmos 27:1"
+  },
+  {
+    "id": "for-011",
+    "category": "fortaleza",
+    "title": "Fuerza en la Rutina",
+    "text": "Señor, también necesito fuerza en la rutina diaria. En lo pequeño, en lo repetitivo, sé mi energía. Que no me agote lo cotidiano porque lo hago contigo.",
+    "tags": ["rutina", "cotidiano", "energía", "contigo"],
+    "verseRef": "Colosenses 3:17"
+  },
+  {
+    "id": "for-012",
+    "category": "fortaleza",
+    "title": "Fortaleza y Mansedumbre",
+    "text": "Padre, dame fortaleza unida a mansedumbre. Que mi firmeza no sea agresiva, sino llena de amor. Enséñame a ser fuerte para proteger y suave para sanar.",
+    "tags": ["mansedumbre", "firmeza", "proteger", "sanar"],
+    "verseRef": "Mateo 11:29"
+  },
+  {
+    "id": "for-013",
+    "category": "fortaleza",
+    "title": "Fuerza en la Espera",
+    "text": "Señor, mientras espero respuestas, fortalece mi corazón. Que la espera no desgaste mi fe, sino que la profundice. Tú renuevas mis fuerzas cuando confío.",
+    "tags": ["espera", "renovar", "fe", "confiar"],
+    "verseRef": "Salmos 27:14"
+  },
+  {
+    "id": "for-014",
+    "category": "fortaleza",
+    "title": "Contra el Desánimo",
+    "text": "Padre, cuando el desánimo me visita, recuérdame Tu llamado. Sopla vida sobre mis huesos secos y hazme levantar. Tu palabra es mi aliento y mi fuerza.",
+    "tags": ["desánimo", "aliento", "huesos", "palabra"],
+    "verseRef": "Ezequiel 37:4-5"
+  },
+  {
+    "id": "for-015",
+    "category": "fortaleza",
+    "title": "Fortaleza en Comunidad",
+    "text": "Señor, gracias por la comunidad que me sostiene. Usa a mis hermanos para animarme y úsame para animarlos. Juntos somos más fuertes en Ti.",
+    "tags": ["comunidad", "ánimo", "juntos", "fuerza"],
+    "verseRef": "Eclesiastés 4:9-10"
+  },
+  {
+    "id": "for-016",
+    "category": "fortaleza",
+    "title": "Valentía para Decir Sí",
+    "text": "Padre, dame valentía para decir sí a Tu llamado. Aunque me sienta pequeño, Tú eres grande en mí. Que el temor no me detenga. Confío en Tu respaldo.",
+    "tags": ["llamado", "respaldo", "pequeño", "sí"],
+    "verseRef": "Jeremías 1:8"
+  },
+  {
+    "id": "for-017",
+    "category": "fortaleza",
+    "title": "Fuerza para Soltar",
+    "text": "Señor, también se necesita fuerza para soltar. Ayúdame a dejar ir lo que ya no edificas. Que soltar no sea pérdida, sino obediencia. Fortalece mi decisión.",
+    "tags": ["soltar", "obediencia", "decisión", "edificar"],
+    "verseRef": "Hebreos 12:1"
+  },
+  {
+    "id": "for-018",
+    "category": "fortaleza",
+    "title": "Sostén Invisible",
+    "text": "Padre, aunque no te vea, sé que me sostienes. Tu soporte invisible me mantiene en pie. Gracias porque Tu fuerza actúa aun cuando me siento débil.",
+    "tags": ["sostén", "invisible", "débil", "gracias"],
+    "verseRef": "Colosenses 1:11"
+  },
+  {
+    "id": "for-019",
+    "category": "fortaleza",
+    "title": "Fortaleza y Gozo",
+    "text": "Señor, Tu gozo es mi fortaleza. Renuévame con alegría profunda que no depende de circunstancias. Que esa fuerza alegre me impulse a seguir.",
+    "tags": ["gozo", "alegría", "impulso", "seguir"],
+    "verseRef": "Nehemías 8:10"
+  },
+  {
+    "id": "for-020",
+    "category": "fortaleza",
+    "title": "Firme Hasta el Final",
+    "text": "Padre, quiero mantenerme firme hasta el final. Guárdame de caer y afírmame en Tu gracia. Que cada día sume resistencia y fidelidad. Tú eres mi meta y mi fuerza.",
+    "tags": ["firme", "fidelidad", "meta", "gracia"],
+    "verseRef": "2 Timoteo 4:7"
+  }
+]
+
