@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../widgets/app_scaffold.dart';
+import '../providers/auth_provider.dart';
+import '../widgets/google_sign_in_button.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -8,33 +11,60 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final auth = context.watch<AuthProvider>();
     return AppScaffold(
       title: 'Perfil',
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            CircleAvatar(
-              radius: 42,
-              backgroundColor: colorScheme.primary.withOpacity(0.15),
-              child: Icon(Icons.person, size: 42, color: colorScheme.primary),
-            ),
+            if (auth.isSignedIn)
+              CircleAvatar(
+                radius: 42,
+                backgroundColor: colorScheme.primary.withOpacity(0.15),
+                backgroundImage: auth.user?.photoUrl != null
+                    ? NetworkImage(auth.user!.photoUrl!)
+                    : null,
+                child: auth.user?.photoUrl == null
+                    ? Icon(Icons.person, size: 42, color: colorScheme.primary)
+                    : null,
+              )
+            else
+              CircleAvatar(
+                radius: 42,
+                backgroundColor: colorScheme.primary.withOpacity(0.15),
+                child: Icon(Icons.person, size: 42, color: colorScheme.primary),
+              ),
             const SizedBox(height: 12),
             Text(
-              'Usuario',
+              auth.isSignedIn ? (auth.user?.displayName ?? 'Usuario') : 'Invitado',
               style: GoogleFonts.playfairDisplay(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              'usuario@email.com',
+              auth.isSignedIn ? (auth.user?.email ?? '') : 'No has iniciado sesión',
               style: GoogleFonts.inter(
                 fontSize: 14,
                 color: colorScheme.onSurface.withOpacity(0.7),
               ),
             ),
             const SizedBox(height: 16),
+            if (!auth.isSignedIn)
+              GoogleSignInButton(
+                onPressed: () async {
+                  try {
+                    await context.read<AuthProvider>().signIn();
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error al iniciar sesión: $e')),
+                      );
+                    }
+                  }
+                },
+              ),
             _profileButton(context, Icons.edit_outlined, 'Editar perfil', () {
               // TODO: conectar con pantalla de edición real
             }),
@@ -45,15 +75,16 @@ class ProfileScreen extends StatelessWidget {
               // TODO: conectar con métricas reales
             }),
             const SizedBox(height: 12),
-            _profileButton(
-              context,
-              Icons.logout,
-              'Cerrar sesión',
-              () {
-                // TODO: implementar logout real
-              },
-              isDestructive: true,
-            ),
+            if (auth.isSignedIn)
+              _profileButton(
+                context,
+                Icons.logout,
+                'Cerrar sesión',
+                () async {
+                  await context.read<AuthProvider>().signOut();
+                },
+                isDestructive: true,
+              ),
           ],
         ),
       ),

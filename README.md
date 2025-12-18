@@ -67,6 +67,20 @@ Aplicación móvil Flutter con versículos bíblicos, oraciones, devocionales, c
 - **iOS**: Requiere Xcode y CocoaPods instalado
 - **Notificaciones**: Configura los permisos necesarios en cada plataforma
 
+## 🔐 Inicio de sesión con Google
+
+### Android
+- Paquete de la app: `com.ozcorp.versiculo_de_hoy` (ver `android/app/build.gradle.kts`)
+- Pasos:
+   1. Obtén el SHA-1 de tu keystore de debug o release:
+       ```bash
+       keytool -list -v -alias androiddebugkey -keystore ~/.android/debug.keystore -storepass android -keypass android | grep SHA1
+       ```
+       Para release, usa tu `key.properties` y keystore correspondiente.
+
+Esta debe ser agregada a la consola de firebase para que funcione. Si no registras el SHA-1 verás errores como `DEVELOPER_ERROR (code 10)` al intentar iniciar sesión.
+
+
 ## 🤝 Cómo colaborar
 
 ### Flujo de trabajo con Git

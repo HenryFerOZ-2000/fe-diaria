@@ -5,6 +5,7 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
 // Load keystore properties
@@ -43,22 +44,31 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            val storeFileProperty = keystoreProperties["storeFile"] as String?
-            storeFile = if (storeFileProperty != null) {
-                file(storeFileProperty)
-            } else {
-                null
+        // Only configure release signing if key.properties exists and has required values
+        val hasKeystore = keystorePropertiesFile.exists()
+        val keyAliasProp = keystoreProperties["keyAlias"] as? String
+        val keyPasswordProp = keystoreProperties["keyPassword"] as? String
+        val storeFileProp = keystoreProperties["storeFile"] as? String
+        val storePasswordProp = keystoreProperties["storePassword"] as? String
+
+        if (hasKeystore && keyAliasProp != null && keyPasswordProp != null && storeFileProp != null && storePasswordProp != null) {
+            create("release") {
+                keyAlias = keyAliasProp
+                keyPassword = keyPasswordProp
+                storeFile = file(storeFileProp)
+                storePassword = storePasswordProp
             }
-            storePassword = keystoreProperties["storePassword"] as String
+        } else {
+            println("[Gradle] Release signing not configured: missing key.properties or required fields.")
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // Assign release signing only if it was configured
+            if (signingConfigs.findByName("release") != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = false
             isShrinkResources = false
         }

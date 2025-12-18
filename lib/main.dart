@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/app_provider.dart';
+import 'providers/auth_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'services/storage_service.dart';
 import 'services/cache_service.dart';
 import 'services/language_service.dart';
@@ -34,6 +36,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
+    await Firebase.initializeApp();
     // Inicializar servicios en orden
     await StorageService.init();
     await CacheService.init();
@@ -73,8 +76,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AppProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+      ],
       child: Consumer<AppProvider>(
         builder: (context, provider, child) {
           return MaterialApp(
