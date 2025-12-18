@@ -191,6 +191,57 @@ class _LiveScreenState extends State<LiveScreen> {
     });
   }
 
+  Future<void> _refreshFeed() async {
+    // Simular carga de nuevas publicaciones
+    await Future.delayed(const Duration(milliseconds: 800));
+    
+    if (!mounted) return;
+    
+    // Generar nuevas publicaciones con timestamps más recientes
+    final now = DateTime.now();
+    final newPosts = [
+      LivePost(
+        id: 'new_${now.millisecondsSinceEpoch}_1',
+        userName: 'María',
+        text: 'Nueva petición de oración. Necesito fortaleza para enfrentar los desafíos de hoy.',
+        timeAgo: 'hace 5 min',
+        mediaUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80',
+        joinCount: 3,
+        likes: 2,
+        comments: 1,
+        isJoined: false,
+      ),
+      LivePost(
+        id: 'new_${now.millisecondsSinceEpoch}_2',
+        userName: 'Carlos',
+        text: 'Gracias a Dios por todas sus bendiciones. Compartamos juntos esta gratitud.',
+        timeAgo: 'hace 12 min',
+        mediaUrl: 'https://images.unsplash.com/photo-1520854221050-0f4caff449fb?auto=format&fit=crop&w=1200&q=80',
+        joinCount: 5,
+        likes: 4,
+        comments: 2,
+        isJoined: false,
+      ),
+      LivePost(
+        id: 'new_${now.millisecondsSinceEpoch}_3',
+        userName: 'Ana',
+        text: 'Oremos juntos por la paz en nuestras familias y comunidades.',
+        timeAgo: 'hace 18 min',
+        mediaUrl: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
+        isVideo: true,
+        joinCount: 8,
+        likes: 6,
+        comments: 3,
+        isJoined: false,
+      ),
+    ];
+    
+    setState(() {
+      // Insertar nuevas publicaciones al inicio del feed
+      _posts.insertAll(0, newPosts);
+    });
+  }
+
   void _toggleJoin(LivePost post) {
     setState(() {
       if (post.isJoined) {
@@ -444,22 +495,26 @@ class _LiveScreenState extends State<LiveScreen> {
       resizeToAvoidBottomInset: true,
       body: _posts.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-              itemCount: _posts.length,
-              itemBuilder: (context, index) {
-                final post = _posts[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _FeedPostTile(
-                    post: post,
-                    onJoin: () => _toggleJoin(post),
-                    onComment: () => _openComments(post),
-                    onShare: () => _sharePost(post),
-                  ),
-                );
-              },
+          : RefreshIndicator(
+              onRefresh: _refreshFeed,
+              color: colorScheme.primary,
+              child: ListView.builder(
+                controller: _scrollController,
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                itemCount: _posts.length,
+                itemBuilder: (context, index) {
+                  final post = _posts[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _FeedPostTile(
+                      post: post,
+                      onJoin: () => _toggleJoin(post),
+                      onComment: () => _openComments(post),
+                      onShare: () => _sharePost(post),
+                    ),
+                  );
+                },
+              ),
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: _createPost,
@@ -702,7 +757,6 @@ class _CreatePostModalState extends State<_CreatePostModal> {
     );
   }
 }
-
 class _ActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -742,3 +796,4 @@ class _ActionButton extends StatelessWidget {
     );
   }
 }
+
