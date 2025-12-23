@@ -13,6 +13,9 @@ class AuthService {
       'profile',
       // Add more scopes if needed
     ],
+    // Use the OAuth client ID from google-services.json
+    // This helps avoid API Exception 10 errors
+    serverClientId: '475052295250-stk492qgav0cj1d5q1jdcfc1a6evsia7.apps.googleusercontent.com',
   );
 
   GoogleSignInAccount? _currentUser;
@@ -37,10 +40,24 @@ class AuthService {
       return _currentUser;
     } on PlatformException catch (e) {
       // Common Android error: code == 10 (DEVELOPER_ERROR) when SHA-1 or package mismatch
-      // Surfacing for easier debugging
-      throw Exception('Google Sign-In failed (code: ${e.code}): ${e.message}');
+      String errorMessage = 'Error al iniciar sesión con Google';
+      
+      if (e.code == '10' || e.code == 'DEVELOPER_ERROR') {
+        errorMessage = 'Error de configuración: Verifica que el SHA-1 esté registrado en Firebase Console.\n\n'
+            'SHA-1 Debug: 0E:EC:99:36:C2:38:CA:D4:6B:49:5E:3B:3F:8D:52:08:6C:52:40:3E\n\n'
+            'Ve a Firebase Console > Configuración del proyecto > Tus aplicaciones > Android app\n'
+            'y agrega este SHA-1 en "Huellas digitales del certificado SHA"';
+      } else if (e.code == '12500') {
+        errorMessage = 'Error: La aplicación no está configurada correctamente en Google Cloud Console';
+      } else if (e.code == '12501') {
+        errorMessage = 'El usuario canceló el inicio de sesión';
+      } else {
+        errorMessage = 'Error (código ${e.code}): ${e.message ?? "Error desconocido"}';
+      }
+      
+      throw Exception(errorMessage);
     } catch (e) {
-      throw Exception('Google Sign-In failed: $e');
+      throw Exception('Error al iniciar sesión con Google: $e');
     }
   }
 

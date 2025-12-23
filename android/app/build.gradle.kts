@@ -27,6 +27,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
         isCoreLibraryDesugaringEnabled = true
     }
+    
+    // Suppress Java 8 obsolete warnings from dependencies
+    tasks.withType<JavaCompile>().configureEach {
+        options.compilerArgs.add("-Xlint:-options")
+    }
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()

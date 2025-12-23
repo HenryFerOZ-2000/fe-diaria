@@ -8,6 +8,7 @@ allprojects {
     tasks.withType<JavaCompile>().configureEach {
         sourceCompatibility = JavaVersion.VERSION_11.toString()
         targetCompatibility = JavaVersion.VERSION_11.toString()
+        options.compilerArgs.add("-Xlint:-options") // Suppress Java 8 obsolete warnings
     }
 }
 

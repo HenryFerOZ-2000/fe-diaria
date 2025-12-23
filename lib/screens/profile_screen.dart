@@ -56,10 +56,28 @@ class ProfileScreen extends StatelessWidget {
                 onPressed: () async {
                   try {
                     await context.read<AuthProvider>().signIn();
-                  } catch (e) {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error al iniciar sesión: $e')),
+                        const SnackBar(
+                          content: Text('Sesión iniciada correctamente'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      final errorMsg = e.toString().replaceAll('Exception: ', '');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            errorMsg.length > 100 
+                              ? '${errorMsg.substring(0, 100)}...\n\nVer FIX_GOOGLE_SIGNIN.md para más detalles'
+                              : errorMsg,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          duration: const Duration(seconds: 5),
+                          backgroundColor: Colors.red,
+                        ),
                       );
                     }
                   }

@@ -24,6 +24,7 @@ import 'screens/traditional_prayers_religion_selection_screen.dart';
 import 'services/content_validator.dart';
 import 'services/daily_content_service.dart';
 import 'theme/app_theme.dart';
+import 'screens/welcome_auth_screen.dart';
 
 int? _initialTabIndex;
 String? _notificationPayload;
@@ -83,13 +84,25 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer<AppProvider>(
         builder: (context, provider, child) {
+          final auth = Provider.of<AuthProvider>(context);
+          final bool onboardingCompleted = _checkOnboarding();
+
+          Widget startScreen;
+          if (!auth.isSignedIn) {
+            startScreen = const WelcomeAuthScreen();
+          } else {
+            startScreen = onboardingCompleted
+                ? MainScreen(initialTabIndex: _initialTabIndex)
+                : const OnboardingScreen();
+          }
+
           return MaterialApp(
             title: 'Versículo del Día',
             debugShowCheckedModeBanner: false,
             theme: lightTheme,
             darkTheme: darkTheme,
             themeMode: provider.darkMode ? ThemeMode.dark : ThemeMode.light,
-            home: _checkOnboarding() ? MainScreen(initialTabIndex: _initialTabIndex) : const OnboardingScreen(),
+            home: startScreen,
             routes: {
               '/home': (context) => MainScreen(initialTabIndex: _initialTabIndex),
               '/emotion-selection': (context) => const EmotionSelectionScreen(),
@@ -97,6 +110,7 @@ class MyApp extends StatelessWidget {
               '/category-prayers': (context) => const CategoryPrayersScreen(),
               '/traditional-prayers-religion-selection': (context) => const TraditionalPrayersReligionSelectionScreen(),
               '/profile': (context) => const ProfileScreen(),
+              '/welcome': (context) => const WelcomeAuthScreen(),
             },
             navigatorObservers: [
               _NotificationNavigatorObserver(),

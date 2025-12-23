@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import '../widgets/app_scaffold.dart';
+import 'dart:async';
 
 class LivePost {
   final String id;
@@ -620,6 +621,21 @@ class _FeedPostTile extends StatelessWidget {
                             child: Image.network(
                               post.mediaUrl!,
                               fit: BoxFit.cover,
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Container(
+                                  color: Colors.grey.shade200,
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded /
+                                              loadingProgress.expectedTotalBytes!
+                                          : null,
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                );
+                              },
                               errorBuilder: (_, __, ___) => Container(
                                 color: Colors.grey.shade200,
                                 child: const Center(
@@ -627,6 +643,7 @@ class _FeedPostTile extends StatelessWidget {
                                       color: Colors.grey),
                                 ),
                               ),
+                              cacheWidth: 800, // Optimize image loading
                             ),
                           ),
                         ),
