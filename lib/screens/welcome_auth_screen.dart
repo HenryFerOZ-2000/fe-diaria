@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../services/storage_service.dart';
 
 class WelcomeAuthScreen extends StatefulWidget {
   const WelcomeAuthScreen({super.key});
@@ -24,6 +25,30 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
     } catch (e) {
       setState(() {
         _error = e.toString().replaceFirst('Exception: ', '');
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _continueAsGuest() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      // Marcar onboarding como completado para no volver a mostrar el welcome
+      await StorageService().setOnboardingCompleted(true);
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('/home');
+      }
+    } catch (e) {
+      setState(() {
+        _error = 'No se pudo continuar como invitado: $e';
       });
     } finally {
       if (mounted) {
@@ -148,6 +173,26 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: _isLoading ? null : _continueAsGuest,
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 13),
+                            side: BorderSide(color: colorScheme.primary.withOpacity(0.6)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          ),
+                          child: Text(
+                            _isLoading ? 'Procesando...' : 'Continuar sin iniciar sesión',
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ),
                       if (_error != null) ...[
                         const SizedBox(height: 12),
                         Container(
@@ -173,22 +218,45 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              Text(
-                'Al continuar, aceptas cuidar la comunidad: respeto, apoyo y oración por los demás.',
-                style: GoogleFonts.inter(
-                  fontSize: 12.5,
-                  height: 1.5,
-                  color: colorScheme.onSurface.withOpacity(0.6),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Tus datos se usan solo para mantener tu sesión y sincronizar tu contenido.',
-                style: GoogleFonts.inter(
-                  fontSize: 12.5,
-                  height: 1.5,
-                  color: colorScheme.onSurface.withOpacity(0.6),
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.info_outline, size: 18, color: colorScheme.primary.withOpacity(0.9)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Al continuar, aceptas cuidar la comunidad: respeto, apoyo y oración por los demás.',
+                          style: GoogleFonts.inter(
+                            fontSize: 12.5,
+                            height: 1.5,
+                            color: colorScheme.onSurface.withOpacity(0.7),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Como invitado no se sincronizan tus datos en la nube. Inicia sesión con Google para guardar rachas, favoritos y progreso entre dispositivos.',
+                          style: GoogleFonts.inter(
+                            fontSize: 12.5,
+                            height: 1.5,
+                            color: colorScheme.onSurface.withOpacity(0.7),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Tus datos se usan solo para mantener tu sesión y sincronizar tu contenido.',
+                          style: GoogleFonts.inter(
+                            fontSize: 12.5,
+                            height: 1.5,
+                            color: colorScheme.onSurface.withOpacity(0.7),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

@@ -100,6 +100,9 @@ class ProfileScreen extends StatelessWidget {
                 'Cerrar sesión',
                 () async {
                   await context.read<AuthProvider>().signOut();
+                  if (context.mounted) {
+                    Navigator.of(context).pushNamedAndRemoveUntil('/welcome', (route) => false);
+                  }
                 },
                 isDestructive: true,
               ),

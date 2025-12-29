@@ -682,6 +682,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
+                    const Divider(height: 1),
+                    ListTile(
+                      title: Text(
+                        'Biblia RV1909',
+                        style: GoogleFonts.roboto(fontSize: 16),
+                      ),
+                      subtitle: Text(
+                        'Texto bíblico: Reina-Valera 1909 (Dominio Público). Fuente: eBible.org.',
+                        style: GoogleFonts.roboto(
+                          fontSize: 14,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      leading: Icon(
+                        Icons.menu_book_outlined,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 32),

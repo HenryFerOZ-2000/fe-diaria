@@ -121,6 +121,6 @@ class HelloAoBibleApi {
   }
 
   String _cacheKey(String translationId, String bookId, int chapter) =>
-      'cache_${translationId}_$bookId\_$chapter';
+      'cache_${translationId}_${bookId}_$chapter';
 }
 

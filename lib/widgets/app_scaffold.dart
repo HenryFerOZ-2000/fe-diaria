@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
+import '../providers/auth_provider.dart';
 
 /// Scaffold personalizado con diseño consistente y gradientes
 class AppScaffold extends StatelessWidget {
@@ -19,6 +21,7 @@ class AppScaffold extends StatelessWidget {
   final bool showAppBar;
   final PreferredSizeWidget? bottom;
   final double? appBarElevation;
+  final bool showGuestNotice;
 
   const AppScaffold({
     super.key,
@@ -38,6 +41,7 @@ class AppScaffold extends StatelessWidget {
     this.showAppBar = true,
     this.bottom,
     this.appBarElevation,
+    this.showGuestNotice = true,
   });
 
   @override
@@ -62,6 +66,80 @@ class AppScaffold extends StatelessWidget {
                   AppColors.background,
                 ],
         );
+
+    // Guest notice (only when not signed in)
+    Widget? guestNotice;
+    if (showGuestNotice) {
+      final auth = Provider.of<AuthProvider?>(context, listen: true);
+      final isGuest = auth == null || !auth.isSignedIn;
+      if (isGuest) {
+        guestNotice = Container(
+          width: double.infinity,
+          margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: colorScheme.primary.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: colorScheme.primary.withOpacity(0.12)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.info_outline, size: 18, color: colorScheme.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Modo invitado: inicia sesión para sincronizar rachas, favoritos y progreso.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: () async {
+                  final authProv = Provider.of<AuthProvider?>(context, listen: false);
+                  if (authProv == null) {
+                    Navigator.of(context).pushNamed('/welcome');
+                    return;
+                  }
+                  try {
+                    await authProv.signIn();
+                    if (context.mounted) {
+                      Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
+                    }
+                  } catch (e) {
+                    final err = e.toString().replaceFirst('Exception: ', '');
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            err.length > 120 ? '${err.substring(0, 120)}...' : err,
+                          ),
+                          duration: const Duration(seconds: 4),
+                        ),
+                      );
+                    }
+                  }
+                },
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  minimumSize: const Size(0, 0),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  'Iniciar sesión',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    }
 
     return Scaffold(
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
@@ -93,7 +171,12 @@ class AppScaffold extends StatelessWidget {
           gradient: bgGradient,
         ),
         child: SafeArea(
-          child: body,
+          child: Column(
+            children: [
+              if (guestNotice != null) guestNotice,
+              Expanded(child: body),
+            ],
+          ),
         ),
       ),
     );

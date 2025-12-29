@@ -25,6 +25,7 @@ import 'services/content_validator.dart';
 import 'services/daily_content_service.dart';
 import 'theme/app_theme.dart';
 import 'screens/welcome_auth_screen.dart';
+import 'bible/ui/bible_books_screen.dart';
 
 int? _initialTabIndex;
 String? _notificationPayload;
@@ -88,12 +89,15 @@ class MyApp extends StatelessWidget {
           final bool onboardingCompleted = _checkOnboarding();
 
           Widget startScreen;
-          if (!auth.isSignedIn) {
-            startScreen = const WelcomeAuthScreen();
-          } else {
+          if (auth.isSignedIn) {
             startScreen = onboardingCompleted
                 ? MainScreen(initialTabIndex: _initialTabIndex)
                 : const OnboardingScreen();
+          } else {
+            // Invitado: si ya completó onboarding, dejar pasar; si no, mostrar welcome.
+            startScreen = onboardingCompleted
+                ? MainScreen(initialTabIndex: _initialTabIndex)
+                : const WelcomeAuthScreen();
           }
 
           return MaterialApp(
@@ -111,6 +115,7 @@ class MyApp extends StatelessWidget {
               '/traditional-prayers-religion-selection': (context) => const TraditionalPrayersReligionSelectionScreen(),
               '/profile': (context) => const ProfileScreen(),
               '/welcome': (context) => const WelcomeAuthScreen(),
+              '/bible-offline': (context) => const BibleBooksScreen(),
             },
             navigatorObservers: [
               _NotificationNavigatorObserver(),
