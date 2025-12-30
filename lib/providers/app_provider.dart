@@ -4,6 +4,7 @@ import '../models/prayer.dart';
 import '../services/verse_service.dart';
 import '../services/prayer_service.dart';
 import '../services/storage_service.dart';
+import '../services/streak_service.dart';
 import '../services/notification_service.dart';
 import '../services/widget_service.dart';
 import '../services/personalization_service.dart';
@@ -12,6 +13,7 @@ class AppProvider extends ChangeNotifier {
   final VerseService _verseService = VerseService();
   final PrayerService _prayerService = PrayerService();
   final StorageService _storageService = StorageService();
+  late final StreakService _streakService = StreakService(_storageService);
   final NotificationService _notificationService = NotificationService();
   final PersonalizationService _personalizationService = PersonalizationService();
 
@@ -325,43 +327,25 @@ class AppProvider extends ChangeNotifier {
   }
 
   Future<void> _updateDailyStreak() async {
-    final today = DateTime.now();
-    final lastDate = _storageService.getLastStreakDate();
-    final storedCount = _storageService.getStreakCount();
-
-    if (lastDate == null) {
-      _streakCount = storedCount > 0 ? storedCount : 1;
-    } else if (_isSameDay(today, lastDate)) {
-      _streakCount = storedCount > 0 ? storedCount : 1;
-    } else if (_isYesterday(lastDate, today)) {
-      _streakCount = storedCount + 1;
-    } else {
-      _streakCount = 1;
+    try {
+      final state = await _streakService.resetIfNeeded();
+      _streakCount = state.count;
+      debugPrint('Streak update: count=${state.count}, last=${state.lastDateYmd}');
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Streak update error: $e');
     }
-
-    await _storageService.saveStreakData(
-      streakCount: _streakCount,
-      lastDate: today,
-    );
   }
 
   Future<void> completeDailyStreak() async {
-    final today = DateTime.now();
-    _streakCount = _storageService.getStreakCount() + 1;
-    await _storageService.saveStreakData(
-      streakCount: _streakCount,
-      lastDate: today,
-    );
-    notifyListeners();
-  }
-
-  bool _isSameDay(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
-  }
-
-  bool _isYesterday(DateTime reference, DateTime today) {
-    final yesterday = DateTime(today.year, today.month, today.day - 1);
-    return _isSameDay(reference, yesterday);
+    try {
+      final state = await _streakService.recordToday();
+      _streakCount = state.count;
+      debugPrint('Streak recorded: count=${state.count}, last=${state.lastDateYmd}');
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Streak record error: $e');
+    }
   }
 
   // Personalización

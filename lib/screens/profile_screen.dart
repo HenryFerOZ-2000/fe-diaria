@@ -86,6 +86,9 @@ class ProfileScreen extends StatelessWidget {
             _profileButton(context, Icons.edit_outlined, 'Editar perfil', () {
               // TODO: conectar con pantalla de edición real
             }),
+            _profileButton(context, Icons.chat_bubble_outline, 'Mis oraciones', () {
+              Navigator.of(context).pushNamed('/my-posts');
+            }),
             _profileButton(context, Icons.local_fire_department_outlined, 'Mis rachas', () {
               // TODO: conectar con pantalla de rachas
             }),

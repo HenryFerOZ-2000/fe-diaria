@@ -15,6 +15,7 @@ import 'screens/live_screen.dart';
 import 'screens/prayers_screen.dart';
 import 'screens/bible_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/my_posts_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/emotion_selection_screen.dart';
 import 'screens/prayer_for_you_screen.dart';
@@ -114,6 +115,7 @@ class MyApp extends StatelessWidget {
               '/category-prayers': (context) => const CategoryPrayersScreen(),
               '/traditional-prayers-religion-selection': (context) => const TraditionalPrayersReligionSelectionScreen(),
               '/profile': (context) => const ProfileScreen(),
+              '/my-posts': (context) => const MyPostsScreen(),
               '/welcome': (context) => const WelcomeAuthScreen(),
               '/bible-offline': (context) => const BibleBooksScreen(),
             },

@@ -1,8 +1,13 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import '../widgets/app_scaffold.dart';
-import 'dart:async';
 
 class LivePost {
   final String id;
@@ -15,6 +20,7 @@ class LivePost {
   int likes;
   int comments;
   bool isJoined;
+  bool isLiked;
 
   LivePost({
     required this.id,
@@ -26,8 +32,10 @@ class LivePost {
     this.joinCount = 0,
     this.likes = 0,
     this.comments = 0,
+    bool? isLiked,
     bool? isJoined,
   })  : isJoined = isJoined ?? false,
+        isLiked = isLiked ?? false,
         isVideo = isVideo ?? false;
 
   bool get isJoinedValue => isJoined;
@@ -54,230 +62,186 @@ class LiveScreen extends StatefulWidget {
   State<LiveScreen> createState() => _LiveScreenState();
 }
 
+enum LiveFilter { all, active }
+
 class _LiveScreenState extends State<LiveScreen> {
+  LiveFilter _filter = LiveFilter.all;
   final ScrollController _scrollController = ScrollController();
   List<LivePost> _posts = [];
-  bool _isLoadingMore = false;
+  bool _initialLoaded = false;
+  String? _loadError;
+  bool _isPosting = false;
+  final Set<String> _likedPosts = {};
+  final _firestore = FirebaseFirestore.instance;
+  final _functions = FirebaseFunctions.instanceFor(region: 'us-central1');
+  final _auth = FirebaseAuth.instance;
+  String? _uid;
 
   @override
   void initState() {
     super.initState();
-    _loadInitialPosts();
-    _scrollController.addListener(_onScroll);
+    _ensureAuth().then((_) {
+      _syncProfileToFirestore();
+      _loadLikes();
+    });
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
 
-  void _onScroll() {
-    if (_isLoadingMore) return;
-    if (_scrollController.position.pixels >
-        _scrollController.position.maxScrollExtent - 200) {
-      _loadMorePosts();
+  void _onScroll() {}
+
+  Future<void> _ensureAuth() async {
+    if (_auth.currentUser == null) {
+      await _auth.signInAnonymously();
+    }
+    _uid = _auth.currentUser?.uid;
+  }
+
+  Future<void> _syncProfileToFirestore() async {
+    await _ensureAuth();
+    final uid = _uid;
+    if (uid == null) return;
+    final user = _auth.currentUser;
+    final displayName = user?.displayName?.trim();
+    final emailPrefix = user?.email != null ? user!.email!.split('@').first : null;
+    final chosenName = displayName?.isNotEmpty == true
+        ? displayName
+        : (emailPrefix?.isNotEmpty == true ? emailPrefix : uid);
+    try {
+      await _firestore.collection('users').doc(uid).set(
+        {
+          'authorName': chosenName,
+          'email': user?.email,
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+    } catch (e) {
+      debugPrint('Error syncing profile: $e');
     }
   }
 
-  void _loadInitialPosts() {
-    setState(() {
-      _posts = [
-        LivePost(
-          id: '1',
-          userName: 'María',
-          text: 'Ayúdenme a orar por la salud de mi mamá. Ella está pasando por un momento difícil y necesitamos la fuerza de Dios.',
-          timeAgo: 'hace 2 h',
-          mediaUrl:
-              'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80',
-          joinCount: 12,
-          likes: 5,
-          comments: 3,
-          isJoined: false,
-        ),
-        LivePost(
-          id: '2',
-          userName: 'Carlos',
-          text: 'Demos gracias por un nuevo día y por nuestra familia. Que Dios bendiga cada momento de este día.',
-          timeAgo: 'hace 3 h',
-          mediaUrl:
-              'https://images.unsplash.com/photo-1520854221050-0f4caff449fb?auto=format&fit=crop&w=1200&q=80',
-          joinCount: 8,
-          likes: 4,
-          comments: 1,
-          isJoined: false,
-        ),
-        LivePost(
-          id: '3',
-          userName: 'Ana',
-          text: 'Pido oración por mi trabajo. Necesito sabiduría y dirección en las decisiones que debo tomar esta semana.',
-          timeAgo: 'hace 5 h',
-          mediaUrl:
-              'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
-          isVideo: true,
-          joinCount: 15,
-          likes: 7,
-          comments: 2,
-          isJoined: false,
-        ),
-        LivePost(
-          id: '4',
-          userName: 'Pedro',
-          text: 'Oremos juntos por la paz en el mundo. Que el amor de Cristo llene cada corazón y traiga reconciliación.',
-          timeAgo: 'hace 6 h',
-          mediaUrl:
-              'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=1200&q=80',
-          joinCount: 22,
-          likes: 10,
-          comments: 5,
-          isJoined: false,
-        ),
-        LivePost(
-          id: '5',
-          userName: 'Laura',
-          text: 'Gracias a Dios por las bendiciones recibidas. Quiero compartir mi gratitud con todos ustedes.',
-          timeAgo: 'hace 8 h',
-          mediaUrl:
-              'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=80',
-          joinCount: 18,
-          likes: 9,
-          comments: 4,
-          isJoined: false,
-        ),
-      ];
-    });
+  Future<void> _loadLikes() async {
+    try {
+      await _ensureAuth();
+      final uid = _uid;
+      if (uid == null) return;
+      final likesSnap = await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('likes')
+          .limit(500)
+          .get();
+      final ids = likesSnap.docs.map((d) => d.id).toSet();
+      if (mounted) {
+        setState(() {
+          _likedPosts
+            ..clear()
+            ..addAll(ids);
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading likes: $e');
+    }
   }
 
-  void _loadMorePosts() {
-    if (_isLoadingMore) return;
-    setState(() {
-      _isLoadingMore = true;
-    });
+  Query<Map<String, dynamic>> _buildQuery() {
+    final base = _firestore.collection('live_posts');
+    if (_filter == LiveFilter.active) {
+      return base
+          .where('status', isEqualTo: 'active')
+          .where('liveUntil', isGreaterThan: Timestamp.now())
+          .orderBy('liveUntil', descending: true)
+          .limit(50);
+    }
+    return base.orderBy('createdAt', descending: true).limit(50);
+  }
 
-    // Simular carga asíncrona
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (!mounted) return;
-      final newPosts = [
-        LivePost(
-          id: '${_posts.length + 1}',
-          userName: 'Usuario ${_posts.length + 1}',
-          text: 'Oración de ejemplo ${_posts.length + 1}. Que Dios bendiga a todos los que están aquí orando juntos.',
-          timeAgo: 'hace ${_posts.length + 1} h',
-          mediaUrl:
-              'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
-          isVideo: (_posts.length % 2 == 0),
-          joinCount: _posts.length * 2,
-          likes: _posts.length,
-          comments: _posts.length ~/ 2,
-          isJoined: false,
-        ),
-        LivePost(
-          id: '${_posts.length + 2}',
-          userName: 'Usuario ${_posts.length + 2}',
-          text: 'Petición de oración ${_posts.length + 2}. Necesitamos la guía del Señor en este momento.',
-          timeAgo: 'hace ${_posts.length + 2} h',
-          mediaUrl:
-              'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80',
-          joinCount: (_posts.length + 1) * 2,
-          likes: _posts.length + 1,
-          comments: (_posts.length + 1) ~/ 2,
-          isJoined: false,
-        ),
-      ];
-      setState(() {
-        _posts.addAll(newPosts);
-        _isLoadingMore = false;
-      });
-    });
+  Future<void> _insertPostById(String postId) async {
+    try {
+      final doc = await _firestore.collection('live_posts').doc(postId).get();
+      if (!doc.exists) return;
+      final data = doc.data();
+      if (data == null) return;
+      if (_posts.any((p) => p.id == doc.id)) return;
+      final now = DateTime.now();
+      final ts = data['createdAt'] as Timestamp?;
+      final post = LivePost(
+        id: doc.id,
+        userName: data['authorUid'] as String? ?? 'Anónimo',
+        text: data['text'] as String? ?? '',
+        timeAgo: _formatTimeAgo(ts?.toDate(), now),
+        joinCount: (data['joinCount'] ?? 0) as int,
+        likes: (data['likeCount'] ?? 0) as int,
+        comments: (data['commentCount'] ?? 0) as int,
+        isJoined: false,
+      );
+      if (mounted) {
+        setState(() {
+          _posts = [post, ..._posts];
+          _initialLoaded = true;
+          _loadError = null;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching post $postId: $e');
+    }
+  }
+
+  String _formatTimeAgo(DateTime? time, DateTime now) {
+    if (time == null) return 'ahora';
+    final diff = now.difference(time);
+    if (diff.inMinutes < 1) return 'ahora';
+    if (diff.inMinutes < 60) return 'hace ${diff.inMinutes} min';
+    if (diff.inHours < 24) return 'hace ${diff.inHours} h';
+    final days = diff.inDays;
+    return 'hace ${days} d';
   }
 
   Future<void> _refreshFeed() async {
-    // Simular carga de nuevas publicaciones
-    await Future.delayed(const Duration(milliseconds: 800));
-    
-    if (!mounted) return;
-    
-    // Generar nuevas publicaciones con timestamps más recientes
-    final now = DateTime.now();
-    final newPosts = [
-      LivePost(
-        id: 'new_${now.millisecondsSinceEpoch}_1',
-        userName: 'María',
-        text: 'Nueva petición de oración. Necesito fortaleza para enfrentar los desafíos de hoy.',
-        timeAgo: 'hace 5 min',
-        mediaUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80',
-        joinCount: 3,
-        likes: 2,
-        comments: 1,
-        isJoined: false,
-      ),
-      LivePost(
-        id: 'new_${now.millisecondsSinceEpoch}_2',
-        userName: 'Carlos',
-        text: 'Gracias a Dios por todas sus bendiciones. Compartamos juntos esta gratitud.',
-        timeAgo: 'hace 12 min',
-        mediaUrl: 'https://images.unsplash.com/photo-1520854221050-0f4caff449fb?auto=format&fit=crop&w=1200&q=80',
-        joinCount: 5,
-        likes: 4,
-        comments: 2,
-        isJoined: false,
-      ),
-      LivePost(
-        id: 'new_${now.millisecondsSinceEpoch}_3',
-        userName: 'Ana',
-        text: 'Oremos juntos por la paz en nuestras familias y comunidades.',
-        timeAgo: 'hace 18 min',
-        mediaUrl: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
-        isVideo: true,
-        joinCount: 8,
-        likes: 6,
-        comments: 3,
-        isJoined: false,
-      ),
-    ];
-    
-    setState(() {
-      // Insertar nuevas publicaciones al inicio del feed
-      _posts.insertAll(0, newPosts);
-    });
+    await Future.delayed(const Duration(milliseconds: 300));
   }
 
-  void _toggleJoin(LivePost post) {
+  Future<void> _toggleLike(LivePost post) async {
+    await _ensureAuth();
+    final uid = _uid;
+    if (uid == null) return;
+    final isLikedNow = _likedPosts.contains(post.id);
     setState(() {
-      if (post.isJoined) {
-        post.isJoined = false;
-        post.joinCount = (post.joinCount - 1).clamp(0, double.infinity).toInt();
+      if (isLikedNow) {
+        _likedPosts.remove(post.id);
       } else {
-        post.isJoined = true;
-        post.joinCount += 1;
+        _likedPosts.add(post.id);
       }
     });
+    try {
+      final postRef = _firestore.collection('live_posts').doc(post.id);
+      final likeRef = _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('likes')
+          .doc(post.id);
+      await _firestore.runTransaction((tx) async {
+        tx.update(
+          postRef,
+          {'likeCount': FieldValue.increment(isLikedNow ? -1 : 1)},
+        );
+        if (isLikedNow) {
+          tx.delete(likeRef);
+        } else {
+          tx.set(likeRef, {'createdAt': FieldValue.serverTimestamp()});
+        }
+      });
+    } catch (e) {
+      debugPrint('Error toggling like: $e');
+    }
   }
 
   void _openComments(LivePost post) {
-    // Comentarios mock
-    final mockComments = [
-      LiveComment(
-        id: 'c1',
-        userName: 'Juan',
-        text: 'Estoy orando contigo. Que Dios te bendiga.',
-        timeAgo: 'hace 1 h',
-      ),
-      LiveComment(
-        id: 'c2',
-        userName: 'Sofía',
-        text: 'Unámonos en oración. El Señor escucha nuestras peticiones.',
-        timeAgo: 'hace 30 min',
-      ),
-      LiveComment(
-        id: 'c3',
-        userName: 'Miguel',
-        text: 'Dios está contigo. Confía en Él.',
-        timeAgo: 'hace 15 min',
-      ),
-    ];
-
     final commentController = TextEditingController();
 
     showModalBottomSheet(
@@ -313,77 +277,112 @@ class _LiveScreenState extends State<LiveScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                'Comentarios (${post.comments})',
+                'Comentarios',
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(height: 12),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: mockComments.length,
-                  itemBuilder: (context, index) {
-                    final comment = mockComments[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withOpacity(0.15),
-                            child: Text(
-                              comment.userName.isNotEmpty
-                                  ? comment.userName[0].toUpperCase()
-                                  : '?',
-                              style: GoogleFonts.inter(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+              SizedBox(
+                height: 240,
+                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: _firestore
+                      .collection('live_posts')
+                      .doc(post.id)
+                      .collection('comments')
+                      .orderBy('createdAt', descending: true)
+                      .limit(50)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          'Error al cargar comentarios',
+                          style: GoogleFonts.inter(),
+                        ),
+                      );
+                    }
+                    final docs = snapshot.data?.docs ?? [];
+                    if (docs.isEmpty) {
+                      return const Center(child: Text('Sé el primero en comentar'));
+                    }
+                    return ListView.builder(
+                      itemCount: docs.length,
+                      itemBuilder: (context, index) {
+                        final data = docs[index].data();
+                        final text = data['text'] as String? ?? '';
+                        final author = data['authorName'] as String? ??
+                            data['authorUid'] as String? ??
+                            'Anónimo';
+                        final created = data['createdAt'] as Timestamp?;
+                        final timeAgo = _formatTimeAgo(
+                          created?.toDate(),
+                          DateTime.now(),
+                        );
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CircleAvatar(
+                                radius: 16,
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.15),
+                                child: Text(
+                                  author.isNotEmpty
+                                      ? author[0].toUpperCase()
+                                      : '?',
+                                  style: GoogleFonts.inter(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      author,
+                                      style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      text,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      timeAgo,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 11,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withOpacity(0.5),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  comment.userName,
-                                  style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  comment.text,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 14,
-                                    height: 1.4,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  comment.timeAgo,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 11,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withOpacity(0.5),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     );
                   },
                 ),
@@ -408,14 +407,43 @@ class _LiveScreenState extends State<LiveScreen> {
                   ),
                   const SizedBox(width: 8),
                   IconButton(
-                    onPressed: () {
+                    onPressed: () async {
                       final text = commentController.text.trim();
-                      if (text.isNotEmpty) {
-                        // Aquí se agregaría el comentario (mock por ahora)
-                        Navigator.pop(context);
+                      if (text.isEmpty) return;
+                      await _ensureAuth();
+                      final uid = _uid;
+                      if (uid == null) return;
+                      final authorName = _auth.currentUser?.displayName ??
+                          _auth.currentUser?.email?.split('@').first ??
+                          uid;
+                      try {
+                        final postRef =
+                            _firestore.collection('live_posts').doc(post.id);
+                        final commentsRef = postRef.collection('comments');
+                        await _firestore.runTransaction((tx) async {
+                          tx.set(commentsRef.doc(), {
+                            'text': text,
+                            'authorUid': uid,
+                            'authorName': authorName,
+                            'createdAt': FieldValue.serverTimestamp(),
+                          });
+                          tx.update(
+                            postRef,
+                            {'commentCount': FieldValue.increment(1)},
+                          );
+                        });
+                        commentController.clear();
+                        if (!mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Comentario agregado (mock)'),
+                            content: Text('Comentario agregado'),
+                          ),
+                        );
+                      } catch (e) {
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error al comentar: $e'),
                           ),
                         );
                       }
@@ -442,6 +470,54 @@ class _LiveScreenState extends State<LiveScreen> {
     );
   }
 
+  Future<void> _submitPost(String text) async {
+    final trimmed = text.trim();
+    if (trimmed.length < 10) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Escribe al menos 10 caracteres')),
+        );
+      }
+      return;
+    }
+    if (_isPosting) return;
+    if (_auth.currentUser == null) {
+      await FirebaseAuth.instance.signInAnonymously();
+    }
+    setState(() {
+      _isPosting = true;
+    });
+    try {
+      final callable = _functions.httpsCallable('createLivePost');
+      final result = await callable.call<Map<String, dynamic>>({'text': trimmed});
+      final postId = result.data['postId'] as String?;
+      if (!mounted) return;
+      if (postId != null) {
+        await _insertPostById(postId);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Publicación creada.')),
+      );
+    } on FirebaseFunctionsException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Error al publicar')),
+      );
+      debugPrint('createLivePost error code=${e.code} message=${e.message} details=${e.details}');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al publicar: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isPosting = false;
+        });
+      }
+    }
+  }
+
   void _createPost() {
     final textController = TextEditingController();
     showModalBottomSheet(
@@ -451,19 +527,7 @@ class _LiveScreenState extends State<LiveScreen> {
       builder: (context) => _CreatePostModal(
         textController: textController,
         onPost: (text, category) {
-          setState(() {
-            _posts.insert(
-              0,
-              LivePost(
-                id: 'new_${DateTime.now().millisecondsSinceEpoch}',
-                userName: 'Tú',
-                text: '$text [$category]',
-                timeAgo: 'ahora',
-                joinCount: 0,
-                isJoined: false,
-              ),
-            );
-          });
+          _submitPost('$text');
         },
       ),
     );
@@ -494,29 +558,102 @@ class _LiveScreenState extends State<LiveScreen> {
       centerTitle: false,
       showAppBar: true,
       resizeToAvoidBottomInset: true,
-      body: _posts.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _refreshFeed,
-              color: colorScheme.primary,
-              child: ListView.builder(
-                controller: _scrollController,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                itemCount: _posts.length,
-                itemBuilder: (context, index) {
-                  final post = _posts[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _FeedPostTile(
-                      post: post,
-                      onJoin: () => _toggleJoin(post),
-                      onComment: () => _openComments(post),
-                      onShare: () => _sharePost(post),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                ChoiceChip(
+                  label: const Text('Todos'),
+                  selected: _filter == LiveFilter.all,
+                  onSelected: (v) {
+                    if (v) {
+                      setState(() {
+                        _filter = LiveFilter.all;
+                      });
+                    }
+                  },
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('En vivo'),
+                  selected: _filter == LiveFilter.active,
+                  onSelected: (v) {
+                    if (v) {
+                      setState(() {
+                        _filter = LiveFilter.active;
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: _buildQuery().snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Error al cargar publicaciones: ${snapshot.error}',
+                      textAlign: TextAlign.center,
                     ),
                   );
-                },
-              ),
+                }
+                final docs = snapshot.data?.docs ?? [];
+                final now = DateTime.now();
+                final posts = docs.map((doc) {
+                  final data = doc.data();
+                  final ts = data['createdAt'] as Timestamp?;
+                  return LivePost(
+                    id: doc.id,
+                    userName: data['authorName'] as String? ??
+                        data['authorUid'] as String? ??
+                        'Anónimo',
+                    text: data['text'] as String? ?? '',
+                    timeAgo: _formatTimeAgo(ts?.toDate(), now),
+                    joinCount: (data['joinCount'] ?? 0) as int,
+                    likes: (data['likeCount'] ?? 0) as int,
+                    comments: (data['commentCount'] ?? 0) as int,
+                    isLiked: _likedPosts.contains(doc.id),
+                  );
+                }).toList();
+
+                if (posts.isEmpty) {
+                  return const Center(child: Text('Aún no hay publicaciones'));
+                }
+
+                return RefreshIndicator(
+                  onRefresh: _refreshFeed,
+                  color: colorScheme.primary,
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                    itemCount: posts.length,
+                    itemBuilder: (context, index) {
+                      final post = posts[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _FeedPostTile(
+                          post: post,
+                          onLike: () => _toggleLike(post),
+                          onComment: () => _openComments(post),
+                          onShare: () => _sharePost(post),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _createPost,
         child: const Icon(Icons.add),
@@ -527,13 +664,13 @@ class _LiveScreenState extends State<LiveScreen> {
 
 class _FeedPostTile extends StatelessWidget {
   final LivePost post;
-  final VoidCallback onJoin;
+  final VoidCallback onLike;
   final VoidCallback onComment;
   final VoidCallback onShare;
 
   const _FeedPostTile({
     required this.post,
-    required this.onJoin,
+    required this.onLike,
     required this.onComment,
     required this.onShare,
   });
@@ -652,13 +789,13 @@ class _FeedPostTile extends StatelessWidget {
                       Row(
                         children: [
                           _ActionButton(
-                            icon: isJoined
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            label: '${post.joinCount}',
-                            color:
-                                isJoined ? Colors.redAccent : Colors.grey[700]!,
-                            onTap: onJoin,
+                            icon:
+                                post.isLiked ? Icons.favorite : Icons.favorite_border,
+                            label: '${post.likes}',
+                            color: post.isLiked
+                                ? Colors.redAccent
+                                : Colors.grey[700]!,
+                            onTap: onLike,
                           ),
                           const SizedBox(width: 8),
                           _ActionButton(
