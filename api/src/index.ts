@@ -13,6 +13,7 @@ if (admin.apps.length === 0) {
 }
 
 const db = admin.firestore();
+const TEST_LIVE_POST_TEXT = "Oración de prueba";
 
 const toDateId = (date: Date): string => {
   const year = date.getUTCFullYear();
@@ -25,10 +26,34 @@ const addSeconds = (date: Date, seconds: number): Date => {
   return new Date(date.getTime() + seconds * 1000);
 };
 
+const ensureSeedKey = (providedKey?: string): void => {
+  const expected = process.env.SEED_KEY;
+  if (!expected) {
+    // Si no hay clave configurada, no restringir para entornos locales.
+    return;
+  }
+  if (!providedKey || providedKey !== expected) {
+    const error = new Error("Unauthorized: invalid SEED_KEY.");
+    (error as {status?: number}).status = 401;
+    throw error;
+  }
+};
+
 export const seedFirestore = onRequest(async (req, res) => {
   logger.info("seedFirestore start", {method: req.method, path: req.path});
 
   try {
+    if (req.method !== "POST") {
+      res.status(405).json({ok: false, error: "Método no permitido"});
+      return;
+    }
+
+    const providedSeedKey =
+      (req.headers["x-seed-key"] as string | undefined) ||
+      (req.headers.seed_key as string | undefined) ||
+      (req.query.seedKey as string | undefined);
+    ensureSeedKey(providedSeedKey);
+
     const now = new Date();
     const todayId = toDateId(now);
     const endAt = Timestamp.fromDate(addSeconds(now, 60));
@@ -50,7 +75,7 @@ export const seedFirestore = onRequest(async (req, res) => {
     batch.set(
       db.collection("live_posts").doc("seed_oracion_prueba"),
       {
-        text: "Oración de prueba",
+        text: TEST_LIVE_POST_TEXT,
         status: "active",
         createdAt: FieldValue.serverTimestamp(),
         endAt,
@@ -67,7 +92,8 @@ export const seedFirestore = onRequest(async (req, res) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     logger.error("seedFirestore error", {error: message});
-    res.status(500).json({ok: false, error: message});
+    const status = (error as {status?: number}).status ?? 500;
+    res.status(status).json({ok: false, error: message});
   }
 });
 
@@ -109,29 +135,50 @@ const checkRateLimit = (
   }
 };
 
-const resolveAuthorName = async (uid: string): Promise<string> => {
+type AuthorProfile = {
+  username?: string;
+  displayName?: string;
+  photoURL?: string;
+};
+
+const resolveAuthorProfile = async (uid: string): Promise<AuthorProfile> => {
   try {
     // 1) Prefer stored username in Firestore
     const userDoc = await db.collection("users").doc(uid).get();
-    const username = userDoc.exists ?
-      (userDoc.get("username") as string | undefined) :
-      undefined;
+    const username = userDoc.exists
+      ? (userDoc.get("username") as string | undefined)
+      : undefined;
+    const displayName = userDoc.exists
+      ? (userDoc.get("displayName") as string | undefined)
+      : undefined;
+    const photoURL = userDoc.exists
+      ? (userDoc.get("photoURL") as string | undefined)
+      : undefined;
     if (username && username.trim() !== "") {
-      return username;
+      return {username, displayName: displayName ?? username, photoURL};
     }
 
     // 2) Fallback to Firebase Auth profile
     const user = await admin.auth().getUser(uid);
     if (user.displayName && user.displayName.trim() !== "") {
-      return user.displayName;
+      return {
+        username: user.displayName,
+        displayName: user.displayName,
+        photoURL: user.photoURL ?? undefined,
+      };
     }
     if (user.email && user.email.trim() !== "") {
-      return user.email.split("@")[0];
+      const emailName = user.email.split("@")[0];
+      return {
+        username: emailName,
+        displayName: emailName,
+        photoURL: user.photoURL ?? undefined,
+      };
     }
-    return uid;
+    return {username: uid, displayName: uid, photoURL};
   } catch (e) {
     logger.warn("resolveAuthorName failed", e as Error);
-    return uid;
+    return {username: uid, displayName: uid};
   }
 };
 
@@ -144,7 +191,7 @@ const createLivePostTx = async (
   const expiresAt = Timestamp.fromMillis(now.toMillis() + 24 * 60 * 60 * 1000);
   const postsRef = db.collection("live_posts");
   const userRef = db.collection("users").doc(uid);
-  const authorName = await resolveAuthorName(uid);
+  const authorProfile = await resolveAuthorProfile(uid);
 
   return db.runTransaction(async (tx) => {
     const userSnap = await tx.get(userRef);
@@ -159,7 +206,9 @@ const createLivePostTx = async (
       text,
       status: "active",
       authorUid: uid,
-      authorName,
+      authorName: authorProfile.displayName ?? authorProfile.username ?? uid,
+      authorUsername: authorProfile.username ?? uid,
+      authorPhoto: authorProfile.photoURL ?? null,
       createdAt: FieldValue.serverTimestamp(),
       liveUntil,
       expiresAt,
@@ -176,11 +225,168 @@ const createLivePostTx = async (
       lastPostAt: now,
       plan: userSnap.exists ? userSnap.get("plan") ?? "free" : "free",
       createdAt,
+      username: authorProfile.username ?? userSnap.get("username") ?? uid,
+      displayName:
+        authorProfile.displayName ??
+        userSnap.get("displayName") ??
+        authorProfile.username ??
+        uid,
+      photoURL: authorProfile.photoURL ?? userSnap.get("photoURL") ?? null,
+      usernameLower:
+        (authorProfile.username ?? userSnap.get("username") ?? uid)
+          .toString()
+          .toLowerCase(),
+      isPublic: userSnap.exists ? userSnap.get("isPublic") ?? true : true,
+      followersCount: userSnap.exists ? userSnap.get("followersCount") ?? 0 : 0,
+      followingCount: userSnap.exists ? userSnap.get("followingCount") ?? 0 : 0,
+      postsCount: userSnap.exists
+        ? FieldValue.increment(1)
+        : 1,
+      updatedAt: FieldValue.serverTimestamp(),
     }, {merge: true});
 
     return postRef.id;
   });
 };
+
+// ---------------------------
+// Username helpers & callable
+// ---------------------------
+
+const normalizeUsername = (username: string): string => {
+  const trimmed = username.trim().toLowerCase();
+  if (!/^[a-z0-9._]{3,20}$/.test(trimmed)) {
+    throw new HttpsError("invalid-argument", "username_invalid");
+  }
+  return trimmed;
+};
+
+export const setUsername = onCall({region: "us-central1"}, async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) {
+    throw new HttpsError("unauthenticated", "auth_required");
+  }
+  const raw = (request.data as {username?: unknown}).username;
+  if (typeof raw !== "string") {
+    throw new HttpsError("invalid-argument", "username_required");
+  }
+  const username = normalizeUsername(raw);
+  const usernameDoc = db.collection("username_map").doc(username);
+  const userDoc = db.collection("users").doc(uid);
+
+  await db.runTransaction(async (tx) => {
+    const userSnap = await tx.get(userDoc);
+    const prevUsername = userSnap.exists ? (userSnap.get("username") as string | undefined) : undefined;
+    const prevLower = prevUsername?.toLowerCase();
+
+    // If same username, do nothing
+    if (prevLower === username) {
+      return;
+    }
+
+    const usernameSnap = await tx.get(usernameDoc);
+    if (usernameSnap.exists) {
+      const owner = usernameSnap.get("uid") as string | undefined;
+      if (owner !== uid) {
+        throw new HttpsError("already-exists", "username_taken");
+      }
+    }
+
+    // Reserve new username
+    tx.set(usernameDoc, {uid, createdAt: FieldValue.serverTimestamp()}, {merge: false});
+
+    // Release previous username if owned by same user
+    if (prevLower && prevLower !== username) {
+      const prevDoc = db.collection("username_map").doc(prevLower);
+      tx.delete(prevDoc);
+    }
+
+    // Update user document
+    tx.set(userDoc, {
+      username,
+      usernameLower: username,
+      updatedAt: FieldValue.serverTimestamp(),
+    }, {merge: true});
+  });
+
+  return {ok: true, username};
+});
+
+// ---------------------------
+// Follow / Unfollow callables
+// ---------------------------
+
+const followerPath = (uid: string, follower: string) =>
+  db.collection("users").doc(uid).collection("followers").doc(follower);
+const followingPath = (uid: string, target: string) =>
+  db.collection("users").doc(uid).collection("following").doc(target);
+
+export const followUser = onCall({region: "us-central1"}, async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) throw new HttpsError("unauthenticated", "auth_required");
+
+  const targetUid = (request.data as {targetUid?: unknown}).targetUid;
+  if (typeof targetUid !== "string" || targetUid.trim() === "") {
+    throw new HttpsError("invalid-argument", "target_required");
+  }
+  if (targetUid === uid) {
+    throw new HttpsError("failed-precondition", "cannot_follow_self");
+  }
+
+  const targetRef = db.collection("users").doc(targetUid);
+  const meRef = db.collection("users").doc(uid);
+  const followerRef = followerPath(targetUid, uid);
+  const followingRef = followingPath(uid, targetUid);
+
+  await db.runTransaction(async (tx) => {
+    const targetSnap = await tx.get(targetRef);
+    if (!targetSnap.exists) {
+      throw new HttpsError("not-found", "target_not_found");
+    }
+
+    // If already following, no-op
+    const followSnap = await tx.get(followerRef);
+    if (followSnap.exists) return;
+
+    tx.set(followerRef, {createdAt: FieldValue.serverTimestamp()});
+    tx.set(followingRef, {createdAt: FieldValue.serverTimestamp()});
+    tx.update(targetRef, {followersCount: FieldValue.increment(1)});
+    tx.update(meRef, {followingCount: FieldValue.increment(1)});
+  });
+
+  return {ok: true};
+});
+
+export const unfollowUser = onCall({region: "us-central1"}, async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) throw new HttpsError("unauthenticated", "auth_required");
+
+  const targetUid = (request.data as {targetUid?: unknown}).targetUid;
+  if (typeof targetUid !== "string" || targetUid.trim() === "") {
+    throw new HttpsError("invalid-argument", "target_required");
+  }
+  if (targetUid === uid) {
+    throw new HttpsError("failed-precondition", "cannot_unfollow_self");
+  }
+
+  const targetRef = db.collection("users").doc(targetUid);
+  const meRef = db.collection("users").doc(uid);
+  const followerRef = followerPath(targetUid, uid);
+  const followingRef = followingPath(uid, targetUid);
+
+  await db.runTransaction(async (tx) => {
+    // If not following, no-op
+    const followSnap = await tx.get(followerRef);
+    if (!followSnap.exists) return;
+
+    tx.delete(followerRef);
+    tx.delete(followingRef);
+    tx.update(targetRef, {followersCount: FieldValue.increment(-1)});
+    tx.update(meRef, {followingCount: FieldValue.increment(-1)});
+  });
+
+  return {ok: true};
+});
 
 const authenticate = async (idToken: string | null): Promise<string> => {
   if (!idToken) {

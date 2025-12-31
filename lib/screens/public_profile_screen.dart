@@ -3,27 +3,34 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/profile_service.dart';
-import '../services/favorites_service.dart';
+import '../services/social_service.dart';
 
-class MySocialProfileScreen extends StatefulWidget {
-  final int? initialTabIndex;
-  const MySocialProfileScreen({super.key, this.initialTabIndex});
+class PublicProfileScreen extends StatefulWidget {
+  final String? uid;
+  const PublicProfileScreen({super.key, this.uid});
 
   @override
-  State<MySocialProfileScreen> createState() => _MySocialProfileScreenState();
+  State<PublicProfileScreen> createState() => _PublicProfileScreenState();
 }
 
-class _MySocialProfileScreenState extends State<MySocialProfileScreen> with TickerProviderStateMixin {
+class _PublicProfileScreenState extends State<PublicProfileScreen>
+    with TickerProviderStateMixin {
   final _auth = FirebaseAuth.instance;
   final _profileService = ProfileService();
-  final _favorites = FavoritesService();
+  final _social = SocialService();
   late final TabController _tabController;
+  String? _uid;
 
   @override
   void initState() {
     super.initState();
-    final initialIndex = (widget.initialTabIndex ?? 0).clamp(0, 1);
-    _tabController = TabController(length: 2, vsync: this, initialIndex: initialIndex);
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _uid = widget.uid ?? ModalRoute.of(context)?.settings.arguments as String?;
   }
 
   @override
@@ -44,48 +51,27 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen> with Tick
     _tabController.animateTo(0);
   }
 
-  void _openEditProfile() {
-    Navigator.of(context).pushNamed('/edit-profile');
-  }
-
-  Widget _metrics(String label, int value, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Text('$value', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 2),
-          Text(label, style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600])),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) {
-      return const Scaffold(body: Center(child: Text('Inicia sesión para ver tu perfil')));
+    final targetUid = _uid;
+    final me = _auth.currentUser?.uid;
+    if (targetUid == null || targetUid.isEmpty) {
+      return const Scaffold(body: Center(child: Text('Perfil no encontrado')));
     }
-
+    if (me != null && me == targetUid) {
+      // Si soy yo, enviar a mi perfil social.
+      Future.microtask(() => Navigator.of(context).pushReplacementNamed('/my-profile'));
+    }
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mi perfil'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: _openEditProfile,
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Perfil')),
       body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        stream: _profileService.userStream(uid),
+        stream: _profileService.userStream(targetUid),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text('Perfil no encontrado'));
+            return const Center(child: Text('Perfil no disponible'));
           }
           final data = snapshot.data!.data() ?? {};
           final displayName = data['displayName'] ?? 'Usuario';
@@ -118,8 +104,10 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen> with Tick
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(displayName, style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text('@$username', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600])),
+                          Text(displayName,
+                              style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text('@$username',
+                              style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600])),
                           if (bio.toString().isNotEmpty) ...[
                             const SizedBox(height: 6),
                             Text(bio, style: GoogleFonts.inter(fontSize: 14)),
@@ -128,8 +116,8 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen> with Tick
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              _metrics('Seguidores', followers, () => _openFollowers(uid)),
-                              _metrics('Siguiendo', following, () => _openFollowing(uid)),
+                              _metrics('Seguidores', followers, () => _openFollowers(targetUid)),
+                              _metrics('Siguiendo', following, () => _openFollowing(targetUid)),
                               _metrics('Posts', posts, _goToPostsTab),
                             ],
                           ),
@@ -143,9 +131,21 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen> with Tick
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _openEditProfile,
-                    child: const Text('Editar perfil'),
+                  child: StreamBuilder<bool>(
+                    stream: _social.isFollowingStream(targetUid),
+                    builder: (context, snap) {
+                      final isFollowing = snap.data ?? false;
+                      return ElevatedButton(
+                        onPressed: () {
+                          if (isFollowing) {
+                            _social.unfollow(targetUid);
+                          } else {
+                            _social.follow(targetUid);
+                          }
+                        },
+                        child: Text(isFollowing ? 'Siguiendo' : 'Seguir'),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -161,8 +161,8 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen> with Tick
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    _PostsTab(uid: uid, profileService: _profileService),
-                    _FavoritesTab(favorites: _favorites),
+                    _PublicPostsTab(uid: targetUid, profileService: _profileService),
+                    const _PlaceholderTab(text: 'Guardados del usuario'),
                   ],
                 ),
               ),
@@ -172,12 +172,25 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen> with Tick
       ),
     );
   }
+
+  Widget _metrics(String label, int value, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Text('$value', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 2),
+          Text(label, style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600])),
+        ],
+      ),
+    );
+  }
 }
 
-class _PostsTab extends StatelessWidget {
+class _PublicPostsTab extends StatelessWidget {
   final String uid;
   final ProfileService profileService;
-  const _PostsTab({required this.uid, required this.profileService});
+  const _PublicPostsTab({required this.uid, required this.profileService});
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +201,7 @@ class _PostsTab extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-          return const Center(child: Text('Error al cargar posts'));
+          return Center(child: Text('Error al cargar posts'));
         }
         final docs = snapshot.data?.docs ?? [];
         if (docs.isEmpty) {
@@ -224,48 +237,14 @@ class _PostsTab extends StatelessWidget {
   }
 }
 
-class _FavoritesTab extends StatelessWidget {
-  final FavoritesService favorites;
-  const _FavoritesTab({required this.favorites});
+class _PlaceholderTab extends StatelessWidget {
+  final String text;
+  const _PlaceholderTab({required this.text});
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: favorites.favoritesStream(limit: 100),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) {
-          return const Center(child: Text('Error al cargar guardados'));
-        }
-        final docs = snapshot.data?.docs ?? [];
-        if (docs.isEmpty) {
-          return const Center(child: Text('Sin guardados'));
-        }
-        return ListView.builder(
-          padding: const EdgeInsets.all(12),
-          itemCount: docs.length,
-          itemBuilder: (context, index) {
-            final data = docs[index].data();
-            final type = data['type'] as String? ?? '';
-            final refId = data['refId'] as String? ?? '';
-            final created = data['createdAt'] as Timestamp?;
-            final time = created != null ? created.toDate().toLocal().toString() : '';
-            return ListTile(
-              leading: Icon(type == 'post' ? Icons.chat_bubble : Icons.menu_book_outlined),
-              title: Text(type == 'post' ? 'Post guardado' : 'Verso guardado'),
-              subtitle: Text(refId),
-              trailing: Text(time, style: GoogleFonts.inter(fontSize: 11, color: Colors.grey[600])),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Abrir detalle próximamente')),
-                );
-              },
-            );
-          },
-        );
-      },
-    );
+    return Center(child: Text(text));
   }
 }
+
+

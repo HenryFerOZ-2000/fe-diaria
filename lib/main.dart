@@ -14,7 +14,19 @@ import 'screens/chat_screen.dart';
 import 'screens/live_screen.dart';
 import 'screens/prayers_screen.dart';
 import 'screens/bible_screen.dart';
+import 'screens/profile_hub_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/public_profile_screen.dart';
+import 'screens/edit_profile_screen.dart';
+import 'screens/followers_list_screen.dart';
+import 'screens/following_list_screen.dart';
+import 'screens/search_users_screen.dart';
+import 'screens/streak_screen.dart';
+import 'screens/spiritual_stats_screen.dart';
+import 'screens/plan_screen.dart';
+import 'screens/account_settings_screen.dart';
+import 'screens/privacy_safety_screen.dart';
+import 'screens/help_support_screen.dart';
 import 'screens/my_posts_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/emotion_selection_screen.dart';
@@ -114,7 +126,28 @@ class MyApp extends StatelessWidget {
               '/prayer-for-you': (context) => const PrayerForYouScreen(),
               '/category-prayers': (context) => const CategoryPrayersScreen(),
               '/traditional-prayers-religion-selection': (context) => const TraditionalPrayersReligionSelectionScreen(),
-              '/profile': (context) => const ProfileScreen(),
+              '/profile': (context) => ProfileHubScreen(),
+              '/my-profile': (context) {
+                final args = ModalRoute.of(context)?.settings.arguments;
+                int? initialTab;
+                if (args is int) {
+                  initialTab = args;
+                } else if (args is Map && args['initialTabIndex'] is int) {
+                  initialTab = args['initialTabIndex'] as int;
+                }
+                return MySocialProfileScreen(initialTabIndex: initialTab);
+              },
+              '/public-profile': (context) => const PublicProfileScreen(),
+              '/edit-profile': (context) => const EditProfileScreen(),
+              '/followers': (context) => const FollowersListScreen(),
+              '/following': (context) => const FollowingListScreen(),
+              '/search-users': (context) => const SearchUsersScreen(),
+              '/streak': (context) => const StreakScreen(),
+              '/spiritual-stats': (context) => const SpiritualStatsScreen(),
+              '/plan': (context) => const PlanScreen(),
+              '/account-settings': (context) => const AccountSettingsScreen(),
+              '/privacy-safety': (context) => const PrivacySafetyScreen(),
+              '/help-support': (context) => const HelpSupportScreen(),
               '/my-posts': (context) => const MyPostsScreen(),
               '/welcome': (context) => const WelcomeAuthScreen(),
               '/bible-offline': (context) => const BibleBooksScreen(),

@@ -109,6 +109,7 @@ class _HomeScreenState extends State<HomeScreen>
         final provider = Provider.of<AppProvider>(context, listen: false);
         provider.refreshTodayVerse();
         provider.loadTodayPrayers();
+        provider.loadTodayFamilyPrayer();
         
         // Programar el siguiente refresco para mañana a las 9 AM
         _setupDailyRefresh();
@@ -741,7 +742,7 @@ class _HomeScreenState extends State<HomeScreen>
       case 'night':
         return provider.todayEveningPrayer?.text ?? 'Oración de la noche no disponible por el momento.';
       case 'family':
-        return 'Señor, bendice a mi familia, cuida su salud y guíanos en amor. Amén.';
+        return provider.todayFamilyPrayer?.text ?? 'Señor, bendice a mi familia, cuida su salud y guíanos en amor. Amén.';
       default:
         return 'Contenido no disponible.';
     }

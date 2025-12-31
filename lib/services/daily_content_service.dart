@@ -12,6 +12,7 @@ class DailyContentService {
   List<Map<String, dynamic>>? _verses;
   List<String>? _morningPrayers;
   List<String>? _nightPrayers;
+  List<String>? _familyPrayers;
   bool _isLoading = false;
 
   /// Obtiene el día del año (1-365) basado en la fecha actual
@@ -25,7 +26,10 @@ class DailyContentService {
   /// Carga el contenido desde los archivos JSON unificados
   Future<void> loadContent() async {
     if (_isLoading) return;
-    if (_verses != null && _morningPrayers != null && _nightPrayers != null) return;
+    if (_verses != null &&
+        _morningPrayers != null &&
+        _nightPrayers != null &&
+        _familyPrayers != null) return;
 
     _isLoading = true;
     try {
@@ -44,12 +48,30 @@ class DailyContentService {
       final List<dynamic> nightData = json.decode(nightJson);
       _nightPrayers = nightData.map((e) => e as String).toList();
 
+      // Cargar oraciones por intención y filtrar las de familia
+      final intentionJson = await rootBundle.loadString('assets/data/prayers_by_intention.json');
+      final List<dynamic> intentionData = json.decode(intentionJson);
+      _familyPrayers = intentionData
+          .where((e) {
+            final intention = (e['intention'] as String?)?.toLowerCase() ?? '';
+            final tags = (e['tags'] as List<dynamic>?)
+                ?.map((t) => (t as String).toLowerCase())
+                .toList();
+            return intention == 'familia' ||
+                intention == 'hijos' ||
+                intention == 'relaciones' ||
+                (tags != null && tags.contains('familia'));
+          })
+          .map((e) => e['text'] as String)
+          .toList();
+
       debugPrint('✓ Contenido cargado: ${_verses!.length} versículos, ${_morningPrayers!.length} oraciones mañana, ${_nightPrayers!.length} oraciones noche');
     } catch (e) {
       debugPrint('Error cargando contenido: $e');
       _verses = [];
       _morningPrayers = [];
       _nightPrayers = [];
+      _familyPrayers = [];
     } finally {
       _isLoading = false;
     }
@@ -114,11 +136,24 @@ class DailyContentService {
     return _verses!;
   }
 
+  /// Obtiene una oración diaria para familia (familia/hijos/relaciones) usando día del año
+  String getFamilyPrayer() {
+    if (_familyPrayers == null || _familyPrayers!.isEmpty) {
+      throw Exception('No hay oraciones para la familia disponibles. Llama a loadContent() primero.');
+    }
+
+    final dayOfYear = getDayOfYear();
+    final index = (dayOfYear - 1) % _familyPrayers!.length;
+
+    return _familyPrayers![index];
+  }
+
   /// Limpia el caché y fuerza recarga
   void clearCache() {
     _verses = null;
     _morningPrayers = null;
     _nightPrayers = null;
+    _familyPrayers = null;
     _isLoading = false;
   }
 }

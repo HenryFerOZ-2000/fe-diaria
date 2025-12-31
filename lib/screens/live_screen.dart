@@ -8,10 +8,13 @@ import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import '../widgets/app_scaffold.dart';
+import '../services/social_service.dart';
 
 class LivePost {
   final String id;
+  final String authorUid;
   String userName;
+  String? authorPhoto;
   String text;
   String timeAgo;
   String? mediaUrl;
@@ -24,9 +27,11 @@ class LivePost {
 
   LivePost({
     required this.id,
+    required this.authorUid,
     required this.userName,
     required this.text,
     required this.timeAgo,
+    this.authorPhoto,
     this.mediaUrl,
     bool? isVideo,
     this.joinCount = 0,
@@ -68,13 +73,12 @@ class _LiveScreenState extends State<LiveScreen> {
   LiveFilter _filter = LiveFilter.all;
   final ScrollController _scrollController = ScrollController();
   List<LivePost> _posts = [];
-  bool _initialLoaded = false;
-  String? _loadError;
   bool _isPosting = false;
   final Set<String> _likedPosts = {};
   final _firestore = FirebaseFirestore.instance;
   final _functions = FirebaseFunctions.instanceFor(region: 'us-central1');
   final _auth = FirebaseAuth.instance;
+  final _social = SocialService();
   String? _uid;
 
   @override
@@ -92,8 +96,6 @@ class _LiveScreenState extends State<LiveScreen> {
     super.dispose();
   }
 
-  void _onScroll() {}
-
   Future<void> _ensureAuth() async {
     if (_auth.currentUser == null) {
       await _auth.signInAnonymously();
@@ -106,19 +108,10 @@ class _LiveScreenState extends State<LiveScreen> {
     final uid = _uid;
     if (uid == null) return;
     final user = _auth.currentUser;
-    final displayName = user?.displayName?.trim();
-    final emailPrefix = user?.email != null ? user!.email!.split('@').first : null;
-    final chosenName = displayName?.isNotEmpty == true
-        ? displayName
-        : (emailPrefix?.isNotEmpty == true ? emailPrefix : uid);
     try {
-      await _firestore.collection('users').doc(uid).set(
-        {
-          'authorName': chosenName,
-          'email': user?.email,
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
+      await _social.syncCurrentUserProfile(
+        displayName: user?.displayName,
+        photoURL: user?.photoURL,
       );
     } catch (e) {
       debugPrint('Error syncing profile: $e');
@@ -172,7 +165,12 @@ class _LiveScreenState extends State<LiveScreen> {
       final ts = data['createdAt'] as Timestamp?;
       final post = LivePost(
         id: doc.id,
-        userName: data['authorUid'] as String? ?? 'Anónimo',
+        authorUid: data['authorUid'] as String? ?? '',
+        userName: (data['authorUsername'] as String?) ??
+            (data['authorName'] as String?) ??
+            (data['authorUid'] as String?) ??
+            'Anónimo',
+        authorPhoto: data['authorPhoto'] as String?,
         text: data['text'] as String? ?? '',
         timeAgo: _formatTimeAgo(ts?.toDate(), now),
         joinCount: (data['joinCount'] ?? 0) as int,
@@ -183,8 +181,6 @@ class _LiveScreenState extends State<LiveScreen> {
       if (mounted) {
         setState(() {
           _posts = [post, ..._posts];
-          _initialLoaded = true;
-          _loadError = null;
         });
       }
     } catch (e) {
@@ -199,7 +195,7 @@ class _LiveScreenState extends State<LiveScreen> {
     if (diff.inMinutes < 60) return 'hace ${diff.inMinutes} min';
     if (diff.inHours < 24) return 'hace ${diff.inHours} h';
     final days = diff.inDays;
-    return 'hace ${days} d';
+    return 'hace $days d';
   }
 
   Future<void> _refreshFeed() async {
@@ -470,6 +466,13 @@ class _LiveScreenState extends State<LiveScreen> {
     );
   }
 
+  void _openProfile(String uid) {
+    if (uid.isEmpty) return;
+    final me = _auth.currentUser?.uid;
+    final route = me != null && me == uid ? '/my-profile' : '/public-profile';
+    Navigator.of(context).pushNamed(route, arguments: uid);
+  }
+
   Future<void> _submitPost(String text) async {
     final trimmed = text.trim();
     if (trimmed.length < 10) {
@@ -527,7 +530,7 @@ class _LiveScreenState extends State<LiveScreen> {
       builder: (context) => _CreatePostModal(
         textController: textController,
         onPost: (text, category) {
-          _submitPost('$text');
+          _submitPost(text);
         },
       ),
     );
@@ -549,6 +552,10 @@ class _LiveScreenState extends State<LiveScreen> {
             ),
           ),
           const Spacer(),
+          IconButton(
+            onPressed: () => Navigator.of(context).pushNamed('/search-users'),
+            icon: const Icon(Icons.search),
+          ),
           IconButton(
             onPressed: () => Navigator.of(context).pushNamed('/profile'),
             icon: const Icon(Icons.person_outline),
@@ -612,9 +619,12 @@ class _LiveScreenState extends State<LiveScreen> {
                   final ts = data['createdAt'] as Timestamp?;
                   return LivePost(
                     id: doc.id,
-                    userName: data['authorName'] as String? ??
+                    authorUid: data['authorUid'] as String? ?? '',
+                    userName: (data['authorUsername'] as String?) ??
+                        (data['authorName'] as String?) ??
                         data['authorUid'] as String? ??
                         'Anónimo',
+                    authorPhoto: data['authorPhoto'] as String?,
                     text: data['text'] as String? ?? '',
                     timeAgo: _formatTimeAgo(ts?.toDate(), now),
                     joinCount: (data['joinCount'] ?? 0) as int,
@@ -644,6 +654,9 @@ class _LiveScreenState extends State<LiveScreen> {
                           onLike: () => _toggleLike(post),
                           onComment: () => _openComments(post),
                           onShare: () => _sharePost(post),
+                          onAuthorTap: post.authorUid.isNotEmpty
+                              ? () => _openProfile(post.authorUid)
+                              : null,
                         ),
                       );
                     },
@@ -667,17 +680,18 @@ class _FeedPostTile extends StatelessWidget {
   final VoidCallback onLike;
   final VoidCallback onComment;
   final VoidCallback onShare;
+  final VoidCallback? onAuthorTap;
 
   const _FeedPostTile({
     required this.post,
     required this.onLike,
     required this.onComment,
     required this.onShare,
+    this.onAuthorTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isJoined = post.isJoinedValue;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -699,17 +713,25 @@ class _FeedPostTile extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.deepPurple.withOpacity(0.12),
-                  child: Text(
-                    post.userName.isNotEmpty
-                        ? post.userName[0].toUpperCase()
-                        : '?',
-                    style: GoogleFonts.inter(
-                      color: Colors.deepPurple,
-                      fontWeight: FontWeight.w700,
-                    ),
+                InkWell(
+                  onTap: onAuthorTap,
+                  borderRadius: BorderRadius.circular(24),
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.deepPurple.withOpacity(0.12),
+                    backgroundImage:
+                        post.authorPhoto != null ? NetworkImage(post.authorPhoto!) : null,
+                    child: post.authorPhoto == null
+                        ? Text(
+                            post.userName.isNotEmpty
+                                ? post.userName[0].toUpperCase()
+                                : '?',
+                            style: GoogleFonts.inter(
+                              color: Colors.deepPurple,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                        : null,
                   ),
                 ),
                 const SizedBox(width: 10),

@@ -8,6 +8,7 @@ import '../services/streak_service.dart';
 import '../services/notification_service.dart';
 import '../services/widget_service.dart';
 import '../services/personalization_service.dart';
+import '../services/daily_content_service.dart';
 
 class AppProvider extends ChangeNotifier {
   final VerseService _verseService = VerseService();
@@ -20,6 +21,7 @@ class AppProvider extends ChangeNotifier {
   Verse? _todayVerse;
   Prayer? _todayMorningPrayer;
   Prayer? _todayEveningPrayer;
+  Prayer? _todayFamilyPrayer;
   bool _isLoading = true;
   List<Verse> _favorites = [];
   List<Prayer> _savedPrayers = [];
@@ -39,6 +41,7 @@ class AppProvider extends ChangeNotifier {
   Verse? get todayVerse => _todayVerse;
   Prayer? get todayMorningPrayer => _todayMorningPrayer;
   Prayer? get todayEveningPrayer => _todayEveningPrayer;
+  Prayer? get todayFamilyPrayer => _todayFamilyPrayer;
   
   /// Obtiene la oración del día según la hora actual
   /// Mañana: 5:00 AM - 5:59 PM
@@ -115,6 +118,7 @@ class AppProvider extends ChangeNotifier {
       
       await loadTodayVerse();
       await loadTodayPrayers();
+      await loadTodayFamilyPrayer();
       await loadFavorites();
       await loadSavedPrayers();
       await _updateDailyStreak();
@@ -209,6 +213,22 @@ class AppProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('Error loading today prayers: $e');
+    }
+  }
+
+  Future<void> loadTodayFamilyPrayer() async {
+    try {
+      await DailyContentService().loadContent();
+      final text = DailyContentService().getFamilyPrayer();
+      _todayFamilyPrayer = Prayer(
+        id: DateTime.now().millisecondsSinceEpoch,
+        text: text,
+        type: 'family',
+        title: 'Oración por la Familia',
+      );
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error loading family prayer: $e');
     }
   }
 
@@ -329,8 +349,8 @@ class AppProvider extends ChangeNotifier {
   Future<void> _updateDailyStreak() async {
     try {
       final state = await _streakService.resetIfNeeded();
-      _streakCount = state.count;
-      debugPrint('Streak update: count=${state.count}, last=${state.lastDateYmd}');
+      _streakCount = state.current;
+      debugPrint('Streak update: current=${state.current}, best=${state.best}, last=${state.lastDateYmd}');
       notifyListeners();
     } catch (e) {
       debugPrint('Streak update error: $e');
@@ -340,8 +360,8 @@ class AppProvider extends ChangeNotifier {
   Future<void> completeDailyStreak() async {
     try {
       final state = await _streakService.recordToday();
-      _streakCount = state.count;
-      debugPrint('Streak recorded: count=${state.count}, last=${state.lastDateYmd}');
+      _streakCount = state.current;
+      debugPrint('Streak recorded: current=${state.current}, best=${state.best}, last=${state.lastDateYmd}');
       notifyListeners();
     } catch (e) {
       debugPrint('Streak record error: $e');
