@@ -6,7 +6,7 @@ import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
 import {FieldValue, Timestamp} from "firebase-admin/firestore";
 import Groq from "groq-sdk";
-import {GROQ_API_KEY} from "./groq.secrets";
+import {GROQ_API_KEY} from "./secrets/groq.secrets";
 import {CHAT_PROMPT, GROQ_MAX_COMPLETION_TOKENS,
   GROQ_MODEL, GROQ_TEMPERATURE} from "./groqConfig";
 import {ChatMessage, ChatRequest, ChatResponse} from "./chat.interfaces";
