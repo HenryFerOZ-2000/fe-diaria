@@ -5,6 +5,11 @@ import {onSchedule} from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
 import {FieldValue, Timestamp} from "firebase-admin/firestore";
+import Groq from "groq-sdk";
+import {GROQ_API_KEY} from "./groq.secrets";
+import {CHAT_PROMPT, GROQ_MAX_COMPLETION_TOKENS,
+  GROQ_MODEL, GROQ_TEMPERATURE} from "./groqConfig";
+import {ChatMessage, ChatRequest, ChatResponse} from "./chat.interfaces";
 
 setGlobalOptions({maxInstances: 10});
 
@@ -145,15 +150,12 @@ const resolveAuthorProfile = async (uid: string): Promise<AuthorProfile> => {
   try {
     // 1) Prefer stored username in Firestore
     const userDoc = await db.collection("users").doc(uid).get();
-    const username = userDoc.exists
-      ? (userDoc.get("username") as string | undefined)
-      : undefined;
-    const displayName = userDoc.exists
-      ? (userDoc.get("displayName") as string | undefined)
-      : undefined;
-    const photoURL = userDoc.exists
-      ? (userDoc.get("photoURL") as string | undefined)
-      : undefined;
+    const username = userDoc.exists ?
+      (userDoc.get("username") as string | undefined) : undefined;
+    const displayName = userDoc.exists ?
+      (userDoc.get("displayName") as string | undefined) : undefined;
+    const photoURL = userDoc.exists ?
+      (userDoc.get("photoURL") as string | undefined) : undefined;
     if (username && username.trim() !== "") {
       return {username, displayName: displayName ?? username, photoURL};
     }
@@ -239,9 +241,8 @@ const createLivePostTx = async (
       isPublic: userSnap.exists ? userSnap.get("isPublic") ?? true : true,
       followersCount: userSnap.exists ? userSnap.get("followersCount") ?? 0 : 0,
       followingCount: userSnap.exists ? userSnap.get("followingCount") ?? 0 : 0,
-      postsCount: userSnap.exists
-        ? FieldValue.increment(1)
-        : 1,
+      postsCount: userSnap.exists ?
+        FieldValue.increment(1) : 1,
       updatedAt: FieldValue.serverTimestamp(),
     }, {merge: true});
 
@@ -276,7 +277,8 @@ export const setUsername = onCall({region: "us-central1"}, async (request) => {
 
   await db.runTransaction(async (tx) => {
     const userSnap = await tx.get(userDoc);
-    const prevUsername = userSnap.exists ? (userSnap.get("username") as string | undefined) : undefined;
+    const prevUsername = userSnap.exists ? (userSnap.get("username") as string
+    | undefined) : undefined;
     const prevLower = prevUsername?.toLowerCase();
 
     // If same username, do nothing
@@ -293,7 +295,8 @@ export const setUsername = onCall({region: "us-central1"}, async (request) => {
     }
 
     // Reserve new username
-    tx.set(usernameDoc, {uid, createdAt: FieldValue.serverTimestamp()}, {merge: false});
+    tx.set(usernameDoc, {uid, createdAt: FieldValue.serverTimestamp()},
+      {merge: false});
 
     // Release previous username if owned by same user
     if (prevLower && prevLower !== username) {
@@ -477,3 +480,76 @@ export const expireLivePosts = onSchedule("* * * * *", async () => {
   await batch.commit();
   logger.info("expireLivePosts updated", {count: snapshot.size});
 });
+
+// Helper function to split response into multiple messages
+const splitResponse = (content: string): string[] => {
+  // Split by double newlines or specific delimiters
+  const parts = content.split(/\n\n+/).filter((p) => p.trim().length > 0);
+  return parts.length > 0 ? parts : [content];
+};
+
+/**
+ * Firebase Function that emulates Groq chat completion.
+ * Receives user text, conversation history
+ * Returns AI-generated response.
+ */
+export const chatWithGroq = onCall(
+  async (request): Promise<ChatResponse> => {
+    // Validate authentication
+    if (!request.auth) {
+      throw new HttpsError(
+        "unauthenticated",
+        "User must be authenticated to use chat."
+      );
+    }
+
+    const {userText, conversation} = request.data as ChatRequest;
+
+    // Validate input
+    if (!userText || typeof userText !== "string") {
+      throw new HttpsError(
+        "invalid-argument",
+        "userText is required and must be a string."
+      );
+    }
+
+    const messages: ChatMessage[] = Array.isArray(conversation) ?
+      conversation : [];
+
+    try {
+      const groq = new Groq({apiKey: GROQ_API_KEY});
+
+      const response = await groq.chat.completions.create({
+        model: GROQ_MODEL,
+        max_completion_tokens: GROQ_MAX_COMPLETION_TOKENS,
+        temperature: GROQ_TEMPERATURE,
+        messages: [
+          {
+            role: "system",
+            content: CHAT_PROMPT,
+          },
+          ...messages,
+          {role: "user", content: userText},
+        ],
+      });
+
+      const content = response?.choices[0]?.message?.content ||
+        "Error getting a response.";
+      const splitMessages = splitResponse(content);
+
+      logger.info("chatWithGroq success", {
+        uid: request.auth.uid,
+        messagesCount: splitMessages.length,
+      });
+
+      return {
+        messages: splitMessages,
+        rawContent: content,
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      logger.error("chatWithGroq failed", {error: message});
+      throw new HttpsError("internal", `Chat failed: ${message}`);
+    }
+  }
+);

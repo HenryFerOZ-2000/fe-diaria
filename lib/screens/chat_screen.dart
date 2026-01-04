@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/chat_bubble.dart';
+import '../services/groq_chat_service.dart' as groq;
+import '../providers/auth_provider.dart';
 
 class ChatMessage {
   final String text;
@@ -18,57 +21,109 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final List<ChatMessage> _messages = [
-    ChatMessage(text: 'Hola, soy tu compañero de oración. ¿En qué te acompaño hoy?'),
+    ChatMessage(text: 'Hola, soy tu compañero espiritual. ¿En qué te acompaño hoy?'),
   ];
+  final List<groq.ChatMessage> _conversationHistory = [];
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final groq.GroqChatService _chatService = groq.GroqChatService();
+  bool _isLoading = false;
 
-  final Map<String, String> _cannedResponses = {
-    'necesito una oración': 'Aquí tienes una oración breve: "Señor, dame paz y guía mis pasos hoy. Amén."',
-    'me siento triste': 'Lo siento. Respira hondo. "Dios está cerca de los que tienen el corazón quebrantado." (Salmo 34:18)',
-    'estoy preocupado': 'Entrega tus cargas: "Echa sobre el Señor tu carga y Él te sustentará." (Salmo 55:22)',
-    'quiero un versículo': 'Proverbios 3:5-6 — Confía en el Señor de todo corazón y Él enderezará tus caminos.',
-    'dame ánimo': 'Eres amado y visto. "Todo lo puedo en Cristo que me fortalece." (Fil 4:13)',
-    'ora por mí': 'Oremos: "Padre, cuida de quien lee esto. Dale paz, fuerza y esperanza. Amén."',
-  };
-
-  void _sendMessage(String text) {
-    if (text.trim().isEmpty) return;
-    setState(() {
-      _messages.add(ChatMessage(text: text.trim(), isUser: true));
-    });
-    _controller.clear();
-    _reply(text);
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      });
+    }
   }
 
-  void _reply(String userText) {
-    final lower = userText.toLowerCase();
-    String reply = 'Estoy aquí contigo. ¿Quieres que oremos juntos?';
-    for (final entry in _cannedResponses.entries) {
-      if (lower.contains(entry.key)) {
-        reply = entry.value;
-        break;
+  Future<void> _sendMessage(String text) async {
+    if (text.trim().isEmpty) return;
+    final userText = text.trim();
+
+    setState(() {
+      _messages.add(ChatMessage(text: userText, isUser: true));
+      _isLoading = true;
+    });
+    _controller.clear();
+    _scrollToBottom();
+
+    // Check if user is authenticated
+    final auth = context.read<AuthProvider>();
+    if (!auth.isSignedIn) {
+      setState(() {
+        _messages.add(ChatMessage(
+          text: 'Para usar el chat con IA, necesitas iniciar sesión. Ve a Perfil → Continuar con Google.',
+          isUser: false,
+        ));
+        _isLoading = false;
+      });
+      _scrollToBottom();
+      return;
+    }
+
+    try {
+      final response = await _chatService.sendMessage(
+        userText: userText,
+        conversation: _conversationHistory,
+      );
+
+      // Add user message to history
+      _conversationHistory.add(groq.ChatMessage.user(userText));
+
+      // Add assistant response(s) to UI and history
+      if (mounted) {
+        setState(() {
+          for (final msg in response.messages) {
+            _messages.add(ChatMessage(text: msg, isUser: false));
+          }
+          _isLoading = false;
+        });
+        // Add full response to history
+        _conversationHistory.add(groq.ChatMessage.assistant(response.rawContent));
+        _scrollToBottom();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _messages.add(ChatMessage(
+            text: 'Lo siento, hubo un error. Intenta de nuevo.',
+            isUser: false,
+          ));
+          _isLoading = false;
+        });
+        _scrollToBottom();
       }
     }
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (!mounted) return;
-      setState(() {
-        _messages.add(ChatMessage(text: reply, isUser: false));
-      });
-    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      title: 'Chat',
+      title: 'Chat Espiritual',
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               padding: const EdgeInsets.all(16),
               reverse: false,
-              itemCount: _messages.length,
+              itemCount: _messages.length + (_isLoading ? 1 : 0),
               itemBuilder: (context, index) {
+                if (_isLoading && index == _messages.length) {
+                  return _buildTypingIndicator(context);
+                }
                 final msg = _messages[index];
                 return ChatBubble(
                   text: msg.text,
@@ -79,6 +134,45 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           _buildInput(context),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTypingIndicator(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(right: 40, bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: colorScheme.surface.withOpacity(0.95),
+          borderRadius: BorderRadius.circular(16).copyWith(
+            bottomLeft: const Radius.circular(0),
+          ),
+          border: Border.all(color: colorScheme.primary.withOpacity(0.08)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: colorScheme.primary,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'Pensando...',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: colorScheme.onSurface.withOpacity(0.7),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
