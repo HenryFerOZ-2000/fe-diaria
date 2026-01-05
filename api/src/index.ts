@@ -1,11 +1,12 @@
 import {setGlobalOptions} from "firebase-functions";
 import {onRequest} from "firebase-functions/https";
 import {onCall, HttpsError} from "firebase-functions/v2/https";
-import {onSchedule} from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
 import {FieldValue, Timestamp} from "firebase-admin/firestore";
+// eslint-disable-next-line import/no-unresolved
 import Groq from "groq-sdk";
+// eslint-disable-next-line import/no-unresolved
 import {GROQ_API_KEY} from "./secrets/groq.secrets";
 import {CHAT_PROMPT, GROQ_MAX_COMPLETION_TOKENS,
   GROQ_MODEL, GROQ_TEMPERATURE} from "./groqConfig";
@@ -151,11 +152,14 @@ const resolveAuthorProfile = async (uid: string): Promise<AuthorProfile> => {
     // 1) Prefer stored username in Firestore
     const userDoc = await db.collection("users").doc(uid).get();
     const username = userDoc.exists ?
-      (userDoc.get("username") as string | undefined) : undefined;
+      (userDoc.get("username") as string | undefined) :
+      undefined;
     const displayName = userDoc.exists ?
-      (userDoc.get("displayName") as string | undefined) : undefined;
+      (userDoc.get("displayName") as string | undefined) :
+      undefined;
     const photoURL = userDoc.exists ?
-      (userDoc.get("photoURL") as string | undefined) : undefined;
+      (userDoc.get("photoURL") as string | undefined) :
+      undefined;
     if (username && username.trim() !== "") {
       return {username, displayName: displayName ?? username, photoURL};
     }
@@ -190,16 +194,18 @@ const createLivePostTx = async (
 ): Promise<string> => {
   const now = Timestamp.now();
   const liveUntil = Timestamp.fromMillis(now.toMillis() + 60_000);
-  const expiresAt = Timestamp.fromMillis(now.toMillis() + 24 * 60 * 60 * 1000);
+  const endAt = Timestamp.fromMillis(now.toMillis() + 24 * 60 * 60 * 1000);
   const postsRef = db.collection("live_posts");
   const userRef = db.collection("users").doc(uid);
   const authorProfile = await resolveAuthorProfile(uid);
 
   return db.runTransaction(async (tx) => {
     const userSnap = await tx.get(userRef);
-    const lastPostAt = userSnap.exists ?
-      (userSnap.get("lastPostAt") as FirebaseFirestore.Timestamp | undefined) :
-      undefined;
+    let lastPostAt: FirebaseFirestore.Timestamp | undefined;
+    if (userSnap.exists) {
+      lastPostAt = userSnap.get("lastPostAt") as FirebaseFirestore.Timestamp |
+        undefined;
+    }
 
     checkRateLimit(lastPostAt, now.toMillis());
 
@@ -213,7 +219,7 @@ const createLivePostTx = async (
       authorPhoto: authorProfile.photoURL ?? null,
       createdAt: FieldValue.serverTimestamp(),
       liveUntil,
-      expiresAt,
+      endAt,
       likeCount: 0,
       joinCount: 0,
       commentCount: 0,
@@ -225,24 +231,34 @@ const createLivePostTx = async (
 
     tx.set(userRef, {
       lastPostAt: now,
-      plan: userSnap.exists ? userSnap.get("plan") ?? "free" : "free",
+      plan: userSnap.exists ?
+        userSnap.get("plan") ?? "free" :
+        "free",
       createdAt,
-      username: authorProfile.username ?? userSnap.get("username") ?? uid,
+      username: authorProfile.username ??
+        userSnap.get("username") ??
+        uid,
       displayName:
         authorProfile.displayName ??
         userSnap.get("displayName") ??
         authorProfile.username ??
         uid,
       photoURL: authorProfile.photoURL ?? userSnap.get("photoURL") ?? null,
-      usernameLower:
-        (authorProfile.username ?? userSnap.get("username") ?? uid)
-          .toString()
-          .toLowerCase(),
+      usernameLower: (
+        authorProfile.username ??
+        userSnap.get("username") ??
+        uid
+      ).toString().toLowerCase(),
       isPublic: userSnap.exists ? userSnap.get("isPublic") ?? true : true,
-      followersCount: userSnap.exists ? userSnap.get("followersCount") ?? 0 : 0,
-      followingCount: userSnap.exists ? userSnap.get("followingCount") ?? 0 : 0,
+      followersCount: userSnap.exists ?
+        userSnap.get("followersCount") ?? 0 :
+        0,
+      followingCount: userSnap.exists ?
+        userSnap.get("followingCount") ?? 0 :
+        0,
       postsCount: userSnap.exists ?
-        FieldValue.increment(1) : 1,
+        FieldValue.increment(1) :
+        1,
       updatedAt: FieldValue.serverTimestamp(),
     }, {merge: true});
 
@@ -277,8 +293,10 @@ export const setUsername = onCall({region: "us-central1"}, async (request) => {
 
   await db.runTransaction(async (tx) => {
     const userSnap = await tx.get(userDoc);
-    const prevUsername = userSnap.exists ? (userSnap.get("username") as string
-    | undefined) : undefined;
+    let prevUsername: string | undefined;
+    if (userSnap.exists) {
+      prevUsername = userSnap.get("username") as string | undefined;
+    }
     const prevLower = prevUsername?.toLowerCase();
 
     // If same username, do nothing
@@ -295,8 +313,11 @@ export const setUsername = onCall({region: "us-central1"}, async (request) => {
     }
 
     // Reserve new username
-    tx.set(usernameDoc, {uid, createdAt: FieldValue.serverTimestamp()},
-      {merge: false});
+    tx.set(
+      usernameDoc,
+      {uid, createdAt: FieldValue.serverTimestamp()},
+      {merge: false},
+    );
 
     // Release previous username if owned by same user
     if (prevLower && prevLower !== username) {
@@ -462,81 +483,14 @@ export const createLivePostHttp = onRequest(async (req, res) => {
   }
 });
 
-export const expireLivePosts = onSchedule("* * * * *", async () => {
-  const now = admin.firestore.Timestamp.now();
-  const snapshot = await db.collection("live_posts")
-    .where("status", "==", "active")
-    .where("endAt", "<=", now)
-    .limit(50)
-    .get();
-
-  if (snapshot.empty) return;
-
-  const batch = db.batch();
-  snapshot.docs.forEach((doc) => {
-    batch.update(doc.ref, {status: "ended"});
-  });
-
-  await batch.commit();
-  logger.info("expireLivePosts updated", {count: snapshot.size});
-});
+// expireLivePosts removed - live feed no longer expires posts
+// Posts are now persistent and displayed in chronological order (newest first)
 
 // Helper function to split response into multiple messages
 const splitResponse = (content: string): string[] => {
   // Split by double newlines or specific delimiters
   const parts = content.split(/\n\n+/).filter((p) => p.trim().length > 0);
   return parts.length > 0 ? parts : [content];
-};
-
-const checkChatRateLimit = async (uid: string): Promise<void> => {
-  const today = toDateId(new Date());
-  const userRef = db.collection("users").doc(uid);
-  const chatLimitRef = userRef.collection("chat_limits").doc(today);
-
-  const now = new Date();
-  const nextResetAt = new Date(
-    Date.UTC(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate() + 1,
-      0,
-      0,
-      0,
-      0,
-    ),
-  );
-
-  await db.runTransaction(async (tx) => {
-    const limitDoc = await tx.get(chatLimitRef);
-    const currentCount = limitDoc.exists ?
-      (limitDoc.get("count") as number | undefined) ?? 0 : 0;
-
-    if (currentCount >= 5) {
-      throw new HttpsError(
-        "resource-exhausted",
-        "Has alcanzado el límite de 5 mensajes diarios.",
-        {
-          resetAt: nextResetAt.toISOString(),
-          resetAtEpochMs: nextResetAt.getTime(),
-          timezone: "UTC",
-        },
-      );
-    }
-
-    // Increment counter
-    if (limitDoc.exists) {
-      tx.update(chatLimitRef, {
-        count: FieldValue.increment(1),
-        lastMessageAt: FieldValue.serverTimestamp(),
-      });
-    } else {
-      tx.set(chatLimitRef, {
-        count: 1,
-        createdAt: FieldValue.serverTimestamp(),
-        lastMessageAt: FieldValue.serverTimestamp(),
-      });
-    }
-  });
 };
 
 /**
@@ -553,11 +507,6 @@ export const chatWithGroq = onCall(
         "User must be authenticated to use chat."
       );
     }
-
-    const uid = request.auth.uid;
-
-    // Check rate limit
-    await checkChatRateLimit(uid);
 
     const {userText, conversation} = request.data as ChatRequest;
 
@@ -594,7 +543,7 @@ export const chatWithGroq = onCall(
       const splitMessages = splitResponse(content);
 
       logger.info("chatWithGroq success", {
-        uid: uid,
+        uid: request.auth.uid,
         messagesCount: splitMessages.length,
       });
 

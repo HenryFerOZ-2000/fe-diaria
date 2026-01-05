@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import '../widgets/app_scaffold.dart';
@@ -67,10 +66,7 @@ class LiveScreen extends StatefulWidget {
   State<LiveScreen> createState() => _LiveScreenState();
 }
 
-enum LiveFilter { all, active }
-
 class _LiveScreenState extends State<LiveScreen> {
-  LiveFilter _filter = LiveFilter.all;
   final ScrollController _scrollController = ScrollController();
   List<LivePost> _posts = [];
   bool _isPosting = false;
@@ -143,15 +139,12 @@ class _LiveScreenState extends State<LiveScreen> {
   }
 
   Query<Map<String, dynamic>> _buildQuery() {
-    final base = _firestore.collection('live_posts');
-    if (_filter == LiveFilter.active) {
-      return base
-          .where('status', isEqualTo: 'active')
-          .where('liveUntil', isGreaterThan: Timestamp.now())
-          .orderBy('liveUntil', descending: true)
-          .limit(50);
-    }
-    return base.orderBy('createdAt', descending: true).limit(50);
+    // Persistent feed: all posts ordered by creation date (newest first)
+    // No expiration filters - posts remain visible indefinitely
+    return _firestore
+        .collection('live_posts')
+        .orderBy('createdAt', descending: true)
+        .limit(50);
   }
 
   Future<void> _insertPostById(String postId) async {
@@ -565,107 +558,71 @@ class _LiveScreenState extends State<LiveScreen> {
       centerTitle: false,
       showAppBar: true,
       resizeToAvoidBottomInset: true,
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                ChoiceChip(
-                  label: const Text('Todos'),
-                  selected: _filter == LiveFilter.all,
-                  onSelected: (v) {
-                    if (v) {
-                      setState(() {
-                        _filter = LiveFilter.all;
-                      });
-                    }
-                  },
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('En vivo'),
-                  selected: _filter == LiveFilter.active,
-                  onSelected: (v) {
-                    if (v) {
-                      setState(() {
-                        _filter = LiveFilter.active;
-                      });
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: _buildQuery().snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      'Error al cargar publicaciones: ${snapshot.error}',
-                      textAlign: TextAlign.center,
-                    ),
-                  );
-                }
-                final docs = snapshot.data?.docs ?? [];
-                final now = DateTime.now();
-                final posts = docs.map((doc) {
-                  final data = doc.data();
-                  final ts = data['createdAt'] as Timestamp?;
-                  return LivePost(
-                    id: doc.id,
-                    authorUid: data['authorUid'] as String? ?? '',
-                    userName: (data['authorUsername'] as String?) ??
-                        (data['authorName'] as String?) ??
-                        data['authorUid'] as String? ??
-                        'Anónimo',
-                    authorPhoto: data['authorPhoto'] as String?,
-                    text: data['text'] as String? ?? '',
-                    timeAgo: _formatTimeAgo(ts?.toDate(), now),
-                    joinCount: (data['joinCount'] ?? 0) as int,
-                    likes: (data['likeCount'] ?? 0) as int,
-                    comments: (data['commentCount'] ?? 0) as int,
-                    isLiked: _likedPosts.contains(doc.id),
-                  );
-                }).toList();
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: _buildQuery().snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                'Error al cargar publicaciones: ${snapshot.error}',
+                textAlign: TextAlign.center,
+              ),
+            );
+          }
+          final docs = snapshot.data?.docs ?? [];
+          final now = DateTime.now();
+          final posts = docs.map((doc) {
+            final data = doc.data();
+            final ts = data['createdAt'] as Timestamp?;
+            return LivePost(
+              id: doc.id,
+              authorUid: data['authorUid'] as String? ?? '',
+              userName: (data['authorUsername'] as String?) ??
+                  (data['authorName'] as String?) ??
+                  data['authorUid'] as String? ??
+                  'Anónimo',
+              authorPhoto: data['authorPhoto'] as String?,
+              text: data['text'] as String? ?? '',
+              timeAgo: _formatTimeAgo(ts?.toDate(), now),
+              joinCount: (data['joinCount'] ?? 0) as int,
+              likes: (data['likeCount'] ?? 0) as int,
+              comments: (data['commentCount'] ?? 0) as int,
+              isLiked: _likedPosts.contains(doc.id),
+            );
+          }).toList();
 
-                if (posts.isEmpty) {
-                  return const Center(child: Text('Aún no hay publicaciones'));
-                }
+          if (posts.isEmpty) {
+            return const Center(child: Text('Aún no hay publicaciones'));
+          }
 
-                return RefreshIndicator(
-                  onRefresh: _refreshFeed,
-                  color: colorScheme.primary,
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                    itemCount: posts.length,
-                    itemBuilder: (context, index) {
-                      final post = posts[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: _FeedPostTile(
-                          post: post,
-                          onLike: () => _toggleLike(post),
-                          onComment: () => _openComments(post),
-                          onShare: () => _sharePost(post),
-                          onAuthorTap: post.authorUid.isNotEmpty
-                              ? () => _openProfile(post.authorUid)
-                              : null,
-                        ),
-                      );
-                    },
+          return RefreshIndicator(
+            onRefresh: _refreshFeed,
+            color: colorScheme.primary,
+            child: ListView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+              itemCount: posts.length,
+              itemBuilder: (context, index) {
+                final post = posts[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _FeedPostTile(
+                    post: post,
+                    onLike: () => _toggleLike(post),
+                    onComment: () => _openComments(post),
+                    onShare: () => _sharePost(post),
+                    onAuthorTap: post.authorUid.isNotEmpty
+                        ? () => _openProfile(post.authorUid)
+                        : null,
                   ),
                 );
               },
             ),
-          ),
-        ],
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _createPost,
