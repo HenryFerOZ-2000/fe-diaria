@@ -1,4 +1,4 @@
-# 📱 Fe Diaria
+# 📱 Verbum
 
 Aplicación móvil Flutter con versículos bíblicos, oraciones, devocionales, categorías espirituales y contenido católico para fortalecer la fe diaria.
 

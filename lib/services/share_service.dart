@@ -21,7 +21,7 @@ class ShareService {
       
       await Share.share(
         shareText,
-        subject: title ?? 'Versículo del Día',
+        subject: title ?? 'Verbum',
       );
     } catch (e) {
       debugPrint('Error sharing text: $e');
@@ -43,7 +43,7 @@ class ShareService {
       final imageBytes = await _createVerseImage(
         text: text,
         reference: reference,
-        title: title ?? 'Versículo del Día',
+        title: title ?? 'Verbum',
         context: context,
         backgroundColor: backgroundColor,
         textColor: textColor,
@@ -58,7 +58,7 @@ class ShareService {
       await Share.shareXFiles(
         [XFile(file.path)],
         text: '$text\n\n$reference',
-        subject: title ?? 'Versículo del Día',
+        subject: title ?? 'Verbum',
       );
 
       // Limpiar después de un tiempo

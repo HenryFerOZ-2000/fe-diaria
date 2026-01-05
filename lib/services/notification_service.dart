@@ -293,7 +293,7 @@ class NotificationService {
       styleInformation: BigTextStyleInformation(
         body,
         contentTitle: title,
-        summaryText: 'Versículo del Día',
+        summaryText: 'Verbum',
       ),
       // Habilitar notificaciones persistentes
       ongoing: false,
@@ -399,7 +399,7 @@ class NotificationService {
       case 'pt':
         return 'Seu versículo do dia está pronto 🙏';
       default:
-        return 'Tu versículo del día está listo 🙏';
+        return 'Tu versículo del día está listo 🙏 - Verbum';
     }
   }
 
@@ -408,7 +408,7 @@ class NotificationService {
     final userName = StorageService().getUserName();
     final greeting = userName.isNotEmpty ? '$userName, ' : '';
     
-    String body = '${greeting}tu versículo del día:\n\n${verse.text}\n\n${verse.reference}';
+    String body = '${greeting}tu versículo del día:\n\n${verse.text}\n\n${verse.reference}\n\n- Verbum';
     
     if (prayer != null) {
       // Truncar oración si es muy larga
@@ -448,9 +448,9 @@ class NotificationService {
           case 'en':
             return 'Daily Verse';
           case 'pt':
-            return 'Versículo Diário';
+            return 'Verbum';
           default:
-            return 'Versículo Diario';
+            return 'Verbum';
         }
       case 'prayer':
         switch (language) {

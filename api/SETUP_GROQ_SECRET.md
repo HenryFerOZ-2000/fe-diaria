@@ -36,3 +36,4 @@ firebase functions:secrets:access GROQ_API_KEY
    - Se encriptan en reposo
    - Solo están disponibles en las funciones que los declaran explícitamente
 
+

@@ -89,7 +89,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Bienvenido a\nVersículo del Día',
+                      'Bienvenido a\nVerbum',
                       style: GoogleFonts.playfairDisplay(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,

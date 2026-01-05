@@ -1,0 +1,18 @@
+# Mantener LF en todo el repo
+* text=auto eol=lf
+
+# Asegurar LF para código
+*.ts text eol=lf
+*.js text eol=lf
+*.dart text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+
+# Lockfiles (mejor no tocarlos pero mantenerlos consistentes)
+pubspec.lock text eol=lf
+package-lock.json text eol=lf
+
+# Windows scripts (si existieran)
+*.bat text eol=crlf
+*.cmd text eol=crlf

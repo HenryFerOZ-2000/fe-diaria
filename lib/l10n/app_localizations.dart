@@ -19,9 +19,9 @@ class AppLocalizations {
       case 'en':
         return 'Verse of the Day';
       case 'pt':
-        return 'Versículo do Dia';
+        return 'Verbum';
       default:
-        return 'Versículo del Día';
+        return 'Verbum';
     }
   }
 
@@ -30,9 +30,9 @@ class AppLocalizations {
       case 'en':
         return 'Verse of the Day';
       case 'pt':
-        return 'Versículo do Dia';
+        return 'Verbum';
       default:
-        return 'Versículo del Día';
+        return 'Verbum';
     }
   }
 
@@ -298,9 +298,9 @@ class AppLocalizations {
       case 'en':
         return 'Verse of the Day';
       case 'pt':
-        return 'Versículo do Dia';
+        return 'Verbum';
       default:
-        return 'Versículo del Día';
+        return 'Verbum';
     }
   }
 
@@ -468,7 +468,7 @@ class AppLocalizations {
       case 'pt':
         return 'Seu Versículo do Dia está pronto';
       default:
-        return 'Tu Versículo del Día está listo';
+        return 'Tu versículo del día está listo - Verbum';
     }
   }
 

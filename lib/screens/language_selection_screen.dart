@@ -111,7 +111,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
                       const SizedBox(height: 32),
                       // Título
                       Text(
-                        'Versículo del Día',
+                        'Verbum',
                         style: GoogleFonts.playfairDisplay(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,

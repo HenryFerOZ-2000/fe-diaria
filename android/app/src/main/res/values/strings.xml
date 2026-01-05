@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Versículo del Día</string>
+    <string name="app_name">Verbum</string>
     <string name="widget_description">Muestra el versículo diario en tu pantalla de inicio</string>
     <string name="widget_icon_description">Icono del widget de versículo</string>
     <string name="widget_default_verse">Cargando versículo...</string>

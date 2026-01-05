@@ -23,10 +23,19 @@ import 'screens/following_list_screen.dart';
 import 'screens/search_users_screen.dart';
 import 'screens/streak_screen.dart';
 import 'screens/spiritual_stats_screen.dart';
+import 'screens/achievement_detail_screen.dart';
 import 'screens/plan_screen.dart';
 import 'screens/account_settings_screen.dart';
 import 'screens/privacy_safety_screen.dart';
+import 'screens/blocked_users_screen.dart';
+import 'screens/report_content_screen.dart';
+import 'screens/privacy_policy_screen.dart';
+import 'screens/terms_screen.dart';
+import 'screens/sessions_devices_screen.dart';
+import 'screens/delete_account_screen.dart';
 import 'screens/help_support_screen.dart';
+import 'screens/faq_screen.dart';
+import 'screens/report_problem_screen.dart';
 import 'screens/my_posts_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/emotion_selection_screen.dart';
@@ -114,7 +123,7 @@ class MyApp extends StatelessWidget {
           }
 
           return MaterialApp(
-            title: 'Versículo del Día',
+            title: 'Verbum',
             debugShowCheckedModeBanner: false,
             theme: lightTheme,
             darkTheme: darkTheme,
@@ -144,10 +153,25 @@ class MyApp extends StatelessWidget {
               '/search-users': (context) => const SearchUsersScreen(),
               '/streak': (context) => const StreakScreen(),
               '/spiritual-stats': (context) => const SpiritualStatsScreen(),
+              '/achievement-detail': (context) {
+                final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+                return AchievementDetailScreen(
+                  achievement: args['achievement'],
+                  stats: args['stats'],
+                );
+              },
               '/plan': (context) => const PlanScreen(),
               '/account-settings': (context) => const AccountSettingsScreen(),
               '/privacy-safety': (context) => const PrivacySafetyScreen(),
+              '/blocked-users': (context) => const BlockedUsersScreen(),
+              '/report-content': (context) => const ReportContentScreen(),
+              '/privacy-policy': (context) => const PrivacyPolicyScreen(),
+              '/terms': (context) => const TermsScreen(),
+              '/sessions-devices': (context) => const SessionsDevicesScreen(),
+              '/delete-account': (context) => const DeleteAccountScreen(),
               '/help-support': (context) => const HelpSupportScreen(),
+              '/faq': (context) => const FaqScreen(),
+              '/report-problem': (context) => const ReportProblemScreen(),
               '/my-posts': (context) => const MyPostsScreen(),
               '/welcome': (context) => const WelcomeAuthScreen(),
               '/bible-offline': (context) => const BibleBooksScreen(),
