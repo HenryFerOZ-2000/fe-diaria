@@ -51,6 +51,12 @@ class GroqChatService {
 
   final FirebaseFunctions _functions = FirebaseFunctions.instance;
 
+  String _formatHm(DateTime dateTimeLocal) {
+    final hh = dateTimeLocal.hour.toString().padLeft(2, '0');
+    final mm = dateTimeLocal.minute.toString().padLeft(2, '0');
+    return '$hh:$mm';
+  }
+
   /// Sends a message to the Groq-powered chatbot and returns the response.
   ///
   /// [userText] - The user's message text.
@@ -70,7 +76,27 @@ class GroqChatService {
       return ChatResponse.fromJson(data);
     } on FirebaseFunctionsException catch (e) {
       debugPrint('FirebaseFunctionsException: ${e.code} - ${e.message}');
-      throw Exception('Error en el chat: ${e.message}');
+
+      if (e.code == 'resource-exhausted') {
+        final details = e.details;
+        final resetAt = (details is Map && details['resetAt'] is String)
+            ? details['resetAt'] as String
+            : null;
+
+        if (resetAt != null) {
+          final resetLocal = DateTime.parse(resetAt).toLocal();
+          final hm = _formatHm(resetLocal);
+          throw Exception(
+            'Has alcanzado el límite de 5 mensajes diarios. Intenta de nuevo mañana a las $hm.',
+          );
+        }
+
+        throw Exception(
+          'Has alcanzado el límite de 5 mensajes diarios. Intenta de nuevo mañana.',
+        );
+      }
+
+      throw Exception(e.message ?? 'Error en el chat');
     } catch (e) {
       debugPrint('GroqChatService error: $e');
       throw Exception('Error al conectar con el chat: $e');

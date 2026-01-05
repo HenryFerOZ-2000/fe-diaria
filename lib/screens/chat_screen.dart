@@ -29,6 +29,14 @@ class _ChatScreenState extends State<ChatScreen> {
   final groq.GroqChatService _chatService = groq.GroqChatService();
   bool _isLoading = false;
 
+  String _errorToMessage(Object error) {
+    final text = error.toString();
+    if (text.startsWith('Exception: ')) {
+      return text.substring('Exception: '.length);
+    }
+    return 'Lo siento, hubo un error. Intenta de nuevo.';
+  }
+
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       Future.delayed(const Duration(milliseconds: 100), () {
@@ -91,7 +99,7 @@ class _ChatScreenState extends State<ChatScreen> {
       if (mounted) {
         setState(() {
           _messages.add(ChatMessage(
-            text: 'Lo siento, hubo un error. Intenta de nuevo.',
+            text: _errorToMessage(e),
             isUser: false,
           ));
           _isLoading = false;
