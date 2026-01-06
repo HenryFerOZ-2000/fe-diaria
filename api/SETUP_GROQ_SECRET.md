@@ -37,3 +37,4 @@ firebase functions:secrets:access GROQ_API_KEY
    - Solo están disponibles en las funciones que los declaran explícitamente
 
 
+

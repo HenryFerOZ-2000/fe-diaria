@@ -9,12 +9,14 @@ import '../providers/app_provider.dart';
 import '../widgets/streak_card.dart';
 import '../controllers/missions_controller.dart';
 import '../controllers/streak_controller.dart';
-import 'reading_screen.dart';
+import 'daily_missions_flow_screen.dart';
 import '../widgets/racha_celebration_dialog.dart';
 import '../services/ads_service.dart';
 import '../services/share_service.dart';
 import '../services/storage_service.dart';
 import '../services/ads_manager.dart';
+import '../services/spiritual_stats_service.dart';
+import '../services/daily_progress_service.dart';
 import '../l10n/app_localizations.dart';
 
 /// Pantalla principal con diseño religioso elegante
@@ -43,7 +45,9 @@ class _HomeScreenState extends State<HomeScreen>
   bool _isMorningPrayer = true;
   bool _adsRemoved = false;
   bool _streakDialogShowing = false;
-  final StreakController _streakController = StreakController();
+  late final StreakController _streakController;
+  final SpiritualStatsService _spiritualStatsService = SpiritualStatsService();
+  final DailyProgressService _dailyProgressService = DailyProgressService();
   // Se inicializa aquí para evitar LateInitializationError en hot reload.
   late final MissionsController _missionsController = MissionsController(
     missions: [
@@ -57,6 +61,9 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+    // Inicializar StreakController
+    _streakController = StreakController();
+    
     // Inicializar TabController (usa un AnimationController internamente)
     final initialIndex = widget.initialTabIndex ?? 0;
     _tabController = TabController(
@@ -89,6 +96,13 @@ class _HomeScreenState extends State<HomeScreen>
           isSensitiveContext: false,
         );
       }
+      // Marcar día como activo si el usuario está autenticado (una vez al día)
+      // Esto se llama al abrir la app para asegurar que el día esté marcado
+      _spiritualStatsService.markActiveTodayOncePerDay().catchError((e) {
+        debugPrint('[HomeScreen] Error marking active today on init: $e');
+      });
+      // Cargar progreso diario y actualizar estado de misiones
+      _loadDailyProgress();
     });
   }
   
@@ -192,6 +206,32 @@ class _HomeScreenState extends State<HomeScreen>
         });
       },
     );
+  }
+
+  /// Carga el progreso diario desde Firestore y actualiza el estado de las misiones
+  Future<void> _loadDailyProgress() async {
+    try {
+      final progress = await _dailyProgressService.getTodayProgress();
+      if (!mounted) return;
+
+      // Actualizar estado de misiones basado en Firestore
+      for (final mission in _missionsController.missions) {
+        final internalId = DailyProgressService.mapMissionIdToInternal(mission.id);
+        final isDone = progress.isMissionDone(internalId);
+        if (isDone && !mission.completed) {
+          _missionsController.completeMission(mission.id);
+        } else if (!isDone && mission.completed) {
+          // Si en Firestore no está hecho pero localmente sí, sincronizar
+          mission.completed = false;
+        }
+      }
+      
+      if (mounted) {
+        setState(() {}); // Actualizar UI
+      }
+    } catch (e) {
+      debugPrint('[HomeScreen] Error loading daily progress: $e');
+    }
   }
 
   @override
@@ -363,17 +403,25 @@ class _HomeScreenState extends State<HomeScreen>
                     value: _streakController,
                     child: Consumer<StreakController>(
                       builder: (context, streak, _) {
+                        // Usar el valor actualizado del streak para el diálogo
+                        final currentStreak = streak.totalDays;
+                        
+                        // Manejar el popup después del build para evitar setState durante build
                         if (streak.showPopup && !_streakDialogShowing) {
                           _streakDialogShowing = true;
                           // Consumir el flag antes de mostrar para evitar múltiples diálogos.
                           _streakController.consumePopup();
-                          Future.microtask(() {
+                          // Esperar después del build para mostrar el diálogo
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
                             if (!mounted) return;
+                            // Obtener el valor más reciente del streak
+                            final latestStreak = _streakController.totalDays;
+                            debugPrint('[HomeScreen] Showing celebration dialog with streak: $latestStreak');
                             showDialog(
                               context: context,
                               barrierDismissible: false,
                               barrierColor: Colors.black54,
-                              builder: (_) => RachaCelebrationDialog(totalDays: streak.totalDays),
+                              builder: (_) => RachaCelebrationDialog(totalDays: latestStreak),
                             ).then((_) {
                               if (mounted) {
                                 setState(() {
@@ -386,7 +434,7 @@ class _HomeScreenState extends State<HomeScreen>
                           });
                         }
                         return StreakCardDuolingoStyle(
-                          totalDays: streak.totalDays,
+                          totalDays: currentStreak,
                           playAnimation: streak.playAnimation,
                           weekDays: streak.days,
                         );
@@ -704,30 +752,59 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void _openMissionRead(BuildContext context, Mission mission, AppProvider provider) {
-    final content = _getMissionContent(mission.id, provider);
-    final reference = _getMissionReference(mission.id, provider);
-    final progress = _missionsProgress();
+    final initialIndex = _missionsController.missions.indexOf(mission);
+    if (initialIndex == -1) return;
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => ReadingScreen(
-          title: mission.title,
-          content: content,
-          reference: reference,
-          backgroundImage: null, // Puedes pasar un AssetImage/NetworkImage si deseas un fondo específico
-          progress: progress,
-          onComplete: () {
+        builder: (_) => DailyMissionsFlowScreen(
+          missions: _missionsController.missions,
+          initialMissionIndex: initialIndex,
+          provider: provider,
+          missionsController: _missionsController,
+          dailyProgressService: _dailyProgressService,
+          spiritualStatsService: _spiritualStatsService,
+          onMissionComplete: (completedMission) {
             setState(() {
-              _missionsController.completeMission(mission.id);
+              // El estado se actualiza dentro de DailyMissionsFlowScreen
             });
-            if (_missionsController.isAllCompleted()) {
-              provider.completeDailyStreak();
-              _streakController.completeToday(DateTime.now().weekday - 1);
+          },
+          onAllCompleted: () async {
+            // Incrementar racha cuando se completan todas las misiones
+            try {
+              debugPrint('[HomeScreen] 🎯 Calling completeAllMissions...');
+              await _spiritualStatsService.completeAllMissions();
+              debugPrint('[HomeScreen] ✅ completeAllMissions called successfully');
+              
+              // Esperar a que Firestore se actualice
+              await Future.delayed(const Duration(milliseconds: 500));
+              
+              // Forzar recarga del StreakController para asegurar que se actualice
+              if (mounted) {
+                final stats = await _spiritualStatsService.getStats();
+                debugPrint('[HomeScreen] 📊 Current stats after completeAllMissions: currentStreak=${stats.currentStreak}, bestStreak=${stats.bestStreak}');
+                
+                // Forzar actualización del StreakController
+                _streakController.reloadFromFirestore();
+              }
+            } catch (e, stackTrace) {
+              debugPrint('[HomeScreen] ❌ Error calling completeAllMissions: $e');
+              debugPrint('[HomeScreen] Stack trace: $stackTrace');
+              // También intentar markActiveToday como fallback
+              try {
+                await _spiritualStatsService.markActiveTodayOncePerDay(force: true);
+              } catch (e2) {
+                debugPrint('[HomeScreen] ❌ Error calling markActiveToday fallback: $e2');
+              }
+            }
+            if (mounted) {
+              setState(() {
+                provider.completeDailyStreak();
+                // No llamar completeToday aquí - el stream actualizará automáticamente
+                // _streakController.completeToday(DateTime.now().weekday - 1);
+              });
             }
           },
-          currentMissionId: mission.id,
-          missions: _missionsController.missions,
-          onOpenMission: (nextMission) => _openMissionRead(context, nextMission, provider),
         ),
       ),
     );

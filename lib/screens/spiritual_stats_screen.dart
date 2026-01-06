@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/spiritual_stats.dart';
@@ -15,6 +16,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
   final _service = SpiritualStatsService();
   SpiritualStats _stats = SpiritualStats.empty();
   bool _isLoading = true;
+  StreamSubscription<SpiritualStats>? _statsSubscription;
 
   // Definición de logros
   static final List<Achievement> _achievements = [
@@ -103,25 +105,52 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
   @override
   void initState() {
     super.initState();
+    
+    // Cargar inicialmente primero
     _loadStats();
+    
+    // Suscribirse a actualizaciones en tiempo real
+    _statsSubscription = _service.statsStream().listen((stats) {
+      debugPrint('[SpiritualStatsScreen] 📊 Stream update: currentStreak=${stats.currentStreak}, bestStreak=${stats.bestStreak}');
+      if (mounted) {
+        setState(() {
+          _stats = stats;
+          _isLoading = false;
+        });
+        debugPrint('[SpiritualStatsScreen] ✅ UI updated with currentStreak=${_stats.currentStreak}');
+      }
+    }, onError: (e) {
+      debugPrint('[SpiritualStatsScreen] ❌ Error in stats stream: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    });
   }
 
   Future<void> _loadStats() async {
     setState(() => _isLoading = true);
     try {
       final stats = await _service.getStats();
+      debugPrint('[SpiritualStatsScreen] 📥 Initial load: currentStreak=${stats.currentStreak}, bestStreak=${stats.bestStreak}');
       if (mounted) {
         setState(() {
           _stats = stats;
           _isLoading = false;
         });
+        debugPrint('[SpiritualStatsScreen] ✅ Initial stats loaded, UI updated');
       }
     } catch (e) {
-      debugPrint('Error loading stats: $e');
+      debugPrint('[SpiritualStatsScreen] ❌ Error loading stats: $e');
       if (mounted) {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _statsSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -145,7 +174,12 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
               onRefresh: _loadStats,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  top: 16,
+                  bottom: MediaQuery.of(context).padding.bottom + 16,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -170,6 +204,8 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
                     ),
                     const SizedBox(height: 16),
                     _buildAchievementsGrid(),
+                    // Espacio adicional al final para evitar overflow
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -184,7 +220,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: 12,
       crossAxisSpacing: 12,
-      childAspectRatio: 1.1,
+      childAspectRatio: 1.15, // Aumentado ligeramente para dar más espacio vertical
       children: [
         _StatsCard(
           title: 'Días activos',
@@ -238,7 +274,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
         crossAxisCount: 3,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 0.85,
+        childAspectRatio: 0.9, // Aumentado para dar más espacio vertical
       ),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -302,54 +338,59 @@ class _StatsCard extends StatelessWidget {
           color: Colors.grey.withOpacity(0.1),
         ),
       ),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               color: color.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 20),
           ),
-          const Spacer(),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                value,
-                style: GoogleFonts.inter(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: color,
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    value,
+                    style: GoogleFonts.inter(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                title,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                const SizedBox(height: 4),
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  color: Colors.grey[600],
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    color: Colors.grey[600],
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -395,55 +436,60 @@ class _AchievementCard extends StatelessWidget {
               ]
             : null,
       ),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Hero(
             tag: 'achievement_icon_${achievement.id}',
             child: Icon(
               achievement.icon,
-              size: 32,
+              size: 28,
               color: isUnlocked
                   ? Colors.amber[700]
                   : Colors.grey[400],
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            achievement.title,
-            style: GoogleFonts.inter(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: isUnlocked ? Colors.amber[900] : Colors.grey[600],
+          const SizedBox(height: 6),
+          Flexible(
+            child: Text(
+              achievement.title,
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: isUnlocked ? Colors.amber[900] : Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
           if (!isUnlocked) ...[
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             LinearProgressIndicator(
               value: progressPercent,
               backgroundColor: Colors.grey[300],
               valueColor: AlwaysStoppedAnimation<Color>(
                 Colors.amber[700]!,
               ),
-              minHeight: 4,
+              minHeight: 3,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               '$progress/${achievement.target}',
               style: GoogleFonts.inter(
-                fontSize: 9,
+                fontSize: 8,
                 color: Colors.grey[600],
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ] else ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Icon(
               Icons.check_circle,
-              size: 16,
+              size: 14,
               color: Colors.amber[700],
             ),
           ],

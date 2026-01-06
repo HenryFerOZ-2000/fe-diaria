@@ -6,7 +6,41 @@ service cloud.firestore {
     // (las funciones callable usan admin SDK y no dependen de rules)
     match /live_posts/{postId} {
       allow read: if true;
-      allow write: if request.auth != null && request.resource.data.authorUid == request.auth.uid;
+      // Crear post: solo el autor
+      allow create: if request.auth != null && request.resource.data.authorUid == request.auth.uid;
+      // Actualizar post: solo el autor, o actualizaciones de contadores (likeCount, commentCount)
+      allow update: if request.auth != null 
+                    && (resource.data.authorUid == request.auth.uid
+                        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount', 'commentCount'])));
+      // Eliminar post: solo el autor
+      allow delete: if request.auth != null && resource.data.authorUid == request.auth.uid;
+      
+      // Likes: cualquier usuario autenticado puede crear/eliminar su propio like
+      match /likes/{uid} {
+        allow read: if true;
+        allow create: if request.auth != null && request.auth.uid == uid;
+        allow delete: if request.auth != null && request.auth.uid == uid;
+      }
+      
+      // Comentarios: cualquier usuario autenticado puede crear comentarios
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if request.auth != null 
+                      && request.resource.data.authorUid == request.auth.uid;
+        // Actualizar comentario: solo el autor o actualizaciones de contadores
+        allow update: if request.auth != null 
+                      && (resource.data.authorUid == request.auth.uid
+                          || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount', 'replyCount'])));
+        allow delete: if request.auth != null 
+                      && resource.data.authorUid == request.auth.uid;
+        
+        // Likes en comentarios
+        match /likes/{uid} {
+          allow read: if true;
+          allow create: if request.auth != null && request.auth.uid == uid;
+          allow delete: if request.auth != null && request.auth.uid == uid;
+        }
+      }
     }
 
     // Perfiles de usuario
@@ -29,6 +63,16 @@ service cloud.firestore {
       match /following/{targetUid} {
         allow read: if request.auth != null && request.auth.uid == userId;
         allow write: if false;
+      }
+
+      // Estadísticas espirituales: solo el propietario puede leer/escribir
+      match /spiritualStats/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Progreso diario: solo el propietario puede leer/escribir
+      match /dailyProgress/{dateId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
       }
     }
 

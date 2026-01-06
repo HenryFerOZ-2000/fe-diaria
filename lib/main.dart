@@ -36,6 +36,7 @@ import 'screens/delete_account_screen.dart';
 import 'screens/help_support_screen.dart';
 import 'screens/faq_screen.dart';
 import 'screens/report_problem_screen.dart';
+import 'screens/comments_screen.dart';
 import 'screens/my_posts_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/emotion_selection_screen.dart';
@@ -105,9 +106,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AppProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
-      child: Consumer<AppProvider>(
-        builder: (context, provider, child) {
-          final auth = Provider.of<AuthProvider>(context);
+      child: Consumer2<AppProvider, AuthProvider>(
+        builder: (context, provider, auth, child) {
           final bool onboardingCompleted = _checkOnboarding();
 
           Widget startScreen;
@@ -172,6 +172,11 @@ class MyApp extends StatelessWidget {
               '/help-support': (context) => const HelpSupportScreen(),
               '/faq': (context) => const FaqScreen(),
               '/report-problem': (context) => const ReportProblemScreen(),
+              '/comments': (context) {
+                final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+                final postId = args?['postId'] as String? ?? '';
+                return CommentsScreen(postId: postId);
+              },
               '/my-posts': (context) => const MyPostsScreen(),
               '/welcome': (context) => const WelcomeAuthScreen(),
               '/bible-offline': (context) => const BibleBooksScreen(),

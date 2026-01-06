@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart' as app_auth;
 import '../services/profile_service.dart';
+import 'welcome_auth_screen.dart';
 
 class ProfileHubScreen extends StatelessWidget {
   ProfileHubScreen({super.key});
@@ -19,7 +20,11 @@ class ProfileHubScreen extends StatelessWidget {
       await _auth.signOut();
     }
     if (context.mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil('/welcome', (route) => false);
+      // Navegar a la pantalla de bienvenida y limpiar el stack de navegación
+      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const WelcomeAuthScreen()),
+        (route) => false,
+      );
     }
   }
 
@@ -83,7 +88,21 @@ class ProfileHubScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
-      return const Scaffold(body: Center(child: Text('Inicia sesión para ver tu perfil')));
+      // Si no hay usuario, navegar directamente a la pantalla de inicio de sesión
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const WelcomeAuthScreen()),
+            (route) => false,
+          );
+        }
+      });
+      // Mostrar un loading mientras navega
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     return Scaffold(

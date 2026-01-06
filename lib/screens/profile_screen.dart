@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/profile_service.dart';
 import '../services/favorites_service.dart';
+import 'welcome_auth_screen.dart';
 
 class MySocialProfileScreen extends StatefulWidget {
   final int? initialTabIndex;
@@ -65,7 +66,21 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen> with Tick
   Widget build(BuildContext context) {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
-      return const Scaffold(body: Center(child: Text('Inicia sesión para ver tu perfil')));
+      // Si no hay usuario, navegar directamente a la pantalla de inicio de sesión
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const WelcomeAuthScreen()),
+            (route) => false,
+          );
+        }
+      });
+      // Mostrar un loading mientras navega
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     return Scaffold(

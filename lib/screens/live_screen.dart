@@ -8,6 +8,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import '../widgets/app_scaffold.dart';
 import '../services/social_service.dart';
+import '../services/live_posts_service.dart';
+import '../services/spiritual_stats_service.dart';
+import 'comments_screen.dart';
 
 class LivePost {
   final String id;
@@ -75,6 +78,7 @@ class _LiveScreenState extends State<LiveScreen> {
   final _functions = FirebaseFunctions.instanceFor(region: 'us-central1');
   final _auth = FirebaseAuth.instance;
   final _social = SocialService();
+  final _livePostsService = LivePostsService();
   String? _uid;
 
   @override
@@ -195,259 +199,10 @@ class _LiveScreenState extends State<LiveScreen> {
     await Future.delayed(const Duration(milliseconds: 300));
   }
 
-  Future<void> _toggleLike(LivePost post) async {
-    await _ensureAuth();
-    final uid = _uid;
-    if (uid == null) return;
-    final isLikedNow = _likedPosts.contains(post.id);
-    setState(() {
-      if (isLikedNow) {
-        _likedPosts.remove(post.id);
-      } else {
-        _likedPosts.add(post.id);
-      }
-    });
-    try {
-      final postRef = _firestore.collection('live_posts').doc(post.id);
-      final likeRef = _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('likes')
-          .doc(post.id);
-      await _firestore.runTransaction((tx) async {
-        tx.update(
-          postRef,
-          {'likeCount': FieldValue.increment(isLikedNow ? -1 : 1)},
-        );
-        if (isLikedNow) {
-          tx.delete(likeRef);
-        } else {
-          tx.set(likeRef, {'createdAt': FieldValue.serverTimestamp()});
-        }
-      });
-    } catch (e) {
-      debugPrint('Error toggling like: $e');
-    }
-  }
-
   void _openComments(LivePost post) {
-    final commentController = TextEditingController();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
-          ),
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .outline
-                        .withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Comentarios',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 240,
-                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: _firestore
-                      .collection('live_posts')
-                      .doc(post.id)
-                      .collection('comments')
-                      .orderBy('createdAt', descending: true)
-                      .limit(50)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text(
-                          'Error al cargar comentarios',
-                          style: GoogleFonts.inter(),
-                        ),
-                      );
-                    }
-                    final docs = snapshot.data?.docs ?? [];
-                    if (docs.isEmpty) {
-                      return const Center(child: Text('Sé el primero en comentar'));
-                    }
-                    return ListView.builder(
-                      itemCount: docs.length,
-                      itemBuilder: (context, index) {
-                        final data = docs[index].data();
-                        final text = data['text'] as String? ?? '';
-                        final author = data['authorName'] as String? ??
-                            data['authorUid'] as String? ??
-                            'Anónimo';
-                        final created = data['createdAt'] as Timestamp?;
-                        final timeAgo = _formatTimeAgo(
-                          created?.toDate(),
-                          DateTime.now(),
-                        );
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CircleAvatar(
-                                radius: 16,
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .primary
-                                    .withOpacity(0.15),
-                                child: Text(
-                                  author.isNotEmpty
-                                      ? author[0].toUpperCase()
-                                      : '?',
-                                  style: GoogleFonts.inter(
-                                    color: Theme.of(context).colorScheme.primary,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      author,
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      text,
-                                      style: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        height: 1.4,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      timeAgo,
-                                      style: GoogleFonts.inter(
-                                        fontSize: 11,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface
-                                            .withOpacity(0.5),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: commentController,
-                      decoration: InputDecoration(
-                        hintText: 'Escribe un comentario...',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    onPressed: () async {
-                      final text = commentController.text.trim();
-                      if (text.isEmpty) return;
-                      await _ensureAuth();
-                      final uid = _uid;
-                      if (uid == null) return;
-                      final authorName = _auth.currentUser?.displayName ??
-                          _auth.currentUser?.email?.split('@').first ??
-                          uid;
-                      try {
-                        final postRef =
-                            _firestore.collection('live_posts').doc(post.id);
-                        final commentsRef = postRef.collection('comments');
-                        await _firestore.runTransaction((tx) async {
-                          tx.set(commentsRef.doc(), {
-                            'text': text,
-                            'authorUid': uid,
-                            'authorName': authorName,
-                            'createdAt': FieldValue.serverTimestamp(),
-                          });
-                          tx.update(
-                            postRef,
-                            {'commentCount': FieldValue.increment(1)},
-                          );
-                        });
-                        commentController.clear();
-                        if (!mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Comentario agregado'),
-                          ),
-                        );
-                      } catch (e) {
-                        if (!mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Error al comentar: $e'),
-                          ),
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.send_rounded),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CommentsScreen(postId: post.id),
       ),
     );
   }
@@ -490,6 +245,9 @@ class _LiveScreenState extends State<LiveScreen> {
       if (!mounted) return;
       if (postId != null) {
         await _insertPostById(postId);
+        // Incrementar contador de publicaciones creadas
+        final spiritualStatsService = SpiritualStatsService();
+        await spiritualStatsService.incrementPostCreated();
       }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Publicación creada.')),
@@ -608,10 +366,13 @@ class _LiveScreenState extends State<LiveScreen> {
               itemBuilder: (context, index) {
                 final post = posts[index];
                 return Padding(
+                  key: ValueKey(post.id),
                   padding: const EdgeInsets.only(bottom: 12),
                   child: _FeedPostTile(
+                    postId: post.id,
                     post: post,
-                    onLike: () => _toggleLike(post),
+                    service: _livePostsService,
+                    currentUid: _uid ?? '',
                     onComment: () => _openComments(post),
                     onShare: () => _sharePost(post),
                     onAuthorTap: post.authorUid.isNotEmpty
@@ -632,20 +393,82 @@ class _LiveScreenState extends State<LiveScreen> {
   }
 }
 
-class _FeedPostTile extends StatelessWidget {
+class _FeedPostTile extends StatefulWidget {
+  final String postId;
   final LivePost post;
-  final VoidCallback onLike;
+  final LivePostsService service;
+  final String currentUid;
   final VoidCallback onComment;
   final VoidCallback onShare;
   final VoidCallback? onAuthorTap;
 
   const _FeedPostTile({
+    required this.postId,
     required this.post,
-    required this.onLike,
+    required this.service,
+    required this.currentUid,
     required this.onComment,
     required this.onShare,
     this.onAuthorTap,
   });
+
+  @override
+  State<_FeedPostTile> createState() => _FeedPostTileState();
+}
+
+class _FeedPostTileState extends State<_FeedPostTile> {
+  bool _optimisticLiked = false;
+  int _optimisticLikeCount = 0;
+  bool _isUpdating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _optimisticLiked = widget.post.isLiked;
+    _optimisticLikeCount = widget.post.likes;
+  }
+
+  @override
+  void didUpdateWidget(_FeedPostTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Solo actualizar si el post cambió y no estamos en medio de una actualización
+    if (!_isUpdating && oldWidget.postId != widget.postId) {
+      _optimisticLiked = widget.post.isLiked;
+      _optimisticLikeCount = widget.post.likes;
+    }
+  }
+
+  Future<void> _handleLike() async {
+    if (_isUpdating || widget.currentUid.isEmpty) return;
+
+    final wasLiked = _optimisticLiked;
+    final oldCount = _optimisticLikeCount;
+
+    setState(() {
+      _isUpdating = true;
+      _optimisticLiked = !_optimisticLiked;
+      // Si estaba liked, ahora no lo está, entonces restamos 1
+      // Si no estaba liked, ahora lo está, entonces sumamos 1
+      _optimisticLikeCount = _optimisticLiked ? oldCount + 1 : oldCount - 1;
+    });
+
+    try {
+      await widget.service.togglePostLike(widget.postId, widget.currentUid);
+    } catch (e) {
+      // Revertir en caso de error
+      if (mounted) {
+        setState(() {
+          _optimisticLiked = wasLiked;
+          _optimisticLikeCount = oldCount;
+        });
+      }
+      debugPrint('Error toggling like: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isUpdating = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -671,17 +494,18 @@ class _FeedPostTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 InkWell(
-                  onTap: onAuthorTap,
+                  onTap: widget.onAuthorTap,
                   borderRadius: BorderRadius.circular(24),
                   child: CircleAvatar(
                     radius: 20,
                     backgroundColor: Colors.deepPurple.withOpacity(0.12),
-                    backgroundImage:
-                        post.authorPhoto != null ? NetworkImage(post.authorPhoto!) : null,
-                    child: post.authorPhoto == null
+                    backgroundImage: widget.post.authorPhoto != null
+                        ? NetworkImage(widget.post.authorPhoto!)
+                        : null,
+                    child: widget.post.authorPhoto == null
                         ? Text(
-                            post.userName.isNotEmpty
-                                ? post.userName[0].toUpperCase()
+                            widget.post.userName.isNotEmpty
+                                ? widget.post.userName[0].toUpperCase()
                                 : '?',
                             style: GoogleFonts.inter(
                               color: Colors.deepPurple,
@@ -700,7 +524,7 @@ class _FeedPostTile extends StatelessWidget {
                         children: [
                           Flexible(
                             child: Text(
-                              post.userName,
+                              widget.post.userName,
                               style: GoogleFonts.inter(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.w800,
@@ -711,7 +535,7 @@ class _FeedPostTile extends StatelessWidget {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            '· ${post.timeAgo}',
+                            '· ${widget.post.timeAgo}',
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: Colors.grey[600],
@@ -721,21 +545,21 @@ class _FeedPostTile extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        post.text,
+                        widget.post.text,
                         style: GoogleFonts.inter(
                           fontSize: 14.5,
                           height: 1.45,
                           color: const Color(0xFF1F1F1F),
                         ),
                       ),
-                      if (post.mediaUrl != null) ...[
+                      if (widget.post.mediaUrl != null) ...[
                         const SizedBox(height: 10),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(14),
                           child: AspectRatio(
                             aspectRatio: 16 / 9,
                             child: Image.network(
-                              post.mediaUrl!,
+                              widget.post.mediaUrl!,
                               fit: BoxFit.cover,
                               loadingBuilder: (context, child, loadingProgress) {
                                 if (loadingProgress == null) return child;
@@ -759,7 +583,7 @@ class _FeedPostTile extends StatelessWidget {
                                       color: Colors.grey),
                                 ),
                               ),
-                              cacheWidth: 800, // Optimize image loading
+                              cacheWidth: 800,
                             ),
                           ),
                         ),
@@ -767,28 +591,77 @@ class _FeedPostTile extends StatelessWidget {
                       const SizedBox(height: 10),
                       Row(
                         children: [
-                          _ActionButton(
-                            icon:
-                                post.isLiked ? Icons.favorite : Icons.favorite_border,
-                            label: '${post.likes}',
-                            color: post.isLiked
-                                ? Colors.redAccent
-                                : Colors.grey[700]!,
-                            onTap: onLike,
+                          // Like button con StreamBuilder para likeCount real
+                          StreamBuilder<int>(
+                            stream: widget.service.getPostLikeCountStream(widget.postId),
+                            builder: (context, countSnapshot) {
+                              // Si no estamos actualizando y tenemos datos del stream, sincronizar
+                              if (!_isUpdating && countSnapshot.hasData) {
+                                final realCount = countSnapshot.data!;
+                                if (_optimisticLikeCount != realCount) {
+                                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                                    if (mounted && !_isUpdating) {
+                                      setState(() {
+                                        _optimisticLikeCount = realCount;
+                                      });
+                                    }
+                                  });
+                                }
+                              }
+                              
+                              final displayCount = _isUpdating 
+                                  ? _optimisticLikeCount 
+                                  : (countSnapshot.data ?? _optimisticLikeCount);
+                              
+                              return StreamBuilder<bool>(
+                                stream: widget.currentUid.isNotEmpty
+                                    ? widget.service.isPostLikedStream(
+                                        widget.postId,
+                                        widget.currentUid,
+                                      )
+                                    : Stream.value(false),
+                                builder: (context, likedSnapshot) {
+                                  // Si no estamos actualizando y tenemos datos del stream, sincronizar
+                                  if (!_isUpdating && likedSnapshot.hasData) {
+                                    final streamLiked = likedSnapshot.data!;
+                                    if (_optimisticLiked != streamLiked) {
+                                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                                        if (mounted && !_isUpdating) {
+                                          setState(() {
+                                            _optimisticLiked = streamLiked;
+                                          });
+                                        }
+                                      });
+                                    }
+                                  }
+                                  
+                                  final isLiked = _isUpdating 
+                                      ? _optimisticLiked 
+                                      : (likedSnapshot.data ?? _optimisticLiked);
+                                  
+                                  return _ActionButton(
+                                    icon: isLiked ? Icons.favorite : Icons.favorite_border,
+                                    label: '$displayCount',
+                                    color: isLiked ? Colors.redAccent : Colors.grey[700]!,
+                                    onTap: _handleLike,
+                                  );
+                                },
+                              );
+                            },
                           ),
                           const SizedBox(width: 8),
                           _ActionButton(
                             icon: Icons.mode_comment_outlined,
-                            label: '${post.comments}',
+                            label: '${widget.post.comments}',
                             color: Colors.grey[700]!,
-                            onTap: onComment,
+                            onTap: widget.onComment,
                           ),
                           const SizedBox(width: 8),
                           _ActionButton(
                             icon: Icons.share_outlined,
                             label: 'Compartir',
                             color: Colors.grey[700]!,
-                            onTap: onShare,
+                            onTap: widget.onShare,
                           ),
                         ],
                       ),

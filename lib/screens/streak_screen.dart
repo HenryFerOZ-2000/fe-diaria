@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../services/streak_service.dart';
-import '../services/storage_service.dart';
+import '../services/spiritual_stats_service.dart';
+import '../models/spiritual_stats.dart';
 
 class StreakScreen extends StatefulWidget {
   const StreakScreen({super.key});
@@ -11,57 +12,63 @@ class StreakScreen extends StatefulWidget {
 }
 
 class _StreakScreenState extends State<StreakScreen> {
-  late final StreakService _streakService;
+  final _spiritualStatsService = SpiritualStatsService();
+  StreamSubscription<SpiritualStats>? _statsSubscription;
   bool _loading = true;
   int _current = 0;
   int _best = 0;
   String? _last;
-  Set<String> _completedYmd = {};
+  Map<String, bool> _activeDaysMap = {};
 
   @override
   void initState() {
     super.initState();
-    _streakService = StreakService(StorageService());
     _load();
+    
+    // Suscribirse a actualizaciones en tiempo real
+    _statsSubscription = _spiritualStatsService.statsStream().listen((stats) {
+      if (mounted) {
+        setState(() {
+          _current = stats.currentStreak;
+          _best = stats.bestStreak;
+          _last = stats.lastActiveDate;
+          _activeDaysMap = stats.activeDaysMap;
+          _loading = false;
+        });
+      }
+    }, onError: (e) {
+      debugPrint('[StreakScreen] Error in stats stream: $e');
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    });
   }
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final state = await _streakService.getStreak();
-    if (!mounted) return;
+    try {
+      final stats = await _spiritualStatsService.getStats();
+      if (!mounted) return;
 
-    // Reconstruir días completados basados en racha actual (contigua hasta lastDate)
-    final completed = <String>{};
-    if (state.lastDateYmd != null && state.current > 0) {
-      final lastDate = _parseYmd(state.lastDateYmd!);
-      if (lastDate != null) {
-        for (int i = 0; i < state.current; i++) {
-          final date = lastDate.subtract(Duration(days: i));
-          completed.add(_toYmd(date));
-        }
+      setState(() {
+        _current = stats.currentStreak;
+        _best = stats.bestStreak;
+        _last = stats.lastActiveDate;
+        _activeDaysMap = stats.activeDaysMap;
+        _loading = false;
+      });
+    } catch (e) {
+      debugPrint('[StreakScreen] Error loading stats: $e');
+      if (mounted) {
+        setState(() => _loading = false);
       }
     }
-
-    setState(() {
-      _current = state.current;
-      _best = state.best;
-      _last = state.lastDateYmd;
-      _completedYmd = completed;
-      _loading = false;
-    });
   }
 
-  DateTime? _parseYmd(String ymd) {
-    try {
-      final parts = ymd.split('-');
-      if (parts.length != 3) return null;
-      final y = int.parse(parts[0]);
-      final m = int.parse(parts[1]);
-      final d = int.parse(parts[2]);
-      return DateTime(y, m, d);
-    } catch (_) {
-      return null;
-    }
+  @override
+  void dispose() {
+    _statsSubscription?.cancel();
+    super.dispose();
   }
 
   String _toYmd(DateTime date) {
@@ -184,7 +191,9 @@ class _StreakScreenState extends State<StreakScreen> {
                     final date = days[index];
                     final ymd = _toYmd(date);
                     final isToday = _toYmd(today) == ymd;
-                    final done = _completedYmd.contains(ymd);
+                    // Usar activeDaysMap de Firestore para determinar si el día está activo
+                    final done = _activeDaysMap[ymd] == true;
+                    
                     if (done) {
                       return Container(
                         decoration: BoxDecoration(

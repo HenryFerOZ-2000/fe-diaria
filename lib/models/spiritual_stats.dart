@@ -1,51 +1,50 @@
+/// Modelo para estadísticas espirituales del usuario
+/// Lee de users/{uid}/spiritualStats/main
 class SpiritualStats {
-  final int activeDaysLast30;
-  final int prayersCompleted;
-  final int versesRead;
-  final int postsCreated;
+  final String? lastActiveDate; // "YYYY-MM-DD"
   final int currentStreak;
   final int bestStreak;
+  final Map<String, bool> activeDaysMap; // "YYYY-MM-DD": true
+  final int prayersCompletedTotal;
+  final int versesReadTotal;
+  final int postsCreatedTotal;
 
   const SpiritualStats({
-    required this.activeDaysLast30,
-    required this.prayersCompleted,
-    required this.versesRead,
-    required this.postsCreated,
+    this.lastActiveDate,
     required this.currentStreak,
     required this.bestStreak,
+    this.activeDaysMap = const {},
+    required this.prayersCompletedTotal,
+    required this.versesReadTotal,
+    required this.postsCreatedTotal,
   });
-
-  factory SpiritualStats.empty() {
-    return const SpiritualStats(
-      activeDaysLast30: 0,
-      prayersCompleted: 0,
-      versesRead: 0,
-      postsCreated: 0,
-      currentStreak: 0,
-      bestStreak: 0,
-    );
-  }
 
   factory SpiritualStats.fromFirestore(Map<String, dynamic> data) {
     return SpiritualStats(
-      activeDaysLast30: (data['activeDaysLast30'] ?? 0) as int,
-      prayersCompleted: (data['prayersCompleted'] ?? 0) as int,
-      versesRead: (data['versesRead'] ?? 0) as int,
-      postsCreated: (data['postsCreated'] ?? 0) as int,
-      currentStreak: (data['currentStreak'] ?? data['streakCurrent'] ?? 0) as int,
-      bestStreak: (data['bestStreak'] ?? data['streakBest'] ?? 0) as int,
+      lastActiveDate: data['lastActiveDate'] as String?,
+      currentStreak: (data['currentStreak'] ?? 0) as int,
+      bestStreak: (data['bestStreak'] ?? 0) as int,
+      activeDaysMap: Map<String, bool>.from(data['activeDaysMap'] ?? {}),
+      prayersCompletedTotal: (data['prayersCompletedTotal'] ?? 0) as int,
+      versesReadTotal: (data['versesReadTotal'] ?? 0) as int,
+      postsCreatedTotal: (data['postsCreatedTotal'] ?? 0) as int,
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'activeDaysLast30': activeDaysLast30,
-      'prayersCompleted': prayersCompleted,
-      'versesRead': versesRead,
-      'postsCreated': postsCreated,
-      'currentStreak': currentStreak,
-      'bestStreak': bestStreak,
-    };
+  factory SpiritualStats.empty() {
+    return const SpiritualStats(
+      currentStreak: 0,
+      bestStreak: 0,
+      prayersCompletedTotal: 0,
+      versesReadTotal: 0,
+      postsCreatedTotal: 0,
+    );
   }
-}
 
+  int get activeDaysLast30 => activeDaysMap.length;
+
+  // Getters de compatibilidad para código existente
+  int get versesRead => versesReadTotal;
+  int get prayersCompleted => prayersCompletedTotal;
+  int get postsCreated => postsCreatedTotal;
+}

@@ -558,3 +558,375 @@ export const chatWithGroq = onCall(
     }
   }
 );
+
+// Helper functions for date formatting (YYYY-MM-DD)
+const formatDateId = (date: Date): string => {
+  const year = date.getUTCFullYear();
+  const month = `${date.getUTCMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getUTCDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const getDaysAgo = (days: number): Date => {
+  const date = new Date();
+  date.setUTCDate(date.getUTCDate() - days);
+  return date;
+};
+
+/**
+ * Marca el día actual como activo y actualiza la racha del usuario.
+ * Idempotente: si ya se marcó hoy, no cambia la racha.
+ * Region: us-central1, Runtime: nodejs20, Memory: 256MiB
+ */
+export const markActiveToday = onCall(
+  {region: "us-central1", memory: "256MiB"},
+  async (request) => {
+    const uid = request.auth?.uid;
+    if (!uid) {
+      throw new HttpsError("unauthenticated", "auth_required");
+    }
+
+    const now = new Date();
+    const today = formatDateId(now);
+    const yesterday = formatDateId(getDaysAgo(1));
+
+    const statsRef = db.collection("users")
+      .doc(uid)
+      .collection("spiritualStats")
+      .doc("main");
+
+    try {
+      const statsSnap = await statsRef.get();
+      const exists = statsSnap.exists;
+      const currentData = statsSnap.data() ?? {};
+
+      const lastActiveDate = currentData["lastActiveDate"] as
+        string | undefined;
+      let currentStreak = (currentData["currentStreak"] ?? 0) as number;
+      let bestStreak = (currentData["bestStreak"] ?? 0) as number;
+      const activeDaysMap = (
+        currentData["activeDaysMap"] as Record<string, boolean> | undefined
+      ) ?? {};
+
+      // Lógica idempotente de racha
+      if (lastActiveDate === today) {
+        // Ya marcado hoy, no cambiar racha (idempotente)
+        // PERO: si currentStreak es 0, establecerlo a 1 (primer día)
+        if (currentStreak === 0) {
+          currentStreak = 1;
+        }
+        activeDaysMap[today] = true;
+      } else if (lastActiveDate === yesterday) {
+        // Continuar racha: ayer fue activo, hoy también
+        currentStreak += 1;
+        activeDaysMap[today] = true;
+      } else if (
+        lastActiveDate === undefined ||
+        lastActiveDate === null ||
+        lastActiveDate === ""
+      ) {
+        // Primer día o no hay lastActiveDate: empezar racha en 1
+        currentStreak = 1;
+        activeDaysMap[today] = true;
+      } else {
+        // Racha rota (último día activo fue hace más de 1 día),
+        // empezar de nuevo
+        currentStreak = 1;
+        activeDaysMap[today] = true;
+      }
+
+      // Actualizar mejor racha
+      bestStreak = Math.max(bestStreak, currentStreak);
+
+      // Limpiar activeDaysMap: mantener solo últimos 30 días
+      const thirtyDaysAgo = formatDateId(getDaysAgo(30));
+      const cleanedMap: Record<string, boolean> = {};
+      Object.keys(activeDaysMap).forEach((dateKey) => {
+        if (dateKey >= thirtyDaysAgo) {
+          cleanedMap[dateKey] = true;
+        }
+      });
+
+      // Valores por defecto si no existen
+      const prayersCompletedTotal = (
+        currentData["prayersCompletedTotal"] ?? 0
+      ) as number;
+      const versesReadTotal = (currentData["versesReadTotal"] ?? 0) as number;
+      const postsCreatedTotal = (
+        currentData["postsCreatedTotal"] ?? 0
+      ) as number;
+
+      // Actualizar o crear documento
+      await statsRef.set({
+        lastActiveDate: today,
+        currentStreak,
+        bestStreak,
+        activeDaysMap: cleanedMap,
+        prayersCompletedTotal,
+        versesReadTotal,
+        postsCreatedTotal,
+        updatedAt: FieldValue.serverTimestamp(),
+      }, {merge: true});
+
+      logger.info("markActiveToday success", {
+        uid,
+        today,
+        currentStreak,
+        bestStreak,
+        wasNew: !exists,
+      });
+
+      return {
+        ok: true,
+        today,
+        currentStreak,
+        bestStreak,
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      logger.error("markActiveToday failed", {uid, error: message});
+      throw new HttpsError("internal", `markActiveToday failed: ${message}`);
+    }
+  }
+);
+
+// Helper function para incrementar contadores
+const getStatsRef = (uid: string) => {
+  return db.collection("users")
+    .doc(uid)
+    .collection("spiritualStats")
+    .doc("main");
+};
+
+const ensureStatsDoc = async (
+  statsRef: FirebaseFirestore.DocumentReference
+) => {
+  const snap = await statsRef.get();
+  if (!snap.exists) {
+    const today = formatDateId(new Date());
+    await statsRef.set({
+      lastActiveDate: today,
+      currentStreak: 1, // Empezar en 1 si es el primer día
+      bestStreak: 1,
+      activeDaysMap: {[today]: true},
+      prayersCompletedTotal: 0,
+      versesReadTotal: 0,
+      postsCreatedTotal: 0,
+      updatedAt: FieldValue.serverTimestamp(),
+    }, {merge: true});
+  }
+};
+
+/**
+ * Incrementa el contador de versículos leídos.
+ * Region: us-central1, Runtime: nodejs20, Memory: 128MiB
+ */
+export const incrementVerseRead = onCall(
+  {region: "us-central1", memory: "128MiB"},
+  async (request) => {
+    const uid = request.auth?.uid;
+    if (!uid) {
+      throw new HttpsError("unauthenticated", "auth_required");
+    }
+
+    const statsRef = getStatsRef(uid);
+    try {
+      await ensureStatsDoc(statsRef);
+      await statsRef.update({
+        versesReadTotal: FieldValue.increment(1),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      logger.info("incrementVerseRead success", {uid});
+      return {ok: true};
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      logger.error("incrementVerseRead failed", {uid, error: message});
+      throw new HttpsError(
+        "internal",
+        `incrementVerseRead failed: ${message}`
+      );
+    }
+  }
+);
+
+/**
+ * Incrementa el contador de oraciones completadas.
+ * Region: us-central1, Runtime: nodejs20, Memory: 128MiB
+ */
+export const incrementPrayerCompleted = onCall(
+  {region: "us-central1", memory: "128MiB"},
+  async (request) => {
+    const uid = request.auth?.uid;
+    if (!uid) {
+      throw new HttpsError("unauthenticated", "auth_required");
+    }
+
+    const statsRef = getStatsRef(uid);
+    try {
+      await ensureStatsDoc(statsRef);
+      await statsRef.update({
+        prayersCompletedTotal: FieldValue.increment(1),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      logger.info("incrementPrayerCompleted success", {uid});
+      return {ok: true};
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      logger.error("incrementPrayerCompleted failed", {uid, error: message});
+      throw new HttpsError(
+        "internal",
+        `incrementPrayerCompleted failed: ${message}`
+      );
+    }
+  }
+);
+
+/**
+ * Incrementa el contador de publicaciones creadas.
+ * Region: us-central1, Runtime: nodejs20, Memory: 128MiB
+ */
+export const incrementPostCreated = onCall(
+  {region: "us-central1", memory: "128MiB"},
+  async (request) => {
+    const uid = request.auth?.uid;
+    if (!uid) {
+      throw new HttpsError("unauthenticated", "auth_required");
+    }
+
+    const statsRef = getStatsRef(uid);
+    try {
+      await ensureStatsDoc(statsRef);
+      await statsRef.update({
+        postsCreatedTotal: FieldValue.increment(1),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      logger.info("incrementPostCreated success", {uid});
+      return {ok: true};
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      logger.error("incrementPostCreated failed", {uid, error: message});
+      throw new HttpsError(
+        "internal",
+        `incrementPostCreated failed: ${message}`
+      );
+    }
+  }
+);
+
+/**
+ * Incrementa la racha cuando se completan todas las misiones del día.
+ * Esta función asegura que la racha se incremente correctamente incluso
+ * si markActiveToday ya fue llamado antes.
+ * Region: us-central1, Runtime: nodejs20, Memory: 256MiB
+ */
+export const completeAllMissions = onCall(
+  {region: "us-central1", memory: "256MiB"},
+  async (request) => {
+    const uid = request.auth?.uid;
+    if (!uid) {
+      throw new HttpsError("unauthenticated", "auth_required");
+    }
+
+    const now = new Date();
+    const today = formatDateId(now);
+    const yesterday = formatDateId(getDaysAgo(1));
+
+    const statsRef = getStatsRef(uid);
+
+    try {
+      await ensureStatsDoc(statsRef);
+      const statsSnap = await statsRef.get();
+      const currentData = statsSnap.data() ?? {};
+
+      const lastActiveDate = currentData["lastActiveDate"] as
+        string | undefined;
+      let currentStreak = (currentData["currentStreak"] ?? 0) as number;
+      let bestStreak = (currentData["bestStreak"] ?? 0) as number;
+      const activeDaysMap = (
+        currentData["activeDaysMap"] as Record<string, boolean> | undefined
+      ) ?? {};
+
+      // Lógica de racha al completar todas las misiones
+      if (lastActiveDate === today) {
+        // Ya marcado hoy: si la racha es 0, establecerla a 1
+        // Si la racha ya es > 0, mantenerla (ya se incrementó antes)
+        if (currentStreak === 0) {
+          currentStreak = 1;
+        }
+      } else if (lastActiveDate === yesterday) {
+        // Ayer fue activo: incrementar racha
+        currentStreak += 1;
+      } else if (
+        lastActiveDate === undefined ||
+        lastActiveDate === null ||
+        lastActiveDate === ""
+      ) {
+        // Primer día: empezar racha en 1
+        currentStreak = 1;
+      } else {
+        // Racha rota: empezar de nuevo
+        currentStreak = 1;
+      }
+
+      // Asegurar que hoy está en el mapa
+      activeDaysMap[today] = true;
+
+      // Actualizar mejor racha
+      bestStreak = Math.max(bestStreak, currentStreak);
+
+      // Limpiar activeDaysMap: mantener solo últimos 30 días
+      const thirtyDaysAgo = formatDateId(getDaysAgo(30));
+      const cleanedMap: Record<string, boolean> = {};
+      Object.keys(activeDaysMap).forEach((dateKey) => {
+        if (dateKey >= thirtyDaysAgo) {
+          cleanedMap[dateKey] = true;
+        }
+      });
+
+      // Preservar contadores existentes
+      const prayersCompletedTotal = (
+        currentData["prayersCompletedTotal"] ?? 0
+      ) as number;
+      const versesReadTotal = (currentData["versesReadTotal"] ?? 0) as number;
+      const postsCreatedTotal = (
+        currentData["postsCreatedTotal"] ?? 0
+      ) as number;
+
+      // Actualizar documento
+      await statsRef.set(
+        {
+          lastActiveDate: today,
+          currentStreak,
+          bestStreak,
+          activeDaysMap: cleanedMap,
+          prayersCompletedTotal,
+          versesReadTotal,
+          postsCreatedTotal,
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        {merge: true}
+      );
+
+      logger.info("completeAllMissions success", {
+        uid,
+        today,
+        currentStreak,
+        bestStreak,
+      });
+
+      return {
+        ok: true,
+        today,
+        currentStreak,
+        bestStreak,
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      logger.error("completeAllMissions failed", {uid, error: message});
+      throw new HttpsError(
+        "internal",
+        `completeAllMissions failed: ${message}`
+      );
+    }
+  }
+);
