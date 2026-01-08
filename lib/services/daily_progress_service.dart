@@ -16,10 +16,13 @@ class DailyProgressService {
         _auth = auth ?? FirebaseAuth.instance;
 
   String _getTodayDateId() {
-    final now = DateTime.now().toUtc();
+    // Usar la fecha LOCAL del dispositivo, no UTC
+    // Esto asegura que las misiones se reseteen según la hora del celular del usuario
+    final now = DateTime.now(); // Fecha local del dispositivo
     final year = now.year;
     final month = now.month.toString().padLeft(2, '0');
     final day = now.day.toString().padLeft(2, '0');
+    debugPrint('[DailyProgressService] 📅 Today date ID (local): $year-$month-$day (device timezone)');
     return '$year-$month-$day';
   }
 

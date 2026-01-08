@@ -87,9 +87,16 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
 
   void _startAutoCompleteTimer() {
     _autoCompleteTimer?.cancel();
-    if (!_completedMissions[_currentPageIndex]!) {
+    // Solo auto-completar si la misión actual NO está completada
+    final currentMission = widget.missions[_currentPageIndex];
+    final isAlreadyCompleted = _completedMissions[_currentPageIndex] ?? false;
+    
+    if (!isAlreadyCompleted && !currentMission.completed) {
       _autoCompleteTimer = Timer(const Duration(seconds: 2), () {
-        if (mounted && !_completedMissions[_currentPageIndex]!) {
+        // Verificar nuevamente antes de completar (puede haber cambiado)
+        if (mounted && 
+            !(_completedMissions[_currentPageIndex] ?? false) && 
+            !widget.missions[_currentPageIndex].completed) {
           final currentMission = widget.missions[_currentPageIndex];
           _completedMissions[_currentPageIndex] = true;
           widget.missionsController.completeMission(currentMission.id);
@@ -125,10 +132,24 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
     return completed / total;
   }
 
+  /// Limpia las etiquetas Strong del texto del versículo
+  String _cleanVerseText(String text) {
+    // Remover etiquetas strong="GXXXX" o strong='GXXXX'
+    var cleaned = text;
+    cleaned = cleaned.replaceAll(RegExp(r'strong="[^"]+"'), '');
+    cleaned = cleaned.replaceAll(RegExp(r"strong='[^']+'"), '');
+    // Remover cualquier carácter residual de las etiquetas
+    cleaned = cleaned.replaceAll(RegExp(r'\|\s*'), ' '); // Limpiar pipes residuales
+    cleaned = cleaned.replaceAll(RegExp(r'\s+'), ' '); // Normalizar espacios
+    return cleaned.trim();
+  }
+
   String _getMissionContent(String id) {
     switch (id) {
       case 'verse':
-        return widget.provider.todayVerse?.text ?? 'Versículo del día no disponible por el momento.';
+        final verseText = widget.provider.todayVerse?.text ?? 'Versículo del día no disponible por el momento.';
+        // Limpiar etiquetas Strong del versículo
+        return _cleanVerseText(verseText);
       case 'morning':
         return widget.provider.todayMorningPrayer?.text ?? 'Oración del día no disponible por el momento.';
       case 'night':
@@ -195,6 +216,7 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
     Future.microtask(() async {
       try {
         final internalId = DailyProgressService.mapMissionIdToInternal(mission.id);
+        debugPrint('[DailyMissionsFlowScreen] 📝 Mission ID: ${mission.id} -> Internal ID: $internalId');
         
         // Guardar en Firestore primero (más rápido)
         await widget.dailyProgressService.setMissionDone(
@@ -202,29 +224,46 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
           done: true,
           totalMissions: widget.missions.length,
         );
+        debugPrint('[DailyMissionsFlowScreen] ✅ Mission saved to Firestore: $internalId');
         
-        // Luego actualizar stats (más lento, pero no bloquea)
-        // Solo marcar día activo una vez (la primera misión)
-        if (isFirstMission) {
-          widget.spiritualStatsService.markActiveTodayOncePerDay().catchError((e) {
-            debugPrint('[DailyMissionsFlowScreen] Error marking active: $e');
-          });
-        }
+        // NO marcar día activo al completar misiones individuales
+        // La racha solo se actualiza cuando se completan TODAS las misiones diarias
+        // (esto se hace en HomeScreen.onAllCompleted)
         
         // Incrementar contadores según el tipo de misión
-        if (internalId == 'verse_of_day') {
-          widget.spiritualStatsService.incrementVerseRead().catchError((e) {
-            debugPrint('[DailyMissionsFlowScreen] Error incrementing verse: $e');
-          });
-        } else if (internalId == 'prayer_day' || 
-                   internalId == 'prayer_night' || 
-                   internalId == 'pray_family') {
-          widget.spiritualStatsService.incrementPrayerCompleted().catchError((e) {
-            debugPrint('[DailyMissionsFlowScreen] Error incrementing prayer: $e');
-          });
+        // Esperar a que termine para asegurar que se actualice correctamente
+        try {
+          debugPrint('[DailyMissionsFlowScreen] 🔍 Checking mission type: $internalId (original: ${mission.id})');
+          if (internalId == 'verse_of_day') {
+            debugPrint('[DailyMissionsFlowScreen] 📖 Detected verse mission, calling incrementVerseRead...');
+            try {
+              await widget.spiritualStatsService.incrementVerseRead();
+              debugPrint('[DailyMissionsFlowScreen] ✅ Verse read incremented successfully');
+            } catch (e) {
+              debugPrint('[DailyMissionsFlowScreen] ❌ Failed to increment verse read: $e');
+              // Continuar sin romper el flujo
+            }
+          } else if (internalId == 'prayer_day' || 
+                     internalId == 'prayer_night' || 
+                     internalId == 'pray_family') {
+            debugPrint('[DailyMissionsFlowScreen] 🙏 Detected prayer mission ($internalId), calling incrementPrayerCompleted...');
+            try {
+              await widget.spiritualStatsService.incrementPrayerCompleted();
+              debugPrint('[DailyMissionsFlowScreen] ✅ Prayer completed incremented successfully');
+            } catch (e) {
+              debugPrint('[DailyMissionsFlowScreen] ❌ Failed to increment prayer completed: $e');
+              // Continuar sin romper el flujo
+            }
+          } else {
+            debugPrint('[DailyMissionsFlowScreen] ⚠️ Unknown mission type: $internalId (mission.id: ${mission.id})');
+          }
+        } catch (e, stackTrace) {
+          debugPrint('[DailyMissionsFlowScreen] ❌ Error incrementing stats: $e');
+          debugPrint('[DailyMissionsFlowScreen] Stack trace: $stackTrace');
+          // No re-lanzar para no romper el flujo, pero loguear bien
         }
       } catch (e) {
-        debugPrint('[DailyMissionsFlowScreen] Error saving mission progress: $e');
+        debugPrint('[DailyMissionsFlowScreen] ❌ Error saving mission progress: $e');
       }
     });
   }

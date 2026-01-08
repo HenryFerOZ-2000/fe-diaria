@@ -13,10 +13,7 @@ class PrivacySafetyScreen extends StatefulWidget {
 class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
   final _service = PrivacySecurityService();
   final _auth = FirebaseAuth.instance;
-  bool _isPublic = true;
-  bool _showActivity = true;
   bool _isLoading = true;
-  bool _isSaving = false;
 
   @override
   void initState() {
@@ -32,57 +29,13 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
     }
 
     try {
-      final settings = await _service.getSettings(uid);
+      // Ya no cargamos configuraciones de perfil público
       setState(() {
-        _isPublic = settings['isPublic'] ?? true;
-        _showActivity = settings['showActivity'] ?? true;
         _isLoading = false;
       });
     } catch (e) {
       debugPrint('Error loading settings: $e');
       setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _updateProfilePublic(bool value) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
-
-    setState(() => _isSaving = true);
-    try {
-      await _service.updateProfilePublic(uid, value);
-      setState(() {
-        _isPublic = value;
-        _isSaving = false;
-      });
-    } catch (e) {
-      setState(() => _isSaving = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al actualizar: $e')),
-        );
-      }
-    }
-  }
-
-  Future<void> _updateShowActivity(bool value) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
-
-    setState(() => _isSaving = true);
-    try {
-      await _service.updateShowActivity(uid, value);
-      setState(() {
-        _showActivity = value;
-        _isSaving = false;
-      });
-    } catch (e) {
-      setState(() => _isSaving = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al actualizar: $e')),
-        );
-      }
     }
   }
 
@@ -106,27 +59,7 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                // A) Privacidad de perfil
-                _buildSectionHeader('Privacidad de perfil'),
-                const SizedBox(height: 8),
-                _buildSwitchTile(
-                  icon: Icons.public,
-                  title: 'Perfil público',
-                  subtitle: _isPublic
-                      ? 'Otros pueden ver tu perfil público'
-                      : 'Tu perfil es privado',
-                  value: _isPublic,
-                  onChanged: _isSaving ? null : _updateProfilePublic,
-                ),
-                _buildSwitchTile(
-                  icon: Icons.timeline,
-                  title: 'Mostrar actividad',
-                  subtitle: 'Mostrar rachas y actividad en perfil público',
-                  value: _showActivity,
-                  onChanged: _isSaving ? null : _updateShowActivity,
-                ),
-                const SizedBox(height: 24),
-                // B) Seguridad
+                // A) Seguridad
                 _buildSectionHeader('Seguridad'),
                 const SizedBox(height: 8),
                 _buildListTile(
@@ -152,7 +85,7 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
                   onTap: () => _showPlaceholder('Autenticación en dos pasos próximamente'),
                 ),
                 const SizedBox(height: 24),
-                // C) Bloqueos y reportes
+                // B) Bloqueos y reportes
                 _buildSectionHeader('Bloqueos y reportes'),
                 const SizedBox(height: 8),
                 _buildListTile(
@@ -168,7 +101,7 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
                   onTap: () => Navigator.of(context).pushNamed('/report-content'),
                 ),
                 const SizedBox(height: 24),
-                // D) Información legal y control
+                // C) Información legal y control
                 _buildSectionHeader('Información legal y control'),
                 const SizedBox(height: 8),
                 _buildListTile(
@@ -204,36 +137,6 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
         fontWeight: FontWeight.w700,
         color: Colors.grey[600],
         letterSpacing: 0.5,
-      ),
-    );
-  }
-
-  Widget _buildSwitchTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required bool value,
-    required ValueChanged<bool>? onChanged,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
-      ),
-      child: SwitchListTile(
-        secondary: Icon(icon),
-        title: Text(
-          title,
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
-        ),
-        value: value,
-        onChanged: onChanged,
       ),
     );
   }

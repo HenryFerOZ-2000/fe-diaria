@@ -16,11 +16,8 @@ import 'screens/prayers_screen.dart';
 import 'screens/bible_screen.dart';
 import 'screens/profile_hub_screen.dart';
 import 'screens/profile_screen.dart';
-import 'screens/public_profile_screen.dart';
 import 'screens/edit_profile_screen.dart';
-import 'screens/followers_list_screen.dart';
-import 'screens/following_list_screen.dart';
-import 'screens/search_users_screen.dart';
+import 'screens/setup_username_screen.dart';
 import 'screens/streak_screen.dart';
 import 'screens/spiritual_stats_screen.dart';
 import 'screens/achievement_detail_screen.dart';
@@ -146,11 +143,8 @@ class MyApp extends StatelessWidget {
                 }
                 return MySocialProfileScreen(initialTabIndex: initialTab);
               },
-              '/public-profile': (context) => const PublicProfileScreen(),
               '/edit-profile': (context) => const EditProfileScreen(),
-              '/followers': (context) => const FollowersListScreen(),
-              '/following': (context) => const FollowingListScreen(),
-              '/search-users': (context) => const SearchUsersScreen(),
+              '/setup-username': (context) => const SetupUsernameScreen(),
               '/streak': (context) => const StreakScreen(),
               '/spiritual-stats': (context) => const SpiritualStatsScreen(),
               '/achievement-detail': (context) {

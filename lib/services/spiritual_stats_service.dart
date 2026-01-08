@@ -19,7 +19,7 @@ class SpiritualStatsService {
     FirebaseFunctions? functions,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
         _auth = auth ?? FirebaseAuth.instance,
-        _functions = functions ?? FirebaseFunctions.instance;
+        _functions = functions ?? FirebaseFunctions.instanceFor(region: 'us-central1');
 
   /// Marca el día actual como activo (llama a Cloud Function)
   /// La función es idempotente, así que puede llamarse múltiples veces sin problema
@@ -86,10 +86,13 @@ class SpiritualStatsService {
   }
 
   String _getTodayDateString() {
-    final now = DateTime.now().toUtc();
+    // Usar la fecha LOCAL del dispositivo, no UTC
+    // Esto asegura que la racha se actualice según la hora del celular del usuario
+    final now = DateTime.now(); // Fecha local del dispositivo
     final year = now.year;
     final month = now.month.toString().padLeft(2, '0');
     final day = now.day.toString().padLeft(2, '0');
+    debugPrint('[SpiritualStatsService] 📅 Today date string (local): $year-$month-$day (device timezone)');
     return '$year-$month-$day';
   }
 
@@ -135,16 +138,20 @@ class SpiritualStatsService {
     }
 
     try {
-      debugPrint('[SpiritualStatsService] incrementVerseRead: Calling function for uid=$uid');
+      debugPrint('[SpiritualStatsService] 📖 incrementVerseRead: Starting for uid=$uid');
       final callable = _functions.httpsCallable('incrementVerseRead');
-      await callable.call();
-      debugPrint('[SpiritualStatsService] incrementVerseRead: ✅ Success!');
+      debugPrint('[SpiritualStatsService] 📖 incrementVerseRead: Callable created, calling...');
+      final result = await callable.call();
+      debugPrint('[SpiritualStatsService] 📖 incrementVerseRead: ✅ Success! Result: ${result.data}');
     } catch (e, stackTrace) {
       debugPrint('[SpiritualStatsService] ❌ ERROR calling incrementVerseRead: $e');
+      debugPrint('[SpiritualStatsService] Error type: ${e.runtimeType}');
       if (e is FirebaseFunctionsException) {
         debugPrint('[SpiritualStatsService] Firebase error code: ${e.code}, message: ${e.message}');
+        debugPrint('[SpiritualStatsService] Firebase error details: ${e.details}');
       }
       debugPrint('[SpiritualStatsService] Stack trace: $stackTrace');
+      // No re-lanzar para no romper el flujo, pero loguear bien
     }
   }
 
@@ -202,9 +209,12 @@ class SpiritualStatsService {
     }
 
     try {
-      debugPrint('[SpiritualStatsService] completeAllMissions: Calling function for uid=$uid');
+      // Enviar la fecha local del dispositivo a la Cloud Function
+      // para asegurar consistencia con la fecha del cliente
+      final todayDateId = _getTodayDateString();
+      debugPrint('[SpiritualStatsService] completeAllMissions: Calling function for uid=$uid with dateId=$todayDateId');
       final callable = _functions.httpsCallable('completeAllMissions');
-      final result = await callable.call();
+      final result = await callable.call({'dateId': todayDateId});
       debugPrint('[SpiritualStatsService] completeAllMissions: ✅ Success! Result: ${result.data}');
     } catch (e, stackTrace) {
       debugPrint('[SpiritualStatsService] ❌ ERROR calling completeAllMissions: $e');

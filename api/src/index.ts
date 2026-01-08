@@ -250,12 +250,6 @@ const createLivePostTx = async (
         uid
       ).toString().toLowerCase(),
       isPublic: userSnap.exists ? userSnap.get("isPublic") ?? true : true,
-      followersCount: userSnap.exists ?
-        userSnap.get("followersCount") ?? 0 :
-        0,
-      followingCount: userSnap.exists ?
-        userSnap.get("followingCount") ?? 0 :
-        0,
       postsCount: userSnap.exists ?
         FieldValue.increment(1) :
         1,
@@ -337,81 +331,6 @@ export const setUsername = onCall({region: "us-central1"}, async (request) => {
 });
 
 // ---------------------------
-// Follow / Unfollow callables
-// ---------------------------
-
-const followerPath = (uid: string, follower: string) =>
-  db.collection("users").doc(uid).collection("followers").doc(follower);
-const followingPath = (uid: string, target: string) =>
-  db.collection("users").doc(uid).collection("following").doc(target);
-
-export const followUser = onCall({region: "us-central1"}, async (request) => {
-  const uid = request.auth?.uid;
-  if (!uid) throw new HttpsError("unauthenticated", "auth_required");
-
-  const targetUid = (request.data as {targetUid?: unknown}).targetUid;
-  if (typeof targetUid !== "string" || targetUid.trim() === "") {
-    throw new HttpsError("invalid-argument", "target_required");
-  }
-  if (targetUid === uid) {
-    throw new HttpsError("failed-precondition", "cannot_follow_self");
-  }
-
-  const targetRef = db.collection("users").doc(targetUid);
-  const meRef = db.collection("users").doc(uid);
-  const followerRef = followerPath(targetUid, uid);
-  const followingRef = followingPath(uid, targetUid);
-
-  await db.runTransaction(async (tx) => {
-    const targetSnap = await tx.get(targetRef);
-    if (!targetSnap.exists) {
-      throw new HttpsError("not-found", "target_not_found");
-    }
-
-    // If already following, no-op
-    const followSnap = await tx.get(followerRef);
-    if (followSnap.exists) return;
-
-    tx.set(followerRef, {createdAt: FieldValue.serverTimestamp()});
-    tx.set(followingRef, {createdAt: FieldValue.serverTimestamp()});
-    tx.update(targetRef, {followersCount: FieldValue.increment(1)});
-    tx.update(meRef, {followingCount: FieldValue.increment(1)});
-  });
-
-  return {ok: true};
-});
-
-export const unfollowUser = onCall({region: "us-central1"}, async (request) => {
-  const uid = request.auth?.uid;
-  if (!uid) throw new HttpsError("unauthenticated", "auth_required");
-
-  const targetUid = (request.data as {targetUid?: unknown}).targetUid;
-  if (typeof targetUid !== "string" || targetUid.trim() === "") {
-    throw new HttpsError("invalid-argument", "target_required");
-  }
-  if (targetUid === uid) {
-    throw new HttpsError("failed-precondition", "cannot_unfollow_self");
-  }
-
-  const targetRef = db.collection("users").doc(targetUid);
-  const meRef = db.collection("users").doc(uid);
-  const followerRef = followerPath(targetUid, uid);
-  const followingRef = followingPath(uid, targetUid);
-
-  await db.runTransaction(async (tx) => {
-    // If not following, no-op
-    const followSnap = await tx.get(followerRef);
-    if (!followSnap.exists) return;
-
-    tx.delete(followerRef);
-    tx.delete(followingRef);
-    tx.update(targetRef, {followersCount: FieldValue.increment(-1)});
-    tx.update(meRef, {followingCount: FieldValue.increment(-1)});
-  });
-
-  return {ok: true};
-});
-
 const authenticate = async (idToken: string | null): Promise<string> => {
   if (!idToken) {
     throw new Error("Auth token requerido.");
@@ -827,9 +746,38 @@ export const completeAllMissions = onCall(
       throw new HttpsError("unauthenticated", "auth_required");
     }
 
-    const now = new Date();
-    const today = formatDateId(now);
-    const yesterday = formatDateId(getDaysAgo(1));
+    // Usar la fecha del cliente si se proporciona, sino usar la fecha
+    // del servidor. Esto asegura consistencia con la fecha local del
+    // dispositivo del usuario
+    const clientDateId = request.data?.dateId as string | undefined;
+    let today: string;
+    let yesterday: string;
+
+    if (clientDateId && /^\d{4}-\d{2}-\d{2}$/.test(clientDateId)) {
+      // Usar la fecha del cliente (fecha local del dispositivo)
+      today = clientDateId;
+      // Calcular ayer basado en la fecha del cliente
+      const [year, month, day] = clientDateId.split("-").map(Number);
+      const clientDate = new Date(Date.UTC(year, month - 1, day));
+      clientDate.setUTCDate(clientDate.getUTCDate() - 1);
+      yesterday = formatDateId(clientDate);
+      logger.info("completeAllMissions using client date", {
+        uid,
+        clientDateId,
+        today,
+        yesterday,
+      });
+    } else {
+      // Fallback: usar fecha del servidor (UTC)
+      const now = new Date();
+      today = formatDateId(now);
+      yesterday = formatDateId(getDaysAgo(1));
+      logger.info("completeAllMissions using server date", {
+        uid,
+        today,
+        yesterday,
+      });
+    }
 
     const statsRef = getStatsRef(uid);
 

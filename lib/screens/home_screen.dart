@@ -96,11 +96,8 @@ class _HomeScreenState extends State<HomeScreen>
           isSensitiveContext: false,
         );
       }
-      // Marcar día como activo si el usuario está autenticado (una vez al día)
-      // Esto se llama al abrir la app para asegurar que el día esté marcado
-      _spiritualStatsService.markActiveTodayOncePerDay().catchError((e) {
-        debugPrint('[HomeScreen] Error marking active today on init: $e');
-      });
+      // NO marcar día como activo al iniciar la app
+      // La racha solo se actualiza cuando se completan todas las misiones diarias
       // Cargar progreso diario y actualizar estado de misiones
       _loadDailyProgress();
     });
@@ -777,15 +774,19 @@ class _HomeScreenState extends State<HomeScreen>
               debugPrint('[HomeScreen] ✅ completeAllMissions called successfully');
               
               // Esperar a que Firestore se actualice
-              await Future.delayed(const Duration(milliseconds: 500));
+              await Future.delayed(const Duration(milliseconds: 800));
               
               // Forzar recarga del StreakController para asegurar que se actualice
               if (mounted) {
                 final stats = await _spiritualStatsService.getStats();
                 debugPrint('[HomeScreen] 📊 Current stats after completeAllMissions: currentStreak=${stats.currentStreak}, bestStreak=${stats.bestStreak}');
                 
-                // Forzar actualización del StreakController
-                _streakController.reloadFromFirestore();
+                // Forzar actualización del StreakController con forceUpdate=true
+                // para permitir que se muestre el popup
+                _streakController.reloadFromFirestore(forceUpdate: true);
+                
+                // Dar tiempo adicional para que el stream se actualice
+                await Future.delayed(const Duration(milliseconds: 300));
               }
             } catch (e, stackTrace) {
               debugPrint('[HomeScreen] ❌ Error calling completeAllMissions: $e');
@@ -810,10 +811,24 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// Limpia las etiquetas Strong del texto del versículo
+  String _cleanVerseText(String text) {
+    // Remover etiquetas strong="GXXXX" o strong='GXXXX'
+    var cleaned = text;
+    cleaned = cleaned.replaceAll(RegExp(r'strong="[^"]+"'), '');
+    cleaned = cleaned.replaceAll(RegExp(r"strong='[^']+'"), '');
+    // Remover cualquier carácter residual de las etiquetas
+    cleaned = cleaned.replaceAll(RegExp(r'\|\s*'), ' '); // Limpiar pipes residuales
+    cleaned = cleaned.replaceAll(RegExp(r'\s+'), ' '); // Normalizar espacios
+    return cleaned.trim();
+  }
+
   String _getMissionContent(String id, AppProvider provider) {
     switch (id) {
       case 'verse':
-        return provider.todayVerse?.text ?? 'Versículo del día no disponible por el momento.';
+        final verseText = provider.todayVerse?.text ?? 'Versículo del día no disponible por el momento.';
+        // Limpiar etiquetas Strong del versículo
+        return _cleanVerseText(verseText);
       case 'morning':
         return provider.todayMorningPrayer?.text ?? 'Oración del día no disponible por el momento.';
       case 'night':

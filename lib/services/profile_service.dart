@@ -24,6 +24,11 @@ class ProfileService {
         .snapshots();
   }
 
+  /// Elimina un post del usuario
+  Future<void> deletePost(String postId) async {
+    await _firestore.collection('live_posts').doc(postId).delete();
+  }
+
   Future<QuerySnapshot<Map<String, dynamic>>> followers(String uid, {int limit = 50}) {
     return _firestore
         .collection('users')

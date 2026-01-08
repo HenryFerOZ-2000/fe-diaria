@@ -32,7 +32,6 @@ class ProfileHubScreen extends StatelessWidget {
     final displayName = data['displayName'] ?? 'Usuario';
     final username = data['username'] ?? '';
     final photoURL = data['photoURL'] as String?;
-    final bio = data['bio'] ?? '';
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -57,10 +56,6 @@ class ProfileHubScreen extends StatelessWidget {
                 Text(displayName,
                     style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold)),
                 Text('@$username', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600])),
-                if (bio.toString().isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Text(bio, style: GoogleFonts.inter(fontSize: 14)),
-                ],
               ],
             ),
           ),
@@ -120,14 +115,6 @@ class ProfileHubScreen extends StatelessWidget {
           return ListView(
             children: [
               _buildHeader(data),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pushNamed('/my-profile'),
-                  child: const Text('Ver mi perfil público'),
-                ),
-              ),
-              const SizedBox(height: 8),
               _buildTile(
                 icon: Icons.edit,
                 title: 'Editar perfil',
@@ -147,11 +134,6 @@ class ProfileHubScreen extends StatelessWidget {
                 icon: Icons.insights_outlined,
                 title: 'Mis datos espirituales',
                 onTap: () => Navigator.of(context).pushNamed('/spiritual-stats'),
-              ),
-              _buildTile(
-                icon: Icons.bookmark_outline,
-                title: 'Guardados',
-                onTap: () => Navigator.of(context).pushNamed('/my-profile', arguments: 1),
               ),
               _buildTile(
                 icon: Icons.workspace_premium_outlined,

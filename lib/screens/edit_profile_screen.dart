@@ -21,8 +21,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _profile = ProfileService();
   final _displayCtrl = TextEditingController();
   final _usernameCtrl = TextEditingController();
-  final _bioCtrl = TextEditingController();
-  bool _isPublic = true;
   bool _loading = true;
   bool _saving = false;
   bool _uploadingPhoto = false;
@@ -50,8 +48,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final data = snap.data() ?? {};
       _displayCtrl.text = data['displayName'] ?? '';
       _usernameCtrl.text = data['username'] ?? '';
-      _bioCtrl.text = data['bio'] ?? '';
-      _isPublic = (data['isPublic'] ?? true) as bool;
       _photoUrl = data['photoURL'] as String?;
     } catch (e) {
       _error = 'Error al cargar perfil';
@@ -85,8 +81,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       await _social.updateProfile(
         uid: uid,
         displayName: _displayCtrl.text.trim(),
-        bio: _bioCtrl.text.trim(),
-        isPublic: _isPublic,
         photoURL: _photoUrl,
       );
       if (mounted) {
@@ -199,19 +193,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Text(
               'Solo minúsculas, números, punto o guión bajo',
               style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _bioCtrl,
-              decoration: const InputDecoration(labelText: 'Bio (opcional)', counterText: ''),
-              maxLength: 160,
-              maxLines: 3,
-            ),
-            const SizedBox(height: 8),
-            SwitchListTile(
-              title: const Text('Perfil público'),
-              value: _isPublic,
-              onChanged: (v) => setState(() => _isPublic = v),
             ),
             const SizedBox(height: 16),
             SizedBox(

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/storage_service.dart';
+import '../services/social_service.dart';
 
 class WelcomeAuthScreen extends StatefulWidget {
   const WelcomeAuthScreen({super.key});
@@ -37,14 +38,37 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
       _error = null;
     });
     try {
-      await context.read<AuthProvider>().signIn();
-      // La navegación se manejará automáticamente por el listener en main.dart
+      final authProvider = context.read<AuthProvider>();
+      final wasSignedIn = authProvider.isSignedIn;
+      await authProvider.signIn();
+      
       if (mounted) {
-        // Esperar un momento para que el estado se actualice
         await Future.delayed(const Duration(milliseconds: 300));
-        if (mounted && context.read<AuthProvider>().isSignedIn) {
+        if (mounted && authProvider.isSignedIn) {
+          // Sincronizar perfil con Firestore
+          final social = SocialService();
+          final user = authProvider.firebaseUser;
+          if (user != null) {
+            await social.syncCurrentUserProfile(
+              displayName: user.displayName,
+              photoURL: user.photoURL,
+            );
+          }
+          
           await StorageService().setOnboardingCompleted(true);
-          Navigator.of(context).pushReplacementNamed('/home');
+          
+          // Si es un nuevo usuario (no estaba logueado antes), verificar username
+          if (!wasSignedIn) {
+            final hasUsername = await social.hasUsername();
+            if (mounted && !hasUsername) {
+              Navigator.of(context).pushReplacementNamed('/setup-username');
+              return;
+            }
+          }
+          
+          if (mounted) {
+            Navigator.of(context).pushReplacementNamed('/home');
+          }
         }
       }
     } catch (e) {
@@ -69,6 +93,10 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
     });
 
     try {
+      final authProvider = context.read<AuthProvider>();
+      final wasSignedIn = authProvider.isSignedIn;
+      final isNewUser = _isSignUp;
+      
       if (_isSignUp) {
         if (_passwordController.text != _confirmPasswordController.text) {
           setState(() {
@@ -77,23 +105,44 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
           });
           return;
         }
-        await context.read<AuthProvider>().signUpWithEmailPassword(
+        await authProvider.signUpWithEmailPassword(
               _emailController.text.trim(),
               _passwordController.text,
             );
       } else {
-        await context.read<AuthProvider>().signInWithEmailPassword(
+        await authProvider.signInWithEmailPassword(
               _emailController.text.trim(),
               _passwordController.text,
             );
       }
 
-      // La navegación se manejará automáticamente
       if (mounted) {
         await Future.delayed(const Duration(milliseconds: 300));
-        if (mounted && context.read<AuthProvider>().isSignedIn) {
+        if (mounted && authProvider.isSignedIn) {
+          // Sincronizar perfil con Firestore
+          final social = SocialService();
+          final user = authProvider.firebaseUser;
+          if (user != null) {
+            await social.syncCurrentUserProfile(
+              displayName: user.displayName ?? _emailController.text.split('@').first,
+              photoURL: user.photoURL,
+            );
+          }
+          
           await StorageService().setOnboardingCompleted(true);
-          Navigator.of(context).pushReplacementNamed('/home');
+          
+          // Si es un nuevo usuario, verificar username
+          if (isNewUser || !wasSignedIn) {
+            final hasUsername = await social.hasUsername();
+            if (mounted && !hasUsername) {
+              Navigator.of(context).pushReplacementNamed('/setup-username');
+              return;
+            }
+          }
+          
+          if (mounted) {
+            Navigator.of(context).pushReplacementNamed('/home');
+          }
         }
       }
     } catch (e) {

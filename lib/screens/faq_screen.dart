@@ -35,10 +35,6 @@ class _FaqScreenState extends State<FaqScreen> {
       'answer': 'Las rachas (streaks) son días consecutivos en los que usas la app. Cada día que abres la app y ves el versículo del día, tu racha aumenta. Puedes ver tu racha actual y mejor racha en Perfil > Mis rachas.',
     },
     {
-      'question': '¿Cómo cambio mi perfil público/privado?',
-      'answer': 'Ve a Perfil > Privacidad y seguridad > Perfil público. Activa o desactiva el switch según prefieras que tu perfil sea visible para otros usuarios o solo para ti.',
-    },
-    {
       'question': '¿Cómo bloqueo a un usuario?',
       'answer': 'Ve al perfil del usuario que quieres bloquear y toca el menú de opciones. Selecciona "Bloquear usuario". Puedes gestionar usuarios bloqueados en Perfil > Privacidad y seguridad > Usuarios bloqueados.',
     },

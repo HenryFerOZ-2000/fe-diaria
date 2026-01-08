@@ -41,9 +41,55 @@ class SocialService {
     }, SetOptions(merge: true));
   }
 
+  /// Genera un username automático basado en email o displayName
+  String generateAutoUsername(String? email, String? displayName) {
+    String base = '';
+    
+    // Priorizar displayName si está disponible
+    if (displayName != null && displayName.trim().isNotEmpty) {
+      base = displayName.trim().toLowerCase();
+    } else if (email != null && email.isNotEmpty) {
+      // Usar la parte antes del @ del email
+      base = email.split('@').first.toLowerCase();
+    } else {
+      // Fallback: usar timestamp
+      base = 'user${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+    }
+    
+    // Limpiar y normalizar: solo letras, números, punto y guión bajo
+    base = base.replaceAll(RegExp(r'[^a-z0-9._]'), '');
+    
+    // Asegurar longitud mínima de 3
+    if (base.length < 3) {
+      base = '${base}${DateTime.now().millisecondsSinceEpoch.toString().substring(10)}';
+    }
+    
+    // Limitar a 20 caracteres
+    if (base.length > 20) {
+      base = base.substring(0, 20);
+    }
+    
+    // Si termina con punto o guión bajo, agregar número
+    if (base.endsWith('.') || base.endsWith('_')) {
+      base = '${base}1';
+    }
+    
+    return base;
+  }
+
   Future<void> setUsername(String username) async {
     final callable = _functions.httpsCallable('setUsername');
     await callable.call({'username': username});
+  }
+  
+  /// Verifica si el usuario tiene un username configurado
+  Future<bool> hasUsername() async {
+    final user = _auth.currentUser;
+    if (user == null) return false;
+    final snap = await getUser(user.uid);
+    final data = snap.data();
+    final username = data?['username'] as String?;
+    return username != null && username.isNotEmpty && username != user.uid;
   }
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getUser(String uid) {
@@ -54,29 +100,6 @@ class SocialService {
     return _firestore.collection('users').doc(uid).snapshots();
   }
 
-  Stream<bool> isFollowingStream(String targetUid) {
-    final me = _auth.currentUser?.uid;
-    if (me == null) {
-      return const Stream<bool>.empty();
-    }
-    return _firestore
-        .collection('users')
-        .doc(me)
-        .collection('following')
-        .doc(targetUid)
-        .snapshots()
-        .map((doc) => doc.exists);
-  }
-
-  Future<void> follow(String targetUid) async {
-    final callable = _functions.httpsCallable('followUser');
-    await callable.call({'targetUid': targetUid});
-  }
-
-  Future<void> unfollow(String targetUid) async {
-    final callable = _functions.httpsCallable('unfollowUser');
-    await callable.call({'targetUid': targetUid});
-  }
 
   Future<void> updateProfile({
     required String uid,
@@ -93,40 +116,5 @@ class SocialService {
     await _firestore.collection('users').doc(uid).set(data, SetOptions(merge: true));
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> searchUsers(String query) {
-    final lower = query.trim().toLowerCase();
-    if (lower.isEmpty) {
-      return const Stream<QuerySnapshot<Map<String, dynamic>>>.empty();
-    }
-    final end = '$lower\uf8ff';
-    return _firestore
-        .collection('users')
-        .where('usernameLower', isGreaterThanOrEqualTo: lower)
-        .where('usernameLower', isLessThan: end)
-        .where('isPublic', isEqualTo: true)
-        .orderBy('usernameLower')
-        .limit(30)
-        .snapshots();
-  }
-
-  Future<QuerySnapshot<Map<String, dynamic>>> followers(String uid, {int limit = 50}) {
-    return _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('followers')
-        .orderBy('createdAt', descending: true)
-        .limit(limit)
-        .get();
-  }
-
-  Future<QuerySnapshot<Map<String, dynamic>>> following(String uid, {int limit = 50}) {
-    return _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('following')
-        .orderBy('createdAt', descending: true)
-        .limit(limit)
-        .get();
-  }
 }
 

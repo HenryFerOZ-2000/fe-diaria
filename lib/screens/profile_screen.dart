@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/profile_service.dart';
-import '../services/favorites_service.dart';
 import 'welcome_auth_screen.dart';
 
 class MySocialProfileScreen extends StatefulWidget {
@@ -14,53 +13,14 @@ class MySocialProfileScreen extends StatefulWidget {
   State<MySocialProfileScreen> createState() => _MySocialProfileScreenState();
 }
 
-class _MySocialProfileScreenState extends State<MySocialProfileScreen> with TickerProviderStateMixin {
+class _MySocialProfileScreenState extends State<MySocialProfileScreen> {
   final _auth = FirebaseAuth.instance;
   final _profileService = ProfileService();
-  final _favorites = FavoritesService();
-  late final TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    final initialIndex = (widget.initialTabIndex ?? 0).clamp(0, 1);
-    _tabController = TabController(length: 2, vsync: this, initialIndex: initialIndex);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  void _openFollowers(String uid) {
-    Navigator.of(context).pushNamed('/followers', arguments: uid);
-  }
-
-  void _openFollowing(String uid) {
-    Navigator.of(context).pushNamed('/following', arguments: uid);
-  }
-
-  void _goToPostsTab() {
-    _tabController.animateTo(0);
-  }
 
   void _openEditProfile() {
     Navigator.of(context).pushNamed('/edit-profile');
   }
 
-  Widget _metrics(String label, int value, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Text('$value', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 2),
-          Text(label, style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600])),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,80 +66,128 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen> with Tick
           final displayName = data['displayName'] ?? 'Usuario';
           final username = data['username'] ?? '';
           final photoURL = data['photoURL'] as String?;
-          final bio = data['bio'] ?? '';
-          final followers = (data['followersCount'] ?? data['followerCount'] ?? 0) as int;
-          final following = (data['followingCount'] ?? 0) as int;
           final posts = (data['postCount'] ?? data['postsCount'] ?? 0) as int;
 
           return Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      radius: 36,
-                      backgroundImage: photoURL != null ? NetworkImage(photoURL) : null,
-                      child: photoURL == null
-                          ? Text(
-                              displayName.isNotEmpty ? displayName[0].toUpperCase() : '?',
-                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                            )
-                          : null,
+              // Header mejorado con diseño más estético
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Colors.grey.withOpacity(0.2),
+                      width: 1,
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Foto de perfil centrada
+                    Center(
+                      child: Stack(
                         children: [
-                          Text(displayName, style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text('@$username', style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600])),
-                          if (bio.toString().isNotEmpty) ...[
-                            const SizedBox(height: 6),
-                            Text(bio, style: GoogleFonts.inter(fontSize: 14)),
-                          ],
-                          const SizedBox(height: 10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              _metrics('Seguidores', followers, () => _openFollowers(uid)),
-                              _metrics('Siguiendo', following, () => _openFollowing(uid)),
-                              _metrics('Posts', posts, _goToPostsTab),
-                            ],
+                          CircleAvatar(
+                            radius: 50,
+                            backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                            backgroundImage: photoURL != null ? NetworkImage(photoURL) : null,
+                            child: photoURL == null
+                                ? Text(
+                                    displayName.isNotEmpty ? displayName[0].toUpperCase() : '?',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                  )
+                                : null,
                           ),
                         ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Nombre y username
+                    Text(
+                      displayName,
+                      style: GoogleFonts.inter(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '@$username',
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Contador de posts mejorado
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.chat_bubble_outline,
+                            size: 20,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '$posts',
+                            style: GoogleFonts.inter(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            posts == 1 ? 'publicación' : 'publicaciones',
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Botón de editar perfil
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: _openEditProfile,
+                        icon: const Icon(Icons.edit_outlined, size: 18),
+                        label: Text(
+                          'Editar perfil',
+                          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _openEditProfile,
-                    child: const Text('Editar perfil'),
-                  ),
-                ),
-              ),
               const SizedBox(height: 8),
-              TabBar(
-                controller: _tabController,
-                tabs: const [
-                  Tab(text: 'Posts'),
-                  Tab(text: 'Guardados'),
-                ],
-              ),
               Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _PostsTab(uid: uid, profileService: _profileService),
-                    _FavoritesTab(favorites: _favorites),
-                  ],
-                ),
+                child: _PostsTab(uid: uid, profileService: _profileService),
               ),
             ],
           );
@@ -189,15 +197,137 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen> with Tick
   }
 }
 
-class _PostsTab extends StatelessWidget {
+class _PostsTab extends StatefulWidget {
   final String uid;
   final ProfileService profileService;
   const _PostsTab({required this.uid, required this.profileService});
 
   @override
+  State<_PostsTab> createState() => _PostsTabState();
+}
+
+class _PostsTabState extends State<_PostsTab> {
+  Future<void> _deletePost(String postId, String postText) async {
+    // Mostrar diálogo de confirmación
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Eliminar publicación',
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '¿Estás seguro que quieres eliminar esta publicación?',
+              style: GoogleFonts.inter(),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                postText.length > 100 ? '${postText.substring(0, 100)}...' : postText,
+                style: GoogleFonts.inter(fontSize: 13, color: Colors.grey[700]),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Esta acción no se puede deshacer.',
+              style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              'Cancelar',
+              style: GoogleFonts.inter(color: Colors.grey[600]),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: Text(
+              'Eliminar',
+              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      try {
+        // Mostrar indicador de carga
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Eliminando publicación...',
+                  style: GoogleFonts.inter(),
+                ),
+              ],
+            ),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+
+        await widget.profileService.deletePost(postId);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Publicación eliminada',
+                style: GoogleFonts.inter(),
+              ),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Error al eliminar: ${e.toString()}',
+                style: GoogleFonts.inter(),
+              ),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: profileService.userPosts(uid, limit: 50),
+      stream: widget.profileService.userPosts(widget.uid, limit: 50),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -213,21 +343,47 @@ class _PostsTab extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           itemCount: docs.length,
           itemBuilder: (context, index) {
-            final data = docs[index].data();
+            final doc = docs[index];
+            final data = doc.data();
+            final postId = doc.id;
             final text = data['text'] as String? ?? '';
             final created = data['createdAt'] as Timestamp?;
-            final time = created != null ? created.toDate().toLocal().toString() : '';
+            final time = created != null 
+                ? _formatDate(created.toDate().toLocal())
+                : '';
+            
             return Card(
               elevation: 1,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: const EdgeInsets.only(bottom: 12),
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(text, style: GoogleFonts.inter(fontSize: 15, height: 1.4)),
-                    const SizedBox(height: 6),
-                    Text(time, style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600])),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            text,
+                            style: GoogleFonts.inter(fontSize: 15, height: 1.4),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline, size: 20),
+                          color: Colors.red[400],
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () => _deletePost(postId, text),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      time,
+                      style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
+                    ),
                   ],
                 ),
               ),
@@ -237,50 +393,26 @@ class _PostsTab extends StatelessWidget {
       },
     );
   }
-}
 
-class _FavoritesTab extends StatelessWidget {
-  final FavoritesService favorites;
-  const _FavoritesTab({required this.favorites});
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
 
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: favorites.favoritesStream(limit: 100),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+    if (difference.inDays == 0) {
+      if (difference.inHours == 0) {
+        if (difference.inMinutes == 0) {
+          return 'Hace unos momentos';
         }
-        if (snapshot.hasError) {
-          return const Center(child: Text('Error al cargar guardados'));
-        }
-        final docs = snapshot.data?.docs ?? [];
-        if (docs.isEmpty) {
-          return const Center(child: Text('Sin guardados'));
-        }
-        return ListView.builder(
-          padding: const EdgeInsets.all(12),
-          itemCount: docs.length,
-          itemBuilder: (context, index) {
-            final data = docs[index].data();
-            final type = data['type'] as String? ?? '';
-            final refId = data['refId'] as String? ?? '';
-            final created = data['createdAt'] as Timestamp?;
-            final time = created != null ? created.toDate().toLocal().toString() : '';
-            return ListTile(
-              leading: Icon(type == 'post' ? Icons.chat_bubble : Icons.menu_book_outlined),
-              title: Text(type == 'post' ? 'Post guardado' : 'Verso guardado'),
-              subtitle: Text(refId),
-              trailing: Text(time, style: GoogleFonts.inter(fontSize: 11, color: Colors.grey[600])),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Abrir detalle próximamente')),
-                );
-              },
-            );
-          },
-        );
-      },
-    );
+        return 'Hace ${difference.inMinutes} min';
+      }
+      return 'Hace ${difference.inHours} h';
+    } else if (difference.inDays == 1) {
+      return 'Ayer';
+    } else if (difference.inDays < 7) {
+      return 'Hace ${difference.inDays} días';
+    } else {
+      return '${date.day}/${date.month}/${date.year}';
+    }
   }
 }
+

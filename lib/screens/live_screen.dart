@@ -214,12 +214,6 @@ class _LiveScreenState extends State<LiveScreen> {
     );
   }
 
-  void _openProfile(String uid) {
-    if (uid.isEmpty) return;
-    final me = _auth.currentUser?.uid;
-    final route = me != null && me == uid ? '/my-profile' : '/public-profile';
-    Navigator.of(context).pushNamed(route, arguments: uid);
-  }
 
   Future<void> _submitPost(String text) async {
     final trimmed = text.trim();
@@ -304,7 +298,8 @@ class _LiveScreenState extends State<LiveScreen> {
           ),
           const Spacer(),
           IconButton(
-            onPressed: () => Navigator.of(context).pushNamed('/search-users'),
+            // Búsqueda de usuarios eliminada - perfiles ya no son públicos
+            onPressed: null,
             icon: const Icon(Icons.search),
           ),
           IconButton(
@@ -375,9 +370,7 @@ class _LiveScreenState extends State<LiveScreen> {
                     currentUid: _uid ?? '',
                     onComment: () => _openComments(post),
                     onShare: () => _sharePost(post),
-                    onAuthorTap: post.authorUid.isNotEmpty
-                        ? () => _openProfile(post.authorUid)
-                        : null,
+                    onAuthorTap: null, // Los perfiles ya no son públicos
                   ),
                 );
               },
@@ -493,27 +486,24 @@ class _FeedPostTileState extends State<_FeedPostTile> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                InkWell(
-                  onTap: widget.onAuthorTap,
-                  borderRadius: BorderRadius.circular(24),
-                  child: CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Colors.deepPurple.withOpacity(0.12),
-                    backgroundImage: widget.post.authorPhoto != null
-                        ? NetworkImage(widget.post.authorPhoto!)
-                        : null,
-                    child: widget.post.authorPhoto == null
-                        ? Text(
-                            widget.post.userName.isNotEmpty
-                                ? widget.post.userName[0].toUpperCase()
-                                : '?',
-                            style: GoogleFonts.inter(
-                              color: Colors.deepPurple,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          )
-                        : null,
-                  ),
+                // Perfiles ya no son públicos, solo mostrar nombre (sin click)
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors.deepPurple.withOpacity(0.12),
+                  backgroundImage: widget.post.authorPhoto != null
+                      ? NetworkImage(widget.post.authorPhoto!)
+                      : null,
+                  child: widget.post.authorPhoto == null
+                      ? Text(
+                          widget.post.userName.isNotEmpty
+                              ? widget.post.userName[0].toUpperCase()
+                              : '?',
+                          style: GoogleFonts.inter(
+                            color: Colors.deepPurple,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        )
+                      : null,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
