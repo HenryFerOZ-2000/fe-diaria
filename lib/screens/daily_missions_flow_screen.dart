@@ -229,14 +229,17 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
       }
     }
 
-    // Navegar inmediatamente sin esperar las llamadas asíncronas
+    // Verificar si todas las misiones están completadas antes de navegar
+    final allCompleted = widget.missionsController.isAllCompleted();
+    
+    // Navegar a la siguiente misión si no es la última
     if (_currentPageIndex + 1 < widget.missions.length) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
-    } else {
-      // Última misión completada - verificar que el contexto sigue montado
+    } else if (allCompleted) {
+      // Todas las misiones completadas - mostrar mensaje y cerrar
       if (mounted && Navigator.of(context).canPop()) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Has completado tus misiones de hoy')),
@@ -244,6 +247,8 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
         Navigator.of(context).pop();
       }
     }
+    // Si no están todas completadas pero es la última misión, no hacer nada
+    // El botón mostrará "Siguiente" hasta que todas estén completadas
   }
 
   /// Guarda el progreso de la misión en segundo plano sin bloquear la UI
@@ -442,11 +447,16 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
                     },
                     itemCount: widget.missions.length,
                     itemBuilder: (context, index) {
+                      final mission = widget.missions[index];
+                      final isBlocked = mission.id == 'night' && 
+                                      !_isNightPrayerAvailable() && 
+                                      !(_completedMissions[index] ?? false);
                       return _MissionStepWidget(
-                        key: ValueKey(widget.missions[index].id),
-                        mission: widget.missions[index],
-                        content: _getMissionContent(widget.missions[index].id),
-                        reference: _getMissionReference(widget.missions[index].id),
+                        key: ValueKey(mission.id),
+                        mission: mission,
+                        content: isBlocked ? '' : _getMissionContent(mission.id),
+                        reference: isBlocked ? null : _getMissionReference(mission.id),
+                        isBlocked: isBlocked,
                       );
                     },
                   ),
@@ -464,7 +474,9 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      _primaryNextButton(),
+                      Expanded(
+                        child: _primaryNextButton(),
+                      ),
                     ],
                   ),
                 ),
@@ -510,29 +522,43 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
   }
 
   Widget _primaryNextButton() {
+    // Verificar si todas las misiones están completadas
+    final allCompleted = widget.missionsController.isAllCompleted();
     final isLastMission = _currentPageIndex + 1 >= widget.missions.length;
+    final currentMission = widget.missions[_currentPageIndex];
+    final isCurrentBlocked = currentMission.id == 'night' && 
+                            !_isNightPrayerAvailable() && 
+                            !(_completedMissions[_currentPageIndex] ?? false);
+    
+    // Solo mostrar "Finalizar" si todas las misiones están completadas
+    final showFinalize = allCompleted && isLastMission;
+    
     return SizedBox(
+      width: double.infinity,
       height: 54,
       child: ElevatedButton(
-        onPressed: _handleNext,
+        onPressed: isCurrentBlocked ? null : _handleNext,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF6C63FF),
+          backgroundColor: isCurrentBlocked 
+              ? Colors.grey.withOpacity(0.5)
+              : const Color(0xFF6C63FF),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
           elevation: 0,
+          disabledBackgroundColor: Colors.grey.withOpacity(0.3),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              isLastMission ? 'Finalizar' : 'Siguiente',
+              showFinalize ? 'Finalizar' : 'Siguiente',
               style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
             ),
             const SizedBox(width: 8),
             Icon(
-              isLastMission ? Icons.check_circle_outline : Icons.arrow_forward_rounded,
+              showFinalize ? Icons.check_circle_outline : Icons.arrow_forward_rounded,
               size: 22,
             ),
           ],
@@ -547,12 +573,14 @@ class _MissionStepWidget extends StatefulWidget {
   final Mission mission;
   final String content;
   final String? reference;
+  final bool isBlocked;
 
   const _MissionStepWidget({
     super.key,
     required this.mission,
     required this.content,
     this.reference,
+    this.isBlocked = false,
   });
 
   @override
@@ -597,26 +625,72 @@ class _MissionStepWidgetState extends State<_MissionStepWidget>
               ),
             ),
             const SizedBox(height: 20),
-            Text(
-              widget.content,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 20,
-                height: 1.55,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            if (widget.reference != null && widget.reference!.isNotEmpty) ...[
-              const SizedBox(height: 16),
+            if (widget.isBlocked)
+              Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.lock_outline,
+                          size: 48,
+                          color: Colors.white.withOpacity(0.5),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Esta misión estará disponible a las 7:00 PM',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.inter(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Vuelve más tarde para completar tu oración de la noche',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.inter(
+                            color: Colors.white.withOpacity(0.5),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              )
+            else ...[
               Text(
-                widget.reference!,
+                widget.content,
+                textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
-                  color: const Color(0xFFFFB74D),
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  fontSize: 20,
+                  height: 1.55,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
+              if (widget.reference != null && widget.reference!.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  widget.reference!,
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFFFFB74D),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ],
           ],
         ),

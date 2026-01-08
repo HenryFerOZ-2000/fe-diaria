@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/prayer_button.dart';
-import '../models/prayer.dart';
 import 'emotion_passage_read_screen.dart';
 import 'intention_prayer_read_screen.dart';
 import 'traditional_prayer_screen.dart';
@@ -36,37 +35,11 @@ class PrayersScreen extends StatelessWidget {
       ),
       body: Consumer<AppProvider>(
         builder: (context, provider, child) {
-          final saved = provider.savedPrayers;
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _sectionTitle(context, Icons.favorite_border, 'Tus oraciones'),
-                const SizedBox(height: 10),
-                if (saved.isEmpty)
-                  Text(
-                    'Aún no guardas oraciones. Guarda tus favoritas para abrirlas aquí rápidamente.',
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: colorScheme.onSurface.withOpacity(0.7),
-                    ),
-                  )
-                else
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: saved
-                        .map((p) => PrayerButton(
-                              icon: Icons.menu_book_rounded,
-                              title: p.title,
-                              onTap: () {
-                                _openPrayerDetail(context, p);
-                              },
-                            ))
-                        .toList(),
-                  ),
-                const SizedBox(height: 24),
                 _sectionTitle(context, Icons.emoji_emotions_outlined, 'Oraciones por emoción'),
                 const SizedBox(height: 10),
                 ..._emotionOptions(context),
@@ -368,53 +341,5 @@ class PrayersScreen extends StatelessWidget {
     ];
   }
 
-  void _openPrayerDetail(BuildContext context, Prayer prayer) {
-    // TODO: Navegar a detalle real de oración o abrir modal/route existente.
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
-        ),
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                prayer.title,
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                prayer.text,
-                style: GoogleFonts.inter(
-                  fontSize: 15,
-                  height: 1.6,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
