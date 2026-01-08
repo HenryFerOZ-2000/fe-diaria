@@ -749,6 +749,29 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void _openMissionRead(BuildContext context, Mission mission, AppProvider provider) {
+    // Verificar si la oración de la noche está bloqueada
+    if (mission.id == 'night' && !_isNightPrayerAvailable() && !mission.completed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.lock_outline, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'La oración de la noche estará disponible a las 7:00 PM',
+                  style: GoogleFonts.inter(),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange[700],
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+    
     final initialIndex = _missionsController.missions.indexOf(mission);
     if (initialIndex == -1) return;
 
@@ -856,9 +879,18 @@ class _HomeScreenState extends State<HomeScreen>
     return completed / total;
   }
 
+  /// Verifica si la oración de la noche está disponible (después de las 7 PM)
+  bool _isNightPrayerAvailable() {
+    final now = DateTime.now();
+    return now.hour >= 19; // 7 PM = 19:00
+  }
+
   Widget _buildMissionCard(BuildContext context, Mission mission, AppProvider provider) {
     final colorScheme = Theme.of(context).colorScheme;
     final completed = mission.completed;
+    final isNightMission = mission.id == 'night';
+    final isBlocked = isNightMission && !_isNightPrayerAvailable() && !completed;
+    
     final gradients = [
       [const Color(0xFF3C2A4D), const Color(0xFF6654A6)],
       [const Color(0xFF6A0F26), const Color(0xFFB83C3C)],
@@ -871,7 +903,7 @@ class _HomeScreenState extends State<HomeScreen>
 
     return InkWell(
       borderRadius: BorderRadius.circular(18),
-      onTap: () => _openMissionRead(context, mission, provider),
+      onTap: isBlocked ? null : () => _openMissionRead(context, mission, provider),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -886,7 +918,9 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ],
         ),
-        child: Row(
+        child: Opacity(
+          opacity: isBlocked ? 0.6 : 1.0,
+          child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(10),
@@ -916,14 +950,34 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    durationText,
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-            fontWeight: FontWeight.w600,
-                      color: Colors.white.withOpacity(0.8),
-          ),
-                  ),
+                  if (isBlocked)
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.lock_outline,
+                          size: 14,
+                          color: Colors.white.withOpacity(0.7),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Disponible a las 7:00 PM',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white.withOpacity(0.7),
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    Text(
+                      durationText,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -934,8 +988,9 @@ class _HomeScreenState extends State<HomeScreen>
                 color: Colors.white,
                 fontSize: 12,
               ),
-          ),
+            ),
           ],
+        ),
         ),
       ),
     );

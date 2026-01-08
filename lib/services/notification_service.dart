@@ -150,13 +150,36 @@ class NotificationService {
       );
     }
 
-    // 2. NOTIFICACIÓN DE LA NOCHE - Solo si está habilitada
+    // 2. NOTIFICACIÓN DE VERSÍCULO DIARIO LISTO - A las 9:00 AM (si está habilitada)
+    if (storageService.getMorningNotificationEnabled()) {
+      await _scheduleNotification(
+        id: 2,
+        title: _getVerseReadyTitle(language),
+        body: _getVerseReadyBody(verse, language),
+        hour: 9,
+        minute: 0,
+        channelId: 'verse_ready_channel',
+        channelName: _getChannelName('verse', language),
+        payload: 'verse',
+      );
+    }
+
+    // 3. NOTIFICACIÓN DE ORACIÓN DEL DÍA - A las 10:00 AM (si está habilitada)
+    if (storageService.getMorningNotificationEnabled()) {
+      await _scheduleNotification(
+        id: 3,
+        title: _getMorningPrayerTitle(language),
+        body: _getMorningPrayerBody(morningPrayer, language),
+        hour: 10,
+        minute: 0,
+        channelId: 'morning_prayer_channel',
+        channelName: _getChannelName('prayer', language),
+        payload: 'morning_prayer',
+      );
+    }
+
+    // 4. NOTIFICACIÓN DE ORACIÓN DE LA NOCHE - A las 7:00 PM (si está habilitada)
     if (storageService.getEveningNotificationEnabled()) {
-      final eveningTime = storageService.getEveningPrayerNotificationTime();
-      final timeParts = eveningTime.split(':');
-      final hour = int.parse(timeParts[0]);
-      final minute = int.parse(timeParts[1]);
-      
       final eveningTitle = _getEveningNotificationTitle(language);
       final eveningBody = _getEveningNotificationBody(eveningPrayer, language);
       
@@ -164,15 +187,29 @@ class NotificationService {
         id: 1,
         title: eveningTitle,
         body: eveningBody,
-        hour: hour,
-        minute: minute,
+        hour: 19, // 7:00 PM
+        minute: 0,
         channelId: 'evening_prayer_channel',
         channelName: _getChannelName('prayer', language),
-        payload: 'prayer',
+        payload: 'night_prayer',
       );
     }
 
-    // 3. RECORDATORIOS CADA 3 HORAS - Solo si están habilitados
+    // 5. NOTIFICACIÓN PARA ORAR POR UN FAMILIAR - A las 2:00 PM (si está habilitada)
+    if (storageService.getNotificationEnabled()) {
+      await _scheduleNotification(
+        id: 4,
+        title: _getFamilyPrayerTitle(language),
+        body: _getFamilyPrayerBody(language),
+        hour: 14, // 2:00 PM
+        minute: 0,
+        channelId: 'family_prayer_channel',
+        channelName: _getChannelName('prayer', language),
+        payload: 'family_prayer',
+      );
+    }
+
+    // 6. RECORDATORIOS CADA 3 HORAS - Solo si están habilitados
     if (storageService.getHourlyRemindersEnabled()) {
       await scheduleHourlyReminders();
     } else {
@@ -496,6 +533,96 @@ class NotificationService {
         return 'Esta é uma notificação de teste';
       default:
         return 'Esta es una notificación de prueba';
+    }
+  }
+
+  /// Obtiene el título de la notificación de versículo listo
+  String _getVerseReadyTitle(String language) {
+    switch (language) {
+      case 'en':
+        return 'Your verse of the day is ready 📖';
+      case 'pt':
+        return 'Seu versículo do dia está pronto 📖';
+      default:
+        return 'Tu versículo del día está listo 📖';
+    }
+  }
+
+  /// Obtiene el cuerpo de la notificación de versículo listo
+  String _getVerseReadyBody(Verse verse, String language) {
+    final userName = StorageService().getUserName();
+    final greeting = userName.isNotEmpty ? '$userName, ' : '';
+    
+    switch (language) {
+      case 'en':
+        return '${greeting}your verse of the day:\n\n${verse.text}\n\n${verse.reference}';
+      case 'pt':
+        return '${greeting}seu versículo do dia:\n\n${verse.text}\n\n${verse.reference}';
+      default:
+        return '${greeting}tu versículo del día:\n\n${verse.text}\n\n${verse.reference}';
+    }
+  }
+
+  /// Obtiene el título de la notificación de oración del día
+  String _getMorningPrayerTitle(String language) {
+    switch (language) {
+      case 'en':
+        return 'Your morning prayer is ready 🙏';
+      case 'pt':
+        return 'Sua oração da manhã está pronta 🙏';
+      default:
+        return 'Tu oración del día está lista 🙏';
+    }
+  }
+
+  /// Obtiene el cuerpo de la notificación de oración del día
+  String _getMorningPrayerBody(Prayer? prayer, String language) {
+    if (prayer == null) {
+      switch (language) {
+        case 'en':
+          return 'Take a moment to pray today';
+        case 'pt':
+          return 'Reserve um momento para orar hoje';
+        default:
+          return 'Tómate un momento para orar hoy';
+      }
+    }
+    
+    final prayerText = prayer.text.length > 150 
+        ? '${prayer.text.substring(0, 150)}...' 
+        : prayer.text;
+    
+    switch (language) {
+      case 'en':
+        return 'Your prayer for today:\n\n$prayerText';
+      case 'pt':
+        return 'Sua oração para hoje:\n\n$prayerText';
+      default:
+        return 'Tu oración para hoy:\n\n$prayerText';
+    }
+  }
+
+  /// Obtiene el título de la notificación para orar por un familiar
+  String _getFamilyPrayerTitle(String language) {
+    switch (language) {
+      case 'en':
+        return 'Pray for your family today 👨‍👩‍👧‍👦';
+      case 'pt':
+        return 'Ore por sua família hoje 👨‍👩‍👧‍👦';
+      default:
+        return 'Ora por tu familia hoy 👨‍👩‍👧‍👦';
+    }
+  }
+
+  /// Obtiene el cuerpo de la notificación para orar por un familiar
+  String _getFamilyPrayerBody(String language) {
+    switch (language) {
+      case 'en':
+        return 'Take a moment to pray for your family and loved ones. Your prayers make a difference.';
+      case 'pt':
+        return 'Reserve um momento para orar por sua família e entes queridos. Suas orações fazem a diferença.';
+      default:
+        return 'Tómate un momento para orar por tu familia y seres queridos. Tus oraciones hacen la diferencia.';
     }
   }
 }

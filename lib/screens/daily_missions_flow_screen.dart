@@ -85,13 +85,24 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
     }
   }
 
+  /// Verifica si la oración de la noche está disponible (después de las 7 PM)
+  bool _isNightPrayerAvailable() {
+    final now = DateTime.now();
+    return now.hour >= 19; // 7 PM = 19:00
+  }
+
   void _startAutoCompleteTimer() {
     _autoCompleteTimer?.cancel();
     // Solo auto-completar si la misión actual NO está completada
     final currentMission = widget.missions[_currentPageIndex];
     final isAlreadyCompleted = _completedMissions[_currentPageIndex] ?? false;
     
-    if (!isAlreadyCompleted && !currentMission.completed) {
+    // Bloquear auto-completar si es la oración de la noche y aún no son las 7 PM
+    final isNightBlocked = currentMission.id == 'night' && 
+                          !_isNightPrayerAvailable() && 
+                          !isAlreadyCompleted;
+    
+    if (!isAlreadyCompleted && !currentMission.completed && !isNightBlocked) {
       _autoCompleteTimer = Timer(const Duration(seconds: 2), () {
         // Verificar nuevamente antes de completar (puede haber cambiado)
         if (mounted && 
@@ -172,6 +183,31 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
 
   void _handleNext() {
     final currentMission = widget.missions[_currentPageIndex];
+    
+    // Verificar si la oración de la noche está bloqueada
+    if (currentMission.id == 'night' && 
+        !_isNightPrayerAvailable() && 
+        !(_completedMissions[_currentPageIndex] ?? false)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.lock_outline, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'La oración de la noche estará disponible a las 7:00 PM',
+                  style: GoogleFonts.inter(),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange[700],
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
     
     // Marcar como completado si no lo está
     if (!_completedMissions[_currentPageIndex]!) {
