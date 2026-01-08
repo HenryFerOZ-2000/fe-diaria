@@ -29,7 +29,9 @@ class DailyContentService {
     if (_verses != null &&
         _morningPrayers != null &&
         _nightPrayers != null &&
-        _familyPrayers != null) return;
+        _familyPrayers != null) {
+      return;
+    }
 
     _isLoading = true;
     try {
