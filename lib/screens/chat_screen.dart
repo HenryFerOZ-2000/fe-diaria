@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/chat_bubble.dart';
 import '../services/groq_chat_service.dart' as groq;
 import '../providers/auth_provider.dart';
+import '../services/ads_service.dart';
+import '../services/storage_service.dart';
 
 class ChatMessage {
   final String text;
@@ -27,7 +30,10 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final groq.GroqChatService _chatService = groq.GroqChatService();
+  final AdsService _adsService = AdsService();
+  BannerAd? _bannerAd;
   bool _isLoading = false;
+  bool _adsRemoved = false;
 
   String _errorToMessage(Object error) {
     final text = error.toString();
@@ -110,9 +116,44 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _adsRemoved = StorageService().getAdsRemoved();
+    if (!_adsRemoved) {
+      _loadBannerAd();
+    }
+  }
+
+  void _loadBannerAd() {
+    if (_adsRemoved) return;
+    
+    _adsService.loadBannerAd(
+      adSize: AdSize.banner,
+      onAdLoaded: (ad) {
+        if (mounted && !_adsRemoved) {
+          setState(() {
+            _bannerAd = ad;
+          });
+        } else {
+          ad.dispose();
+        }
+      },
+      onAdFailedToLoad: (error) {
+        debugPrint('Failed to load banner ad: $error');
+        Future.delayed(const Duration(seconds: 5), () {
+          if (mounted && !_adsRemoved && _bannerAd == null) {
+            _loadBannerAd();
+          }
+        });
+      },
+    );
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     _scrollController.dispose();
+    _bannerAd?.dispose();
     super.dispose();
   }
 
@@ -120,6 +161,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return AppScaffold(
       title: 'Chat Espiritual',
+      showBanner: !_adsRemoved,
+      bannerAd: _bannerAd,
       body: Column(
         children: [
           Expanded(

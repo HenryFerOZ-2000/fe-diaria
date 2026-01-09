@@ -23,7 +23,6 @@ import 'screens/spiritual_stats_screen.dart';
 import 'screens/achievement_detail_screen.dart';
 import 'screens/plan_screen.dart';
 import 'screens/account_settings_screen.dart';
-import 'screens/privacy_safety_screen.dart';
 import 'screens/blocked_users_screen.dart';
 import 'screens/report_content_screen.dart';
 import 'screens/privacy_policy_screen.dart';
@@ -156,7 +155,6 @@ class MyApp extends StatelessWidget {
               },
               '/plan': (context) => const PlanScreen(),
               '/account-settings': (context) => const AccountSettingsScreen(),
-              '/privacy-safety': (context) => const PrivacySafetyScreen(),
               '/blocked-users': (context) => const BlockedUsersScreen(),
               '/report-content': (context) => const ReportContentScreen(),
               '/privacy-policy': (context) => const PrivacyPolicyScreen(),

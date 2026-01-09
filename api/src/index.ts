@@ -622,12 +622,14 @@ const ensureStatsDoc = async (
 ) => {
   const snap = await statsRef.get();
   if (!snap.exists) {
-    const today = formatDateId(new Date());
+    // NO establecer racha aquí - solo crear el documento con contadores en 0
+    // La racha solo se debe actualizar cuando se completan TODAS las misiones
+    // (a través de completeAllMissions o markActiveToday)
     await statsRef.set({
-      lastActiveDate: today,
-      currentStreak: 1, // Empezar en 1 si es el primer día
-      bestStreak: 1,
-      activeDaysMap: {[today]: true},
+      // Empezar en 0, se actualizará cuando se completen todas las misiones
+      currentStreak: 0,
+      bestStreak: 0,
+      activeDaysMap: {},
       prayersCompletedTotal: 0,
       versesReadTotal: 0,
       postsCreatedTotal: 0,

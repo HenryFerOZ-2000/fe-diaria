@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../controllers/missions_controller.dart';
 import '../providers/app_provider.dart';
-import 'reading_chat_screen.dart';
 import '../services/share_service.dart';
 import '../services/daily_progress_service.dart';
 import '../services/spiritual_stats_service.dart';
@@ -183,6 +182,16 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
 
   void _handleNext() {
     final currentMission = widget.missions[_currentPageIndex];
+    final isLastMission = _currentPageIndex + 1 >= widget.missions.length;
+    final allCompleted = widget.missionsController.isAllCompleted();
+    
+    // Si es la última misión y no todas están completadas, o si todas están completadas, cerrar
+    if ((isLastMission && !allCompleted) || allCompleted) {
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      return;
+    }
     
     // Verificar si la oración de la noche está bloqueada
     if (currentMission.id == 'night' && 
@@ -229,26 +238,13 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
       }
     }
 
-    // Verificar si todas las misiones están completadas antes de navegar
-    final allCompleted = widget.missionsController.isAllCompleted();
-    
     // Navegar a la siguiente misión si no es la última
     if (_currentPageIndex + 1 < widget.missions.length) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
-    } else if (allCompleted) {
-      // Todas las misiones completadas - mostrar mensaje y cerrar
-      if (mounted && Navigator.of(context).canPop()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Has completado tus misiones de hoy')),
-        );
-        Navigator.of(context).pop();
-      }
     }
-    // Si no están todas completadas pero es la última misión, no hacer nada
-    // El botón mostrará "Siguiente" hasta que todas estén completadas
   }
 
   /// Guarda el progreso de la misión en segundo plano sin bloquear la UI
@@ -307,22 +303,6 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
         debugPrint('[DailyMissionsFlowScreen] ❌ Error saving mission progress: $e');
       }
     });
-  }
-
-  void _openChat() {
-    final currentMission = widget.missions[_currentPageIndex];
-    final content = _getMissionContent(currentMission.id);
-    final reference = _getMissionReference(currentMission.id);
-    
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ReadingChatScreen(
-          title: currentMission.title,
-          content: content,
-          reference: reference,
-        ),
-      ),
-    );
   }
 
   void _share() {
@@ -461,62 +441,15 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
                     },
                   ),
                 ),
-                // Botones de acción
+                // Botón de acción
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _glassButton(
-                          icon: Icons.forum_outlined,
-                          label: 'Chat',
-                          onTap: _openChat,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _primaryNextButton(),
-                      ),
-                    ],
-                  ),
+                  child: _primaryNextButton(),
                 ),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _glassButton({required IconData icon, String? label, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 54,
-        padding: EdgeInsets.symmetric(horizontal: label != null ? 16 : 0),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.22),
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: Colors.white.withOpacity(0.3)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: Colors.white, size: 22),
-            if (label != null) ...[
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ]
-          ],
-        ),
       ),
     );
   }
@@ -530,8 +463,8 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
                             !_isNightPrayerAvailable() && 
                             !(_completedMissions[_currentPageIndex] ?? false);
     
-    // Solo mostrar "Finalizar" si todas las misiones están completadas
-    final showFinalize = allCompleted && isLastMission;
+    // Mostrar "Cerrar" si es la última misión (completadas o no) o si todas están completadas
+    final showClose = isLastMission || allCompleted;
     
     return SizedBox(
       width: double.infinity,
@@ -553,12 +486,12 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              showFinalize ? 'Finalizar' : 'Siguiente',
+              showClose ? 'Cerrar' : 'Siguiente',
               style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
             ),
             const SizedBox(width: 8),
             Icon(
-              showFinalize ? Icons.check_circle_outline : Icons.arrow_forward_rounded,
+              showClose ? Icons.close_rounded : Icons.arrow_forward_rounded,
               size: 22,
             ),
           ],

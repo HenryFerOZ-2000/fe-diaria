@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../widgets/app_scaffold.dart';
+import '../../services/ads_service.dart';
+import '../../services/storage_service.dart';
 import '../data/bible_db.dart';
 import 'bible_chapters_screen.dart';
 
@@ -14,11 +17,43 @@ class BibleBooksScreen extends StatefulWidget {
 class _BibleBooksScreenState extends State<BibleBooksScreen> {
   bool _loading = true;
   String? _error;
+  final AdsService _adsService = AdsService();
+  BannerAd? _bannerAd;
+  bool _adsRemoved = false;
 
   @override
   void initState() {
     super.initState();
+    _adsRemoved = StorageService().getAdsRemoved();
+    if (!_adsRemoved) {
+      _loadBannerAd();
+    }
     _initDb();
+  }
+
+  void _loadBannerAd() {
+    if (_adsRemoved) return;
+    
+    _adsService.loadBannerAd(
+      adSize: AdSize.banner,
+      onAdLoaded: (ad) {
+        if (mounted && !_adsRemoved) {
+          setState(() {
+            _bannerAd = ad;
+          });
+        } else {
+          ad.dispose();
+        }
+      },
+      onAdFailedToLoad: (error) {
+        debugPrint('Failed to load banner ad: $error');
+        Future.delayed(const Duration(seconds: 5), () {
+          if (mounted && !_adsRemoved && _bannerAd == null) {
+            _loadBannerAd();
+          }
+        });
+      },
+    );
   }
 
   Future<void> _initDb() async {
@@ -112,9 +147,17 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
   ];
 
   @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      title: 'Biblia RV1909 (offline)',
+      title: 'Biblia',
+      showBanner: !_adsRemoved,
+      bannerAd: _bannerAd,
       body: _loading
           ? const Center(
               child: Column(

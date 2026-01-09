@@ -1,21 +1,75 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../providers/app_provider.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/prayer_button.dart';
+import '../services/ads_service.dart';
+import '../services/storage_service.dart';
 import 'emotion_passage_read_screen.dart';
 import 'intention_prayer_read_screen.dart';
 import 'traditional_prayer_screen.dart';
 
-class PrayersScreen extends StatelessWidget {
+class PrayersScreen extends StatefulWidget {
   const PrayersScreen({super.key});
+
+  @override
+  State<PrayersScreen> createState() => _PrayersScreenState();
+}
+
+class _PrayersScreenState extends State<PrayersScreen> {
+  final AdsService _adsService = AdsService();
+  BannerAd? _bannerAd;
+  bool _adsRemoved = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _adsRemoved = StorageService().getAdsRemoved();
+    if (!_adsRemoved) {
+      _loadBannerAd();
+    }
+  }
+
+  void _loadBannerAd() {
+    if (_adsRemoved) return;
+    
+    _adsService.loadBannerAd(
+      adSize: AdSize.banner,
+      onAdLoaded: (ad) {
+        if (mounted && !_adsRemoved) {
+          setState(() {
+            _bannerAd = ad;
+          });
+        } else {
+          ad.dispose();
+        }
+      },
+      onAdFailedToLoad: (error) {
+        debugPrint('Failed to load banner ad: $error');
+        Future.delayed(const Duration(seconds: 5), () {
+          if (mounted && !_adsRemoved && _bannerAd == null) {
+            _loadBannerAd();
+          }
+        });
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AppScaffold(
+      showBanner: !_adsRemoved,
+      bannerAd: _bannerAd,
       titleWidget: Row(
         children: [
           Text(

@@ -6,10 +6,13 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../widgets/app_scaffold.dart';
 import '../services/social_service.dart';
 import '../services/live_posts_service.dart';
 import '../services/spiritual_stats_service.dart';
+import '../services/ads_service.dart';
+import '../services/storage_service.dart';
 import 'comments_screen.dart';
 
 class LivePost {
@@ -79,20 +82,53 @@ class _LiveScreenState extends State<LiveScreen> {
   final _auth = FirebaseAuth.instance;
   final _social = SocialService();
   final _livePostsService = LivePostsService();
+  final AdsService _adsService = AdsService();
+  BannerAd? _bannerAd;
+  bool _adsRemoved = false;
   String? _uid;
 
   @override
   void initState() {
     super.initState();
+    _adsRemoved = StorageService().getAdsRemoved();
+    if (!_adsRemoved) {
+      _loadBannerAd();
+    }
     _ensureAuth().then((_) {
       _syncProfileToFirestore();
       _loadLikes();
     });
   }
 
+  void _loadBannerAd() {
+    if (_adsRemoved) return;
+    
+    _adsService.loadBannerAd(
+      adSize: AdSize.banner,
+      onAdLoaded: (ad) {
+        if (mounted && !_adsRemoved) {
+          setState(() {
+            _bannerAd = ad;
+          });
+        } else {
+          ad.dispose();
+        }
+      },
+      onAdFailedToLoad: (error) {
+        debugPrint('Failed to load banner ad: $error');
+        Future.delayed(const Duration(seconds: 5), () {
+          if (mounted && !_adsRemoved && _bannerAd == null) {
+            _loadBannerAd();
+          }
+        });
+      },
+    );
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
+    _bannerAd?.dispose();
     super.dispose();
   }
 
@@ -286,6 +322,8 @@ class _LiveScreenState extends State<LiveScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AppScaffold(
+      showBanner: !_adsRemoved,
+      bannerAd: _bannerAd,
       titleWidget: Row(
         children: [
           Text(
@@ -682,70 +720,334 @@ class _CreatePostModal extends StatefulWidget {
 
 class _CreatePostModalState extends State<_CreatePostModal> {
   String _selectedCategory = 'Salud';
+  final FocusNode _focusNode = FocusNode();
+  int _charCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.textController.addListener(() {
+      setState(() {
+        _charCount = widget.textController.text.length;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final text = widget.textController.text.trim();
+    final canPost = text.length >= 10;
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+          color: isDark ? colorScheme.surface : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
+          ],
         ),
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Handle bar
+            Padding(
+              padding: const EdgeInsets.only(top: 12, bottom: 8),
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: colorScheme.outline.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            // Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.edit_note_rounded,
+                      color: colorScheme.primary,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Nueva oración',
+                          style: GoogleFonts.inter(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Comparte tu petición con la comunidad',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: colorScheme.onSurface.withOpacity(0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Content
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Text Field
+                  Container(
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? colorScheme.surfaceContainerHighest
+                          : Colors.grey[50],
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: _focusNode.hasFocus
+                            ? colorScheme.primary
+                            : colorScheme.outline.withOpacity(0.2),
+                        width: _focusNode.hasFocus ? 2 : 1,
+                      ),
+                    ),
+                    child: TextField(
+                      controller: widget.textController,
+                      focusNode: _focusNode,
+                      decoration: InputDecoration(
+                        hintText: 'Escribe tu petición aquí...',
+                        hintStyle: GoogleFonts.inter(
+                          color: colorScheme.onSurface.withOpacity(0.4),
+                          fontSize: 15,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.all(16),
+                      ),
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        height: 1.5,
+                        color: colorScheme.onSurface,
+                      ),
+                      maxLines: 5,
+                      minLines: 3,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Character counter
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        '$_charCount / 10 caracteres mínimos',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: canPost
+                              ? Colors.green[600]
+                              : colorScheme.onSurface.withOpacity(0.5),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Category selector
+                  Text(
+                    'Categoría',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface.withOpacity(0.8),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? colorScheme.surfaceContainerHighest
+                          : Colors.grey[50],
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: colorScheme.outline.withOpacity(0.2),
+                      ),
+                    ),
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedCategory,
+                      isExpanded: true,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                      ),
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      icon: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: colorScheme.primary,
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'Salud',
+                          child: Row(
+                            children: [
+                              Text('🏥'),
+                              SizedBox(width: 12),
+                              Text('Salud'),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Familia',
+                          child: Row(
+                            children: [
+                              Text('👨‍👩‍👧‍👦'),
+                              SizedBox(width: 12),
+                              Text('Familia'),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Emergencia',
+                          child: Row(
+                            children: [
+                              Text('🚨'),
+                              SizedBox(width: 12),
+                              Text('Emergencia'),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Gratitud',
+                          child: Row(
+                            children: [
+                              Text('🙏'),
+                              SizedBox(width: 12),
+                              Text('Gratitud'),
+                            ],
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            _selectedCategory = value;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
+            // Action buttons
             Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .outline
-                    .withOpacity(0.3),
-                borderRadius: BorderRadius.circular(4),
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        side: BorderSide(
+                          color: colorScheme.outline.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Text(
+                        'Cancelar',
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton(
+                      onPressed: canPost
+                          ? () {
+                              widget.onPost(text, _selectedCategory);
+                              Navigator.pop(context);
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        disabledBackgroundColor:
+                            colorScheme.surfaceContainerHighest,
+                        disabledForegroundColor:
+                            colorScheme.onSurface.withOpacity(0.4),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        elevation: canPost ? 2 : 0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.send_rounded,
+                            size: 20,
+                            color: canPost
+                                ? colorScheme.onPrimary
+                                : colorScheme.onSurface.withOpacity(0.4),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Publicar',
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: widget.textController,
-              decoration: const InputDecoration(
-                labelText: 'Escribe tu petición',
-              ),
-              maxLines: 3,
-            ),
-            const SizedBox(height: 12),
-            DropdownButton<String>(
-              value: _selectedCategory,
-              isExpanded: true,
-              items: const [
-                DropdownMenuItem(value: 'Salud', child: Text('Salud')),
-                DropdownMenuItem(value: 'Familia', child: Text('Familia')),
-                DropdownMenuItem(
-                    value: 'Emergencia', child: Text('Emergencia')),
-                DropdownMenuItem(value: 'Gratitud', child: Text('Gratitud')),
-              ],
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _selectedCategory = value;
-                  });
-                }
-              },
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () {
-                final text = widget.textController.text.trim();
-                if (text.isNotEmpty) {
-                  widget.onPost(text, _selectedCategory);
-                  Navigator.pop(context);
-                }
-              },
-              child: const Text('Publicar petición'),
             ),
           ],
         ),

@@ -66,29 +66,6 @@ class _IntentionPrayerReadScreenState extends State<IntentionPrayerReadScreen>
     }
   }
 
-  String _categoryTitle(String key) {
-    switch (key) {
-      case 'salud':
-        return 'Salud';
-      case 'familia':
-        return 'Familia';
-      case 'trabajo':
-        return 'Trabajo';
-      case 'proteccion':
-        return 'Protección';
-      case 'pareja':
-        return 'Pareja';
-      case 'hijos':
-        return 'Hijos';
-      case 'sabiduria':
-        return 'Sabiduría';
-      case 'prosperidad':
-        return 'Prosperidad';
-      default:
-        return key;
-    }
-  }
-
   void _openChat() {
     if (_current == null) return;
     Navigator.of(context).push(

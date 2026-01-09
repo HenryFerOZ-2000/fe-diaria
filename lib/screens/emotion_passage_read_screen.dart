@@ -66,25 +66,6 @@ class _EmotionPassageReadScreenState extends State<EmotionPassageReadScreen>
     }
   }
 
-  String _emotionTitle(String key) {
-    switch (key) {
-      case 'ansiedad':
-        return 'Ansiedad';
-      case 'tristeza':
-        return 'Tristeza';
-      case 'paz_interior':
-        return 'Paz interior';
-      case 'gratitud':
-        return 'Gratitud';
-      case 'perdon':
-        return 'Perdón';
-      case 'fortaleza':
-        return 'Fortaleza';
-      default:
-        return key;
-    }
-  }
-
   void _openChat() {
     if (_prayer == null) return;
     Navigator.of(context).push(

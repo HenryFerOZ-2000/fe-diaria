@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 
@@ -22,6 +23,8 @@ class AppScaffold extends StatelessWidget {
   final PreferredSizeWidget? bottom;
   final double? appBarElevation;
   final bool showGuestNotice;
+  final BannerAd? bannerAd;
+  final bool showBanner;
 
   const AppScaffold({
     super.key,
@@ -42,6 +45,8 @@ class AppScaffold extends StatelessWidget {
     this.bottom,
     this.appBarElevation,
     this.showGuestNotice = true,
+    this.bannerAd,
+    this.showBanner = false,
   });
 
   @override
@@ -175,6 +180,45 @@ class AppScaffold extends StatelessWidget {
             children: [
               if (guestNotice != null) guestNotice,
               Expanded(child: body),
+              // Banner Ad flotante - siempre visible en la parte inferior
+              if (showBanner && bannerAd != null)
+                Container(
+                  alignment: Alignment.center,
+                  width: double.infinity,
+                  height: bannerAd!.size.height.toDouble(),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.surfaceDark
+                        : Colors.white,
+                    border: Border(
+                      top: BorderSide(
+                        color: colorScheme.outline.withOpacity(0.1),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  child: AdWidget(ad: bannerAd!),
+                )
+              else if (showBanner)
+                Container(
+                  alignment: Alignment.center,
+                  width: double.infinity,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.surfaceDark
+                        : Colors.white,
+                    border: Border(
+                      top: BorderSide(
+                        color: colorScheme.outline.withOpacity(0.1),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  child: const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
             ],
           ),
         ),

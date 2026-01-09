@@ -141,11 +141,6 @@ class ProfileHubScreen extends StatelessWidget {
                 onTap: () => Navigator.of(context).pushNamed('/plan'),
               ),
               _buildTile(
-                icon: Icons.lock_outline,
-                title: 'Privacidad y seguridad',
-                onTap: () => Navigator.of(context).pushNamed('/privacy-safety'),
-              ),
-              _buildTile(
                 icon: Icons.help_outline,
                 title: 'Ayuda / Soporte',
                 onTap: () => Navigator.of(context).pushNamed('/help-support'),

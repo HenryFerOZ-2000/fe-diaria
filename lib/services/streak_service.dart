@@ -95,7 +95,6 @@ class StreakService {
 
     final currentState = await getStreak();
     final lastYmd = currentState.lastDateYmd;
-    final current = currentState.current;
     final best = currentState.best;
 
     if (lastYmd == null) {

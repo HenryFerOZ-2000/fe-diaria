@@ -685,7 +685,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const Divider(height: 1),
                     ListTile(
                       title: Text(
-                        'Biblia RV1909',
+                        'Biblia',
                         style: GoogleFonts.roboto(fontSize: 16),
                       ),
                       subtitle: Text(
