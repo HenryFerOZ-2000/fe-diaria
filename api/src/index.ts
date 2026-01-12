@@ -8,7 +8,7 @@ import {FieldValue, Timestamp} from "firebase-admin/firestore";
 import Groq from "groq-sdk";
 // eslint-disable-next-line import/no-unresolved
 import {GROQ_API_KEY} from "./secrets/groq.secrets";
-import {CHAT_PROMPT, GROQ_MAX_COMPLETION_TOKENS,
+import {CHAT_PROMPT, FREE_TIER_CHAT_DAILY_LIMIT, GROQ_MAX_COMPLETION_TOKENS,
   GROQ_MODEL, GROQ_TEMPERATURE} from "./groqConfig";
 import {ChatMessage, ChatRequest, ChatResponse} from "./chat.interfaces";
 
@@ -412,6 +412,57 @@ const splitResponse = (content: string): string[] => {
   return parts.length > 0 ? parts : [content];
 };
 
+const checkChatRateLimit = async (uid: string): Promise<void> => {
+  const today = toDateId(new Date());
+  const userRef = db.collection("users").doc(uid);
+  const chatLimitRef = userRef.collection("chat_limits").doc(today);
+
+  const now = new Date();
+  const nextResetAt = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate() + 1,
+      0,
+      0,
+      0,
+      0,
+    ),
+  );
+
+  await db.runTransaction(async (tx) => {
+    const limitDoc = await tx.get(chatLimitRef);
+    const currentCount = limitDoc.exists ?
+      (limitDoc.get("count") as number | undefined) ?? 0 : 0;
+
+    if (currentCount >= FREE_TIER_CHAT_DAILY_LIMIT) {
+      throw new HttpsError(
+        "resource-exhausted",
+        "Has alcanzado el límite de 5 mensajes diarios.",
+        {
+          resetAt: nextResetAt.toISOString(),
+          resetAtEpochMs: nextResetAt.getTime(),
+          timezone: "UTC",
+        },
+      );
+    }
+
+    // Increment counter
+    if (limitDoc.exists) {
+      tx.update(chatLimitRef, {
+        count: FieldValue.increment(1),
+        lastMessageAt: FieldValue.serverTimestamp(),
+      });
+    } else {
+      tx.set(chatLimitRef, {
+        count: 1,
+        createdAt: FieldValue.serverTimestamp(),
+        lastMessageAt: FieldValue.serverTimestamp(),
+      });
+    }
+  });
+};
+
 /**
  * Firebase Function that emulates Groq chat completion.
  * Receives user text, conversation history
@@ -426,6 +477,11 @@ export const chatWithGroq = onCall(
         "User must be authenticated to use chat."
       );
     }
+
+    const uid = request.auth.uid;
+
+    // Check rate limit
+    await checkChatRateLimit(uid);
 
     const {userText, conversation} = request.data as ChatRequest;
 

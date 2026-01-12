@@ -99,3 +99,4 @@ Tu objetivo no es ganar discusiones, sino cuidar almas.
 export const GROQ_MODEL = "llama-3.3-70b-versatile";
 export const GROQ_MAX_COMPLETION_TOKENS = 300;
 export const GROQ_TEMPERATURE = 0.8;
+export const FREE_TIER_CHAT_DAILY_LIMIT = 5;
