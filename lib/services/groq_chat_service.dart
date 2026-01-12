@@ -87,7 +87,7 @@ class GroqChatService {
           final resetLocal = DateTime.parse(resetAt).toLocal();
           final hm = _formatHm(resetLocal);
           throw Exception(
-            'Has alcanzado el límite de 5 mensajes diarios. Intenta de nuevo mañana a las $hm.',
+            'Has alcanzado el límite de 5 mensajes diarios. Intenta de nuevo el ${resetLocal.day} a las $hm.',
           );
         }
 
