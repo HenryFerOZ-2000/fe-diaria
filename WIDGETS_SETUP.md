@@ -26,7 +26,7 @@ Los siguientes datos están disponibles para los widgets:
 
 Para implementar widgets en Android, necesitas:
 
-1. **Crear un AppWidgetProvider** en `android/app/src/main/java/com/ozcorp/versiculo_de_hoy/VersiculoWidgetProvider.kt`
+1. **Crear un AppWidgetProvider** en `android/app/src/main/java/com/ozcorp/verbum/VersiculoWidgetProvider.kt`
 
 2. **Registrar el widget** en `AndroidManifest.xml`:
 ```xml
@@ -55,7 +55,7 @@ Para implementar widgets en iOS, necesitas:
    - Nombre: "VersiculoWidget"
 
 2. **Configurar el App Group** en Capabilities:
-   - Agregar App Group: `group.com.ozcorp.versiculo_de_hoy`
+   - Agregar App Group: `group.com.ozcorp.verbum`
 
 3. **Implementar el widget** en Swift usando `WidgetKit`
 

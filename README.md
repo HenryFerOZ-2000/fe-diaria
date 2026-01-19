@@ -70,7 +70,7 @@ Aplicación móvil Flutter con versículos bíblicos, oraciones, devocionales, c
 ## 🔐 Inicio de sesión con Google
 
 ### Android
-- Paquete de la app: `com.ozcorp.versiculo_de_hoy` (ver `android/app/build.gradle.kts`)
+- Paquete de la app: `com.ozcorp.verbum` (ver `android/app/build.gradle.kts`)
 - Pasos:
    1. Obtén el SHA-1 de tu keystore de debug o release:
        ```bash

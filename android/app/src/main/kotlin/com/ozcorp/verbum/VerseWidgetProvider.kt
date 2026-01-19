@@ -1,4 +1,4 @@
-package com.ozcorp.versiculo_de_hoy
+package com.ozcorp.verbum
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -19,7 +19,7 @@ class VerseWidgetProvider : AppWidgetProvider() {
         private const val PREFS_NAME = "versiculo_widget_prefs"
         private const val KEY_VERSE_TEXT = "verse_text"
         private const val KEY_VERSE_REFERENCE = "verse_reference"
-        private const val ACTION_UPDATE_WIDGET = "com.ozcorp.versiculo_de_hoy.UPDATE_WIDGET"
+        private const val ACTION_UPDATE_WIDGET = "com.ozcorp.verbum.UPDATE_WIDGET"
         
         /**
          * Guarda los datos del versículo en SharedPreferences

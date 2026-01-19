@@ -17,7 +17,7 @@ Tu SHA-1 de debug es:
 2. Selecciona tu proyecto: **verbum-ef0a8**
 3. Ve a **Configuración del proyecto** (ícono de engranaje)
 4. En la sección **Tus aplicaciones**, encuentra tu app Android:
-   - Package name: `com.ozcorp.versiculo_de_hoy`
+   - Package name: `com.ozcorp.verbum`
 5. Haz clic en **Agregar huella digital**
 6. Pega el SHA-1:
    ```
@@ -44,7 +44,7 @@ flutter run
 
 Si después de seguir estos pasos aún tienes problemas:
 
-1. Verifica que el package name coincida exactamente: `com.ozcorp.versiculo_de_hoy`
+1. Verifica que el package name coincida exactamente: `com.ozcorp.verbum`
 2. Asegúrate de que el SHA-1 esté en formato correcto (con dos puntos)
 3. Espera unos minutos después de agregar el SHA-1
 4. Verifica que el `google-services.json` esté actualizado

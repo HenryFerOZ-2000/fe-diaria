@@ -6,7 +6,7 @@ import '../models/prayer.dart';
 /// Servicio nativo para gestionar widgets de Android sin dependencias externas
 /// Usa MethodChannel para comunicación con código nativo
 class WidgetService {
-  static const MethodChannel _channel = MethodChannel('com.ozcorp.versiculo_de_hoy/widget');
+  static const MethodChannel _channel = MethodChannel('com.ozcorp.verbum/widget');
   static bool _initialized = false;
 
   /// Inicializa el servicio de widgets

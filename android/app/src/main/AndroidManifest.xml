@@ -18,7 +18,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     
     <application
-        android:label="versiculo_de_hoy"
+        android:label="Verbum"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -60,7 +60,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.ozcorp.versiculo_de_hoy.UPDATE_WIDGET" />
+                <action android:name="com.ozcorp.verbum.UPDATE_WIDGET" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

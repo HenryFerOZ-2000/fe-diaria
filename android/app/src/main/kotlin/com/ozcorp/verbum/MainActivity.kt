@@ -1,11 +1,11 @@
-package com.ozcorp.versiculo_de_hoy
+package com.ozcorp.verbum
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "com.ozcorp.versiculo_de_hoy/widget"
+    private val CHANNEL = "com.ozcorp.verbum/widget"
     
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
