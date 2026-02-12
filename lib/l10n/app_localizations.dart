@@ -17,7 +17,7 @@ class AppLocalizations {
   String get appTitle {
     switch (languageCode) {
       case 'en':
-        return 'Verse of the Day';
+        return 'Versículo del Día';
       case 'pt':
         return 'Verbum';
       default:
@@ -28,7 +28,7 @@ class AppLocalizations {
   String get homeTitle {
     switch (languageCode) {
       case 'en':
-        return 'Verse of the Day';
+        return 'Versículo del Día';
       case 'pt':
         return 'Verbum';
       default:
@@ -296,7 +296,7 @@ class AppLocalizations {
   String get verseNotificationTime {
     switch (languageCode) {
       case 'en':
-        return 'Verse of the Day';
+        return 'Versículo del Día';
       case 'pt':
         return 'Verbum';
       default:
