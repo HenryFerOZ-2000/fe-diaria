@@ -14,17 +14,21 @@ class ProfileHubScreen extends StatelessWidget {
   final _profileService = ProfileService();
 
   void _logout(BuildContext context) async {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Cerrando sesión...'),
+        duration: Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
     try {
       await context.read<app_auth.AuthProvider>().signOut();
+      // No navegar manualmente: al notificar, el Consumer2 en main.dart
+      // reconstruye y la home pasa a ser WelcomeAuthScreen.
     } catch (_) {
+      // Fallback: cerrar al menos Firebase para que authStateChanges actualice la UI
       await _auth.signOut();
-    }
-    if (context.mounted) {
-      // Navegar a la pantalla de bienvenida y limpiar el stack de navegación
-      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const WelcomeAuthScreen()),
-        (route) => false,
-      );
     }
   }
 

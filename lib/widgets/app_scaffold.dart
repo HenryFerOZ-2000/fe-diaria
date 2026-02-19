@@ -110,7 +110,7 @@ class AppScaffold extends StatelessWidget {
                   }
                   try {
                     await authProv.signIn();
-                    if (context.mounted) {
+                    if (context.mounted && authProv.isSignedIn) {
                       Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
                     }
                   } catch (e) {

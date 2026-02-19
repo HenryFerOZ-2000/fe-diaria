@@ -57,10 +57,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
         rethrow;
       }
 
-      // Cerrar sesión
+      // Cerrar sesión (Google Sign In, etc.). La UI se actualiza sola por authStateChanges.
       if (mounted) {
         await context.read<app_auth.AuthProvider>().signOut();
-        Navigator.of(context).pushNamedAndRemoveUntil('/welcome', (route) => false);
       }
     } catch (e) {
       debugPrint('Error deleting account: $e');

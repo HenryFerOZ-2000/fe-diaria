@@ -41,13 +41,9 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> signIn() async {
-    try {
-      _user = await _authService.signIn();
-      _firebaseUser = FirebaseAuth.instance.currentUser;
-      notifyListeners();
-    } catch (e) {
-      rethrow;
-    }
+    _user = await _authService.signIn();
+    _firebaseUser = FirebaseAuth.instance.currentUser;
+    notifyListeners();
   }
 
   Future<void> signInWithEmailPassword(String email, String password) async {
@@ -81,10 +77,14 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
-    await _authService.signOut();
-    _user = null;
-    _firebaseUser = null;
-    notifyListeners();
+    try {
+      await _authService.signOut();
+    } finally {
+      // Siempre limpiar estado local para que la UI muestre "cerrado" aunque falle el signOut remoto
+      _user = null;
+      _firebaseUser = null;
+      notifyListeners();
+    }
   }
 
   @override
