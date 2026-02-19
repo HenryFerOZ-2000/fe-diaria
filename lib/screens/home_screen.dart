@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:async';
 import '../providers/app_provider.dart';
@@ -10,8 +9,6 @@ import '../controllers/missions_controller.dart';
 import '../controllers/streak_controller.dart';
 import 'daily_missions_flow_screen.dart';
 import '../widgets/racha_celebration_dialog.dart';
-import '../services/ads_service.dart';
-import '../services/storage_service.dart';
 import '../services/ads_manager.dart';
 import '../services/spiritual_stats_service.dart';
 import '../services/daily_progress_service.dart';
@@ -30,8 +27,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen>
     with TickerProviderStateMixin {
-  final AdsService _adsService = AdsService();
-  BannerAd? _bannerAd;
   late TabController _tabController;
   late AnimationController _animationController;
   late AnimationController _prayerTransitionController;
@@ -40,7 +35,6 @@ class _HomeScreenState extends State<HomeScreen>
   Timer? _prayerTimeCheckTimer;
   Timer? _dailyRefreshTimer;
   bool _isMorningPrayer = true;
-  bool _adsRemoved = false;
   bool _streakDialogShowing = false;
   late final StreakController _streakController;
   final SpiritualStatsService _spiritualStatsService = SpiritualStatsService();
@@ -70,10 +64,6 @@ class _HomeScreenState extends State<HomeScreen>
     );
     // Inicializar AnimationController para animaciones de contenido
     _setupAnimations();
-    _adsRemoved = StorageService().getAdsRemoved();
-    if (!_adsRemoved) {
-      _loadBannerAd();
-    }
     _checkPrayerTime();
     _setupDailyRefresh();
     // Verificar cada minuto si cambió la hora de oración
@@ -168,33 +158,6 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
-  void _loadBannerAd() {
-    if (_adsRemoved) return;
-    
-    _adsService.loadBannerAd(
-      adSize: AdSize.banner,
-      onAdLoaded: (ad) {
-        if (mounted && !_adsRemoved) {
-          setState(() {
-            _bannerAd = ad;
-          });
-          debugPrint('Banner ad loaded successfully');
-        } else {
-          ad.dispose();
-        }
-      },
-      onAdFailedToLoad: (error) {
-        debugPrint('Failed to load banner ad: $error');
-        // Reintentar después de 5 segundos
-        Future.delayed(const Duration(seconds: 5), () {
-          if (mounted && !_adsRemoved && _bannerAd == null) {
-            _loadBannerAd();
-          }
-        });
-      },
-    );
-  }
-
   /// Carga el progreso diario desde Firestore y actualiza el estado de las misiones
   Future<void> _loadDailyProgress() async {
     try {
@@ -227,7 +190,6 @@ class _HomeScreenState extends State<HomeScreen>
     _animationController.dispose();
     _prayerTransitionController.dispose();
     _streakController.dispose();
-    _bannerAd?.dispose();
     _audioPlayer?.dispose();
     _prayerTimeCheckTimer?.cancel();
     _dailyRefreshTimer?.cancel();
@@ -236,26 +198,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Actualizar estado de anuncios removidos en cada build
-    final storage = StorageService();
-    final adsRemovedNow = storage.getAdsRemoved();
-    if (adsRemovedNow && !_adsRemoved) {
-      // Si se compró mientras esta vista estaba activa, liberar banner
-      _bannerAd?.dispose();
-      _bannerAd = null;
-      _adsRemoved = true;
-    } else if (!adsRemovedNow && _adsRemoved) {
-      // Si se restauraron los anuncios, recargar banner
-      _adsRemoved = false;
-      _loadBannerAd();
-    } else if (!adsRemovedNow && _bannerAd == null) {
-      // Si no hay banner cargado y los anuncios no están removidos, cargar
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && !_adsRemoved && _bannerAd == null) {
-          _loadBannerAd();
-        }
-      });
-    }
     final localizations = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colorScheme = Theme.of(context).colorScheme;
@@ -332,32 +274,6 @@ class _HomeScreenState extends State<HomeScreen>
               Expanded(
                 child: _buildVerseTab(context, isDark, localizations),
               ),
-              // Banner Ad flotante - siempre visible en la parte inferior
-              if (!_adsRemoved)
-                Container(
-                  alignment: Alignment.center,
-                  width: double.infinity,
-                  height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? colorScheme.surface
-                        : Colors.white,
-                    border: Border(
-                      top: BorderSide(
-                        color: colorScheme.outline.withOpacity(0.1),
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                  child: _bannerAd != null
-                      ? AdWidget(ad: _bannerAd!)
-                      : const SizedBox(
-                          height: 50,
-                          child: Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        ),
-                ),
             ],
           ),
         ),

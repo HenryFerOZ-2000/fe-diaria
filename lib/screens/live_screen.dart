@@ -6,13 +6,10 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../widgets/app_scaffold.dart';
 import '../services/social_service.dart';
 import '../services/live_posts_service.dart';
 import '../services/spiritual_stats_service.dart';
-import '../services/ads_service.dart';
-import '../services/storage_service.dart';
 import 'comments_screen.dart';
 
 class LivePost {
@@ -82,53 +79,20 @@ class _LiveScreenState extends State<LiveScreen> {
   final _auth = FirebaseAuth.instance;
   final _social = SocialService();
   final _livePostsService = LivePostsService();
-  final AdsService _adsService = AdsService();
-  BannerAd? _bannerAd;
-  bool _adsRemoved = false;
   String? _uid;
 
   @override
   void initState() {
     super.initState();
-    _adsRemoved = StorageService().getAdsRemoved();
-    if (!_adsRemoved) {
-      _loadBannerAd();
-    }
     _ensureAuth().then((_) {
       _syncProfileToFirestore();
       _loadLikes();
     });
   }
 
-  void _loadBannerAd() {
-    if (_adsRemoved) return;
-    
-    _adsService.loadBannerAd(
-      adSize: AdSize.banner,
-      onAdLoaded: (ad) {
-        if (mounted && !_adsRemoved) {
-          setState(() {
-            _bannerAd = ad;
-          });
-        } else {
-          ad.dispose();
-        }
-      },
-      onAdFailedToLoad: (error) {
-        debugPrint('Failed to load banner ad: $error');
-        Future.delayed(const Duration(seconds: 5), () {
-          if (mounted && !_adsRemoved && _bannerAd == null) {
-            _loadBannerAd();
-          }
-        });
-      },
-    );
-  }
-
   @override
   void dispose() {
     _scrollController.dispose();
-    _bannerAd?.dispose();
     super.dispose();
   }
 
@@ -325,8 +289,7 @@ class _LiveScreenState extends State<LiveScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return AppScaffold(
-      showBanner: !_adsRemoved,
-      bannerAd: _bannerAd,
+      showBanner: false,
       titleWidget: Row(
         children: [
           Text(
@@ -910,7 +873,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                       ),
                     ),
                     child: DropdownButtonFormField<String>(
-                      value: _selectedCategory,
+                      initialValue: _selectedCategory,
                       isExpanded: true,
                       decoration: InputDecoration(
                         border: InputBorder.none,

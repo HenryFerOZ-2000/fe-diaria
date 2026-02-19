@@ -57,7 +57,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
 
   Future<void> _savePersonalization() async {
     if (_nameController.text.trim().isEmpty && _selectedEmotion == null) {
-      _showMessage('Por favor, ingresa tu nombre o selecciona cómo te sientes', isError: true);
+      _showMessage('Por favor, ingresa un nombre de usuario o selecciona cómo te sientes', isError: true);
       return;
     }
 
@@ -68,7 +68,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
     try {
       final provider = Provider.of<AppProvider>(context, listen: false);
       
-      // Guardar nombre
+      // Guardar nombre de usuario (para saludos y personalización en la app)
       if (_nameController.text.trim().isNotEmpty) {
         await provider.setUserName(_nameController.text.trim());
       }
@@ -152,10 +152,10 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Sección de nombre
+                // Sección nombre de usuario
                 _buildSectionHeader(
-                  'Tu Nombre',
-                  Icons.person_outline,
+                  'Nombre de usuario',
+                  Icons.alternate_email,
                   colorScheme,
                 ),
                 const SizedBox(height: 16),
@@ -238,12 +238,12 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
           color: colorScheme.onSurface,
         ),
         decoration: InputDecoration(
-          hintText: 'Ingresa tu nombre',
+          hintText: 'Ej: usuario123 o tu nombre para saludos',
           hintStyle: GoogleFonts.inter(
             color: colorScheme.onSurfaceVariant,
           ),
           prefixIcon: Icon(
-            Icons.edit_outlined,
+            Icons.alternate_email,
             color: colorScheme.primary,
           ),
           border: InputBorder.none,
@@ -408,7 +408,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Al personalizar tu experiencia, recibirás versículos y oraciones especialmente seleccionados para ti según cómo te sientas hoy.',
+              'Tu nombre de usuario se usará en saludos (p. ej. "¿Cómo te sientes hoy, X?") y en notificaciones. También puedes elegir una emoción para recibir versículos y oraciones acordes.',
               style: GoogleFonts.inter(
                 fontSize: 14,
                 color: colorScheme.onSurfaceVariant,

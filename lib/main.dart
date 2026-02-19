@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'providers/app_provider.dart';
 import 'providers/auth_provider.dart';
@@ -44,6 +45,7 @@ import 'services/content_validator.dart';
 import 'services/daily_content_service.dart';
 import 'theme/app_theme.dart';
 import 'screens/welcome_auth_screen.dart';
+import 'widgets/ad_banner.dart';
 import 'bible/ui/bible_books_screen.dart';
 
 int? _initialTabIndex;
@@ -55,6 +57,7 @@ bool _checkOnboarding() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await MobileAds.instance.initialize();
 
   try {
     await Firebase.initializeApp();
@@ -284,15 +287,22 @@ class _MainScreenState extends State<MainScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: List.generate(
-          _screens.length,
-          (index) => FadeTransition(
-            opacity: _fadeAnimations[index],
-            child: _screens[index],
+      body: Column(
+        children: [
+          Expanded(
+            child: IndexedStack(
+              index: _currentIndex,
+              children: List.generate(
+                _screens.length,
+                (index) => FadeTransition(
+                  opacity: _fadeAnimations[index],
+                  child: _screens[index],
+                ),
+              ),
+            ),
           ),
-        ),
+          AdBanner(visible: !StorageService().getAdsRemoved()),
+        ],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
