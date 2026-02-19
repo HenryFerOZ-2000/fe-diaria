@@ -51,7 +51,9 @@ class CacheService {
       if (lastDate == todayString) {
         final verseData = _verseBox.get(_todayVerseKey);
         if (verseData != null) {
-          return Verse.fromJson(verseData as Map<String, dynamic>);
+          return Verse.fromJson(
+            Map<String, dynamic>.from(verseData as Map),
+          );
         }
       }
     } catch (e) {
@@ -65,7 +67,9 @@ class CacheService {
     try {
       final verseData = _verseBox.get(_todayVerseKey);
       if (verseData != null) {
-        return Verse.fromJson(verseData as Map<String, dynamic>);
+        return Verse.fromJson(
+          Map<String, dynamic>.from(verseData as Map),
+        );
       }
     } catch (e) {
       debugPrint('Error getting last verse: $e');
@@ -125,7 +129,9 @@ class CacheService {
       if (lastDate == todayString) {
         final prayerData = _prayerBox.get(key);
         if (prayerData != null) {
-          return Prayer.fromJson(prayerData as Map<String, dynamic>);
+          return Prayer.fromJson(
+            Map<String, dynamic>.from(prayerData as Map),
+          );
         }
       }
     } catch (e) {
@@ -143,7 +149,9 @@ class CacheService {
       
       final prayerData = _prayerBox.get(key);
       if (prayerData != null) {
-        return Prayer.fromJson(prayerData as Map<String, dynamic>);
+        return Prayer.fromJson(
+          Map<String, dynamic>.from(prayerData as Map),
+        );
       }
     } catch (e) {
       debugPrint('Error getting last prayer: $e');

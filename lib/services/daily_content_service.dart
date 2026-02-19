@@ -45,10 +45,12 @@ class DailyContentService {
       final List<dynamic> morningData = json.decode(morningJson);
       _morningPrayers = morningData.map((e) => e as String).toList();
 
-      // Cargar oraciones de la noche
+      // Cargar oraciones de la noche (estructura: array de objetos con campo "text")
       final nightJson = await rootBundle.loadString('assets/data/night_prayers.json');
       final List<dynamic> nightData = json.decode(nightJson);
-      _nightPrayers = nightData.map((e) => e as String).toList();
+      _nightPrayers = nightData
+          .map((e) => (e as Map<String, dynamic>)['text'] as String)
+          .toList();
 
       // Cargar oraciones por intención y filtrar las de familia
       final intentionJson = await rootBundle.loadString('assets/data/prayers_by_intention.json');

@@ -314,7 +314,10 @@ class _LiveScreenState extends State<LiveScreen> {
           _submitPost(text);
         },
       ),
-    );
+    ).then((_) {
+      // Asegurar que el controller se disponga cuando el modal se cierra
+      textController.dispose();
+    });
   }
 
   @override
@@ -722,19 +725,25 @@ class _CreatePostModalState extends State<_CreatePostModal> {
   String _selectedCategory = 'Salud';
   final FocusNode _focusNode = FocusNode();
   int _charCount = 0;
+  late VoidCallback _textListener;
 
   @override
   void initState() {
     super.initState();
-    widget.textController.addListener(() {
-      setState(() {
-        _charCount = widget.textController.text.length;
-      });
-    });
+    _charCount = widget.textController.text.length;
+    _textListener = () {
+      if (mounted) {
+        setState(() {
+          _charCount = widget.textController.text.length;
+        });
+      }
+    };
+    widget.textController.addListener(_textListener);
   }
 
   @override
   void dispose() {
+    widget.textController.removeListener(_textListener);
     _focusNode.dispose();
     super.dispose();
   }
