@@ -57,6 +57,7 @@ class LivePostsService {
     required String postId,
     required String uid,
     required String authorName,
+    String? authorUsername,
     required String text,
     String? authorPhoto,
   }) async {
@@ -70,6 +71,7 @@ class LivePostsService {
           'text': text,
           'authorUid': uid,
           'authorName': authorName,
+          'authorUsername': authorUsername,
           'authorPhoto': authorPhoto,
           'createdAt': FieldValue.serverTimestamp(),
           'likeCount': 0,
@@ -92,6 +94,7 @@ class LivePostsService {
     required String postId,
     required String uid,
     required String authorName,
+    String? authorUsername,
     required String text,
     required String parentCommentId,
     required String rootId,
@@ -101,32 +104,24 @@ class LivePostsService {
       final postRef = _firestore.collection('live_posts').doc(postId);
       final commentsRef = postRef.collection('comments');
       final commentRef = commentsRef.doc();
-      final parentRef = commentsRef.doc(parentCommentId);
-      final rootRef = commentsRef.doc(rootId);
+      final threadRootId = rootId.trim().isEmpty ? parentCommentId : rootId;
+      final threadRootRef = commentsRef.doc(threadRootId);
 
       await _firestore.runTransaction((tx) async {
-        // Crear el reply
         tx.set(commentRef, {
           'text': text,
           'authorUid': uid,
           'authorName': authorName,
+          'authorUsername': authorUsername,
           'authorPhoto': authorPhoto,
           'createdAt': FieldValue.serverTimestamp(),
           'likeCount': 0,
           'replyCount': 0,
-          'parentId': parentCommentId,
-          'rootId': rootId,
+          'parentId': threadRootId,
+          'rootId': threadRootId,
         });
 
-        // Incrementar replyCount en el comentario padre
-        tx.update(parentRef, {'replyCount': FieldValue.increment(1)});
-
-        // Si el padre no es el root, también incrementar en el root
-        if (parentCommentId != rootId) {
-          tx.update(rootRef, {'replyCount': FieldValue.increment(1)});
-        }
-
-        // Incrementar commentCount en el post
+        tx.update(threadRootRef, {'replyCount': FieldValue.increment(1)});
         tx.update(postRef, {'commentCount': FieldValue.increment(1)});
       });
 
@@ -201,6 +196,18 @@ class LivePostsService {
         .where('parentId', isEqualTo: commentId)
         .orderBy('createdAt', descending: false)
         .snapshots();
+  }
+
+  /// Verifica si un comentario raíz tiene al menos una respuesta
+  Stream<bool> hasRepliesStream(String postId, String commentId) {
+    return _firestore
+        .collection('live_posts')
+        .doc(postId)
+        .collection('comments')
+        .where('parentId', isEqualTo: commentId)
+        .limit(1)
+        .snapshots()
+        .map((snap) => snap.docs.isNotEmpty);
   }
 }
 

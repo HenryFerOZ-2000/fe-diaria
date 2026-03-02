@@ -215,7 +215,7 @@ class _LiveScreenState extends State<LiveScreen> {
   }
 
 
-  Future<void> _submitPost(String text) async {
+  Future<bool> _submitPost(String text) async {
     final trimmed = text.trim();
     if (trimmed.length < 10) {
       if (mounted) {
@@ -223,9 +223,9 @@ class _LiveScreenState extends State<LiveScreen> {
           const SnackBar(content: Text('Escribe al menos 10 caracteres')),
         );
       }
-      return;
+      return false;
     }
-    if (_isPosting) return;
+    if (_isPosting) return false;
     if (_auth.currentUser == null) {
       await FirebaseAuth.instance.signInAnonymously();
     }
@@ -236,27 +236,31 @@ class _LiveScreenState extends State<LiveScreen> {
       final callable = _functions.httpsCallable('createLivePost');
       final result = await callable.call<Map<String, dynamic>>({'text': trimmed});
       final postId = result.data['postId'] as String?;
-      if (!mounted) return;
+      if (!mounted) return false;
       if (postId != null) {
         await _insertPostById(postId);
         // Incrementar contador de publicaciones creadas
         final spiritualStatsService = SpiritualStatsService();
         await spiritualStatsService.incrementPostCreated();
       }
+      if (!mounted) return false;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Publicación creada.')),
       );
+      return true;
     } on FirebaseFunctionsException catch (e) {
-      if (!mounted) return;
+      if (!mounted) return false;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? 'Error al publicar')),
       );
       debugPrint('createLivePost error code=${e.code} message=${e.message} details=${e.details}');
+      return false;
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) return false;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al publicar: $e')),
       );
+      return false;
     } finally {
       if (mounted) {
         setState(() {
@@ -271,11 +275,12 @@ class _LiveScreenState extends State<LiveScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _CreatePostModal(
         textController: textController,
-        onPost: (text, category) {
-          _submitPost(text);
+        onPost: (text, category) async {
+          return _submitPost(text);
         },
       ),
     ).then((_) {
@@ -490,176 +495,251 @@ class _FeedPostTileState extends State<_FeedPostTile> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Perfiles ya no son públicos, solo mostrar nombre (sin click)
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.deepPurple.withOpacity(0.12),
-                  backgroundImage: widget.post.authorPhoto != null
-                      ? NetworkImage(widget.post.authorPhoto!)
-                      : null,
-                  child: widget.post.authorPhoto == null
-                      ? Text(
-                          widget.post.userName.isNotEmpty
-                              ? widget.post.userName[0].toUpperCase()
-                              : '?',
-                          style: GoogleFonts.inter(
-                            color: Colors.deepPurple,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        )
-                      : null,
-                ),
-                const SizedBox(width: 10),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                  child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                    stream: widget.post.authorUid.isNotEmpty
+                        ? FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(widget.post.authorUid)
+                            .snapshots()
+                        : null,
+                    builder: (context, profileSnapshot) {
+                      final profileData = profileSnapshot.data?.data();
+                      final displayName = ((profileData?['displayName'] as String?) ??
+                              widget.post.userName)
+                          .trim();
+                      final username =
+                          ((profileData?['username'] as String?) ?? '').trim();
+                      final authorPhoto =
+                          (profileData?['photoURL'] as String?) ?? widget.post.authorPhoto;
+                      final isMine = widget.currentUid.isNotEmpty &&
+                          widget.post.authorUid == widget.currentUid;
+
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Flexible(
-                            child: Text(
-                              widget.post.userName,
-                              style: GoogleFonts.inter(
-                                fontSize: 14.5,
-                                fontWeight: FontWeight.w800,
-                                color: const Color(0xFF1F1F1F),
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.deepPurple.withValues(alpha: 0.12),
+                            backgroundImage:
+                                authorPhoto != null ? NetworkImage(authorPhoto) : null,
+                            child: authorPhoto == null
+                                ? Text(
+                                    displayName.isNotEmpty
+                                        ? displayName[0].toUpperCase()
+                                        : '?',
+                                    style: GoogleFonts.inter(
+                                      color: Colors.deepPurple,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  )
+                                : null,
                           ),
-                          const SizedBox(width: 6),
-                          Text(
-                            '· ${widget.post.timeAgo}',
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        widget.post.text,
-                        style: GoogleFonts.inter(
-                          fontSize: 14.5,
-                          height: 1.45,
-                          color: const Color(0xFF1F1F1F),
-                        ),
-                      ),
-                      if (widget.post.mediaUrl != null) ...[
-                        const SizedBox(height: 10),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(14),
-                          child: AspectRatio(
-                            aspectRatio: 16 / 9,
-                            child: Image.network(
-                              widget.post.mediaUrl!,
-                              fit: BoxFit.cover,
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Container(
-                                  color: Colors.grey.shade200,
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      value: loadingProgress.expectedTotalBytes != null
-                                          ? loadingProgress.cumulativeBytesLoaded /
-                                              loadingProgress.expectedTotalBytes!
-                                          : null,
-                                      strokeWidth: 2,
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        displayName.isNotEmpty ? displayName : 'Anónimo',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14.5,
+                                          fontWeight: FontWeight.w800,
+                                          color: const Color(0xFF1F1F1F),
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    if (isMine) ...[
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                              .withValues(alpha: 0.12),
+                                          borderRadius: BorderRadius.circular(999),
+                                        ),
+                                        child: Text(
+                                          'Tú',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w700,
+                                            color: Theme.of(context).colorScheme.primary,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '· ${widget.post.timeAgo}',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  '@${username.isNotEmpty ? username : 'sin-username'}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  widget.post.text,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14.5,
+                                    height: 1.45,
+                                    color: const Color(0xFF1F1F1F),
+                                  ),
+                                ),
+                                if (widget.post.mediaUrl != null) ...[
+                                  const SizedBox(height: 10),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(14),
+                                    child: AspectRatio(
+                                      aspectRatio: 16 / 9,
+                                      child: Image.network(
+                                        widget.post.mediaUrl!,
+                                        fit: BoxFit.cover,
+                                        loadingBuilder:
+                                            (context, child, loadingProgress) {
+                                          if (loadingProgress == null) return child;
+                                          return Container(
+                                            color: Colors.grey.shade200,
+                                            child: Center(
+                                              child: CircularProgressIndicator(
+                                                value: loadingProgress
+                                                            .expectedTotalBytes !=
+                                                        null
+                                                    ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes!
+                                                    : null,
+                                                strokeWidth: 2,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (_, __, ___) => Container(
+                                          color: Colors.grey.shade200,
+                                          child: const Center(
+                                            child: Icon(
+                                              Icons.image_not_supported_outlined,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                        cacheWidth: 800,
+                                      ),
                                     ),
                                   ),
-                                );
-                              },
-                              errorBuilder: (_, __, ___) => Container(
-                                color: Colors.grey.shade200,
-                                child: const Center(
-                                  child: Icon(Icons.image_not_supported_outlined,
-                                      color: Colors.grey),
+                                ],
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    StreamBuilder<int>(
+                                      stream: widget.service
+                                          .getPostLikeCountStream(widget.postId),
+                                      builder: (context, countSnapshot) {
+                                        if (!_isUpdating && countSnapshot.hasData) {
+                                          final realCount = countSnapshot.data!;
+                                          if (_optimisticLikeCount != realCount) {
+                                            WidgetsBinding.instance
+                                                .addPostFrameCallback((_) {
+                                              if (mounted && !_isUpdating) {
+                                                setState(() {
+                                                  _optimisticLikeCount = realCount;
+                                                });
+                                              }
+                                            });
+                                          }
+                                        }
+
+                                        final displayCount = _isUpdating
+                                            ? _optimisticLikeCount
+                                            : (countSnapshot.data ??
+                                                _optimisticLikeCount);
+
+                                        return StreamBuilder<bool>(
+                                          stream: widget.currentUid.isNotEmpty
+                                              ? widget.service.isPostLikedStream(
+                                                  widget.postId,
+                                                  widget.currentUid,
+                                                )
+                                              : Stream.value(false),
+                                          builder: (context, likedSnapshot) {
+                                            if (!_isUpdating &&
+                                                likedSnapshot.hasData) {
+                                              final streamLiked =
+                                                  likedSnapshot.data!;
+                                              if (_optimisticLiked != streamLiked) {
+                                                WidgetsBinding.instance
+                                                    .addPostFrameCallback((_) {
+                                                  if (mounted && !_isUpdating) {
+                                                    setState(() {
+                                                      _optimisticLiked = streamLiked;
+                                                    });
+                                                  }
+                                                });
+                                              }
+                                            }
+
+                                            final isLiked = _isUpdating
+                                                ? _optimisticLiked
+                                                : (likedSnapshot.data ??
+                                                    _optimisticLiked);
+
+                                            return _ActionButton(
+                                              icon: isLiked
+                                                  ? Icons.favorite
+                                                  : Icons.favorite_border,
+                                              label: '$displayCount',
+                                              color: isLiked
+                                                  ? Colors.redAccent
+                                                  : Colors.grey[700]!,
+                                              onTap: _handleLike,
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(width: 8),
+                                    _ActionButton(
+                                      icon: Icons.mode_comment_outlined,
+                                      label: '${widget.post.comments}',
+                                      color: Colors.grey[700]!,
+                                      onTap: widget.onComment,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    _ActionButton(
+                                      icon: Icons.share_outlined,
+                                      label: 'Compartir',
+                                      color: Colors.grey[700]!,
+                                      onTap: widget.onShare,
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              cacheWidth: 800,
+                              ],
                             ),
                           ),
-                        ),
-                      ],
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          // Like button con StreamBuilder para likeCount real
-                          StreamBuilder<int>(
-                            stream: widget.service.getPostLikeCountStream(widget.postId),
-                            builder: (context, countSnapshot) {
-                              // Si no estamos actualizando y tenemos datos del stream, sincronizar
-                              if (!_isUpdating && countSnapshot.hasData) {
-                                final realCount = countSnapshot.data!;
-                                if (_optimisticLikeCount != realCount) {
-                                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                                    if (mounted && !_isUpdating) {
-                                      setState(() {
-                                        _optimisticLikeCount = realCount;
-                                      });
-                                    }
-                                  });
-                                }
-                              }
-                              
-                              final displayCount = _isUpdating 
-                                  ? _optimisticLikeCount 
-                                  : (countSnapshot.data ?? _optimisticLikeCount);
-                              
-                              return StreamBuilder<bool>(
-                                stream: widget.currentUid.isNotEmpty
-                                    ? widget.service.isPostLikedStream(
-                                        widget.postId,
-                                        widget.currentUid,
-                                      )
-                                    : Stream.value(false),
-                                builder: (context, likedSnapshot) {
-                                  // Si no estamos actualizando y tenemos datos del stream, sincronizar
-                                  if (!_isUpdating && likedSnapshot.hasData) {
-                                    final streamLiked = likedSnapshot.data!;
-                                    if (_optimisticLiked != streamLiked) {
-                                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                                        if (mounted && !_isUpdating) {
-                                          setState(() {
-                                            _optimisticLiked = streamLiked;
-                                          });
-                                        }
-                                      });
-                                    }
-                                  }
-                                  
-                                  final isLiked = _isUpdating 
-                                      ? _optimisticLiked 
-                                      : (likedSnapshot.data ?? _optimisticLiked);
-                                  
-                                  return _ActionButton(
-                                    icon: isLiked ? Icons.favorite : Icons.favorite_border,
-                                    label: '$displayCount',
-                                    color: isLiked ? Colors.redAccent : Colors.grey[700]!,
-                                    onTap: _handleLike,
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          _ActionButton(
-                            icon: Icons.mode_comment_outlined,
-                            label: '${widget.post.comments}',
-                            color: Colors.grey[700]!,
-                            onTap: widget.onComment,
-                          ),
-                          const SizedBox(width: 8),
-                          _ActionButton(
-                            icon: Icons.share_outlined,
-                            label: 'Compartir',
-                            color: Colors.grey[700]!,
-                            onTap: widget.onShare,
-                          ),
                         ],
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ],
@@ -673,7 +753,7 @@ class _FeedPostTileState extends State<_FeedPostTile> {
 
 class _CreatePostModal extends StatefulWidget {
   final TextEditingController textController;
-  final Function(String text, String category) onPost;
+  final Future<bool> Function(String text, String category) onPost;
 
   const _CreatePostModal({
     required this.textController,
@@ -688,6 +768,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
   String _selectedCategory = 'Salud';
   final FocusNode _focusNode = FocusNode();
   int _charCount = 0;
+  bool _isSubmitting = false;
   late VoidCallback _textListener;
 
   @override
@@ -715,13 +796,18 @@ class _CreatePostModalState extends State<_CreatePostModal> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final mediaQuery = MediaQuery.of(context);
+    final bottomInset = mediaQuery.viewInsets.bottom;
+    final bottomSafeArea = mediaQuery.viewPadding.bottom;
+    final modalBottomPadding =
+        (bottomInset > 0 ? 8.0 : bottomSafeArea) + 8;
     final text = widget.textController.text.trim();
-    final canPost = text.length >= 10;
+    final canPost = text.length >= 10 && !_isSubmitting;
 
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOut,
+      padding: EdgeInsets.only(bottom: modalBottomPadding),
       child: Container(
         decoration: BoxDecoration(
           color: isDark ? colorScheme.surface : Colors.white,
@@ -978,9 +1064,16 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                     flex: 2,
                     child: ElevatedButton(
                       onPressed: canPost
-                          ? () {
-                              widget.onPost(text, _selectedCategory);
-                              Navigator.pop(context);
+                          ? () async {
+                              setState(() => _isSubmitting = true);
+                              final didPublish =
+                                  await widget.onPost(text, _selectedCategory);
+                              if (!context.mounted) return;
+                              if (didPublish) {
+                                Navigator.of(context).pop();
+                              } else {
+                                setState(() => _isSubmitting = false);
+                              }
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
@@ -999,16 +1092,27 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.send_rounded,
-                            size: 20,
-                            color: canPost
-                                ? colorScheme.onPrimary
-                                : colorScheme.onSurface.withOpacity(0.4),
-                          ),
-                          const SizedBox(width: 8),
+                          if (_isSubmitting)
+                            SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: colorScheme.onPrimary,
+                              ),
+                            )
+                          else ...[
+                            Icon(
+                              Icons.send_rounded,
+                              size: 20,
+                              color: canPost
+                                  ? colorScheme.onPrimary
+                                  : colorScheme.onSurface.withOpacity(0.4),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
                           Text(
-                            'Publicar',
+                            _isSubmitting ? 'Publicando...' : 'Publicar',
                             style: GoogleFonts.inter(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
