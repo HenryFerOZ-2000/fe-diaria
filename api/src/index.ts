@@ -306,6 +306,19 @@ export const setUsername = onCall({region: "us-central1"}, async (request) => {
       }
     }
 
+    // Legacy safety: if username_map is missing/stale, verify against users docs
+    const existingUserWithUsername = await tx.get(
+      db.collection("users")
+        .where("usernameLower", "==", username)
+        .limit(1),
+    );
+    if (!existingUserWithUsername.empty) {
+      const ownerUid = existingUserWithUsername.docs[0].id;
+      if (ownerUid !== uid) {
+        throw new HttpsError("already-exists", "username_taken");
+      }
+    }
+
     // Reserve new username
     tx.set(
       usernameDoc,
@@ -316,7 +329,13 @@ export const setUsername = onCall({region: "us-central1"}, async (request) => {
     // Release previous username if owned by same user
     if (prevLower && prevLower !== username) {
       const prevDoc = db.collection("username_map").doc(prevLower);
-      tx.delete(prevDoc);
+      const prevSnap = await tx.get(prevDoc);
+      const prevOwner = prevSnap.exists ?
+        (prevSnap.get("uid") as string | undefined) :
+        undefined;
+      if (prevOwner === uid) {
+        tx.delete(prevDoc);
+      }
     }
 
     // Update user document

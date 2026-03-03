@@ -61,7 +61,7 @@ class SocialService {
     
     // Asegurar longitud mínima de 3
     if (base.length < 3) {
-      base = '${base}${DateTime.now().millisecondsSinceEpoch.toString().substring(10)}';
+      base = '$base${DateTime.now().millisecondsSinceEpoch.toString().substring(10)}';
     }
     
     // Limitar a 20 caracteres
@@ -108,6 +108,9 @@ class SocialService {
     bool? isPublic,
     String? photoURL,
   }) async {
+    if (displayName != null && displayName.trim().isEmpty) {
+      throw ArgumentError('displayName_required');
+    }
     final data = <String, dynamic>{'updatedAt': FieldValue.serverTimestamp()};
     if (displayName != null) data['displayName'] = displayName.trim();
     if (bio != null) data['bio'] = bio;
