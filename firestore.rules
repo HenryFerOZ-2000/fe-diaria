@@ -91,7 +91,13 @@ service cloud.firestore {
       }
     }
 
-    // Reserva de usernames: solo lectura pública (opcional); escrituras bloqueadas para cliente
+    // Lock técnico de usernames: solo backend (admin SDK)
+    match /username_locks/{username} {
+      allow read: if false;
+      allow write: if false;
+    }
+
+    // Legado: colección anterior de reserva de usernames
     match /username_map/{username} {
       allow read: if false;
       allow write: if false;

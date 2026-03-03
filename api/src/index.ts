@@ -1,6 +1,7 @@
 import {setGlobalOptions} from "firebase-functions";
 import {onRequest} from "firebase-functions/https";
 import {onCall, HttpsError} from "firebase-functions/v2/https";
+import {user} from "firebase-functions/v1/auth";
 import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
 import {FieldValue, Timestamp} from "firebase-admin/firestore";
@@ -20,6 +21,9 @@ if (admin.apps.length === 0) {
 
 const db = admin.firestore();
 const TEST_LIVE_POST_TEXT = "Oración de prueba";
+const USERNAME_REGEX = /^[a-z0-9._]{3,20}$/;
+const USERNAME_LOCKS_COLLECTION = "username_locks";
+const LEGACY_USERNAME_MAP_COLLECTION = "username_map";
 
 const toDateId = (date: Date): string => {
   const year = date.getUTCFullYear();
@@ -235,20 +239,12 @@ const createLivePostTx = async (
         userSnap.get("plan") ?? "free" :
         "free",
       createdAt,
-      username: authorProfile.username ??
-        userSnap.get("username") ??
-        uid,
       displayName:
         authorProfile.displayName ??
         userSnap.get("displayName") ??
         authorProfile.username ??
         uid,
       photoURL: authorProfile.photoURL ?? userSnap.get("photoURL") ?? null,
-      usernameLower: (
-        authorProfile.username ??
-        userSnap.get("username") ??
-        uid
-      ).toString().toLowerCase(),
       isPublic: userSnap.exists ? userSnap.get("isPublic") ?? true : true,
       postsCount: userSnap.exists ?
         FieldValue.increment(1) :
@@ -266,39 +262,73 @@ const createLivePostTx = async (
 
 const normalizeUsername = (username: string): string => {
   const trimmed = username.trim().toLowerCase();
-  if (!/^[a-z0-9._]{3,20}$/.test(trimmed)) {
+  if (!USERNAME_REGEX.test(trimmed)) {
     throw new HttpsError("invalid-argument", "username_invalid");
   }
   return trimmed;
 };
 
-export const setUsername = onCall({region: "us-central1"}, async (request) => {
-  const uid = request.auth?.uid;
-  if (!uid) {
-    throw new HttpsError("unauthenticated", "auth_required");
-  }
-  const raw = (request.data as {username?: unknown}).username;
-  if (typeof raw !== "string") {
-    throw new HttpsError("invalid-argument", "username_required");
-  }
-  const username = normalizeUsername(raw);
-  const usernameDoc = db.collection("username_map").doc(username);
+const normalizeStoredUsername = (value: unknown): string | null => {
+  if (typeof value !== "string") return null;
+  const normalized = value.trim().toLowerCase();
+  if (!USERNAME_REGEX.test(normalized)) return null;
+  return normalized;
+};
+
+const usernameLocks = () => db.collection(USERNAME_LOCKS_COLLECTION);
+
+const assignUsernameForUid = async (
+  uid: string,
+  rawUsername: string,
+): Promise<string> => {
+  const username = normalizeUsername(rawUsername);
+  const usernameDoc = usernameLocks().doc(username);
   const userDoc = db.collection("users").doc(uid);
 
   await db.runTransaction(async (tx) => {
     const userSnap = await tx.get(userDoc);
-    let prevUsername: string | undefined;
-    if (userSnap.exists) {
-      prevUsername = userSnap.get("username") as string | undefined;
-    }
-    const prevLower = prevUsername?.toLowerCase();
+    const userData = userSnap.data() ?? {};
+    const prevLower = normalizeStoredUsername(userData.usernameLower) ??
+      normalizeStoredUsername(userData.username) ??
+      undefined;
+    const usernameSnap = await tx.get(usernameDoc);
+    const legacyCurrentRef = db.collection(LEGACY_USERNAME_MAP_COLLECTION)
+      .doc(username);
+    const legacyCurrentSnap = await tx.get(legacyCurrentRef);
 
-    // If same username, do nothing
+    let prevDoc: FirebaseFirestore.DocumentReference | null = null;
+    let prevSnap: FirebaseFirestore.DocumentSnapshot | null = null;
+    let legacyPrevRef: FirebaseFirestore.DocumentReference | null = null;
+    let legacyPrevSnap: FirebaseFirestore.DocumentSnapshot | null = null;
+
+    if (prevLower && prevLower !== username) {
+      prevDoc = usernameLocks().doc(prevLower);
+      prevSnap = await tx.get(prevDoc);
+      legacyPrevRef = db.collection(LEGACY_USERNAME_MAP_COLLECTION).doc(prevLower);
+      legacyPrevSnap = await tx.get(legacyPrevRef);
+    }
+
     if (prevLower === username) {
+      tx.set(usernameDoc, {
+        uid,
+        updatedAt: FieldValue.serverTimestamp(),
+      }, {merge: true});
+
+      const legacyOwner = legacyCurrentSnap.exists ?
+        (legacyCurrentSnap.get("uid") as string | undefined) :
+        undefined;
+      if (legacyOwner === uid) {
+        tx.delete(legacyCurrentRef);
+      }
+
+      tx.set(userDoc, {
+        username,
+        usernameLower: username,
+        updatedAt: FieldValue.serverTimestamp(),
+      }, {merge: true});
       return;
     }
 
-    const usernameSnap = await tx.get(usernameDoc);
     if (usernameSnap.exists) {
       const owner = usernameSnap.get("uid") as string | undefined;
       if (owner !== uid) {
@@ -306,7 +336,6 @@ export const setUsername = onCall({region: "us-central1"}, async (request) => {
       }
     }
 
-    // Legacy safety: if username_map is missing/stale, verify against users docs
     const existingUserWithUsername = await tx.get(
       db.collection("users")
         .where("usernameLower", "==", username)
@@ -319,26 +348,43 @@ export const setUsername = onCall({region: "us-central1"}, async (request) => {
       }
     }
 
-    // Reserve new username
     tx.set(
       usernameDoc,
-      {uid, createdAt: FieldValue.serverTimestamp()},
+      {
+        uid,
+        createdAt: usernameSnap.exists ?
+          usernameSnap.get("createdAt") ?? FieldValue.serverTimestamp() :
+          FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      },
       {merge: false},
     );
 
-    // Release previous username if owned by same user
-    if (prevLower && prevLower !== username) {
-      const prevDoc = db.collection("username_map").doc(prevLower);
-      const prevSnap = await tx.get(prevDoc);
+    if (prevDoc && prevSnap) {
       const prevOwner = prevSnap.exists ?
         (prevSnap.get("uid") as string | undefined) :
         undefined;
       if (prevOwner === uid) {
         tx.delete(prevDoc);
       }
+
+      if (legacyPrevRef && legacyPrevSnap) {
+        const legacyPrevOwner = legacyPrevSnap.exists ?
+          (legacyPrevSnap.get("uid") as string | undefined) :
+          undefined;
+        if (legacyPrevOwner === uid) {
+          tx.delete(legacyPrevRef);
+        }
+      }
+
+      const legacyOwner = legacyCurrentSnap.exists ?
+        (legacyCurrentSnap.get("uid") as string | undefined) :
+        undefined;
+      if (legacyOwner === uid) {
+        tx.delete(legacyCurrentRef);
+      }
     }
 
-    // Update user document
     tx.set(userDoc, {
       username,
       usernameLower: username,
@@ -346,7 +392,351 @@ export const setUsername = onCall({region: "us-central1"}, async (request) => {
     }, {merge: true});
   });
 
+  return username;
+};
+
+const buildUsernameCandidate = (
+  baseUsername: string,
+  uid: string,
+  attempt: number,
+): string => {
+  const base = normalizeUsername(baseUsername);
+  const suffixSeed = `_${uid.slice(0, 4).toLowerCase()}`;
+  const numbered = attempt > 0 ? `${suffixSeed}${attempt}` : suffixSeed;
+  const maxBaseLength = 20 - numbered.length;
+  const trimmedBase = base.slice(0, Math.max(3, maxBaseLength));
+  return `${trimmedBase}${numbered}`;
+};
+
+const assignAvailableUsername = async (
+  uid: string,
+  preferredBase: string,
+): Promise<string> => {
+  for (let attempt = 0; attempt <= 50; attempt += 1) {
+    const candidate = buildUsernameCandidate(preferredBase, uid, attempt);
+    try {
+      return await assignUsernameForUid(uid, candidate);
+    } catch (error) {
+      const isTaken =
+        error instanceof HttpsError &&
+        error.code === "already-exists" &&
+        error.message === "username_taken";
+      if (!isTaken) {
+        throw error;
+      }
+    }
+  }
+  throw new HttpsError("resource-exhausted", "username_generation_failed");
+};
+
+export const setUsername = onCall({region: "us-central1"}, async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) {
+    throw new HttpsError("unauthenticated", "auth_required");
+  }
+  const raw = (request.data as {username?: unknown}).username;
+  if (typeof raw !== "string") {
+    throw new HttpsError("invalid-argument", "username_required");
+  }
+  const username = await assignUsernameForUid(uid, raw);
+
   return {ok: true, username};
+});
+
+export const cleanupUserProfileOnDelete = user().onDelete(async (userRecord) => {
+  const uid = userRecord.uid;
+
+  const userDoc = db.collection("users").doc(uid);
+  await db.runTransaction(async (tx) => {
+    const userSnap = await tx.get(userDoc);
+    const userData = userSnap.data() ?? {};
+    const usernameLower = normalizeStoredUsername(userData.usernameLower) ??
+      normalizeStoredUsername(userData.username) ??
+      undefined;
+
+    if (usernameLower) {
+      const lockRef = usernameLocks().doc(usernameLower);
+      const lockSnap = await tx.get(lockRef);
+      const legacyRef = db.collection(LEGACY_USERNAME_MAP_COLLECTION)
+        .doc(usernameLower);
+      const legacySnap = await tx.get(legacyRef);
+
+      const owner = lockSnap.exists ?
+        (lockSnap.get("uid") as string | undefined) :
+        undefined;
+      if (owner === uid) {
+        tx.delete(lockRef);
+      }
+
+      const legacyOwner = legacySnap.exists ?
+        (legacySnap.get("uid") as string | undefined) :
+        undefined;
+      if (legacyOwner === uid) {
+        tx.delete(legacyRef);
+      }
+    }
+
+    if (userSnap.exists) {
+      tx.delete(userDoc);
+    }
+  });
+
+  const additionalLocks = await usernameLocks().where("uid", "==", uid).get();
+  if (!additionalLocks.empty) {
+    const batch = db.batch();
+    for (const doc of additionalLocks.docs) {
+      batch.delete(doc.ref);
+    }
+    await batch.commit();
+  }
+
+  const legacyLocks = await db.collection(LEGACY_USERNAME_MAP_COLLECTION)
+    .where("uid", "==", uid)
+    .get();
+  if (!legacyLocks.empty) {
+    const batch = db.batch();
+    for (const doc of legacyLocks.docs) {
+      batch.delete(doc.ref);
+    }
+    await batch.commit();
+  }
+});
+
+type UsernameUserRecord = {
+  uid: string;
+  createdAtMs: number;
+};
+
+const getCreatedAtMs = (value: unknown): number => {
+  if (value instanceof Timestamp) {
+    return value.toMillis();
+  }
+  return Number.MAX_SAFE_INTEGER;
+};
+
+export const migrateDuplicateUsernames = onRequest(async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      res.status(405).json({ok: false, error: "Método no permitido"});
+      return;
+    }
+
+    const providedSeedKey =
+      (req.headers["x-seed-key"] as string | undefined) ||
+      (req.headers.seed_key as string | undefined) ||
+      (req.query.seedKey as string | undefined);
+    ensureSeedKey(providedSeedKey);
+
+    const body = (req.body as {dryRun?: unknown}) || {};
+    const dryRun = body.dryRun === true || req.query.dryRun === "true";
+
+    const usersSnap = await db.collection("users").get();
+    const usernameOwners = new Map<string, UsernameUserRecord[]>();
+
+    for (const doc of usersSnap.docs) {
+      const data = doc.data();
+      const username = normalizeStoredUsername(data.usernameLower) ??
+        normalizeStoredUsername(data.username);
+      if (!username) {
+        continue;
+      }
+      const current = usernameOwners.get(username) ?? [];
+      current.push({
+        uid: doc.id,
+        createdAtMs: getCreatedAtMs(data.createdAt),
+      });
+      usernameOwners.set(username, current);
+    }
+
+    const duplicateEntries = Array.from(usernameOwners.entries())
+      .filter(([, owners]) => owners.length > 1);
+    const renamed: Array<{uid: string; old: string; next: string}> = [];
+
+    if (!dryRun) {
+      for (const [username, owners] of duplicateEntries) {
+        owners.sort((a, b) => {
+          if (a.createdAtMs === b.createdAtMs) {
+            return a.uid.localeCompare(b.uid);
+          }
+          return a.createdAtMs - b.createdAtMs;
+        });
+
+        const keeper = owners[0];
+        await assignUsernameForUid(keeper.uid, username);
+
+        for (const owner of owners.slice(1)) {
+          const next = await assignAvailableUsername(owner.uid, username);
+          renamed.push({uid: owner.uid, old: username, next});
+        }
+      }
+    }
+
+    res.json({
+      ok: true,
+      dryRun,
+      scannedUsers: usersSnap.size,
+      duplicatedUsernames: duplicateEntries.length,
+      duplicateUsersAffected: duplicateEntries.reduce(
+        (acc, [, owners]) => acc + owners.length,
+        0,
+      ),
+      renamedCount: renamed.length,
+      renamed,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    logger.error("migrateDuplicateUsernames error", {error: message});
+    const status = (error as {status?: number}).status ?? 500;
+    res.status(status).json({ok: false, error: message});
+  }
+});
+
+export const migrateUsernameMapToLocks = onRequest(async (req, res) => {
+  try {
+    if (req.method !== "POST") {
+      res.status(405).json({ok: false, error: "Método no permitido"});
+      return;
+    }
+
+    const providedSeedKey =
+      (req.headers["x-seed-key"] as string | undefined) ||
+      (req.headers.seed_key as string | undefined) ||
+      (req.query.seedKey as string | undefined);
+    ensureSeedKey(providedSeedKey);
+
+    const body = (req.body as {
+      dryRun?: unknown;
+      deleteLegacy?: unknown;
+      forceOverwrite?: unknown;
+    }) || {};
+
+    const dryRun = body.dryRun === true || req.query.dryRun === "true";
+    const deleteLegacy =
+      body.deleteLegacy === true || req.query.deleteLegacy === "true";
+    const forceOverwrite =
+      body.forceOverwrite === true || req.query.forceOverwrite === "true";
+
+    const legacySnap = await db.collection(LEGACY_USERNAME_MAP_COLLECTION).get();
+    let processed = 0;
+    let migrated = 0;
+    let deletedLegacy = 0;
+    let skippedInvalid = 0;
+    let skippedMissingUid = 0;
+    let conflicts = 0;
+    const conflictDetails: Array<{username: string; lockUid: string; mapUid: string}> = [];
+
+    if (!dryRun) {
+      let batch = db.batch();
+      let ops = 0;
+      const flush = async () => {
+        if (ops === 0) return;
+        await batch.commit();
+        batch = db.batch();
+        ops = 0;
+      };
+
+      for (const legacyDoc of legacySnap.docs) {
+        processed += 1;
+        const legacyData = legacyDoc.data();
+        const username = normalizeStoredUsername(legacyDoc.id);
+        const uid = typeof legacyData.uid === "string" ? legacyData.uid : "";
+
+        if (!username) {
+          skippedInvalid += 1;
+          continue;
+        }
+        if (!uid) {
+          skippedMissingUid += 1;
+          continue;
+        }
+
+        const lockRef = usernameLocks().doc(username);
+        const lockSnap = await lockRef.get();
+        if (lockSnap.exists) {
+          const lockUid = lockSnap.get("uid") as string | undefined;
+          if (lockUid && lockUid !== uid && !forceOverwrite) {
+            conflicts += 1;
+            conflictDetails.push({username, lockUid, mapUid: uid});
+            continue;
+          }
+        }
+
+        const createdAt = legacyData.createdAt ?? FieldValue.serverTimestamp();
+        batch.set(lockRef, {
+          uid,
+          createdAt,
+          updatedAt: FieldValue.serverTimestamp(),
+          migratedFrom: LEGACY_USERNAME_MAP_COLLECTION,
+        }, {merge: true});
+        ops += 1;
+        migrated += 1;
+
+        if (deleteLegacy) {
+          batch.delete(legacyDoc.ref);
+          ops += 1;
+          deletedLegacy += 1;
+        }
+
+        if (ops >= 450) {
+          await flush();
+        }
+      }
+
+      await flush();
+    } else {
+      for (const legacyDoc of legacySnap.docs) {
+        processed += 1;
+        const legacyData = legacyDoc.data();
+        const username = normalizeStoredUsername(legacyDoc.id);
+        const uid = typeof legacyData.uid === "string" ? legacyData.uid : "";
+
+        if (!username) {
+          skippedInvalid += 1;
+          continue;
+        }
+        if (!uid) {
+          skippedMissingUid += 1;
+          continue;
+        }
+
+        const lockRef = usernameLocks().doc(username);
+        const lockSnap = await lockRef.get();
+        if (lockSnap.exists) {
+          const lockUid = lockSnap.get("uid") as string | undefined;
+          if (lockUid && lockUid !== uid && !forceOverwrite) {
+            conflicts += 1;
+            conflictDetails.push({username, lockUid, mapUid: uid});
+            continue;
+          }
+        }
+
+        migrated += 1;
+        if (deleteLegacy) {
+          deletedLegacy += 1;
+        }
+      }
+    }
+
+    res.json({
+      ok: true,
+      dryRun,
+      deleteLegacy,
+      forceOverwrite,
+      scanned: legacySnap.size,
+      processed,
+      migrated,
+      deletedLegacy,
+      conflicts,
+      skippedInvalid,
+      skippedMissingUid,
+      conflictDetails,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    logger.error("migrateUsernameMapToLocks error", {error: message});
+    const status = (error as {status?: number}).status ?? 500;
+    res.status(status).json({ok: false, error: message});
+  }
 });
 
 // ---------------------------
