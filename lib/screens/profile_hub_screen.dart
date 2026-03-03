@@ -91,7 +91,11 @@ class ProfileHubScreen extends StatelessWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.mounted) {
           Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const WelcomeAuthScreen()),
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => const WelcomeAuthScreen(),
+              transitionDuration: Duration.zero,
+              reverseTransitionDuration: Duration.zero,
+            ),
             (route) => false,
           );
         }
