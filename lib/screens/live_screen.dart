@@ -783,7 +783,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
     final bottomInset = mediaQuery.viewInsets.bottom;
     final bottomSafeArea = mediaQuery.viewPadding.bottom;
     final modalBottomPadding =
-        (bottomInset > 0 ? 8.0 : bottomSafeArea) + 8;
+      bottomInset > 0 ? bottomInset + 8 : bottomSafeArea + 8;
     final text = _textController.text.trim();
     final canPost = text.length >= 10 && !_isSubmitting;
 
@@ -791,21 +791,22 @@ class _CreatePostModalState extends State<_CreatePostModal> {
       duration: const Duration(milliseconds: 180),
       curve: Curves.easeOut,
       padding: EdgeInsets.only(bottom: modalBottomPadding),
-      child: Container(
-        decoration: BoxDecoration(
-          color: isDark ? colorScheme.surface : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 20,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+      child: SingleChildScrollView(
+        child: Container(
+          decoration: BoxDecoration(
+            color: isDark ? colorScheme.surface : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             // Handle bar
             Padding(
               padding: const EdgeInsets.only(top: 12, bottom: 8),
@@ -1108,7 +1109,8 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                 ],
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );
