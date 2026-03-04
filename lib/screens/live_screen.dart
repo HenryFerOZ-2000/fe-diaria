@@ -10,6 +10,7 @@ import '../widgets/app_scaffold.dart';
 import '../widgets/top_notice.dart';
 import '../services/social_service.dart';
 import '../services/live_posts_service.dart';
+import '../services/profile_service.dart';
 import '../services/spiritual_stats_service.dart';
 import 'comments_screen.dart';
 
@@ -80,6 +81,7 @@ class _LiveScreenState extends State<LiveScreen> {
   final _auth = FirebaseAuth.instance;
   final _social = SocialService();
   final _livePostsService = LivePostsService();
+  final _profileService = ProfileService();
   String? _uid;
 
   @override
@@ -179,6 +181,46 @@ class _LiveScreenState extends State<LiveScreen> {
       '${post.text}\n\n- ${post.userName}',
       subject: 'Oración en vivo',
     );
+  }
+
+  Future<void> _deletePostFromLive(LivePost post) async {
+    final uid = _uid;
+    if (uid == null || post.authorUid != uid) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Eliminar publicación'),
+        content: const Text('¿Quieres eliminar esta publicación? Esta acción no se puede deshacer.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+
+    if (!mounted) return;
+    if (confirmed != true) return;
+
+    showTopNotice(context, message: 'Eliminando publicación...');
+    try {
+      await _profileService.deletePost(post.id);
+      if (!mounted) return;
+      showTopNotice(context, message: 'Publicación eliminada.');
+    } catch (e) {
+      if (!mounted) return;
+      showTopNotice(
+        context,
+        message: 'Error al eliminar: $e',
+        isError: true,
+      );
+    }
   }
 
   Future<bool> _submitPost(String text, {BuildContext? feedbackContext}) async {
@@ -362,6 +404,7 @@ class _LiveScreenState extends State<LiveScreen> {
                     currentUid: _uid ?? '',
                     onComment: () => _openComments(post),
                     onShare: () => _sharePost(post),
+                    onDelete: () => _deletePostFromLive(post),
                     onAuthorTap: null, // Los perfiles ya no son públicos
                   ),
                 );
@@ -385,6 +428,7 @@ class _FeedPostTile extends StatefulWidget {
   final String currentUid;
   final VoidCallback onComment;
   final VoidCallback onShare;
+  final VoidCallback? onDelete;
   final VoidCallback? onAuthorTap;
 
   const _FeedPostTile({
@@ -394,6 +438,7 @@ class _FeedPostTile extends StatefulWidget {
     required this.currentUid,
     required this.onComment,
     required this.onShare,
+    this.onDelete,
     this.onAuthorTap,
   });
 
@@ -720,6 +765,25 @@ class _FeedPostTileState extends State<_FeedPostTile> {
                               ],
                             ),
                           ),
+                          if (isMine && widget.onDelete != null)
+                            PopupMenuButton<String>(
+                              tooltip: 'Opciones',
+                              onSelected: (value) {
+                                if (value == 'delete') {
+                                  widget.onDelete?.call();
+                                }
+                              },
+                              itemBuilder: (context) => const [
+                                PopupMenuItem<String>(
+                                  value: 'delete',
+                                  child: Text('Eliminar publicación'),
+                                ),
+                              ],
+                              icon: Icon(
+                                Icons.more_vert,
+                                color: Colors.grey[700],
+                              ),
+                            ),
                         ],
                       );
                     },
