@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'system_ui_service.dart';
 
 class AdsService {
   static final AdsService _instance = AdsService._internal();
@@ -67,10 +68,12 @@ class AdsService {
           interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
             onAdDismissedFullScreenContent: (ad) {
               ad.dispose();
+              SystemUiService.applyFromPlatformBrightness();
               onAdDismissed();
             },
             onAdFailedToShowFullScreenContent: (ad, error) {
               ad.dispose();
+              SystemUiService.applyFromPlatformBrightness();
             },
           );
         },
