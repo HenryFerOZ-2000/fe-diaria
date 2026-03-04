@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/profile_service.dart';
@@ -269,61 +270,64 @@ class _PostsTabState extends State<_PostsTab> {
       ),
     );
 
-    if (confirmed == true && mounted) {
-      try {
-        // Mostrar indicador de carga
+    final shouldDelete = confirmed == true;
+    if (!shouldDelete) return;
+
+    try {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Row(
-              children: [
-                const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  'Eliminando publicación...',
-                  style: GoogleFonts.inter(),
-                ),
-              ],
+            content: Text(
+              'Eliminando publicación...',
+              style: GoogleFonts.inter(),
             ),
+            duration: const Duration(seconds: 30),
+          ),
+        );
+      }
+
+      await widget.profileService.deletePost(postId);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Publicación eliminada',
+              style: GoogleFonts.inter(),
+            ),
+            backgroundColor: Colors.green,
             duration: const Duration(seconds: 2),
           ),
         );
-
-        await widget.profileService.deletePost(postId);
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Publicación eliminada',
-                style: GoogleFonts.inter(),
-              ),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 2),
+      }
+    } on FirebaseFunctionsException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Error al eliminar (${e.code}): ${e.message ?? 'sin detalle'}',
+              style: GoogleFonts.inter(),
             ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Error al eliminar: ${e.toString()}',
-                style: GoogleFonts.inter(),
-              ),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Error al eliminar: ${e.toString()}',
+              style: GoogleFonts.inter(),
             ),
-          );
-        }
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
       }
     }
   }
@@ -333,13 +337,13 @@ class _PostsTabState extends State<_PostsTab> {
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: widget.profileService.userPosts(widget.uid, limit: 50),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
         if (snapshot.hasError) {
           return const Center(child: Text('Error al cargar posts'));
         }
         final docs = snapshot.data?.docs ?? [];
+        if (snapshot.connectionState == ConnectionState.waiting && docs.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
         if (docs.isEmpty) {
           return const Center(child: Text('Sin publicaciones todavía'));
         }

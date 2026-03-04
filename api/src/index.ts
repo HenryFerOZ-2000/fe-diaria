@@ -109,6 +109,7 @@ export const seedFirestore = onRequest(async (req, res) => {
 });
 
 type CreateLivePostInput = {text?: unknown};
+type DeleteLivePostInput = {postId?: unknown};
 
 const parseAuthHeader = (authHeader?: string): string | null => {
   if (!authHeader) return null;
@@ -811,6 +812,51 @@ export const createLivePostHttp = onRequest(async (req, res) => {
     res.status(400).json({ok: false, error: message});
   }
 });
+
+export const deleteLivePost = onCall(
+  {region: "us-central1"},
+  async (request) => {
+    logger.info("deleteLivePost called", {
+      hasAuth: !!request.auth,
+      uid: request.auth?.uid ?? null,
+    });
+
+    if (!request.auth?.uid) {
+      throw new HttpsError("unauthenticated", "login requerido");
+    }
+
+    const data = request.data as DeleteLivePostInput | undefined;
+    const postIdValue = data?.postId;
+    if (typeof postIdValue !== "string" || postIdValue.trim().length === 0) {
+      throw new HttpsError("invalid-argument", "postId requerido");
+    }
+
+    const postId = postIdValue.trim();
+    const postRef = db.collection("live_posts").doc(postId);
+    const userRef = db.collection("users").doc(request.auth.uid);
+
+    await db.runTransaction(async (tx) => {
+      const postSnap = await tx.get(postRef);
+      if (!postSnap.exists) {
+        throw new HttpsError("not-found", "Post no encontrado");
+      }
+
+      const authorUid = postSnap.get("authorUid") as string | undefined;
+      if (authorUid !== request.auth?.uid) {
+        throw new HttpsError("permission-denied", "No puedes eliminar este post");
+      }
+
+      tx.delete(postRef);
+      tx.set(userRef, {
+        postsCount: FieldValue.increment(-1),
+        updatedAt: FieldValue.serverTimestamp(),
+      }, {merge: true});
+    });
+
+    logger.info("deleteLivePost success", {postId, uid: request.auth.uid});
+    return {ok: true, postId};
+  },
+);
 
 // expireLivePosts removed - live feed no longer expires posts
 // Posts are now persistent and displayed in chronological order (newest first)
