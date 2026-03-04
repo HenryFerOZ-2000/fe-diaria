@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import '../widgets/app_scaffold.dart';
+import '../widgets/top_notice.dart';
 import '../services/social_service.dart';
 import '../services/live_posts_service.dart';
 import '../services/spiritual_stats_service.dart';
@@ -71,8 +72,8 @@ class LiveScreen extends StatefulWidget {
 
 class _LiveScreenState extends State<LiveScreen> {
   final ScrollController _scrollController = ScrollController();
-  List<LivePost> _posts = [];
   bool _isPosting = false;
+  DateTime? _nextPostAllowedAt;
   final Set<String> _likedPosts = {};
   final _firestore = FirebaseFirestore.instance;
   final _functions = FirebaseFunctions.instanceFor(region: 'us-central1');
@@ -151,40 +152,6 @@ class _LiveScreenState extends State<LiveScreen> {
         .limit(50);
   }
 
-  Future<void> _insertPostById(String postId) async {
-    try {
-      final doc = await _firestore.collection('live_posts').doc(postId).get();
-      if (!doc.exists) return;
-      final data = doc.data();
-      if (data == null) return;
-      if (_posts.any((p) => p.id == doc.id)) return;
-      final now = DateTime.now();
-      final ts = data['createdAt'] as Timestamp?;
-      final post = LivePost(
-        id: doc.id,
-        authorUid: data['authorUid'] as String? ?? '',
-        userName: (data['authorUsername'] as String?) ??
-            (data['authorName'] as String?) ??
-            (data['authorUid'] as String?) ??
-            'Anónimo',
-        authorPhoto: data['authorPhoto'] as String?,
-        text: data['text'] as String? ?? '',
-        timeAgo: _formatTimeAgo(ts?.toDate(), now),
-        joinCount: (data['joinCount'] ?? 0) as int,
-        likes: (data['likeCount'] ?? 0) as int,
-        comments: (data['commentCount'] ?? 0) as int,
-        isJoined: false,
-      );
-      if (mounted) {
-        setState(() {
-          _posts = [post, ..._posts];
-        });
-      }
-    } catch (e) {
-      debugPrint('Error fetching post $postId: $e');
-    }
-  }
-
   String _formatTimeAgo(DateTime? time, DateTime now) {
     if (time == null) return 'ahora';
     final diff = now.difference(time);
@@ -214,17 +181,34 @@ class _LiveScreenState extends State<LiveScreen> {
     );
   }
 
-
-  Future<bool> _submitPost(String text) async {
+  Future<bool> _submitPost(String text, {BuildContext? feedbackContext}) async {
+    final messageContext = feedbackContext ?? context;
     final trimmed = text.trim();
     if (trimmed.length < 10) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Escribe al menos 10 caracteres')),
+        showTopNotice(
+          messageContext,
+          message: 'Escribe al menos 10 caracteres',
+          isError: true,
         );
       }
       return false;
     }
+
+    final now = DateTime.now();
+    final nextAllowedAt = _nextPostAllowedAt;
+    if (nextAllowedAt != null && nextAllowedAt.isAfter(now)) {
+      final remaining = nextAllowedAt.difference(now).inSeconds;
+      if (mounted) {
+        showTopNotice(
+          messageContext,
+          message: 'Espera ${remaining > 0 ? remaining : 1}s para volver a publicar',
+          isError: true,
+        );
+      }
+      return false;
+    }
+
     if (_isPosting) return false;
     if (_auth.currentUser == null) {
       await FirebaseAuth.instance.signInAnonymously();
@@ -238,27 +222,28 @@ class _LiveScreenState extends State<LiveScreen> {
       final postId = result.data['postId'] as String?;
       if (!mounted) return false;
       if (postId != null) {
-        await _insertPostById(postId);
         // Incrementar contador de publicaciones creadas
         final spiritualStatsService = SpiritualStatsService();
         await spiritualStatsService.incrementPostCreated();
       }
+      _nextPostAllowedAt = DateTime.now().add(const Duration(seconds: 10));
       if (!mounted) return false;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Publicación creada.')),
-      );
       return true;
     } on FirebaseFunctionsException catch (e) {
-      if (!mounted) return false;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Error al publicar')),
+      if (!mounted || !messageContext.mounted) return false;
+      showTopNotice(
+        messageContext,
+        message: e.message ?? 'Error al publicar',
+        isError: true,
       );
       debugPrint('createLivePost error code=${e.code} message=${e.message} details=${e.details}');
       return false;
     } catch (e) {
-      if (!mounted) return false;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al publicar: $e')),
+      if (!mounted || !messageContext.mounted) return false;
+      showTopNotice(
+        messageContext,
+        message: 'Error al publicar: $e',
+        isError: true,
       );
       return false;
     } finally {
@@ -270,23 +255,21 @@ class _LiveScreenState extends State<LiveScreen> {
     }
   }
 
-  void _createPost() {
-    final textController = TextEditingController();
-    showModalBottomSheet(
+  Future<void> _createPost() async {
+    final didPublish = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _CreatePostModal(
-        textController: textController,
+      builder: (modalContext) => _CreatePostModal(
         onPost: (text, category) async {
-          return _submitPost(text);
+          return _submitPost(text, feedbackContext: modalContext);
         },
       ),
-    ).then((_) {
-      // Asegurar que el controller se disponga cuando el modal se cierra
-      textController.dispose();
-    });
+    );
+
+    if (!mounted || didPublish != true) return;
+    showTopNotice(context, message: 'Publicación creada.');
   }
 
   @override
@@ -752,11 +735,9 @@ class _FeedPostTileState extends State<_FeedPostTile> {
 }
 
 class _CreatePostModal extends StatefulWidget {
-  final TextEditingController textController;
   final Future<bool> Function(String text, String category) onPost;
 
   const _CreatePostModal({
-    required this.textController,
     required this.onPost,
   });
 
@@ -766,6 +747,7 @@ class _CreatePostModal extends StatefulWidget {
 
 class _CreatePostModalState extends State<_CreatePostModal> {
   String _selectedCategory = 'Salud';
+  final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   int _charCount = 0;
   bool _isSubmitting = false;
@@ -774,20 +756,21 @@ class _CreatePostModalState extends State<_CreatePostModal> {
   @override
   void initState() {
     super.initState();
-    _charCount = widget.textController.text.length;
+    _charCount = _textController.text.length;
     _textListener = () {
       if (mounted) {
         setState(() {
-          _charCount = widget.textController.text.length;
+          _charCount = _textController.text.length;
         });
       }
     };
-    widget.textController.addListener(_textListener);
+    _textController.addListener(_textListener);
   }
 
   @override
   void dispose() {
-    widget.textController.removeListener(_textListener);
+    _textController.removeListener(_textListener);
+    _textController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
@@ -801,7 +784,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
     final bottomSafeArea = mediaQuery.viewPadding.bottom;
     final modalBottomPadding =
         (bottomInset > 0 ? 8.0 : bottomSafeArea) + 8;
-    final text = widget.textController.text.trim();
+    final text = _textController.text.trim();
     final canPost = text.length >= 10 && !_isSubmitting;
 
     return AnimatedPadding(
@@ -900,7 +883,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                       ),
                     ),
                     child: TextField(
-                      controller: widget.textController,
+                      controller: _textController,
                       focusNode: _focusNode,
                       decoration: InputDecoration(
                         hintText: 'Escribe tu petición aquí...',
@@ -1039,7 +1022,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(context, false),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -1070,7 +1053,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                                   await widget.onPost(text, _selectedCategory);
                               if (!context.mounted) return;
                               if (didPublish) {
-                                Navigator.of(context).pop();
+                                Navigator.of(context).pop(true);
                               } else {
                                 setState(() => _isSubmitting = false);
                               }

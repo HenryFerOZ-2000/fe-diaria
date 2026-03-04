@@ -21,6 +21,7 @@ if (admin.apps.length === 0) {
 
 const db = admin.firestore();
 const TEST_LIVE_POST_TEXT = "Oración de prueba";
+const LIVE_POST_COOLDOWN_MS = 10_000;
 const USERNAME_REGEX = /^[a-z0-9._]{3,20}$/;
 const USERNAME_LOCKS_COLLECTION = "username_locks";
 const LEGACY_USERNAME_MAP_COLLECTION = "username_map";
@@ -139,8 +140,8 @@ const checkRateLimit = (
 ) => {
   if (!lastPostAt) return;
   const elapsed = nowMs - lastPostAt.toMillis();
-  if (elapsed < 60_000) {
-    const wait = Math.ceil((60_000 - elapsed) / 1000);
+  if (elapsed < LIVE_POST_COOLDOWN_MS) {
+    const wait = Math.ceil((LIVE_POST_COOLDOWN_MS - elapsed) / 1000);
     throw new Error(`Espera ${wait}s antes de publicar de nuevo.`);
   }
 };

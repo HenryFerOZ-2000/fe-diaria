@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/live_posts_service.dart';
+import '../widgets/top_notice.dart';
 
 class CommentsScreen extends StatefulWidget {
   final String postId;
@@ -92,19 +93,14 @@ class _CommentsScreenState extends State<CommentsScreen> {
       });
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              isReply ? 'Respuesta publicada.' : 'Comentario publicado.',
-            ),
-          ),
+        showTopNotice(
+          context,
+          message: isReply ? 'Respuesta publicada.' : 'Comentario publicado.',
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al comentar: $e')),
-        );
+        showTopNotice(context, message: 'Error al comentar: $e', isError: true);
       }
     } finally {
       if (mounted) {
@@ -146,11 +142,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
     final uid = _auth.currentUser?.uid;
     final mediaQuery = MediaQuery.of(context);
     final bottomInset = mediaQuery.viewInsets.bottom;
-    final bottomSafeArea = mediaQuery.viewPadding.bottom;
-    final inputBottomPadding =
-      (bottomInset > 0 ? 8.0 : bottomSafeArea) + 8;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(
           'Comentarios',
@@ -221,93 +215,103 @@ class _CommentsScreenState extends State<CommentsScreen> {
             ),
           ),
           // Input de comentario
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              border: Border(
-                top: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
-              ),
-            ),
-            padding: EdgeInsets.only(
-              left: 16,
-              right: 16,
-              top: 8,
-              bottom: inputBottomPadding,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (_replyingToAuthorName != null)
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    margin: const EdgeInsets.only(bottom: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Respondiendo a $_replyingToAuthorName',
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
+          AnimatedPadding(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
+            padding: EdgeInsets.only(bottom: bottomInset),
+            child: SafeArea(
+              top: false,
+              minimum: const EdgeInsets.only(bottom: 8),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  border: Border(
+                    top: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
+                  ),
+                ),
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  top: 8,
+                  bottom: 8,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_replyingToAuthorName != null)
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[50],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Respondiendo a $_replyingToAuthorName',
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: Colors.blue[900],
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close, size: 18),
+                              onPressed: _cancelReply,
                               color: Colors.blue[900],
                             ),
+                          ],
+                        ),
+                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _commentController,
+                            decoration: InputDecoration(
+                              hintText: _replyingToCommentId != null
+                                  ? 'Escribe una respuesta...'
+                                  : 'Escribe un comentario...',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 10,
+                              ),
+                            ),
+                            maxLines: null,
+                            textInputAction: TextInputAction.send,
+                            scrollPadding: const EdgeInsets.only(bottom: 120),
+                            onSubmitted:
+                                _isSubmittingComment ? null : (_) => _submitComment(),
                           ),
                         ),
+                        const SizedBox(width: 8),
                         IconButton(
-                          icon: const Icon(Icons.close, size: 18),
-                          onPressed: _cancelReply,
-                          color: Colors.blue[900],
+                          onPressed: _isSubmittingComment ? null : _submitComment,
+                          icon: _isSubmittingComment
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(Icons.send_rounded),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Colors.white,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _commentController,
-                        decoration: InputDecoration(
-                          hintText: _replyingToCommentId != null
-                              ? 'Escribe una respuesta...'
-                              : 'Escribe un comentario...',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
-                          ),
-                        ),
-                        maxLines: null,
-                        textInputAction: TextInputAction.send,
-                        onSubmitted:
-                            _isSubmittingComment ? null : (_) => _submitComment(),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      onPressed: _isSubmittingComment ? null : _submitComment,
-                      icon: _isSubmittingComment
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Icon(Icons.send_rounded),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         ],
