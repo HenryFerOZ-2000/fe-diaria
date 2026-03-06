@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,6 +14,7 @@ class MyPostsScreen extends StatefulWidget {
 class _MyPostsScreenState extends State<MyPostsScreen> {
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
+  final _functions = FirebaseFunctions.instanceFor(region: 'us-central1');
   String? _uid;
 
   @override
@@ -32,14 +34,29 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
 
   Future<void> _deletePost(String postId) async {
     try {
-      await _firestore.collection('live_posts').doc(postId).delete();
       if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Eliminando publicación...')),
+        );
+      }
+      final callable = _functions.httpsCallable('deleteLivePost');
+      await callable.call<Map<String, dynamic>>({'postId': postId});
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Publicación eliminada')),
         );
       }
+    } on FirebaseFunctionsException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al eliminar (${e.code}): ${e.message ?? 'sin detalle'}')),
+        );
+      }
     } catch (e) {
       if (mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error al eliminar: $e')),
         );
@@ -67,9 +84,6 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
             .orderBy('createdAt', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
           if (snapshot.hasError) {
             return Center(
               child: Text(
@@ -79,6 +93,9 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
             );
           }
           final docs = snapshot.data?.docs ?? [];
+          if (snapshot.connectionState == ConnectionState.waiting && docs.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
           if (docs.isEmpty) {
             return const Center(child: Text('Aún no has publicado oraciones.'));
           }

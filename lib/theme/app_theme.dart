@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// Paleta de colores profesional y moderna
@@ -274,6 +275,7 @@ ThemeData get lightTheme {
       backgroundColor: Colors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
+      systemOverlayStyle: SystemUiOverlayStyle.dark,
       iconTheme: const IconThemeData(color: AppColors.primary),
       titleTextStyle: GoogleFonts.nunito(
         fontSize: 24,
@@ -528,6 +530,7 @@ ThemeData get darkTheme {
       backgroundColor: Colors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
+      systemOverlayStyle: SystemUiOverlayStyle.light,
       iconTheme: const IconThemeData(color: AppColors.primaryLight),
       titleTextStyle: GoogleFonts.nunito(
         fontSize: 24,

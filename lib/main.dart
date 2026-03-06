@@ -9,6 +9,7 @@ import 'services/cache_service.dart';
 import 'services/language_service.dart';
 import 'services/notification_service.dart';
 import 'services/ads_service.dart';
+import 'services/system_ui_service.dart';
 import 'services/widget_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/chat_screen.dart';
@@ -57,6 +58,7 @@ bool _checkOnboarding() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemUiService.applyFromPlatformBrightness();
   await MobileAds.instance.initialize();
 
   try {
@@ -127,6 +129,10 @@ class MyApp extends StatelessWidget {
             theme: lightTheme,
             darkTheme: darkTheme,
             themeMode: provider.darkMode ? ThemeMode.dark : ThemeMode.light,
+            builder: (context, child) {
+              SystemUiService.applyFromContext(context);
+              return child ?? const SizedBox.shrink();
+            },
             home: startScreen,
             routes: {
               '/home': (context) => MainScreen(initialTabIndex: _initialTabIndex),

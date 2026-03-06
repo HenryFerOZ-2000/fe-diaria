@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'ads_service.dart';
 import 'storage_service.dart';
+import 'system_ui_service.dart';
 
 /// Gestor central de anuncios: controla reglas de frecuencia y anti-molestia.
 class AdsManager {
@@ -17,13 +18,19 @@ class AdsManager {
 
   /// Mostrar interstitial al ingresar a “Oraciones para…”.
   /// No bloquea la navegación; intenta cargar y mostrar en segundo plano.
-  void tryShowCategoryEntryInterstitial({VoidCallback? onDismissed}) async {
+  void tryShowCategoryEntryInterstitial({
+    VoidCallback? onDismissed,
+    BuildContext? context,
+  }) async {
     if (adsRemoved) return;
     if (_isShowingInterstitial) return;
     // Anti-molestia: no en lectura ni entrada de texto. La categoría es segura.
     final interstitial = await _adsService.loadInterstitialAd(
       onAdDismissed: () {
         _isShowingInterstitial = false;
+        if (context != null) {
+          SystemUiService.applyFromContext(context);
+        }
         if (onDismissed != null) onDismissed();
       },
     );
@@ -59,6 +66,7 @@ class AdsManager {
     final ad = await _adsService.loadInterstitialAd(
       onAdDismissed: () async {
         _isShowingInterstitial = false;
+        SystemUiService.applyFromContext(context);
       },
     );
     if (ad == null) return;

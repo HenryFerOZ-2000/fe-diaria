@@ -108,6 +108,9 @@ class SocialService {
     bool? isPublic,
     String? photoURL,
   }) async {
+    if (displayName != null && displayName.trim().isEmpty) {
+      throw ArgumentError('displayName_required');
+    }
     final data = <String, dynamic>{'updatedAt': FieldValue.serverTimestamp()};
     if (displayName != null) data['displayName'] = displayName.trim();
     if (bio != null) data['bio'] = bio;

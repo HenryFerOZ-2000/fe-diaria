@@ -65,6 +65,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _save() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
+    final displayName = _displayCtrl.text.trim();
+    if (displayName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('El nombre visible no puede estar vacío')),
+      );
+      return;
+    }
     final username = _usernameCtrl.text.trim().toLowerCase();
     if (!_validUsername(username)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -80,7 +87,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       await _social.setUsername(username);
       await _social.updateProfile(
         uid: uid,
-        displayName: _displayCtrl.text.trim(),
+        displayName: displayName,
         photoURL: _photoUrl,
       );
       if (mounted) {
@@ -91,8 +98,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final rawError = e.toString();
+        var message = 'Error: $rawError';
+        if (rawError.contains('username_taken') ||
+            rawError.contains('already-exists')) {
+          message = 'Este username ya está en uso. Prueba con otro.';
+        } else if (rawError.contains('username_invalid')) {
+          message = 'Username inválido: usa 3-20 caracteres [a-z0-9._]';
+        }
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          SnackBar(content: Text(message)),
         );
       }
     } finally {
