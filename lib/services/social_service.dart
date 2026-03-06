@@ -61,7 +61,7 @@ class SocialService {
     
     // Asegurar longitud mínima de 3
     if (base.length < 3) {
-      base = '${base}${DateTime.now().millisecondsSinceEpoch.toString().substring(10)}';
+      base = '$base${DateTime.now().millisecondsSinceEpoch.toString().substring(10)}';
     }
     
     // Limitar a 20 caracteres
