@@ -66,8 +66,9 @@ class HelloAoBibleApi {
       if (chapter != null) return chapter;
     }
 
-    final uri =
-        Uri.parse('$_baseUrl/$translationId/$bookId/$chapterNumber.json');
+    final uri = Uri.parse(
+      '$_baseUrl/$translationId/$bookId/$chapterNumber.json',
+    );
     try {
       final res = await _client.get(uri);
       if (res.statusCode != 200) {
@@ -76,8 +77,7 @@ class HelloAoBibleApi {
       final jsonMap = json.decode(res.body) as Map<String, dynamic>;
       final chapter = HelloAoChapter.fromJson(jsonMap);
       await prefs.setString(cacheKey, res.body);
-      await prefs.setInt(
-          cacheTimeKey, DateTime.now().millisecondsSinceEpoch);
+      await prefs.setInt(cacheTimeKey, DateTime.now().millisecondsSinceEpoch);
       return chapter;
     } catch (_) {
       final cached = fromCache();
@@ -123,4 +123,3 @@ class HelloAoBibleApi {
   String _cacheKey(String translationId, String bookId, int chapter) =>
       'cache_${translationId}_${bookId}_$chapter';
 }
-

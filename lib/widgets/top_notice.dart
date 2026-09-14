@@ -16,12 +16,13 @@ void showTopNotice(
   final mediaQuery = MediaQuery.of(context);
   final colorScheme = Theme.of(context).colorScheme;
 
-  final backgroundColor =
-      isError ? colorScheme.error : colorScheme.surfaceContainerHighest;
-  final foregroundColor =
-      isError ? colorScheme.onError : colorScheme.onSurface;
-  final borderColor =
-      isError ? colorScheme.error.withValues(alpha: 0.75) : colorScheme.primary.withValues(alpha: 0.28);
+  final backgroundColor = isError
+      ? colorScheme.error
+      : colorScheme.surfaceContainerHighest;
+  final foregroundColor = isError ? colorScheme.onError : colorScheme.onSurface;
+  final borderColor = isError
+      ? colorScheme.error.withValues(alpha: 0.75)
+      : colorScheme.primary.withValues(alpha: 0.28);
 
   _activeTopNoticeTimer?.cancel();
   _activeTopNotice?.remove();
@@ -70,11 +71,16 @@ void showTopNotice(
                     ],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
                     child: Row(
                       children: [
                         Icon(
-                          isError ? Icons.error_outline_rounded : Icons.check_circle_outline_rounded,
+                          isError
+                              ? Icons.error_outline_rounded
+                              : Icons.check_circle_outline_rounded,
                           color: foregroundColor,
                           size: 20,
                         ),

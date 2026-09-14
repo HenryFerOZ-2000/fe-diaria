@@ -48,9 +48,9 @@ class HelpSupportScreen extends StatelessWidget {
 
   void _openWhatsApp(BuildContext context) {
     if (AppConstants.supportWhatsApp == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('WhatsApp no disponible')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('WhatsApp no disponible')));
       return;
     }
 
@@ -193,7 +193,7 @@ class HelpSupportScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
       ),
       child: ListTile(
         leading: Icon(icon),

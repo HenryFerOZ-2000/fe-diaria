@@ -18,10 +18,12 @@ class TraditionalPrayersListScreen extends StatefulWidget {
   });
 
   @override
-  State<TraditionalPrayersListScreen> createState() => _TraditionalPrayersListScreenState();
+  State<TraditionalPrayersListScreen> createState() =>
+      _TraditionalPrayersListScreenState();
 }
 
-class _TraditionalPrayersListScreenState extends State<TraditionalPrayersListScreen> {
+class _TraditionalPrayersListScreenState
+    extends State<TraditionalPrayersListScreen> {
   final TraditionalPrayersService _service = TraditionalPrayersService();
   final AdsService _adsService = AdsService();
   BannerAd? _bannerAd;
@@ -43,7 +45,10 @@ class _TraditionalPrayersListScreenState extends State<TraditionalPrayersListScr
     try {
       await _service.loadPrayers();
       setState(() {
-        _prayers = _service.getPrayersByCategory(widget.religion, widget.category);
+        _prayers = _service.getPrayersByCategory(
+          widget.religion,
+          widget.category,
+        );
         _isLoading = false;
       });
     } catch (e) {
@@ -56,7 +61,7 @@ class _TraditionalPrayersListScreenState extends State<TraditionalPrayersListScr
 
   void _loadBannerAd() {
     if (_adsRemoved) return;
-    
+
     _adsService.loadBannerAd(
       adSize: AdSize.banner,
       onAdLoaded: (ad) {
@@ -102,7 +107,9 @@ class _TraditionalPrayersListScreenState extends State<TraditionalPrayersListScr
 
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final categoryDisplayName = _service.getCategoryDisplayName(widget.category);
+    final categoryDisplayName = _service.getCategoryDisplayName(
+      widget.category,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -124,7 +131,7 @@ class _TraditionalPrayersListScreenState extends State<TraditionalPrayersListScr
             end: Alignment.bottomRight,
             colors: [
               Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).colorScheme.tertiary.withOpacity(0.05),
+              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
               Theme.of(context).scaffoldBackgroundColor,
             ],
           ),
@@ -140,104 +147,113 @@ class _TraditionalPrayersListScreenState extends State<TraditionalPrayersListScr
                         ),
                       )
                     : _prayers.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.error_outline,
-                                  size: 64,
-                                  color: colorScheme.onSurface.withOpacity(0.5),
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'No se encontraron oraciones',
-                                  style: GoogleFonts.inter(fontSize: 16),
-                                ),
-                              ],
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              size: 64,
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.5,
+                              ),
                             ),
-                          )
-                        : ListView.builder(
-                            padding: const EdgeInsets.all(24),
-                            itemCount: _prayers.length,
-                            itemBuilder: (context, index) {
-                              final prayerKey = _prayers.keys.elementAt(index);
-                              final prayer = _prayers[prayerKey] as Map<String, dynamic>;
-                              final title = prayer['titulo'] as String? ?? prayerKey;
+                            const SizedBox(height: 16),
+                            Text(
+                              'No se encontraron oraciones',
+                              style: GoogleFonts.inter(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(24),
+                        itemCount: _prayers.length,
+                        itemBuilder: (context, index) {
+                          final prayerKey = _prayers.keys.elementAt(index);
+                          final prayer =
+                              _prayers[prayerKey] as Map<String, dynamic>;
+                          final title =
+                              prayer['titulo'] as String? ?? prayerKey;
 
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) => TraditionalPrayerDetailScreen(
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          TraditionalPrayerDetailScreen(
                                             religion: widget.religion,
                                             category: widget.category,
                                             prayerKey: prayerKey,
                                           ),
-                                        ),
-                                      );
-                                    },
-                                    borderRadius: BorderRadius.circular(16),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(20),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: Border.all(
-                                          color: colorScheme.primary.withOpacity(0.2),
-                                          width: 1,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: colorScheme.primary.withOpacity(0.1),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 2),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              title,
-                                              style: GoogleFonts.inter(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w600,
-                                                color: colorScheme.onSurface,
-                                              ),
-                                            ),
-                                          ),
-                                          Icon(
-                                            Icons.arrow_forward_ios,
-                                            size: 16,
-                                            color: colorScheme.primary,
-                                          ),
-                                        ],
-                                      ),
                                     ),
+                                  );
+                                },
+                                borderRadius: BorderRadius.circular(16),
+                                child: Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: colorScheme.primary.withValues(
+                                        alpha: 0.2,
+                                      ),
+                                      width: 1,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: colorScheme.primary.withValues(
+                                          alpha: 0.1,
+                                        ),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          title,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                            color: colorScheme.onSurface,
+                                          ),
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: 16,
+                                        color: colorScheme.primary,
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
               ),
               // Banner Ad fijo en la parte inferior
               if (!_adsRemoved)
                 Container(
                   alignment: Alignment.center,
                   width: double.infinity,
-                  height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
+                  height: _bannerAd != null
+                      ? _bannerAd!.size.height.toDouble()
+                      : 50,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? colorScheme.surface
-                        : Colors.white,
+                    color: isDark ? colorScheme.surface : Colors.white,
                     border: Border(
                       top: BorderSide(
-                        color: colorScheme.outline.withOpacity(0.1),
+                        color: colorScheme.outline.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -287,4 +303,3 @@ class _TraditionalPrayersListScreenState extends State<TraditionalPrayersListScr
     );
   }
 }
-

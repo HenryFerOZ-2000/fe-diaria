@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/share_service.dart';
+import '../widgets/prayer_reading_experience.dart';
 
 class MissionReadScreen extends StatefulWidget {
   final String title;
@@ -42,9 +43,33 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return PrayerReadingExperience(
+      loading: false,
+      category: 'Misión de hoy',
+      title: widget.title,
+      text: widget.content,
+      accent: const Color(0xFF77649A),
+      onBack: () => Navigator.pop(context),
+      onShare: () => ShareService.shareAsText(
+        text: widget.content,
+        reference: widget.title,
+        title: widget.title,
+      ),
+      onNext: () {
+        if (!_completed) {
+          widget.onCompleted();
+          _completed = true;
+        }
+        Navigator.pop(context);
+      },
+    );
+  }
+
+  // ignore: unused_element
+  Widget _buildLegacy(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: colorScheme.surface.withOpacity(0.98),
+      backgroundColor: colorScheme.surface.withValues(alpha: 0.98),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -67,20 +92,22 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
             borderRadius: BorderRadius.circular(18),
             gradient: LinearGradient(
               colors: [
-                colorScheme.primary.withOpacity(0.16),
-                colorScheme.tertiary.withOpacity(0.12),
+                colorScheme.primary.withValues(alpha: 0.16),
+                colorScheme.tertiary.withValues(alpha: 0.12),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withOpacity(0.08),
+                color: colorScheme.primary.withValues(alpha: 0.08),
                 blurRadius: 18,
                 offset: const Offset(0, 10),
               ),
             ],
-            border: Border.all(color: colorScheme.outline.withOpacity(0.08)),
+            border: Border.all(
+              color: colorScheme.outline.withValues(alpha: 0.08),
+            ),
           ),
           child: SingleChildScrollView(
             child: Column(
@@ -89,7 +116,7 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.12),
+                    color: Colors.white.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -154,7 +181,7 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -163,4 +190,3 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
     );
   }
 }
-

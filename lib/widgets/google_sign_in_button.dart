@@ -14,8 +14,10 @@ class GoogleSignInButton extends StatelessWidget {
       child: OutlinedButton.icon(
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-          side: BorderSide(color: colorScheme.outline.withOpacity(0.3)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          side: BorderSide(color: colorScheme.outline.withValues(alpha: 0.3)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           backgroundColor: Theme.of(context).brightness == Brightness.light
               ? Colors.white
               : colorScheme.surface,
@@ -47,10 +49,7 @@ class _GoogleGIcon extends StatelessWidget {
       child: FittedBox(
         child: Text(
           'G',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.red[600],
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red[600]),
         ),
       ),
     );

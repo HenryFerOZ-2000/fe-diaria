@@ -1,19 +1,26 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'providers/app_provider.dart';
 import 'providers/auth_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'services/storage_service.dart';
 import 'services/cache_service.dart';
 import 'services/language_service.dart';
 import 'services/notification_service.dart';
+import 'services/fcm_background_handler.dart';
+import 'services/push_messaging_service.dart';
 import 'services/ads_service.dart';
+import 'services/deep_link_service.dart';
 import 'services/system_ui_service.dart';
 import 'services/widget_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/chat_screen.dart';
-import 'screens/live_screen.dart';
+import 'screens/community_screen.dart';
 import 'screens/prayers_screen.dart';
 import 'screens/bible_screen.dart';
 import 'screens/profile_hub_screen.dart';
@@ -34,6 +41,8 @@ import 'screens/delete_account_screen.dart';
 import 'screens/help_support_screen.dart';
 import 'screens/faq_screen.dart';
 import 'screens/report_problem_screen.dart';
+import 'screens/settings_screen.dart';
+import 'screens/spiritual_paths_screen.dart';
 import 'screens/comments_screen.dart';
 import 'screens/my_posts_screen.dart';
 import 'screens/onboarding_screen.dart';
@@ -46,14 +55,28 @@ import 'services/content_validator.dart';
 import 'services/daily_content_service.dart';
 import 'theme/app_theme.dart';
 import 'screens/welcome_auth_screen.dart';
-import 'widgets/ad_banner.dart';
 import 'bible/ui/bible_books_screen.dart';
 
 int? _initialTabIndex;
 String? _notificationPayload;
+final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
 bool _checkOnboarding() {
   return StorageService().getOnboardingCompleted();
+}
+
+bool _hasFaithSelection() {
+  return StorageService().getValidatedTraditionalPrayersReligion().isNotEmpty;
+}
+
+Widget _buildHomeEntry() {
+  if (!_hasFaithSelection()) {
+    return const TraditionalPrayersReligionSelectionScreen(
+      requireSelection: true,
+      nextRouteOnSelect: '/home',
+    );
+  }
+  return MainScreen(initialTabIndex: _initialTabIndex);
 }
 
 void main() async {
@@ -63,13 +86,27 @@ void main() async {
 
   try {
     await Firebase.initializeApp();
+    // App Check reduce abuso de APIs Firebase y evita warnings de token ausente.
+    // En debug usa proveedor de desarrollo; en release usa providers reales.
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: kDebugMode
+          ? AndroidProvider.debug
+          : AndroidProvider.playIntegrity,
+      appleProvider: kDebugMode
+          ? AppleProvider.debug
+          : AppleProvider.appAttestWithDeviceCheckFallback,
+    );
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
     // Inicializar servicios en orden
     await StorageService.init();
+    await StorageService()
+        .syncTraditionalPrayersReligionFromCloudForCurrentUser();
     await CacheService.init();
     await LanguageService.init();
     final notificationService = NotificationService();
     await notificationService.initialize();
-    
+    await PushMessagingService().initialize();
+
     // Verificar si la app se abrió desde una notificación
     final details = await notificationService.getNotificationAppLaunchDetails();
     if (details?.didNotificationLaunchApp ?? false) {
@@ -81,7 +118,14 @@ void main() async {
         _initialTabIndex = 1;
       }
     }
-    
+
+    if (kDebugMode) {
+      debugPrint(
+        '[Verbum/Notifications] cold start: launchFromNotification=${details?.didNotificationLaunchApp} '
+        'payload=$_notificationPayload',
+      );
+    }
+
     await AdsService().initialize();
     // await PurchaseService().initialize(); // Deshabilitado - opción de pago único removida
     await WidgetService.initialize();
@@ -95,6 +139,7 @@ void main() async {
   }
 
   runApp(const MyApp());
+  DeepLinkService.instance.initialize(_navigatorKey);
 }
 
 class MyApp extends StatelessWidget {
@@ -110,20 +155,27 @@ class MyApp extends StatelessWidget {
       child: Consumer2<AppProvider, AuthProvider>(
         builder: (context, provider, auth, child) {
           final bool onboardingCompleted = _checkOnboarding();
+          final bool traditionSelected = _hasFaithSelection();
 
           Widget startScreen;
-          if (auth.isSignedIn) {
+          if (!traditionSelected) {
+            startScreen = TraditionalPrayersReligionSelectionScreen(
+              requireSelection: true,
+              nextRouteOnSelect: auth.isSignedIn ? '/home' : '/welcome',
+            );
+          } else if (auth.isSignedIn) {
             startScreen = onboardingCompleted
-                ? MainScreen(initialTabIndex: _initialTabIndex)
+                ? _buildHomeEntry()
                 : const OnboardingScreen();
           } else {
             // Invitado: si ya completó onboarding, dejar pasar; si no, mostrar welcome.
             startScreen = onboardingCompleted
-                ? MainScreen(initialTabIndex: _initialTabIndex)
+                ? _buildHomeEntry()
                 : const WelcomeAuthScreen();
           }
 
           return MaterialApp(
+            navigatorKey: _navigatorKey,
             title: 'Verbum',
             debugShowCheckedModeBanner: false,
             theme: lightTheme,
@@ -135,11 +187,12 @@ class MyApp extends StatelessWidget {
             },
             home: startScreen,
             routes: {
-              '/home': (context) => MainScreen(initialTabIndex: _initialTabIndex),
+              '/home': (context) => _buildHomeEntry(),
               '/emotion-selection': (context) => const EmotionSelectionScreen(),
               '/prayer-for-you': (context) => const PrayerForYouScreen(),
               '/category-prayers': (context) => const CategoryPrayersScreen(),
-              '/traditional-prayers-religion-selection': (context) => const TraditionalPrayersReligionSelectionScreen(),
+              '/traditional-prayers-religion-selection': (context) =>
+                  const TraditionalPrayersReligionSelectionScreen(),
               '/profile': (context) => ProfileHubScreen(),
               '/my-profile': (context) {
                 final args = ModalRoute.of(context)?.settings.arguments;
@@ -156,7 +209,9 @@ class MyApp extends StatelessWidget {
               '/streak': (context) => const StreakScreen(),
               '/spiritual-stats': (context) => const SpiritualStatsScreen(),
               '/achievement-detail': (context) {
-                final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+                final args =
+                    ModalRoute.of(context)!.settings.arguments
+                        as Map<String, dynamic>;
                 return AchievementDetailScreen(
                   achievement: args['achievement'],
                   stats: args['stats'],
@@ -173,8 +228,12 @@ class MyApp extends StatelessWidget {
               '/help-support': (context) => const HelpSupportScreen(),
               '/faq': (context) => const FaqScreen(),
               '/report-problem': (context) => const ReportProblemScreen(),
+              '/settings': (context) => const SettingsScreen(),
+              '/spiritual-paths': (context) => const SpiritualPathsScreen(),
               '/comments': (context) {
-                final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+                final args =
+                    ModalRoute.of(context)?.settings.arguments
+                        as Map<String, dynamic>?;
                 final postId = args?['postId'] as String? ?? '';
                 return CommentsScreen(postId: postId);
               },
@@ -184,6 +243,9 @@ class MyApp extends StatelessWidget {
             },
             navigatorObservers: [
               _NotificationNavigatorObserver(),
+              FirebaseAnalyticsObserver(
+                analytics: FirebaseAnalytics.instance,
+              ),
             ],
           );
         },
@@ -196,7 +258,7 @@ class _NotificationNavigatorObserver extends NavigatorObserver {
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPush(route, previousRoute);
-    
+
     // Si hay un payload de notificación y la app está lista, navegar
     if (_notificationPayload == 'emotion') {
       // Navegar a pantalla de emociones después de que la app esté lista
@@ -212,15 +274,14 @@ class _NotificationNavigatorObserver extends NavigatorObserver {
 
 class MainScreen extends StatefulWidget {
   final int? initialTabIndex;
-  
+
   const MainScreen({super.key, this.initialTabIndex});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen>
-    with TickerProviderStateMixin {
+class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   int _currentIndex = 2; // Default en "Hoy"
   int? _homeTabIndex;
   late List<AnimationController> _animationControllers;
@@ -239,12 +300,11 @@ class _MainScreenState extends State<MainScreen>
       ),
     );
     _fadeAnimations = _animationControllers
-        .map((controller) => Tween<double>(begin: 0.0, end: 1.0).animate(
-              CurvedAnimation(
-                parent: controller,
-                curve: Curves.easeInOut,
-              ),
-            ))
+        .map(
+          (controller) => Tween<double>(begin: 0.0, end: 1.0).animate(
+            CurvedAnimation(parent: controller, curve: Curves.easeInOut),
+          ),
+        )
         .toList();
     // Iniciar animación de la primera pantalla
     _animationControllers[_currentIndex].forward();
@@ -252,7 +312,7 @@ class _MainScreenState extends State<MainScreen>
 
   List<Widget> get _screens => [
     const ChatScreen(),
-    const LiveScreen(),
+    const CommunityScreen(),
     HomeScreen(initialTabIndex: _homeTabIndex), // Hoy
     const PrayersScreen(),
     const BibleScreen(),
@@ -273,8 +333,10 @@ class _MainScreenState extends State<MainScreen>
     if (!mounted) return;
 
     // Animar salida de la pantalla actual solo si está visible
-    if (_animationControllers[_currentIndex].status == AnimationStatus.forward ||
-        _animationControllers[_currentIndex].status == AnimationStatus.completed) {
+    if (_animationControllers[_currentIndex].status ==
+            AnimationStatus.forward ||
+        _animationControllers[_currentIndex].status ==
+            AnimationStatus.completed) {
       _animationControllers[_currentIndex].reverse();
     }
 
@@ -292,55 +354,75 @@ class _MainScreenState extends State<MainScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final dark = theme.brightness == Brightness.dark;
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: IndexedStack(
-              index: _currentIndex,
-              children: List.generate(
-                _screens.length,
-                (index) => FadeTransition(
-                  opacity: _fadeAnimations[index],
-                  child: _screens[index],
-                ),
-              ),
-            ),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: List.generate(
+          _screens.length,
+          (index) => FadeTransition(
+            opacity: _fadeAnimations[index],
+            child: _screens[index],
           ),
-          AdBanner(visible: !StorageService().getAdsRemoved()),
-        ],
+        ),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: _onDestinationSelected,
-        animationDuration: const Duration(milliseconds: 300),
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.chat_bubble_outline),
-            selectedIcon: const Icon(Icons.chat_bubble),
-            label: 'Chat',
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(12, 3, 12, 9),
+        child: Container(
+          decoration: BoxDecoration(
+            color: dark
+                ? const Color(0xFF262130).withValues(alpha: .97)
+                : const Color(0xFFFFFCF7).withValues(alpha: .98),
+            borderRadius: BorderRadius.circular(23),
+            border: Border.all(color: scheme.outline.withValues(alpha: .14)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: dark ? .28 : .11),
+                blurRadius: 24,
+                offset: const Offset(0, 9),
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.radio_button_unchecked),
-            selectedIcon: const Icon(Icons.radio_button_checked),
-            label: 'En Vivo',
+          clipBehavior: Clip.antiAlias,
+          child: NavigationBar(
+            height: 63,
+            backgroundColor: Colors.transparent,
+            indicatorColor: scheme.primary.withValues(alpha: dark ? .24 : .11),
+            selectedIndex: _currentIndex,
+            onDestinationSelected: _onDestinationSelected,
+            animationDuration: const Duration(milliseconds: 280),
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.chat_bubble_outline_rounded),
+                selectedIcon: Icon(Icons.chat_bubble_rounded),
+                label: 'Chat',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.groups_2_outlined),
+                selectedIcon: Icon(Icons.groups_2_rounded),
+                label: 'Comunidad',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.auto_awesome_outlined),
+                selectedIcon: Icon(Icons.auto_awesome_rounded),
+                label: 'Hoy',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.favorite_border_rounded),
+                selectedIcon: Icon(Icons.favorite_rounded),
+                label: 'Oraciones',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.menu_book_outlined),
+                selectedIcon: Icon(Icons.menu_book_rounded),
+                label: 'Biblia',
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.star_border),
-            selectedIcon: const Icon(Icons.star),
-            label: 'Hoy',
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.favorite_border),
-            selectedIcon: const Icon(Icons.favorite),
-            label: 'Oraciones',
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.menu_book_outlined),
-            selectedIcon: const Icon(Icons.menu_book),
-            label: 'Biblia',
-          ),
-        ],
+        ),
       ),
     );
   }

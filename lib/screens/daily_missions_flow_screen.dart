@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../controllers/missions_controller.dart';
@@ -6,6 +5,7 @@ import '../providers/app_provider.dart';
 import '../services/share_service.dart';
 import '../services/daily_progress_service.dart';
 import '../services/spiritual_stats_service.dart';
+import '../widgets/prayer_reading_experience.dart';
 
 /// Pantalla contenedora que maneja el flujo de misiones diarias
 /// usando PageView para transiciones fluidas tipo wizard
@@ -32,33 +32,34 @@ class DailyMissionsFlowScreen extends StatefulWidget {
   });
 
   @override
-  State<DailyMissionsFlowScreen> createState() => _DailyMissionsFlowScreenState();
+  State<DailyMissionsFlowScreen> createState() =>
+      _DailyMissionsFlowScreenState();
 }
 
 class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
   late PageController _pageController;
   late int _currentPageIndex;
   final Map<int, bool> _completedMissions = {};
-  Timer? _autoCompleteTimer;
+  bool _allCompletedNotified = false;
 
   @override
   void initState() {
     super.initState();
-    _currentPageIndex = widget.initialMissionIndex.clamp(0, widget.missions.length - 1);
+    _currentPageIndex = widget.initialMissionIndex.clamp(
+      0,
+      widget.missions.length - 1,
+    );
     _pageController = PageController(initialPage: _currentPageIndex);
-    
+
     // Inicializar estado de completado
     for (int i = 0; i < widget.missions.length; i++) {
       _completedMissions[i] = widget.missions[i].completed;
     }
-    
+
     // Cargar progreso desde Firestore al iniciar
     _loadProgressFromFirestore();
-    
-    // Auto-completar misión actual después de 2 segundos (comportamiento original)
-    _startAutoCompleteTimer();
   }
-  
+
   /// Carga el progreso diario desde Firestore y actualiza el estado
   Future<void> _loadProgressFromFirestore() async {
     try {
@@ -68,14 +69,17 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
       // Actualizar estado de misiones basado en Firestore
       for (int i = 0; i < widget.missions.length; i++) {
         final mission = widget.missions[i];
-        final internalId = DailyProgressService.mapMissionIdToInternal(mission.id);
+        final internalId = DailyProgressService.mapMissionIdToInternal(
+          mission.id,
+        );
         final isDone = progress.isMissionDone(internalId);
         _completedMissions[i] = isDone;
         if (isDone && !mission.completed) {
           widget.missionsController.completeMission(mission.id);
         }
       }
-      
+      _allCompletedNotified = widget.missionsController.isAllCompleted();
+
       if (mounted) {
         setState(() {});
       }
@@ -90,54 +94,21 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
     return now.hour >= 19; // 7 PM = 19:00
   }
 
-  void _startAutoCompleteTimer() {
-    _autoCompleteTimer?.cancel();
-    // Solo auto-completar si la misión actual NO está completada
-    final currentMission = widget.missions[_currentPageIndex];
-    final isAlreadyCompleted = _completedMissions[_currentPageIndex] ?? false;
-    
-    // Bloquear auto-completar si es la oración de la noche y aún no son las 7 PM
-    final isNightBlocked = currentMission.id == 'night' && 
-                          !_isNightPrayerAvailable() && 
-                          !isAlreadyCompleted;
-    
-    if (!isAlreadyCompleted && !currentMission.completed && !isNightBlocked) {
-      _autoCompleteTimer = Timer(const Duration(seconds: 2), () {
-        // Verificar nuevamente antes de completar (puede haber cambiado)
-        if (mounted && 
-            !(_completedMissions[_currentPageIndex] ?? false) && 
-            !widget.missions[_currentPageIndex].completed) {
-          final currentMission = widget.missions[_currentPageIndex];
-          _completedMissions[_currentPageIndex] = true;
-          widget.missionsController.completeMission(currentMission.id);
-          widget.onMissionComplete(currentMission);
-          
-          // Guardar en Firestore y actualizar stats en segundo plano (sin bloquear UI)
-          final isFirst = _completedMissions.values.where((c) => c == true).length == 1;
-          _saveMissionProgressAsync(currentMission, isFirstMission: isFirst);
-          
-          if (widget.missionsController.isAllCompleted() && widget.onAllCompleted != null) {
-            widget.onAllCompleted!();
-          }
-          
-          if (mounted) {
-            setState(() {});
-          }
-        }
-      });
-    }
-  }
-
   @override
   void dispose() {
-    _autoCompleteTimer?.cancel();
     _pageController.dispose();
     super.dispose();
   }
 
   double _getProgress() {
-    final total = widget.missions.length;
-    final completed = _completedMissions.values.where((c) => c == true).length;
+    final essentialIndexes = <int>[
+      for (var i = 0; i < widget.missions.length; i++)
+        if (!widget.missions[i].isOptional) i,
+    ];
+    final total = essentialIndexes.length;
+    final completed = essentialIndexes
+        .where((index) => _completedMissions[index] == true)
+        .length;
     if (total == 0) return 0.0;
     return completed / total;
   }
@@ -149,7 +120,10 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
     cleaned = cleaned.replaceAll(RegExp(r'strong="[^"]+"'), '');
     cleaned = cleaned.replaceAll(RegExp(r"strong='[^']+'"), '');
     // Remover cualquier carácter residual de las etiquetas
-    cleaned = cleaned.replaceAll(RegExp(r'\|\s*'), ' '); // Limpiar pipes residuales
+    cleaned = cleaned.replaceAll(
+      RegExp(r'\|\s*'),
+      ' ',
+    ); // Limpiar pipes residuales
     cleaned = cleaned.replaceAll(RegExp(r'\s+'), ' '); // Normalizar espacios
     return cleaned.trim();
   }
@@ -157,15 +131,26 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
   String _getMissionContent(String id) {
     switch (id) {
       case 'verse':
-        final verseText = widget.provider.todayVerse?.text ?? 'Versículo del día no disponible por el momento.';
+        final verseText =
+            widget.provider.todayVerse?.text ??
+            'Versículo del día no disponible por el momento.';
         // Limpiar etiquetas Strong del versículo
         return _cleanVerseText(verseText);
       case 'morning':
-        return widget.provider.todayMorningPrayer?.text ?? 'Oración del día no disponible por el momento.';
+        return widget.provider.todayMorningPrayer?.text ??
+            'Oración del día no disponible por el momento.';
       case 'night':
-        return widget.provider.todayEveningPrayer?.text ?? 'Oración de la noche no disponible por el momento.';
+        return widget.provider.todayEveningPrayer?.text ??
+            'Oración de la noche no disponible por el momento.';
+      case 'practice':
+        return widget.missions
+                .where((mission) => mission.id == id)
+                .firstOrNull
+                ?.content ??
+            'Haz una pausa y convierte la Palabra de hoy en un gesto concreto.';
       case 'family':
-        return widget.provider.todayFamilyPrayer?.text ?? 'Señor, bendice a mi familia, cuida su salud y guíanos en amor. Amén.';
+        return widget.provider.todayFamilyPrayer?.text ??
+            'Señor, bendice a mi familia, cuida su salud y guíanos en amor. Amén.';
       default:
         return 'Contenido no disponible.';
     }
@@ -182,125 +167,140 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
 
   void _handleNext() {
     final currentMission = widget.missions[_currentPageIndex];
-    final isLastMission = _currentPageIndex + 1 >= widget.missions.length;
-    final allCompleted = widget.missionsController.isAllCompleted();
-    
-    // Si es la última misión y no todas están completadas, o si todas están completadas, cerrar
-    if ((isLastMission && !allCompleted) || allCompleted) {
+    if (!(_completedMissions[_currentPageIndex] ?? false)) {
+      _completeCurrentMission();
+    }
+
+    // El cierre nocturno nunca se encadena a los tres momentos esenciales.
+    if (currentMission.isOptional ||
+        widget.missionsController.isAllCompleted()) {
       if (mounted && Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
       return;
     }
-    
-    // Verificar si la oración de la noche está bloqueada
-    if (currentMission.id == 'night' && 
-        !_isNightPrayerAvailable() && 
-        !(_completedMissions[_currentPageIndex] ?? false)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.lock_outline, color: Colors.white),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'La oración de la noche estará disponible a las 7:00 PM',
-                  style: GoogleFonts.inter(),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.orange[700],
-          duration: const Duration(seconds: 3),
-        ),
-      );
-      return;
-    }
-    
-    // Marcar como completado si no lo está
-    if (!_completedMissions[_currentPageIndex]!) {
-      _completedMissions[_currentPageIndex] = true;
-      widget.missionsController.completeMission(currentMission.id);
-      widget.onMissionComplete(currentMission);
-      
-      // Guardar en Firestore y actualizar stats en segundo plano (sin bloquear UI)
-      final isFirst = _completedMissions.values.where((c) => c == true).length == 1;
-      _saveMissionProgressAsync(currentMission, isFirstMission: isFirst);
-      
-      // Verificar si todas están completadas
-      if (widget.missionsController.isAllCompleted() && widget.onAllCompleted != null) {
-        widget.onAllCompleted!();
-      }
-      
-      if (mounted) {
-        setState(() {}); // Actualizar UI
-      }
-    }
 
-    // Navegar a la siguiente misión si no es la última
-    if (_currentPageIndex + 1 < widget.missions.length) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+    for (
+      var index = _currentPageIndex + 1;
+      index < widget.missions.length;
+      index++
+    ) {
+      if (!widget.missions[index].isOptional) {
+        setState(() => _currentPageIndex = index);
+        return;
+      }
     }
+    Navigator.of(context).pop();
+  }
+
+  void _completeCurrentMission() {
+    final mission = widget.missions[_currentPageIndex];
+    if (_completedMissions[_currentPageIndex] == true) return;
+    if (mission.id == 'night' && !_isNightPrayerAvailable()) return;
+
+    _completedMissions[_currentPageIndex] = true;
+    widget.missionsController.completeMission(mission.id);
+    widget.onMissionComplete(mission);
+    final isFirst = widget.missionsController.completedEssentialCount == 1;
+    _saveMissionProgressAsync(mission, isFirstMission: isFirst);
+
+    if (!mission.isOptional &&
+        widget.missionsController.isAllCompleted() &&
+        !_allCompletedNotified) {
+      _allCompletedNotified = true;
+      widget.onAllCompleted?.call();
+    }
+    if (mounted) setState(() {});
   }
 
   /// Guarda el progreso de la misión en segundo plano sin bloquear la UI
-  void _saveMissionProgressAsync(Mission mission, {bool isFirstMission = false}) {
+  void _saveMissionProgressAsync(
+    Mission mission, {
+    bool isFirstMission = false,
+  }) {
     // Ejecutar en segundo plano sin bloquear la navegación
     Future.microtask(() async {
       try {
-        final internalId = DailyProgressService.mapMissionIdToInternal(mission.id);
-        debugPrint('[DailyMissionsFlowScreen] 📝 Mission ID: ${mission.id} -> Internal ID: $internalId');
-        
+        final internalId = DailyProgressService.mapMissionIdToInternal(
+          mission.id,
+        );
+        debugPrint(
+          '[DailyMissionsFlowScreen] 📝 Mission ID: ${mission.id} -> Internal ID: $internalId',
+        );
+
         // Guardar en Firestore primero (más rápido)
         await widget.dailyProgressService.setMissionDone(
           internalId,
           done: true,
-          totalMissions: widget.missions.length,
+          requiredMissionIds: widget.missions
+              .where((item) => !item.isOptional)
+              .map(
+                (item) => DailyProgressService.mapMissionIdToInternal(item.id),
+              )
+              .toList(),
         );
-        debugPrint('[DailyMissionsFlowScreen] ✅ Mission saved to Firestore: $internalId');
-        
+        debugPrint(
+          '[DailyMissionsFlowScreen] ✅ Mission saved to Firestore: $internalId',
+        );
+
         // NO marcar día activo al completar misiones individuales
-        // La racha solo se actualiza cuando se completan TODAS las misiones diarias
+        // La racha se actualiza al completar los tres momentos esenciales.
         // (esto se hace en HomeScreen.onAllCompleted)
-        
+
         // Incrementar contadores según el tipo de misión
         // Esperar a que termine para asegurar que se actualice correctamente
         try {
-          debugPrint('[DailyMissionsFlowScreen] 🔍 Checking mission type: $internalId (original: ${mission.id})');
+          debugPrint(
+            '[DailyMissionsFlowScreen] 🔍 Checking mission type: $internalId (original: ${mission.id})',
+          );
           if (internalId == 'verse_of_day') {
-            debugPrint('[DailyMissionsFlowScreen] 📖 Detected verse mission, calling incrementVerseRead...');
+            debugPrint(
+              '[DailyMissionsFlowScreen] 📖 Detected verse mission, calling incrementVerseRead...',
+            );
             try {
               await widget.spiritualStatsService.incrementVerseRead();
-              debugPrint('[DailyMissionsFlowScreen] ✅ Verse read incremented successfully');
+              debugPrint(
+                '[DailyMissionsFlowScreen] ✅ Verse read incremented successfully',
+              );
             } catch (e) {
-              debugPrint('[DailyMissionsFlowScreen] ❌ Failed to increment verse read: $e');
+              debugPrint(
+                '[DailyMissionsFlowScreen] ❌ Failed to increment verse read: $e',
+              );
               // Continuar sin romper el flujo
             }
-          } else if (internalId == 'prayer_day' || 
-                     internalId == 'prayer_night' || 
-                     internalId == 'pray_family') {
-            debugPrint('[DailyMissionsFlowScreen] 🙏 Detected prayer mission ($internalId), calling incrementPrayerCompleted...');
+          } else if (internalId == 'prayer_day' ||
+              internalId == 'prayer_night' ||
+              internalId == 'pray_family') {
+            debugPrint(
+              '[DailyMissionsFlowScreen] 🙏 Detected prayer mission ($internalId), calling incrementPrayerCompleted...',
+            );
             try {
               await widget.spiritualStatsService.incrementPrayerCompleted();
-              debugPrint('[DailyMissionsFlowScreen] ✅ Prayer completed incremented successfully');
+              debugPrint(
+                '[DailyMissionsFlowScreen] ✅ Prayer completed incremented successfully',
+              );
             } catch (e) {
-              debugPrint('[DailyMissionsFlowScreen] ❌ Failed to increment prayer completed: $e');
+              debugPrint(
+                '[DailyMissionsFlowScreen] ❌ Failed to increment prayer completed: $e',
+              );
               // Continuar sin romper el flujo
             }
           } else {
-            debugPrint('[DailyMissionsFlowScreen] ⚠️ Unknown mission type: $internalId (mission.id: ${mission.id})');
+            debugPrint(
+              '[DailyMissionsFlowScreen] ⚠️ Unknown mission type: $internalId (mission.id: ${mission.id})',
+            );
           }
         } catch (e, stackTrace) {
-          debugPrint('[DailyMissionsFlowScreen] ❌ Error incrementing stats: $e');
+          debugPrint(
+            '[DailyMissionsFlowScreen] ❌ Error incrementing stats: $e',
+          );
           debugPrint('[DailyMissionsFlowScreen] Stack trace: $stackTrace');
           // No re-lanzar para no romper el flujo, pero loguear bien
         }
       } catch (e) {
-        debugPrint('[DailyMissionsFlowScreen] ❌ Error saving mission progress: $e');
+        debugPrint(
+          '[DailyMissionsFlowScreen] ❌ Error saving mission progress: $e',
+        );
       }
     });
   }
@@ -309,7 +309,7 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
     final currentMission = widget.missions[_currentPageIndex];
     final content = _getMissionContent(currentMission.id);
     final reference = _getMissionReference(currentMission.id);
-    
+
     ShareService.shareAsText(
       text: content,
       reference: reference ?? currentMission.title,
@@ -319,6 +319,61 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final mission = widget.missions[_currentPageIndex];
+    final blocked =
+        mission.id == 'night' &&
+        !_isNightPrayerAvailable() &&
+        !(_completedMissions[_currentPageIndex] ?? false);
+    return PrayerReadingExperience(
+      key: ValueKey('daily_${mission.id}'),
+      loading: false,
+      error: blocked
+          ? 'Esta oración estará disponible a las 7:00 PM. Vuelve más tarde para cerrar el día en paz.'
+          : null,
+      category: mission.isOptional
+          ? 'Cierre opcional'
+          : 'Momento ${widget.missions.take(_currentPageIndex + 1).where((m) => !m.isOptional).length} de ${widget.missions.where((m) => !m.isOptional).length}',
+      title: mission.title,
+      text: blocked ? null : _getMissionContent(mission.id),
+      verseReference: blocked ? null : _getMissionReference(mission.id),
+      accent: _missionAccent(mission.id),
+      onBack: () => Navigator.of(context).pop(),
+      onShare: blocked ? null : _share,
+      onComplete: blocked ? null : _completeCurrentMission,
+      onNext: blocked ? null : _handleNext,
+      initiallyCompleted: mission.completed,
+      primaryActionLabel: mission.id == 'practice'
+          ? 'He realizado este gesto'
+          : mission.id == 'verse'
+          ? 'He recibido la Palabra'
+          : mission.id == 'night'
+          ? 'He cerrado mi día en oración'
+          : 'He terminado mi oración',
+      completedActionLabel:
+          mission.isOptional ||
+              (mission.id == 'practice' &&
+                  widget.missionsController.isAllCompleted())
+          ? 'Finalizar'
+          : 'Continuar',
+    );
+  }
+
+  Color _missionAccent(String id) {
+    switch (id) {
+      case 'morning':
+        return const Color(0xFFB58A45);
+      case 'night':
+        return const Color(0xFF536C91);
+      case 'practice':
+        return const Color(0xFF5F8178);
+      default:
+        return const Color(0xFF77649A);
+    }
+  }
+
+  // Conservado temporalmente como referencia de la composición anterior.
+  // ignore: unused_element
+  Widget _buildLegacy(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Stack(
@@ -330,10 +385,7 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF1E1C2A),
-                  Color(0xFF2D2347),
-                ],
+                colors: [Color(0xFF1E1C2A), Color(0xFF2D2347)],
               ),
             ),
           ),
@@ -343,8 +395,8 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withOpacity(0.4),
-                  Colors.black.withOpacity(0.1),
+                  Colors.black.withValues(alpha: 0.4),
+                  Colors.black.withValues(alpha: 0.1),
                 ],
               ),
             ),
@@ -358,16 +410,25 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+                        icon: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Colors.white,
+                        ),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const Spacer(),
                       IconButton(
-                        icon: const Icon(Icons.close_rounded, color: Colors.white),
+                        icon: const Icon(
+                          Icons.close_rounded,
+                          color: Colors.white,
+                        ),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.share_outlined, color: Colors.white),
+                        icon: const Icon(
+                          Icons.share_outlined,
+                          color: Colors.white,
+                        ),
                         onPressed: _share,
                       ),
                     ],
@@ -383,7 +444,7 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
                           Text(
                             'Progress today',
                             style: GoogleFonts.inter(
-                              color: Colors.white.withOpacity(0.85),
+                              color: Colors.white.withValues(alpha: 0.85),
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
@@ -405,8 +466,10 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
                         child: LinearProgressIndicator(
                           value: _getProgress().clamp(0.0, 1.0),
                           minHeight: 8,
-                          backgroundColor: Colors.white.withOpacity(0.2),
-                          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFFB74D)),
+                          backgroundColor: Colors.white.withValues(alpha: 0.2),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Color(0xFFFFB74D),
+                          ),
                         ),
                       ),
                     ],
@@ -417,25 +480,29 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
                 Expanded(
                   child: PageView.builder(
                     controller: _pageController,
-                    physics: const NeverScrollableScrollPhysics(), // Solo avance con botones
+                    physics:
+                        const NeverScrollableScrollPhysics(), // Solo avance con botones
                     onPageChanged: (index) {
                       setState(() {
                         _currentPageIndex = index;
                       });
-                      // Reiniciar timer de auto-completado para la nueva página
-                      _startAutoCompleteTimer();
                     },
                     itemCount: widget.missions.length,
                     itemBuilder: (context, index) {
                       final mission = widget.missions[index];
-                      final isBlocked = mission.id == 'night' && 
-                                      !_isNightPrayerAvailable() && 
-                                      !(_completedMissions[index] ?? false);
+                      final isBlocked =
+                          mission.id == 'night' &&
+                          !_isNightPrayerAvailable() &&
+                          !(_completedMissions[index] ?? false);
                       return _MissionStepWidget(
                         key: ValueKey(mission.id),
                         mission: mission,
-                        content: isBlocked ? '' : _getMissionContent(mission.id),
-                        reference: isBlocked ? null : _getMissionReference(mission.id),
+                        content: isBlocked
+                            ? ''
+                            : _getMissionContent(mission.id),
+                        reference: isBlocked
+                            ? null
+                            : _getMissionReference(mission.id),
                         isBlocked: isBlocked,
                       );
                     },
@@ -455,32 +522,33 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
   }
 
   Widget _primaryNextButton() {
-    // Verificar si todas las misiones están completadas
+    // Verificar si todos los momentos esenciales están completados.
     final allCompleted = widget.missionsController.isAllCompleted();
     final isLastMission = _currentPageIndex + 1 >= widget.missions.length;
     final currentMission = widget.missions[_currentPageIndex];
-    final isCurrentBlocked = currentMission.id == 'night' && 
-                            !_isNightPrayerAvailable() && 
-                            !(_completedMissions[_currentPageIndex] ?? false);
-    
+    final isCurrentBlocked =
+        currentMission.id == 'night' &&
+        !_isNightPrayerAvailable() &&
+        !(_completedMissions[_currentPageIndex] ?? false);
+
     // Mostrar "Cerrar" si es la última misión (completadas o no) o si todas están completadas
     final showClose = isLastMission || allCompleted;
-    
+
     return SizedBox(
       width: double.infinity,
       height: 54,
       child: ElevatedButton(
         onPressed: isCurrentBlocked ? null : _handleNext,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isCurrentBlocked 
-              ? Colors.grey.withOpacity(0.5)
+          backgroundColor: isCurrentBlocked
+              ? Colors.grey.withValues(alpha: 0.5)
               : const Color(0xFF6C63FF),
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
           elevation: 0,
-          disabledBackgroundColor: Colors.grey.withOpacity(0.3),
+          disabledBackgroundColor: Colors.grey.withValues(alpha: 0.3),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -564,10 +632,10 @@ class _MissionStepWidgetState extends State<_MissionStepWidget>
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         width: 1,
                       ),
                     ),
@@ -576,14 +644,14 @@ class _MissionStepWidgetState extends State<_MissionStepWidget>
                         Icon(
                           Icons.lock_outline,
                           size: 48,
-                          color: Colors.white.withOpacity(0.5),
+                          color: Colors.white.withValues(alpha: 0.5),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'Esta misión estará disponible a las 7:00 PM',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.inter(
-                            color: Colors.white.withOpacity(0.7),
+                            color: Colors.white.withValues(alpha: 0.7),
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -593,7 +661,7 @@ class _MissionStepWidgetState extends State<_MissionStepWidget>
                           'Vuelve más tarde para completar tu oración de la noche',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.inter(
-                            color: Colors.white.withOpacity(0.5),
+                            color: Colors.white.withValues(alpha: 0.5),
                             fontSize: 14,
                           ),
                         ),
@@ -631,4 +699,3 @@ class _MissionStepWidgetState extends State<_MissionStepWidget>
     );
   }
 }
-

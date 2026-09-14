@@ -12,7 +12,9 @@ class TraditionalPrayerRepository {
 
   Future<List<TraditionalPrayer>> _load() async {
     if (_cache != null) return _cache!;
-    final jsonStr = await rootBundle.loadString('assets/traditional_prayers.json');
+    final jsonStr = await rootBundle.loadString(
+      'assets/traditional_prayers.json',
+    );
     final data = json.decode(jsonStr) as List<dynamic>;
     _cache = data
         .map((e) => TraditionalPrayer.fromJson(e as Map<String, dynamic>))
@@ -31,4 +33,3 @@ class TraditionalPrayerRepository {
     }
   }
 }
-

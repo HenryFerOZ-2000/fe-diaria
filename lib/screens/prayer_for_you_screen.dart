@@ -10,6 +10,7 @@ import '../widgets/app_scaffold.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/main_card.dart';
 import '../theme/app_theme.dart';
+import '../widgets/prayer_reading_experience.dart';
 
 /// Pantalla dedicada "Oración para ti" - Mostrando oración y versículo personalizados
 class PrayerForYouScreen extends StatefulWidget {
@@ -35,7 +36,7 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
 
   void _loadBannerAd() {
     if (_adsRemoved) return;
-    
+
     _adsService.loadBannerAd(
       adSize: AdSize.banner,
       onAdLoaded: (ad) {
@@ -84,18 +85,16 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
         final personalizationService = PersonalizationService();
         final userName = personalizationService.getUserName();
         final emotion = personalizationService.getUserEmotion();
-        
+
         // Generar oración personalizada
-        final personalizedPrayerText = personalizationService.generatePersonalizedPrayer(
-          emotion,
-          userName,
-        );
-        
+        final personalizedPrayerText = personalizationService
+            .generatePersonalizedPrayer(emotion, userName);
+
         // Obtener versículo personalizado (si hay emoción)
         final verse = provider.todayVerse;
         final colorScheme = Theme.of(context).colorScheme;
         final isDark = Theme.of(context).brightness == Brightness.dark;
-        
+
         return AppScaffold(
           title: 'Oración para ti',
           actions: [
@@ -121,29 +120,30 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
                         text: '¿Cómo te sientes ahora?',
                         icon: Icons.emoji_emotions_outlined,
                         onPressed: () {
-                          Navigator.of(context).pushReplacementNamed('/emotion-selection');
+                          Navigator.of(
+                            context,
+                          ).pushReplacementNamed('/emotion-selection');
                         },
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.lg,
+                        ),
                         fontSize: 18,
                       ),
                       const SizedBox(height: AppSpacing.xl),
-                      
+
                       // Oración personalizada
                       _buildPrayerCard(
                         context: context,
                         prayerText: personalizedPrayerText,
                         userName: userName,
                       ),
-                      
+
                       const SizedBox(height: AppSpacing.xl),
-                      
+
                       // Versículo relacionado
                       if (verse != null)
-                        _buildVerseCard(
-                          context: context,
-                          verse: verse,
-                        ),
+                        _buildVerseCard(context: context, verse: verse),
                     ],
                   ),
                 ),
@@ -153,14 +153,14 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
                 Container(
                   alignment: Alignment.center,
                   width: double.infinity,
-                  height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
+                  height: _bannerAd != null
+                      ? _bannerAd!.size.height.toDouble()
+                      : 50,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? colorScheme.surface
-                        : AppColors.surface,
+                    color: isDark ? colorScheme.surface : AppColors.surface,
                     border: Border(
                       top: BorderSide(
-                        color: colorScheme.outline.withOpacity(0.1),
+                        color: colorScheme.outline.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -200,8 +200,20 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return MainCard(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => PrayerTextReadingScreen(
+            title: userName.isNotEmpty
+                ? 'Oración para $userName'
+                : 'Tu oración personalizada',
+            text: prayerText,
+            accent: const Color(0xFFA65F69),
+            category: 'Oración para ti',
+          ),
+        ),
+      ),
       padding: const EdgeInsets.all(AppSpacing.xl),
       child: Stack(
         children: [
@@ -216,10 +228,7 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
-                    colors: [
-                      colorScheme.primary,
-                      colorScheme.tertiary,
-                    ],
+                    colors: [colorScheme.primary, colorScheme.tertiary],
                   ),
                 ),
               ),
@@ -233,7 +242,7 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
-                      color: colorScheme.secondary.withOpacity(0.15),
+                      color: colorScheme.secondary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(AppRadius.md),
                     ),
                     child: Icon(
@@ -245,7 +254,7 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
-                      userName.isNotEmpty 
+                      userName.isNotEmpty
                           ? 'Oración para $userName'
                           : 'Tu Oración Personalizada',
                       style: theme.textTheme.displaySmall?.copyWith(
@@ -278,12 +287,12 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return MainCard(
       padding: const EdgeInsets.all(AppSpacing.xl),
-      backgroundColor: colorScheme.tertiary.withOpacity(0.1),
+      backgroundColor: colorScheme.tertiary.withValues(alpha: 0.1),
       border: Border.all(
-        color: colorScheme.tertiary.withOpacity(0.3),
+        color: colorScheme.tertiary.withValues(alpha: 0.3),
         width: 2,
       ),
       child: Stack(
@@ -293,11 +302,7 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
             right: -30,
             child: Opacity(
               opacity: 0.06,
-              child: Icon(
-                Icons.book,
-                size: 140,
-                color: colorScheme.tertiary,
-              ),
+              child: Icon(Icons.book, size: 140, color: colorScheme.tertiary),
             ),
           ),
           Column(
@@ -308,7 +313,7 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
-                      color: colorScheme.tertiary.withOpacity(0.2),
+                      color: colorScheme.tertiary.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(AppRadius.md),
                     ),
                     child: Icon(
@@ -353,4 +358,3 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
     );
   }
 }
-

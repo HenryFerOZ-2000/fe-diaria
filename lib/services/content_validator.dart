@@ -53,9 +53,13 @@ class ContentValidator {
       }
     }
     if (total < 365) {
-      debugPrint('Validation: verses total $total < 365 (will normalize by cycling)');
+      debugPrint(
+        'Validation: verses total $total < 365 (will normalize by cycling)',
+      );
     } else if (total > 365) {
-      debugPrint('Validation: verses total $total > 365 (will truncate to 365)');
+      debugPrint(
+        'Validation: verses total $total > 365 (will truncate to 365)',
+      );
     } else {
       debugPrint('Validation: verses total OK = 365');
     }
@@ -71,20 +75,21 @@ class ContentValidator {
       final raw = await rootBundle.loadString(path);
       final list = json.decode(raw) as List<dynamic>;
       if (list.length < expectedMin) {
-        debugPrint('Validation: $label has only ${list.length} items (< $expectedMin). Will cycle at runtime.');
+        debugPrint(
+          'Validation: $label has only ${list.length} items (< $expectedMin). Will cycle at runtime.',
+        );
       }
       // spot check first item
       if (list.isNotEmpty) {
         final first = list.first;
         if (first is Map && !first.containsKey(itemPath)) {
-          debugPrint('Validation: $label first item missing "$itemPath" field.');
+          debugPrint(
+            'Validation: $label first item missing "$itemPath" field.',
+          );
         }
       }
     } catch (e) {
       debugPrint('Validation: could not read $label at $path: $e');
     }
   }
-
 }
-
-

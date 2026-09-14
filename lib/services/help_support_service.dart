@@ -7,11 +7,9 @@ class HelpSupportService {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
 
-  HelpSupportService({
-    FirebaseFirestore? firestore,
-    FirebaseAuth? auth,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance;
+  HelpSupportService({FirebaseFirestore? firestore, FirebaseAuth? auth})
+    : _firestore = firestore ?? FirebaseFirestore.instance,
+      _auth = auth ?? FirebaseAuth.instance;
 
   /// Obtiene FAQ desde Firestore o retorna null si no existe
   Future<List<Map<String, dynamic>>?> getFaqFromFirestore() async {
@@ -45,7 +43,9 @@ class HelpSupportService {
         'description': description,
         'screenshotUrl': screenshotUrl,
         'appVersion': '0.1.1', // TODO: obtener de package_info_plus
-        'platform': Platform.isAndroid ? 'android' : (Platform.isIOS ? 'ios' : 'unknown'),
+        'platform': Platform.isAndroid
+            ? 'android'
+            : (Platform.isIOS ? 'ios' : 'unknown'),
         'status': 'open',
         'createdAt': FieldValue.serverTimestamp(),
       });
@@ -55,4 +55,3 @@ class HelpSupportService {
     }
   }
 }
-

@@ -27,4 +27,3 @@ class EmotionPassageRepository {
     return _cache?[emotionKey] ?? <EmotionPassage>[];
   }
 }
-

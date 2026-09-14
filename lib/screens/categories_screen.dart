@@ -17,6 +17,8 @@ import '../widgets/app_scaffold.dart';
 import '../widgets/section_title.dart';
 import '../widgets/category_card.dart';
 import '../theme/app_theme.dart';
+import '../faith/faith_tradition.dart';
+import '../faith/tradition_capabilities.dart';
 
 /// Pantalla principal de Categorías con acceso a todos los módulos
 class CategoriesScreen extends StatefulWidget {
@@ -42,7 +44,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   void _loadBannerAd() {
     if (_adsRemoved) return;
-    
+
     _adsService.loadBannerAd(
       adSize: AdSize.banner,
       onAdLoaded: (ad) {
@@ -64,6 +66,144 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   void dispose() {
     _bannerAd?.dispose();
     super.dispose();
+  }
+
+  List<Widget> _buildCategoryCards(BuildContext context) {
+    final tradition = faithTraditionFromStorageString(
+      StorageService().getValidatedTraditionalPrayersReligion(),
+    );
+    final caps = TraditionCapabilities.forTradition(tradition);
+
+    return [
+      CategoryCard(
+        title: 'Devocionales diarios',
+        description: 'Reflexiones diarias con versículos',
+        icon: Icons.book_rounded,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const DevotionalsScreen()),
+          );
+        },
+      ),
+      CategoryCard(
+        title: 'Salmos por categoría',
+        description: 'Salmos de protección, agradecimiento y consuelo',
+        icon: Icons.library_books_rounded,
+        onTap: () {
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (context) => const PsalmsScreen()));
+        },
+      ),
+      CategoryCard(
+        title: TraditionUiStrings.categoriesTraditionalCardTitle(tradition),
+        description: TraditionUiStrings.categoriesTraditionalCardDescription(
+          tradition,
+        ),
+        icon: Icons.menu_book_rounded,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) =>
+                  const TraditionalPrayersReligionSelectionScreen(),
+            ),
+          );
+        },
+      ),
+      CategoryCard(
+        title: 'Oración para…',
+        description: 'Oraciones para situaciones específicas',
+        icon: Icons.favorite_rounded,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const CategoryPrayersScreen(),
+            ),
+          );
+        },
+      ),
+      CategoryCard(
+        title: 'Cómo te sientes hoy',
+        description: 'Oraciones personalizadas según tu emoción',
+        icon: Icons.emoji_emotions_rounded,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const EmotionSelectionScreen(),
+            ),
+          );
+        },
+      ),
+      CategoryCard(
+        title: 'Oraciones para dormir',
+        description: 'Oraciones de paz y descanso nocturno',
+        icon: Icons.bedtime_rounded,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const NightPrayersScreen()),
+          );
+        },
+      ),
+      CategoryCard(
+        title: 'Peticiones especiales',
+        description: 'Oraciones por salud, trabajo, familia y más',
+        icon: Icons.healing_rounded,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const PrayersByIntentionScreen(),
+            ),
+          );
+        },
+      ),
+      CategoryCard(
+        title: 'Intenciones del día',
+        description: 'Guarda y reza por tus intenciones personales',
+        icon: Icons.edit_note_rounded,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const DailyIntentionsScreen(),
+            ),
+          );
+        },
+      ),
+      if (caps.showRosaryGuide)
+        CategoryCard(
+          title: 'Guía del Rosario',
+          description: 'Aprende a rezar el rosario paso a paso',
+          icon: Icons.church_rounded,
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const RosaryGuideScreen(),
+              ),
+            );
+          },
+        ),
+      if (caps.showSaintsOfDay)
+        CategoryCard(
+          title: 'Santos del día',
+          description: 'Conoce a los santos y sus oraciones',
+          icon: Icons.auto_stories_rounded,
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const SaintsScreen()),
+            );
+          },
+        ),
+      if (caps.showNovena)
+        CategoryCard(
+          title: 'Novena',
+          description: 'Novena de Navidad día a día',
+          icon: Icons.calendar_view_day_rounded,
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const NovenaScreen()),
+            );
+          },
+        ),
+    ];
   }
 
   @override
@@ -88,7 +228,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return AppScaffold(
       title: 'Categorías',
       body: Column(
@@ -101,7 +241,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 children: [
                   SectionTitle(
                     title: 'Explora nuestras categorías',
-                    subtitle: 'Encuentra oraciones, devocionales y recursos espirituales',
+                    subtitle:
+                        'Encuentra oraciones, devocionales y recursos espirituales',
                     padding: EdgeInsets.zero,
                   ),
                   const SizedBox(height: AppSpacing.lg),
@@ -113,140 +254,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     crossAxisSpacing: AppSpacing.md,
                     mainAxisSpacing: AppSpacing.md,
                     childAspectRatio: 0.95,
-                    children: [
-                      CategoryCard(
-                        title: 'Devocionales diarios',
-                        description: 'Reflexiones diarias con versículos',
-                        icon: Icons.book_rounded,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const DevotionalsScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      CategoryCard(
-                        title: 'Salmos por categoría',
-                        description: 'Salmos de protección, agradecimiento y consuelo',
-                        icon: Icons.library_books_rounded,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const PsalmsScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      CategoryCard(
-                        title: 'Oraciones tradicionales',
-                        description: 'Oraciones clásicas de la tradición cristiana',
-                        icon: Icons.menu_book_rounded,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const TraditionalPrayersReligionSelectionScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      CategoryCard(
-                        title: 'Oración para…',
-                        description: 'Oraciones para situaciones específicas',
-                        icon: Icons.favorite_rounded,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const CategoryPrayersScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      CategoryCard(
-                        title: 'Cómo te sientes hoy',
-                        description: 'Oraciones personalizadas según tu emoción',
-                        icon: Icons.emoji_emotions_rounded,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const EmotionSelectionScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      CategoryCard(
-                        title: 'Oraciones para dormir',
-                        description: 'Oraciones de paz y descanso nocturno',
-                        icon: Icons.bedtime_rounded,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const NightPrayersScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      CategoryCard(
-                        title: 'Peticiones especiales',
-                        description: 'Oraciones por salud, trabajo, familia y más',
-                        icon: Icons.healing_rounded,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const PrayersByIntentionScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      CategoryCard(
-                        title: 'Intenciones del día',
-                        description: 'Guarda y reza por tus intenciones personales',
-                        icon: Icons.edit_note_rounded,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const DailyIntentionsScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      CategoryCard(
-                        title: 'Guía del Rosario',
-                        description: 'Aprende a rezar el rosario paso a paso',
-                        icon: Icons.church_rounded,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const RosaryGuideScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      CategoryCard(
-                        title: 'Santos del día',
-                        description: 'Conoce a los santos y sus oraciones',
-                        icon: Icons.auto_stories_rounded,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const SaintsScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      CategoryCard(
-                        title: 'Novena',
-                        description: 'Novena de Navidad día a día',
-                        icon: Icons.calendar_view_day_rounded,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const NovenaScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                    children: _buildCategoryCards(context),
                   ),
                   // Padding adicional al final para evitar overflow
                   const SizedBox(height: AppSpacing.xl),
@@ -259,14 +267,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             Container(
               alignment: Alignment.center,
               width: double.infinity,
-              height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
+              height: _bannerAd != null
+                  ? _bannerAd!.size.height.toDouble()
+                  : 50,
               decoration: BoxDecoration(
-                color: isDark
-                    ? colorScheme.surface
-                    : AppColors.surface,
+                color: isDark ? colorScheme.surface : AppColors.surface,
                 border: Border(
                   top: BorderSide(
-                    color: colorScheme.outline.withOpacity(0.1),
+                    color: colorScheme.outline.withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
@@ -284,6 +292,4 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       ),
     );
   }
-
 }
-

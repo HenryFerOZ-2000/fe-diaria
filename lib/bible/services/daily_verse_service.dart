@@ -12,7 +12,9 @@ class DailyVerseService {
 
   Future<void> _loadRefs() async {
     if (_refs != null) return;
-    final jsonStr = await rootBundle.loadString('assets/data/daily_verses_refs.json');
+    final jsonStr = await rootBundle.loadString(
+      'assets/data/daily_verses_refs.json',
+    );
     final List<dynamic> data = json.decode(jsonStr);
     _refs = data.map((e) => e as Map<String, dynamic>).toList();
   }
@@ -39,7 +41,9 @@ class DailyVerseService {
 
     final text = await BibleDb.instance.getVerseText(book, chapter, verseNum);
     if (text == null) {
-      throw Exception('No se encontró el versículo $book $chapter:$verseNum en la DB');
+      throw Exception(
+        'No se encontró el versículo $book $chapter:$verseNum en la DB',
+      );
     }
     return Verse(
       book: book,
@@ -50,4 +54,3 @@ class DailyVerseService {
     );
   }
 }
-

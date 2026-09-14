@@ -52,7 +52,8 @@ class _DevotionalsScreenState extends State<DevotionalsScreen> {
           ad.dispose();
         }
       },
-      onAdFailedToLoad: (error) => debugPrint('Failed to load banner ad: $error'),
+      onAdFailedToLoad: (error) =>
+          debugPrint('Failed to load banner ad: $error'),
     );
   }
 
@@ -94,96 +95,115 @@ class _DevotionalsScreenState extends State<DevotionalsScreen> {
         children: [
           Expanded(
             child: _isLoading
-                ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: colorScheme.primary,
+                    ),
+                  )
                 : devotionals.isEmpty
-                    ? EmptyState(
-                        title: 'No hay devocionales disponibles',
-                        message: 'Intenta recargar más tarde',
-                        icon: Icons.book_outlined,
-                        onAction: _loadData,
-                        actionLabel: 'Recargar',
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        itemCount: devotionals.length,
-                        itemBuilder: (context, index) {
-                          final devotional = devotionals[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                            child: MainCard(
-                              padding: const EdgeInsets.all(AppSpacing.lg),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    devotional.title,
-                                    style: theme.textTheme.titleLarge?.copyWith(
-                                      color: colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
+                ? EmptyState(
+                    title: 'No hay devocionales disponibles',
+                    message: 'Intenta recargar más tarde',
+                    icon: Icons.book_outlined,
+                    onAction: _loadData,
+                    actionLabel: 'Recargar',
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    itemCount: devotionals.length,
+                    itemBuilder: (context, index) {
+                      final devotional = devotionals[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                        child: MainCard(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                devotional.title,
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  color: colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              Container(
+                                padding: const EdgeInsets.all(AppSpacing.md),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.tertiary.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadius.md,
+                                  ),
+                                  border: Border.all(
+                                    color: colorScheme.tertiary.withValues(
+                                      alpha: 0.3,
                                     ),
                                   ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  Container(
-                                    padding: const EdgeInsets.all(AppSpacing.md),
-                                    decoration: BoxDecoration(
-                                      color: colorScheme.tertiary.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(AppRadius.md),
-                                      border: Border.all(
-                                        color: colorScheme.tertiary.withOpacity(0.3),
-                                      ),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          devotional.verse,
-                                          style: theme.textTheme.bodyLarge?.copyWith(
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      devotional.verse,
+                                      style: theme.textTheme.bodyLarge
+                                          ?.copyWith(
                                             fontStyle: FontStyle.italic,
                                             height: 1.6,
                                           ),
-                                        ),
-                                        const SizedBox(height: AppSpacing.sm),
-                                        Text(
-                                          devotional.verseReference,
-                                          style: theme.textTheme.bodySmall?.copyWith(
+                                    ),
+                                    const SizedBox(height: AppSpacing.sm),
+                                    Text(
+                                      devotional.verseReference,
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
                                             color: colorScheme.tertiary,
                                             fontWeight: FontWeight.w600,
                                           ),
-                                          textAlign: TextAlign.right,
-                                        ),
-                                      ],
+                                      textAlign: TextAlign.right,
                                     ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  Text(
-                                    devotional.reflection,
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      height: 1.6,
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
+                              const SizedBox(height: AppSpacing.md),
+                              Text(
+                                devotional.reflection,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  height: 1.6,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
           if (!_adsRemoved)
             Container(
               alignment: Alignment.center,
               width: double.infinity,
-              height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
+              height: _bannerAd != null
+                  ? _bannerAd!.size.height.toDouble()
+                  : 50,
               decoration: BoxDecoration(
                 color: isDark ? colorScheme.surface : AppColors.surface,
                 border: Border(
-                  top: BorderSide(color: colorScheme.outline.withOpacity(0.1), width: 1),
+                  top: BorderSide(
+                    color: colorScheme.outline.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
                 ),
               ),
               child: _bannerAd != null
                   ? AdWidget(ad: _bannerAd!)
                   : const SizedBox(
                       height: 50,
-                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     ),
             ),
         ],
@@ -191,4 +211,3 @@ class _DevotionalsScreenState extends State<DevotionalsScreen> {
     );
   }
 }
-

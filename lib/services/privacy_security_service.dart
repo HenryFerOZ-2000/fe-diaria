@@ -6,11 +6,9 @@ class PrivacySecurityService {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
 
-  PrivacySecurityService({
-    FirebaseFirestore? firestore,
-    FirebaseAuth? auth,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance;
+  PrivacySecurityService({FirebaseFirestore? firestore, FirebaseAuth? auth})
+    : _firestore = firestore ?? FirebaseFirestore.instance,
+      _auth = auth ?? FirebaseAuth.instance;
 
   /// Obtiene configuración de privacidad del usuario
   Future<Map<String, dynamic>> getSettings(String uid) async {
@@ -33,10 +31,10 @@ class PrivacySecurityService {
   /// Actualiza si el perfil es público
   Future<void> updateProfilePublic(String uid, bool isPublic) async {
     try {
-      await _firestore.collection('users').doc(uid).set(
-        {'isPublic': isPublic, 'updatedAt': FieldValue.serverTimestamp()},
-        SetOptions(merge: true),
-      );
+      await _firestore.collection('users').doc(uid).set({
+        'isPublic': isPublic,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       debugPrint('[PrivacySecurityService] Error updating profile public: $e');
       rethrow;
@@ -46,10 +44,10 @@ class PrivacySecurityService {
   /// Actualiza si se muestra actividad
   Future<void> updateShowActivity(String uid, bool showActivity) async {
     try {
-      await _firestore.collection('users').doc(uid).set(
-        {'showActivity': showActivity, 'updatedAt': FieldValue.serverTimestamp()},
-        SetOptions(merge: true),
-      );
+      await _firestore.collection('users').doc(uid).set({
+        'showActivity': showActivity,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
       debugPrint('[PrivacySecurityService] Error updating show activity: $e');
       rethrow;
@@ -65,10 +63,7 @@ class PrivacySecurityService {
           .collection('blockedUsers')
           .orderBy('createdAt', descending: true)
           .get();
-      return snapshot.docs.map((doc) => {
-        'id': doc.id,
-        ...doc.data(),
-      }).toList();
+      return snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList();
     } catch (e) {
       debugPrint('[PrivacySecurityService] Error getting blocked users: $e');
       return [];
@@ -76,7 +71,12 @@ class PrivacySecurityService {
   }
 
   /// Bloquea un usuario
-  Future<void> blockUser(String uid, String blockedUid, {String? displayName, String? photoUrl}) async {
+  Future<void> blockUser(
+    String uid,
+    String blockedUid, {
+    String? displayName,
+    String? photoUrl,
+  }) async {
     try {
       await _firestore
           .collection('users')
@@ -84,10 +84,10 @@ class PrivacySecurityService {
           .collection('blockedUsers')
           .doc(blockedUid)
           .set({
-        'displayName': displayName,
-        'photoUrl': photoUrl,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+            'displayName': displayName,
+            'photoUrl': photoUrl,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
     } catch (e) {
       debugPrint('[PrivacySecurityService] Error blocking user: $e');
       rethrow;
@@ -143,7 +143,9 @@ class PrivacySecurityService {
         'status': 'pending',
       });
     } catch (e) {
-      debugPrint('[PrivacySecurityService] Error requesting account deletion: $e');
+      debugPrint(
+        '[PrivacySecurityService] Error requesting account deletion: $e',
+      );
       rethrow;
     }
   }
@@ -165,4 +167,3 @@ class PrivacySecurityService {
     }
   }
 }
-

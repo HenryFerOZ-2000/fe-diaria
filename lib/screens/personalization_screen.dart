@@ -19,15 +19,60 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
   bool _isLoading = false;
 
   final List<Map<String, dynamic>> _emotions = [
-    {'id': 'ansioso', 'name': 'Ansioso', 'icon': Icons.psychology, 'color': Color(0xFFFF9800)},
-    {'id': 'triste', 'name': 'Triste', 'icon': Icons.sentiment_very_dissatisfied, 'color': Color(0xFF2196F3)},
-    {'id': 'agradecido', 'name': 'Agradecido', 'icon': Icons.favorite, 'color': Color(0xFF4CAF50)},
-    {'id': 'motivado', 'name': 'Motivado', 'icon': Icons.trending_up, 'color': Color(0xFFFF5722)},
-    {'id': 'preocupado', 'name': 'Preocupado', 'icon': Icons.warning, 'color': Color(0xFFFFC107)},
-    {'id': 'feliz', 'name': 'Feliz', 'icon': Icons.sentiment_very_satisfied, 'color': Color(0xFFFFEB3B)},
-    {'id': 'desanimado', 'name': 'Desanimado', 'icon': Icons.sentiment_dissatisfied, 'color': Color(0xFF9E9E9E)},
-    {'id': 'enojado', 'name': 'Enojado', 'icon': Icons.mood_bad, 'color': Color(0xFFF44336)},
-    {'id': 'tranquilo', 'name': 'Tranquilo', 'icon': Icons.wb_sunny, 'color': Color(0xFF87CEEB)},
+    {
+      'id': 'ansioso',
+      'name': 'Ansioso',
+      'icon': Icons.psychology,
+      'color': Color(0xFFFF9800),
+    },
+    {
+      'id': 'triste',
+      'name': 'Triste',
+      'icon': Icons.sentiment_very_dissatisfied,
+      'color': Color(0xFF2196F3),
+    },
+    {
+      'id': 'agradecido',
+      'name': 'Agradecido',
+      'icon': Icons.favorite,
+      'color': Color(0xFF4CAF50),
+    },
+    {
+      'id': 'motivado',
+      'name': 'Motivado',
+      'icon': Icons.trending_up,
+      'color': Color(0xFFFF5722),
+    },
+    {
+      'id': 'preocupado',
+      'name': 'Preocupado',
+      'icon': Icons.warning,
+      'color': Color(0xFFFFC107),
+    },
+    {
+      'id': 'feliz',
+      'name': 'Feliz',
+      'icon': Icons.sentiment_very_satisfied,
+      'color': Color(0xFFFFEB3B),
+    },
+    {
+      'id': 'desanimado',
+      'name': 'Desanimado',
+      'icon': Icons.sentiment_dissatisfied,
+      'color': Color(0xFF9E9E9E),
+    },
+    {
+      'id': 'enojado',
+      'name': 'Enojado',
+      'icon': Icons.mood_bad,
+      'color': Color(0xFFF44336),
+    },
+    {
+      'id': 'tranquilo',
+      'name': 'Tranquilo',
+      'icon': Icons.wb_sunny,
+      'color': Color(0xFF87CEEB),
+    },
   ];
 
   @override
@@ -39,11 +84,11 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
   void _loadUserData() {
     final name = _personalizationService.getUserName();
     final emotion = _personalizationService.getUserEmotion();
-    
+
     if (name.isNotEmpty) {
       _nameController.text = name;
     }
-    
+
     if (emotion.isNotEmpty) {
       _selectedEmotion = emotion;
     }
@@ -57,7 +102,10 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
 
   Future<void> _savePersonalization() async {
     if (_nameController.text.trim().isEmpty && _selectedEmotion == null) {
-      _showMessage('Por favor, ingresa un nombre de usuario o selecciona cómo te sientes', isError: true);
+      _showMessage(
+        'Por favor, ingresa un nombre de usuario o selecciona cómo te sientes',
+        isError: true,
+      );
       return;
     }
 
@@ -67,12 +115,12 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
 
     try {
       final provider = Provider.of<AppProvider>(context, listen: false);
-      
+
       // Guardar nombre de usuario (para saludos y personalización en la app)
       if (_nameController.text.trim().isNotEmpty) {
         await provider.setUserName(_nameController.text.trim());
       }
-      
+
       // Guardar emoción
       if (_selectedEmotion != null) {
         await provider.setUserEmotion(_selectedEmotion!);
@@ -98,17 +146,15 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
 
   void _showMessage(String message, {bool isError = false}) {
     if (!mounted) return;
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError 
+        backgroundColor: isError
             ? Theme.of(context).colorScheme.error
             : Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -140,7 +186,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
             end: Alignment.bottomRight,
             colors: [
               Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).colorScheme.tertiary.withOpacity(0.05),
+              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
               Theme.of(context).scaffoldBackgroundColor,
             ],
           ),
@@ -161,7 +207,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
                 const SizedBox(height: 16),
                 _buildNameInput(colorScheme),
                 const SizedBox(height: 32),
-                
+
                 // Sección de emociones
                 _buildSectionHeader(
                   '¿Cómo te sientes hoy?',
@@ -171,11 +217,11 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
                 const SizedBox(height: 16),
                 _buildEmotionGrid(isDark, colorScheme),
                 const SizedBox(height: 32),
-                
+
                 // Botón de guardar
                 _buildSaveButton(colorScheme),
                 const SizedBox(height: 24),
-                
+
                 // Información adicional
                 _buildInfoCard(colorScheme),
               ],
@@ -186,20 +232,20 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon, ColorScheme colorScheme) {
+  Widget _buildSectionHeader(
+    String title,
+    IconData icon,
+    ColorScheme colorScheme,
+  ) {
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: colorScheme.primary.withOpacity(0.15),
+            color: colorScheme.primary.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(
-            icon,
-            color: colorScheme.primary,
-            size: 20,
-          ),
+          child: Icon(icon, color: colorScheme.primary, size: 20),
         ),
         const SizedBox(width: 12),
         Text(
@@ -220,12 +266,12 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: colorScheme.outline.withOpacity(0.2),
+          color: colorScheme.outline.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.primary.withOpacity(0.05),
+            color: colorScheme.primary.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -233,19 +279,11 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
       ),
       child: TextField(
         controller: _nameController,
-        style: GoogleFonts.inter(
-          fontSize: 16,
-          color: colorScheme.onSurface,
-        ),
+        style: GoogleFonts.inter(fontSize: 16, color: colorScheme.onSurface),
         decoration: InputDecoration(
           hintText: 'Ej: usuario123 o tu nombre para saludos',
-          hintStyle: GoogleFonts.inter(
-            color: colorScheme.onSurfaceVariant,
-          ),
-          prefixIcon: Icon(
-            Icons.alternate_email,
-            color: colorScheme.primary,
-          ),
+          hintStyle: GoogleFonts.inter(color: colorScheme.onSurfaceVariant),
+          prefixIcon: Icon(Icons.alternate_email, color: colorScheme.primary),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(20),
         ),
@@ -268,7 +306,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
       itemBuilder: (context, index) {
         final emotion = _emotions[index];
         final isSelected = _selectedEmotion == emotion['id'];
-        
+
         return _buildEmotionCard(
           emotion: emotion,
           isSelected: isSelected,
@@ -290,7 +328,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
     required VoidCallback onTap,
   }) {
     final emotionColor = emotion['color'] as Color;
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -299,19 +337,19 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
         child: Container(
           decoration: BoxDecoration(
             color: isSelected
-                ? emotionColor.withOpacity(0.2)
+                ? emotionColor.withValues(alpha: 0.2)
                 : colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isSelected
                   ? emotionColor
-                  : colorScheme.outline.withOpacity(0.2),
+                  : colorScheme.outline.withValues(alpha: 0.2),
               width: isSelected ? 2 : 1,
             ),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: emotionColor.withOpacity(0.3),
+                      color: emotionColor.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -332,7 +370,9 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                  color: isSelected ? emotionColor : colorScheme.onSurfaceVariant,
+                  color: isSelected
+                      ? emotionColor
+                      : colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 2,
@@ -390,21 +430,17 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: colorScheme.tertiary.withOpacity(0.1),
+        color: colorScheme.tertiary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: colorScheme.tertiary.withOpacity(0.3),
+          color: colorScheme.tertiary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.info_outline,
-            color: colorScheme.tertiary,
-            size: 24,
-          ),
+          Icon(Icons.info_outline, color: colorScheme.tertiary, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -423,4 +459,3 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
     );
   }
 }
-

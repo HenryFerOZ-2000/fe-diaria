@@ -34,10 +34,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Última actualización: ${DateTime.now().year}',
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
             ),
             const SizedBox(height: 24),
             Text(
@@ -74,7 +71,10 @@ class PrivacyPolicyScreen extends StatelessWidget {
               icon: const Icon(Icons.open_in_new),
               label: const Text('Ver política completa'),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
               ),
             ),
           ],
@@ -91,19 +91,12 @@ class PrivacyPolicyScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
+            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
-          Text(
-            content,
-            style: GoogleFonts.inter(fontSize: 14, height: 1.6),
-          ),
+          Text(content, style: GoogleFonts.inter(fontSize: 14, height: 1.6)),
         ],
       ),
     );
   }
 }
-

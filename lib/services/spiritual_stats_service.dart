@@ -17,9 +17,10 @@ class SpiritualStatsService {
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
     FirebaseFunctions? functions,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance,
-        _functions = functions ?? FirebaseFunctions.instanceFor(region: 'us-central1');
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _auth = auth ?? FirebaseAuth.instance,
+       _functions =
+           functions ?? FirebaseFunctions.instanceFor(region: 'us-central1');
 
   /// Marca el día actual como activo (llama a Cloud Function)
   /// La función es idempotente, así que puede llamarse múltiples veces sin problema
@@ -27,19 +28,23 @@ class SpiritualStatsService {
   Future<void> markActiveTodayOncePerDay({bool force = false}) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
-      debugPrint('[SpiritualStatsService] markActiveTodayOncePerDay: No user authenticated');
+      debugPrint(
+        '[SpiritualStatsService] markActiveTodayOncePerDay: No user authenticated',
+      );
       return;
     }
 
     final today = _getTodayDateString();
-    
+
     if (!force) {
       // Verificar si ya se llamó hoy (solo para evitar spam, pero la función es idempotente)
       final prefs = await SharedPreferences.getInstance();
       final lastDate = prefs.getString(_lastMarkActiveDateKey);
-      
+
       if (lastDate == today) {
-        debugPrint('[SpiritualStatsService] markActiveTodayOncePerDay: Already called today ($today), skipping (function is idempotent)');
+        debugPrint(
+          '[SpiritualStatsService] markActiveTodayOncePerDay: Already called today ($today), skipping (function is idempotent)',
+        );
         // Aún así, verificar que el documento existe en Firestore
         // Si no existe, forzar la llamada
         try {
@@ -50,13 +55,15 @@ class SpiritualStatsService {
               .doc('main')
               .get();
           if (!statsDoc.exists) {
-            debugPrint('[SpiritualStatsService] Document does not exist, forcing call');
+            debugPrint(
+              '[SpiritualStatsService] Document does not exist, forcing call',
+            );
             force = true;
           }
         } catch (e) {
           debugPrint('[SpiritualStatsService] Error checking document: $e');
         }
-        
+
         if (!force) {
           return;
         }
@@ -64,21 +71,31 @@ class SpiritualStatsService {
     }
 
     try {
-      debugPrint('[SpiritualStatsService] markActiveTodayOncePerDay: Calling function for uid=$uid, today=$today, force=$force');
+      debugPrint(
+        '[SpiritualStatsService] markActiveTodayOncePerDay: Calling function for uid=$uid, today=$today, force=$force',
+      );
       final callable = _functions.httpsCallable('markActiveToday');
       final result = await callable.call();
-      
+
       // Guardar que se llamó hoy
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_lastMarkActiveDateKey, today);
-      
-      debugPrint('[SpiritualStatsService] markActiveTodayOncePerDay: ✅ Success! Result: ${result.data}');
+
+      debugPrint(
+        '[SpiritualStatsService] markActiveTodayOncePerDay: ✅ Success! Result: ${result.data}',
+      );
     } catch (e, stackTrace) {
-      debugPrint('[SpiritualStatsService] ❌ ERROR calling markActiveTodayOncePerDay: $e');
+      debugPrint(
+        '[SpiritualStatsService] ❌ ERROR calling markActiveTodayOncePerDay: $e',
+      );
       debugPrint('[SpiritualStatsService] Error type: ${e.runtimeType}');
       if (e is FirebaseFunctionsException) {
-        debugPrint('[SpiritualStatsService] Firebase error code: ${e.code}, message: ${e.message}');
-        debugPrint('[SpiritualStatsService] Firebase error details: ${e.details}');
+        debugPrint(
+          '[SpiritualStatsService] Firebase error code: ${e.code}, message: ${e.message}',
+        );
+        debugPrint(
+          '[SpiritualStatsService] Firebase error details: ${e.details}',
+        );
       }
       debugPrint('[SpiritualStatsService] Stack trace: $stackTrace');
       // No re-lanzar para no romper el flujo, pero loguear bien
@@ -92,7 +109,9 @@ class SpiritualStatsService {
     final year = now.year;
     final month = now.month.toString().padLeft(2, '0');
     final day = now.day.toString().padLeft(2, '0');
-    debugPrint('[SpiritualStatsService] 📅 Today date string (local): $year-$month-$day (device timezone)');
+    debugPrint(
+      '[SpiritualStatsService] 📅 Today date string (local): $year-$month-$day (device timezone)',
+    );
     return '$year-$month-$day';
   }
 
@@ -117,7 +136,9 @@ class SpiritualStatsService {
       if (statsDoc.exists && statsDoc.data() != null) {
         final data = statsDoc.data()!;
         final stats = SpiritualStats.fromFirestore(data);
-        debugPrint('[SpiritualStatsService] getStats: Found document - currentStreak=${stats.currentStreak}, bestStreak=${stats.bestStreak}');
+        debugPrint(
+          '[SpiritualStatsService] getStats: Found document - currentStreak=${stats.currentStreak}, bestStreak=${stats.bestStreak}',
+        );
         return stats;
       }
 
@@ -133,22 +154,36 @@ class SpiritualStatsService {
   Future<void> incrementVerseRead() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
-      debugPrint('[SpiritualStatsService] incrementVerseRead: No user authenticated');
+      debugPrint(
+        '[SpiritualStatsService] incrementVerseRead: No user authenticated',
+      );
       return;
     }
 
     try {
-      debugPrint('[SpiritualStatsService] 📖 incrementVerseRead: Starting for uid=$uid');
+      debugPrint(
+        '[SpiritualStatsService] 📖 incrementVerseRead: Starting for uid=$uid',
+      );
       final callable = _functions.httpsCallable('incrementVerseRead');
-      debugPrint('[SpiritualStatsService] 📖 incrementVerseRead: Callable created, calling...');
+      debugPrint(
+        '[SpiritualStatsService] 📖 incrementVerseRead: Callable created, calling...',
+      );
       final result = await callable.call();
-      debugPrint('[SpiritualStatsService] 📖 incrementVerseRead: ✅ Success! Result: ${result.data}');
+      debugPrint(
+        '[SpiritualStatsService] 📖 incrementVerseRead: ✅ Success! Result: ${result.data}',
+      );
     } catch (e, stackTrace) {
-      debugPrint('[SpiritualStatsService] ❌ ERROR calling incrementVerseRead: $e');
+      debugPrint(
+        '[SpiritualStatsService] ❌ ERROR calling incrementVerseRead: $e',
+      );
       debugPrint('[SpiritualStatsService] Error type: ${e.runtimeType}');
       if (e is FirebaseFunctionsException) {
-        debugPrint('[SpiritualStatsService] Firebase error code: ${e.code}, message: ${e.message}');
-        debugPrint('[SpiritualStatsService] Firebase error details: ${e.details}');
+        debugPrint(
+          '[SpiritualStatsService] Firebase error code: ${e.code}, message: ${e.message}',
+        );
+        debugPrint(
+          '[SpiritualStatsService] Firebase error details: ${e.details}',
+        );
       }
       debugPrint('[SpiritualStatsService] Stack trace: $stackTrace');
       // No re-lanzar para no romper el flujo, pero loguear bien
@@ -159,19 +194,29 @@ class SpiritualStatsService {
   Future<void> incrementPrayerCompleted() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
-      debugPrint('[SpiritualStatsService] incrementPrayerCompleted: No user authenticated');
+      debugPrint(
+        '[SpiritualStatsService] incrementPrayerCompleted: No user authenticated',
+      );
       return;
     }
 
     try {
-      debugPrint('[SpiritualStatsService] incrementPrayerCompleted: Calling function for uid=$uid');
+      debugPrint(
+        '[SpiritualStatsService] incrementPrayerCompleted: Calling function for uid=$uid',
+      );
       final callable = _functions.httpsCallable('incrementPrayerCompleted');
       await callable.call();
-      debugPrint('[SpiritualStatsService] incrementPrayerCompleted: ✅ Success!');
+      debugPrint(
+        '[SpiritualStatsService] incrementPrayerCompleted: ✅ Success!',
+      );
     } catch (e, stackTrace) {
-      debugPrint('[SpiritualStatsService] ❌ ERROR calling incrementPrayerCompleted: $e');
+      debugPrint(
+        '[SpiritualStatsService] ❌ ERROR calling incrementPrayerCompleted: $e',
+      );
       if (e is FirebaseFunctionsException) {
-        debugPrint('[SpiritualStatsService] Firebase error code: ${e.code}, message: ${e.message}');
+        debugPrint(
+          '[SpiritualStatsService] Firebase error code: ${e.code}, message: ${e.message}',
+        );
       }
       debugPrint('[SpiritualStatsService] Stack trace: $stackTrace');
     }
@@ -181,19 +226,27 @@ class SpiritualStatsService {
   Future<void> incrementPostCreated() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
-      debugPrint('[SpiritualStatsService] incrementPostCreated: No user authenticated');
+      debugPrint(
+        '[SpiritualStatsService] incrementPostCreated: No user authenticated',
+      );
       return;
     }
 
     try {
-      debugPrint('[SpiritualStatsService] incrementPostCreated: Calling function for uid=$uid');
+      debugPrint(
+        '[SpiritualStatsService] incrementPostCreated: Calling function for uid=$uid',
+      );
       final callable = _functions.httpsCallable('incrementPostCreated');
       await callable.call();
       debugPrint('[SpiritualStatsService] incrementPostCreated: ✅ Success!');
     } catch (e, stackTrace) {
-      debugPrint('[SpiritualStatsService] ❌ ERROR calling incrementPostCreated: $e');
+      debugPrint(
+        '[SpiritualStatsService] ❌ ERROR calling incrementPostCreated: $e',
+      );
       if (e is FirebaseFunctionsException) {
-        debugPrint('[SpiritualStatsService] Firebase error code: ${e.code}, message: ${e.message}');
+        debugPrint(
+          '[SpiritualStatsService] Firebase error code: ${e.code}, message: ${e.message}',
+        );
       }
       debugPrint('[SpiritualStatsService] Stack trace: $stackTrace');
     }
@@ -204,7 +257,9 @@ class SpiritualStatsService {
   Future<void> completeAllMissions() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
-      debugPrint('[SpiritualStatsService] completeAllMissions: No user authenticated');
+      debugPrint(
+        '[SpiritualStatsService] completeAllMissions: No user authenticated',
+      );
       return;
     }
 
@@ -212,16 +267,26 @@ class SpiritualStatsService {
       // Enviar la fecha local del dispositivo a la Cloud Function
       // para asegurar consistencia con la fecha del cliente
       final todayDateId = _getTodayDateString();
-      debugPrint('[SpiritualStatsService] completeAllMissions: Calling function for uid=$uid with dateId=$todayDateId');
+      debugPrint(
+        '[SpiritualStatsService] completeAllMissions: Calling function for uid=$uid with dateId=$todayDateId',
+      );
       final callable = _functions.httpsCallable('completeAllMissions');
       final result = await callable.call({'dateId': todayDateId});
-      debugPrint('[SpiritualStatsService] completeAllMissions: ✅ Success! Result: ${result.data}');
+      debugPrint(
+        '[SpiritualStatsService] completeAllMissions: ✅ Success! Result: ${result.data}',
+      );
     } catch (e, stackTrace) {
-      debugPrint('[SpiritualStatsService] ❌ ERROR calling completeAllMissions: $e');
+      debugPrint(
+        '[SpiritualStatsService] ❌ ERROR calling completeAllMissions: $e',
+      );
       debugPrint('[SpiritualStatsService] Error type: ${e.runtimeType}');
       if (e is FirebaseFunctionsException) {
-        debugPrint('[SpiritualStatsService] Firebase error code: ${e.code}, message: ${e.message}');
-        debugPrint('[SpiritualStatsService] Firebase error details: ${e.details}');
+        debugPrint(
+          '[SpiritualStatsService] Firebase error code: ${e.code}, message: ${e.message}',
+        );
+        debugPrint(
+          '[SpiritualStatsService] Firebase error details: ${e.details}',
+        );
       }
       debugPrint('[SpiritualStatsService] Stack trace: $stackTrace');
       // No re-lanzar para no romper el flujo
@@ -233,12 +298,16 @@ class SpiritualStatsService {
   Stream<SpiritualStats> statsStream() {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
-      debugPrint('[SpiritualStatsService] statsStream: No user authenticated, returning empty stream');
+      debugPrint(
+        '[SpiritualStatsService] statsStream: No user authenticated, returning empty stream',
+      );
       return Stream.value(SpiritualStats.empty());
     }
 
-    debugPrint('[SpiritualStatsService] statsStream: Setting up stream for uid=$uid');
-    
+    debugPrint(
+      '[SpiritualStatsService] statsStream: Setting up stream for uid=$uid',
+    );
+
     return _firestore
         .collection('users')
         .doc(uid)
@@ -246,17 +315,23 @@ class SpiritualStatsService {
         .doc('main')
         .snapshots()
         .map((snapshot) {
-      debugPrint('[SpiritualStatsService] 📊 Stream event: exists=${snapshot.exists}, hasData=${snapshot.data() != null}');
-      
-      if (!snapshot.exists || snapshot.data() == null) {
-        debugPrint('[SpiritualStatsService] Stream: Document does not exist or has no data');
-        return SpiritualStats.empty();
-      }
-      
-      final data = snapshot.data()!;
-      final stats = SpiritualStats.fromFirestore(data);
-      debugPrint('[SpiritualStatsService] 📈 Stream: currentStreak=${stats.currentStreak}, bestStreak=${stats.bestStreak}, lastActiveDate=${stats.lastActiveDate}');
-      return stats;
-    });
+          debugPrint(
+            '[SpiritualStatsService] 📊 Stream event: exists=${snapshot.exists}, hasData=${snapshot.data() != null}',
+          );
+
+          if (!snapshot.exists || snapshot.data() == null) {
+            debugPrint(
+              '[SpiritualStatsService] Stream: Document does not exist or has no data',
+            );
+            return SpiritualStats.empty();
+          }
+
+          final data = snapshot.data()!;
+          final stats = SpiritualStats.fromFirestore(data);
+          debugPrint(
+            '[SpiritualStatsService] 📈 Stream: currentStreak=${stats.currentStreak}, bestStreak=${stats.bestStreak}, lastActiveDate=${stats.lastActiveDate}',
+          );
+          return stats;
+        });
   }
 }

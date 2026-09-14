@@ -5,6 +5,7 @@ import '../services/traditional_prayers_service.dart';
 import '../services/ads_service.dart';
 import '../services/storage_service.dart';
 import '../services/share_service.dart';
+import '../faith/tradition_guard.dart';
 
 /// Pantalla principal de la Novena - Selección de día
 class NovenaScreen extends StatefulWidget {
@@ -17,12 +18,24 @@ class NovenaScreen extends StatefulWidget {
 class _NovenaScreenState extends State<NovenaScreen> {
   final TraditionalPrayersService _service = TraditionalPrayersService();
   bool _isLoading = true;
+  bool _blockedByTradition = false;
 
   @override
   void initState() {
     super.initState();
+    if (_blockIfEvangelical()) return;
     _loadData();
     _loadSavedProgress();
+  }
+
+  bool _blockIfEvangelical() {
+    final blocked = TraditionGuard.blockCatholicOnlyModuleIfNeeded(
+      context: context,
+      moduleName: 'La novena',
+      isMounted: () => mounted,
+    );
+    _blockedByTradition = blocked;
+    return blocked;
   }
 
   void _loadSavedProgress() {
@@ -67,6 +80,9 @@ class _NovenaScreenState extends State<NovenaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_blockedByTradition) {
+      return const SizedBox.shrink();
+    }
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -89,7 +105,7 @@ class _NovenaScreenState extends State<NovenaScreen> {
             end: Alignment.bottomRight,
             colors: [
               Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).colorScheme.tertiary.withOpacity(0.05),
+              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
               Theme.of(context).scaffoldBackgroundColor,
             ],
           ),
@@ -97,9 +113,7 @@ class _NovenaScreenState extends State<NovenaScreen> {
         child: SafeArea(
           child: _isLoading
               ? Center(
-                  child: CircularProgressIndicator(
-                    color: colorScheme.primary,
-                  ),
+                  child: CircularProgressIndicator(color: colorScheme.primary),
                 )
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(24),
@@ -127,19 +141,21 @@ class _NovenaScreenState extends State<NovenaScreen> {
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 1.0,
-                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: 1.0,
+                            ),
                         itemCount: 9,
                         itemBuilder: (context, index) {
                           final day = index + 1;
                           final lastDay = StorageService().getNovenaLastDay();
                           final isCompleted = lastDay != null && day < lastDay;
-                          final isInProgress = lastDay != null && day == lastDay;
-                          
+                          final isInProgress =
+                              lastDay != null && day == lastDay;
+
                           return _buildDayButton(
                             context: context,
                             colorScheme: colorScheme,
@@ -149,7 +165,8 @@ class _NovenaScreenState extends State<NovenaScreen> {
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => NovenaDayScreen(day: day),
+                                  builder: (context) =>
+                                      NovenaDayScreen(day: day),
                                 ),
                               );
                             },
@@ -177,19 +194,19 @@ class _NovenaScreenState extends State<NovenaScreen> {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
-        splashColor: colorScheme.primary.withOpacity(0.1),
-        highlightColor: colorScheme.primary.withOpacity(0.05),
+        splashColor: colorScheme.primary.withValues(alpha: 0.1),
+        highlightColor: colorScheme.primary.withValues(alpha: 0.05),
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: colorScheme.primary.withOpacity(0.15),
+              color: colorScheme.primary.withValues(alpha: 0.15),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withOpacity(0.08),
+                color: colorScheme.primary.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
                 spreadRadius: 0,
@@ -226,8 +243,8 @@ class _NovenaScreenState extends State<NovenaScreen> {
                   style: GoogleFonts.playfairDisplay(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: isCompleted 
-                        ? colorScheme.secondary 
+                    color: isCompleted
+                        ? colorScheme.secondary
                         : colorScheme.primary,
                   ),
                 ),
@@ -258,16 +275,28 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
   int _currentStep = 1;
   int _totalSteps = 0;
   bool _isLoading = true;
+  bool _blockedByTradition = false;
 
   @override
   void initState() {
     super.initState();
+    if (_blockIfEvangelical()) return;
     _adsRemoved = StorageService().getAdsRemoved();
     if (!_adsRemoved) {
       _loadBannerAd();
     }
     _loadStepData();
     _loadSavedStep();
+  }
+
+  bool _blockIfEvangelical() {
+    final blocked = TraditionGuard.blockCatholicOnlyModuleIfNeeded(
+      context: context,
+      moduleName: 'La novena',
+      isMounted: () => mounted,
+    );
+    _blockedByTradition = blocked;
+    return blocked;
   }
 
   void _loadSavedStep() {
@@ -297,7 +326,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
 
   void _loadBannerAd() {
     if (_adsRemoved) return;
-    
+
     _adsService.loadBannerAd(
       adSize: AdSize.banner,
       onAdLoaded: (ad) {
@@ -341,6 +370,9 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_blockedByTradition) {
+      return const SizedBox.shrink();
+    }
     // Actualizar estado de anuncios removidos
     final storage = StorageService();
     final adsRemovedNow = storage.getAdsRemoved();
@@ -383,7 +415,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
             end: Alignment.bottomRight,
             colors: [
               Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).colorScheme.tertiary.withOpacity(0.05),
+              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
               Theme.of(context).scaffoldBackgroundColor,
             ],
           ),
@@ -399,125 +431,110 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                         ),
                       )
                     : stepData == null
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              size: 64,
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No se pudo cargar el paso',
+                              style: GoogleFonts.inter(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Indicador de progreso
+                            Row(
                               children: [
-                                Icon(
-                                  Icons.error_outline,
-                                  size: 64,
-                                  color: colorScheme.onSurface.withOpacity(0.5),
+                                Expanded(
+                                  child: LinearProgressIndicator(
+                                    value: _currentStep / _totalSteps,
+                                    backgroundColor: colorScheme.primary
+                                        .withValues(alpha: 0.1),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      colorScheme.primary,
+                                    ),
+                                    minHeight: 6,
+                                  ),
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(width: 12),
                                 Text(
-                                  'No se pudo cargar el paso',
-                                  style: GoogleFonts.inter(fontSize: 16),
+                                  '$_currentStep/$_totalSteps',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: colorScheme.primary,
+                                  ),
                                 ),
                               ],
                             ),
-                          )
-                        : SingleChildScrollView(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Indicador de progreso
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: LinearProgressIndicator(
-                                        value: _currentStep / _totalSteps,
-                                        backgroundColor: colorScheme.primary.withOpacity(0.1),
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                          colorScheme.primary,
-                                        ),
-                                        minHeight: 6,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      '$_currentStep/$_totalSteps',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: colorScheme.primary,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 24),
-                                // Contenido del paso
-                                _buildStepCard(
-                                  context: context,
-                                  title: stepData['titulo'] as String? ?? '',
-                                  text: stepData['texto'] as String? ?? '',
-                                  colorScheme: colorScheme,
-                                  isVillancico: (stepData['titulo'] as String? ?? '')
+                            const SizedBox(height: 24),
+                            // Contenido del paso
+                            _buildStepCard(
+                              context: context,
+                              title: stepData['titulo'] as String? ?? '',
+                              text: stepData['texto'] as String? ?? '',
+                              colorScheme: colorScheme,
+                              isVillancico:
+                                  (stepData['titulo'] as String? ?? '')
                                       .toLowerCase()
                                       .contains('villancico'),
-                                ),
-                                const SizedBox(height: 24),
-                                // Botones de navegación
-                                Row(
-                                  children: [
-                                    if (_currentStep > 1)
-                                      Expanded(
-                                        child: ElevatedButton.icon(
-                                          onPressed: _previousStep,
-                                          icon: const Icon(Icons.arrow_back),
-                                          label: const Text('Anterior'),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: colorScheme.surface,
-                                            foregroundColor: colorScheme.onSurface,
-                                            padding: const EdgeInsets.symmetric(vertical: 16),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(16),
-                                            ),
-                                            elevation: 0,
+                            ),
+                            const SizedBox(height: 24),
+                            // Botones de navegación
+                            Row(
+                              children: [
+                                if (_currentStep > 1)
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: _previousStep,
+                                      icon: const Icon(Icons.arrow_back),
+                                      label: const Text('Anterior'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: colorScheme.surface,
+                                        foregroundColor: colorScheme.onSurface,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 16,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            16,
                                           ),
                                         ),
-                                      ),
-                                    if (_currentStep > 1) const SizedBox(width: 12),
-                                    Expanded(
-                                      child: ElevatedButton.icon(
-                                        onPressed: _currentStep < _totalSteps
-                                            ? _nextStep
-                                            : null,
-                                        icon: const Icon(Icons.arrow_forward),
-                                        label: Text(_currentStep < _totalSteps ? 'Siguiente' : 'Finalizado'),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: colorScheme.primary,
-                                          foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(vertical: 16),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(16),
-                                          ),
-                                          elevation: 2,
-                                        ),
+                                        elevation: 0,
                                       ),
                                     ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                // Botón de regreso al inicio
-                                SizedBox(
-                                  width: double.infinity,
+                                  ),
+                                if (_currentStep > 1) const SizedBox(width: 12),
+                                Expanded(
                                   child: ElevatedButton.icon(
-                                    onPressed: () {
-                                      Navigator.of(context).pushNamed('/home');
-                                    },
-                                    icon: const Icon(Icons.home, size: 24),
+                                    onPressed: _currentStep < _totalSteps
+                                        ? _nextStep
+                                        : null,
+                                    icon: const Icon(Icons.arrow_forward),
                                     label: Text(
-                                      'Regresar al inicio',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                      _currentStep < _totalSteps
+                                          ? 'Siguiente'
+                                          : 'Finalizado',
                                     ),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: colorScheme.primary,
                                       foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(16),
                                       ),
@@ -527,21 +544,52 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                                 ),
                               ],
                             ),
-                          ),
+                            const SizedBox(height: 16),
+                            // Botón de regreso al inicio
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed('/home');
+                                },
+                                icon: const Icon(Icons.home, size: 24),
+                                label: Text(
+                                  'Regresar al inicio',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: colorScheme.primary,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  elevation: 2,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
               ),
               // Banner Ad fijo en la parte inferior
               if (!_adsRemoved)
                 Container(
                   alignment: Alignment.center,
                   width: double.infinity,
-                  height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
+                  height: _bannerAd != null
+                      ? _bannerAd!.size.height.toDouble()
+                      : 50,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? colorScheme.surface
-                        : Colors.white,
+                    color: isDark ? colorScheme.surface : Colors.white,
                     border: Border(
                       top: BorderSide(
-                        color: colorScheme.outline.withOpacity(0.1),
+                        color: colorScheme.outline.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -577,7 +625,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.primary.withOpacity(0.1),
+            color: colorScheme.primary.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -592,13 +640,15 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: isVillancico
-                      ? colorScheme.secondary.withOpacity(0.15)
-                      : colorScheme.primary.withOpacity(0.15),
+                      ? colorScheme.secondary.withValues(alpha: 0.15)
+                      : colorScheme.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   isVillancico ? Icons.music_note : Icons.book,
-                  color: isVillancico ? colorScheme.secondary : colorScheme.primary,
+                  color: isVillancico
+                      ? colorScheme.secondary
+                      : colorScheme.primary,
                   size: 28,
                 ),
               ),
@@ -674,4 +724,3 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
     );
   }
 }
-

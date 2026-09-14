@@ -1,21 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/live_posts_service.dart';
+import '../services/post_social_service.dart';
 import '../widgets/top_notice.dart';
 
 class CommentsScreen extends StatefulWidget {
   final String postId;
 
-  const CommentsScreen({super.key, required this.postId});
+  /// Si es null se usa [LivePostsService] (En Vivo).
+  final PostSocialService? socialService;
+
+  /// Sin [Scaffold] ni AppBar: para incrustar en detalle de comunidad.
+  final bool embedded;
+
+  const CommentsScreen({
+    super.key,
+    required this.postId,
+    this.socialService,
+    this.embedded = false,
+  });
 
   @override
   State<CommentsScreen> createState() => _CommentsScreenState();
 }
 
 class _CommentsScreenState extends State<CommentsScreen> {
-  final _service = LivePostsService();
+  late final PostSocialService _service;
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
   final _commentController = TextEditingController();
@@ -28,6 +41,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
   @override
   void initState() {
     super.initState();
+    _service = widget.socialService ?? LivePostsService();
     _rootCommentsStream = _service.getRootCommentsStream(widget.postId);
   }
 
@@ -50,16 +64,18 @@ class _CommentsScreenState extends State<CommentsScreen> {
     try {
       final userDoc = await _firestore.collection('users').doc(uid).get();
       final userData = userDoc.data();
-      final authorName = ((userData?['displayName'] as String?) ??
-          _auth.currentUser?.displayName ??
-          _auth.currentUser?.email?.split('@').first ??
-          uid)
-        .trim();
-      final authorUsername =
-        ((userData?['username'] as String?) ?? '').trim().toLowerCase();
-      final authorPhoto = ((userData?['photoURL'] as String?) ??
-          _auth.currentUser?.photoURL)
-        ?.trim();
+      final authorName =
+          ((userData?['displayName'] as String?) ??
+                  _auth.currentUser?.displayName ??
+                  _auth.currentUser?.email?.split('@').first ??
+                  uid)
+              .trim();
+      final authorUsername = ((userData?['username'] as String?) ?? '')
+          .trim()
+          .toLowerCase();
+      final authorPhoto =
+          ((userData?['photoURL'] as String?) ?? _auth.currentUser?.photoURL)
+              ?.trim();
 
       final isReply = _replyingToCommentId != null && _rootId != null;
 
@@ -68,7 +84,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
           postId: widget.postId,
           uid: uid,
           authorName: authorName,
-        authorUsername: authorUsername,
+          authorUsername: authorUsername,
           text: text,
           parentCommentId: _replyingToCommentId!,
           rootId: _rootId!,
@@ -99,8 +115,14 @@ class _CommentsScreenState extends State<CommentsScreen> {
         );
       }
     } catch (e) {
+      String message = 'Error al comentar.';
+      if (e is FirebaseFunctionsException) {
+        message = e.message ?? message;
+      } else {
+        message = 'Error al comentar: $e';
+      }
       if (mounted) {
-        showTopNotice(context, message: 'Error al comentar: $e', isError: true);
+        showTopNotice(context, message: message, isError: true);
       }
     } finally {
       if (mounted) {
@@ -137,12 +159,185 @@ class _CommentsScreenState extends State<CommentsScreen> {
     return 'hace $days d';
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildThreadBody(BuildContext context) {
     final uid = _auth.currentUser?.uid;
     final mediaQuery = MediaQuery.of(context);
     final bottomInset = mediaQuery.viewInsets.bottom;
 
+    return Column(
+      children: [
+        Expanded(
+          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+            stream: _rootCommentsStream,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text(
+                    'Error al cargar comentarios: ${snapshot.error}',
+                    style: GoogleFonts.inter(),
+                  ),
+                );
+              }
+
+              final comments = snapshot.data?.docs ?? [];
+              if (comments.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.comment_outlined,
+                        size: 64,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Sé el primero en comentar',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: comments.length,
+                itemBuilder: (context, index) {
+                  final comment = comments[index];
+                  return _CommentItem(
+                    postId: widget.postId,
+                    commentId: comment.id,
+                    data: comment.data(),
+                    service: _service,
+                    currentUid: uid ?? '',
+                    onReply: _startReply,
+                    formatTimeAgo: _formatTimeAgo,
+                  );
+                },
+              );
+            },
+          ),
+        ),
+        // Input de comentario
+        AnimatedPadding(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          padding: EdgeInsets.only(bottom: bottomInset),
+          child: SafeArea(
+            top: false,
+            minimum: const EdgeInsets.only(bottom: 8),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                border: Border(
+                  top: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
+                ),
+              ),
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 8,
+                bottom: 8,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_replyingToAuthorName != null)
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      margin: const EdgeInsets.only(bottom: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[50],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Respondiendo a $_replyingToAuthorName',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: Colors.blue[900],
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, size: 18),
+                            onPressed: _cancelReply,
+                            color: Colors.blue[900],
+                          ),
+                        ],
+                      ),
+                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _commentController,
+                          decoration: InputDecoration(
+                            hintText: _replyingToCommentId != null
+                                ? 'Escribe una respuesta...'
+                                : 'Escribe un comentario...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                          ),
+                          maxLines: null,
+                          textInputAction: TextInputAction.send,
+                          scrollPadding: const EdgeInsets.only(bottom: 120),
+                          onSubmitted: _isSubmittingComment
+                              ? null
+                              : (_) => _submitComment(),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: _isSubmittingComment ? null : _submitComment,
+                        icon: _isSubmittingComment
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Icon(Icons.send_rounded),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final body = _buildThreadBody(context);
+    if (widget.embedded) {
+      return body;
+    }
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -157,165 +352,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: _rootCommentsStream,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      'Error al cargar comentarios: ${snapshot.error}',
-                      style: GoogleFonts.inter(),
-                    ),
-                  );
-                }
-
-                final comments = snapshot.data?.docs ?? [];
-                if (comments.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.comment_outlined, size: 64, color: Colors.grey[400]),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Sé el primero en comentar',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: comments.length,
-                  itemBuilder: (context, index) {
-                    final comment = comments[index];
-                    return _CommentItem(
-                      postId: widget.postId,
-                      commentId: comment.id,
-                      data: comment.data(),
-                      service: _service,
-                      currentUid: uid ?? '',
-                      onReply: _startReply,
-                      formatTimeAgo: _formatTimeAgo,
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-          // Input de comentario
-          AnimatedPadding(
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeOut,
-            padding: EdgeInsets.only(bottom: bottomInset),
-            child: SafeArea(
-              top: false,
-              minimum: const EdgeInsets.only(bottom: 8),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  border: Border(
-                    top: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
-                  ),
-                ),
-                padding: const EdgeInsets.only(
-                  left: 16,
-                  right: 16,
-                  top: 8,
-                  bottom: 8,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (_replyingToAuthorName != null)
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        margin: const EdgeInsets.only(bottom: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.blue[50],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'Respondiendo a $_replyingToAuthorName',
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: Colors.blue[900],
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.close, size: 18),
-                              onPressed: _cancelReply,
-                              color: Colors.blue[900],
-                            ),
-                          ],
-                        ),
-                      ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _commentController,
-                            decoration: InputDecoration(
-                              hintText: _replyingToCommentId != null
-                                  ? 'Escribe una respuesta...'
-                                  : 'Escribe un comentario...',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
-                              ),
-                            ),
-                            maxLines: null,
-                            textInputAction: TextInputAction.send,
-                            scrollPadding: const EdgeInsets.only(bottom: 120),
-                            onSubmitted:
-                                _isSubmittingComment ? null : (_) => _submitComment(),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          onPressed: _isSubmittingComment ? null : _submitComment,
-                          icon: _isSubmittingComment
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Icon(Icons.send_rounded),
-                          style: IconButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.primary,
-                            foregroundColor: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      body: body,
     );
   }
 }
@@ -324,7 +361,7 @@ class _CommentItem extends StatefulWidget {
   final String postId;
   final String commentId;
   final Map<String, dynamic> data;
-  final LivePostsService service;
+  final PostSocialService service;
   final String currentUid;
   final Function(String, String, String?) onReply;
   final String Function(DateTime?) formatTimeAgo;
@@ -345,7 +382,8 @@ class _CommentItem extends StatefulWidget {
 
 class _CommentItemState extends State<_CommentItem> {
   bool _showReplies = false;
-  late final Stream<DocumentSnapshot<Map<String, dynamic>>>? _authorProfileStream;
+  late final Stream<DocumentSnapshot<Map<String, dynamic>>>?
+  _authorProfileStream;
   late final Stream<bool> _hasRepliesStream;
   late final Stream<bool> _isLikedStream;
   late final Stream<int> _likeCountStream;
@@ -356,16 +394,25 @@ class _CommentItemState extends State<_CommentItem> {
     super.initState();
     final authorUid = (widget.data['authorUid'] as String? ?? '').trim();
     _authorProfileStream = authorUid.isNotEmpty
-        ? FirebaseFirestore.instance.collection('users').doc(authorUid).snapshots()
+        ? FirebaseFirestore.instance
+              .collection('users')
+              .doc(authorUid)
+              .snapshots()
         : null;
-    _hasRepliesStream = widget.service.hasRepliesStream(widget.postId, widget.commentId);
+    _hasRepliesStream = widget.service.hasRepliesStream(
+      widget.postId,
+      widget.commentId,
+    );
     _isLikedStream = widget.service.isCommentLikedStream(
       widget.postId,
       widget.commentId,
       widget.currentUid,
     );
     _likeCountStream = _getLikeCountStream();
-    _repliesStream = widget.service.getRepliesStream(widget.postId, widget.commentId);
+    _repliesStream = widget.service.getRepliesStream(
+      widget.postId,
+      widget.commentId,
+    );
   }
 
   Future<void> _toggleLike() async {
@@ -386,8 +433,8 @@ class _CommentItemState extends State<_CommentItem> {
     final authorUid = (widget.data['authorUid'] as String? ?? '').trim();
     final fallbackDisplayName =
         ((widget.data['authorName'] as String?) ?? 'Anónimo').trim();
-    final fallbackUsername =
-        ((widget.data['authorUsername'] as String?) ?? '').trim();
+    final fallbackUsername = ((widget.data['authorUsername'] as String?) ?? '')
+        .trim();
     final fallbackPhoto = widget.data['authorPhoto'] as String?;
     final createdAt = widget.data['createdAt'] as Timestamp?;
     final likeCount = (widget.data['likeCount'] ?? 0) as int;
@@ -400,7 +447,8 @@ class _CommentItemState extends State<_CommentItem> {
       builder: (context, profileSnapshot) {
         final profileData = profileSnapshot.data?.data();
         final authorName =
-            ((profileData?['displayName'] as String?) ?? fallbackDisplayName).trim();
+            ((profileData?['displayName'] as String?) ?? fallbackDisplayName)
+                .trim();
         final username =
             ((profileData?['username'] as String?) ?? fallbackUsername).trim();
         final authorPhoto =
@@ -417,11 +465,15 @@ class _CommentItemState extends State<_CommentItem> {
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundImage: authorPhoto != null ? NetworkImage(authorPhoto) : null,
+                    backgroundImage: authorPhoto != null
+                        ? NetworkImage(authorPhoto)
+                        : null,
                     backgroundColor: Colors.deepPurple.withValues(alpha: 0.12),
                     child: authorPhoto == null
                         ? Text(
-                            authorName.isNotEmpty ? authorName[0].toUpperCase() : '?',
+                            authorName.isNotEmpty
+                                ? authorName[0].toUpperCase()
+                                : '?',
                             style: GoogleFonts.inter(
                               color: Colors.deepPurple,
                               fontWeight: FontWeight.bold,
@@ -468,14 +520,18 @@ class _CommentItemState extends State<_CommentItem> {
                                             .colorScheme
                                             .primary
                                             .withValues(alpha: 0.12),
-                                        borderRadius: BorderRadius.circular(999),
+                                        borderRadius: BorderRadius.circular(
+                                          999,
+                                        ),
                                       ),
                                       child: Text(
                                         'Tú',
                                         style: GoogleFonts.inter(
                                           fontSize: 10,
                                           fontWeight: FontWeight.w700,
-                                          color: Theme.of(context).colorScheme.primary,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
                                         ),
                                       ),
                                     ),
@@ -503,70 +559,74 @@ class _CommentItemState extends State<_CommentItem> {
                             ],
                           ),
                         ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(
-                          widget.formatTimeAgo(createdAt?.toDate()),
-                          style: GoogleFonts.inter(
-                            fontSize: 11,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        InkWell(
-                          onTap: () => widget.onReply(
-                            widget.commentId,
-                            authorName,
-                            widget.data['rootId'] as String?,
-                          ),
-                          child: Text(
-                            'Responder',
-                            style: GoogleFonts.inter(
-                              fontSize: 11,
-                              color: Colors.blue[700],
-                              fontWeight: FontWeight.w600,
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Text(
+                              widget.formatTimeAgo(createdAt?.toDate()),
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                color: Colors.grey[600],
+                              ),
                             ),
-                          ),
-                        ),
-                        StreamBuilder<bool>(
-                          stream: _hasRepliesStream,
-                          builder: (context, hasRepliesSnapshot) {
-                            final hasReplies = hasRepliesSnapshot.data ?? false;
-                            final shouldShowToggle = hasReplies || replyCount > 0;
-
-                            if (!shouldShowToggle) {
-                              return const SizedBox.shrink();
-                            }
-
-                            final displayReplyCount = hasReplies
-                                ? (replyCount > 0 ? replyCount : 1)
-                                : replyCount;
-
-                            return Row(
-                              children: [
-                                const SizedBox(width: 12),
-                                InkWell(
-                                  onTap: () {
-                                    setState(() => _showReplies = !_showReplies);
-                                  },
-                                  child: Text(
-                                    _showReplies
-                                        ? 'Ocultar'
-                                        : 'Ver $displayReplyCount ${displayReplyCount == 1 ? 'respuesta' : 'respuestas'}',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 11,
-                                      color: Colors.blue[700],
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
+                            const SizedBox(width: 12),
+                            InkWell(
+                              onTap: () => widget.onReply(
+                                widget.commentId,
+                                authorName,
+                                widget.data['rootId'] as String?,
+                              ),
+                              child: Text(
+                                'Responder',
+                                style: GoogleFonts.inter(
+                                  fontSize: 11,
+                                  color: Colors.blue[700],
+                                  fontWeight: FontWeight.w600,
                                 ),
-                              ],
-                            );
-                          },
+                              ),
+                            ),
+                            StreamBuilder<bool>(
+                              stream: _hasRepliesStream,
+                              builder: (context, hasRepliesSnapshot) {
+                                final hasReplies =
+                                    hasRepliesSnapshot.data ?? false;
+                                final shouldShowToggle =
+                                    hasReplies || replyCount > 0;
+
+                                if (!shouldShowToggle) {
+                                  return const SizedBox.shrink();
+                                }
+
+                                final displayReplyCount = hasReplies
+                                    ? (replyCount > 0 ? replyCount : 1)
+                                    : replyCount;
+
+                                return Row(
+                                  children: [
+                                    const SizedBox(width: 12),
+                                    InkWell(
+                                      onTap: () {
+                                        setState(
+                                          () => _showReplies = !_showReplies,
+                                        );
+                                      },
+                                      child: Text(
+                                        _showReplies
+                                            ? 'Ocultar'
+                                            : 'Ver $displayReplyCount ${displayReplyCount == 1 ? 'respuesta' : 'respuestas'}',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 11,
+                                          color: Colors.blue[700],
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
                       ],
                     ),
                   ),
@@ -595,9 +655,13 @@ class _CommentItemState extends State<_CommentItem> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  isLiked ? Icons.favorite : Icons.favorite_border,
+                                  isLiked
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
                                   size: 16,
-                                  color: isLiked ? Colors.red : Colors.grey[600],
+                                  color: isLiked
+                                      ? Colors.red
+                                      : Colors.grey[600],
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
@@ -654,13 +718,10 @@ class _CommentItemState extends State<_CommentItem> {
   }
 
   Stream<int> _getLikeCountStream() {
-    return FirebaseFirestore.instance
-        .collection('live_posts')
-        .doc(widget.postId)
-        .collection('comments')
-        .doc(widget.commentId)
-        .snapshots()
-        .map((snap) => (snap.data()?['likeCount'] ?? 0) as int);
+    return widget.service.getCommentLikeCountStream(
+      widget.postId,
+      widget.commentId,
+    );
   }
 }
 
@@ -668,7 +729,7 @@ class _ReplyItem extends StatefulWidget {
   final String postId;
   final String replyId;
   final Map<String, dynamic> data;
-  final LivePostsService service;
+  final PostSocialService service;
   final String currentUid;
   final String Function(DateTime?) formatTimeAgo;
 
@@ -692,8 +753,8 @@ class _ReplyItemState extends State<_ReplyItem> {
     final authorUid = (widget.data['authorUid'] as String? ?? '').trim();
     final fallbackDisplayName =
         ((widget.data['authorName'] as String?) ?? 'Anónimo').trim();
-    final fallbackUsername =
-        ((widget.data['authorUsername'] as String?) ?? '').trim();
+    final fallbackUsername = ((widget.data['authorUsername'] as String?) ?? '')
+        .trim();
     final fallbackPhoto = widget.data['authorPhoto'] as String?;
     final createdAt = widget.data['createdAt'] as Timestamp?;
     final isMine =
@@ -702,14 +763,15 @@ class _ReplyItemState extends State<_ReplyItem> {
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: authorUid.isNotEmpty
           ? FirebaseFirestore.instance
-              .collection('users')
-              .doc(authorUid)
-              .snapshots()
+                .collection('users')
+                .doc(authorUid)
+                .snapshots()
           : null,
       builder: (context, profileSnapshot) {
         final profileData = profileSnapshot.data?.data();
         final authorName =
-            ((profileData?['displayName'] as String?) ?? fallbackDisplayName).trim();
+            ((profileData?['displayName'] as String?) ?? fallbackDisplayName)
+                .trim();
         final username =
             ((profileData?['username'] as String?) ?? fallbackUsername).trim();
         final authorPhoto =
@@ -722,11 +784,15 @@ class _ReplyItemState extends State<_ReplyItem> {
             children: [
               CircleAvatar(
                 radius: 14,
-                backgroundImage: authorPhoto != null ? NetworkImage(authorPhoto) : null,
+                backgroundImage: authorPhoto != null
+                    ? NetworkImage(authorPhoto)
+                    : null,
                 backgroundColor: Colors.deepPurple.withValues(alpha: 0.12),
                 child: authorPhoto == null
                     ? Text(
-                        authorName.isNotEmpty ? authorName[0].toUpperCase() : '?',
+                        authorName.isNotEmpty
+                            ? authorName[0].toUpperCase()
+                            : '?',
                         style: GoogleFonts.inter(
                           color: Colors.deepPurple,
                           fontWeight: FontWeight.bold,
@@ -769,9 +835,7 @@ class _ReplyItemState extends State<_ReplyItem> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .primary
+                                    color: Theme.of(context).colorScheme.primary
                                         .withValues(alpha: 0.12),
                                     borderRadius: BorderRadius.circular(999),
                                   ),
@@ -780,7 +844,9 @@ class _ReplyItemState extends State<_ReplyItem> {
                                     style: GoogleFonts.inter(
                                       fontSize: 10,
                                       fontWeight: FontWeight.w700,
-                                      color: Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
                                     ),
                                   ),
                                 ),
@@ -800,10 +866,7 @@ class _ReplyItemState extends State<_ReplyItem> {
                           const SizedBox(height: 2),
                           Text(
                             text,
-                            style: GoogleFonts.inter(
-                              fontSize: 13,
-                              height: 1.4,
-                            ),
+                            style: GoogleFonts.inter(fontSize: 13, height: 1.4),
                           ),
                         ],
                       ),
@@ -832,13 +895,10 @@ class _ReplyItemState extends State<_ReplyItem> {
                         builder: (context, likedSnapshot) {
                           final isLiked = likedSnapshot.data ?? false;
                           return StreamBuilder<int>(
-                            stream: FirebaseFirestore.instance
-                                .collection('live_posts')
-                                .doc(widget.postId)
-                                .collection('comments')
-                                .doc(widget.replyId)
-                                .snapshots()
-                                .map((snap) => (snap.data()?['likeCount'] ?? 0) as int),
+                            stream: widget.service.getCommentLikeCountStream(
+                              widget.postId,
+                              widget.replyId,
+                            ),
                             builder: (context, countSnapshot) {
                               final count = countSnapshot.data ?? 0;
                               return InkWell(
@@ -863,9 +923,13 @@ class _ReplyItemState extends State<_ReplyItem> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Icon(
-                                        isLiked ? Icons.favorite : Icons.favorite_border,
+                                        isLiked
+                                            ? Icons.favorite
+                                            : Icons.favorite_border,
                                         size: 14,
-                                        color: isLiked ? Colors.red : Colors.grey[600],
+                                        color: isLiked
+                                            ? Colors.red
+                                            : Colors.grey[600],
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
@@ -894,4 +958,3 @@ class _ReplyItemState extends State<_ReplyItem> {
     );
   }
 }
-

@@ -43,8 +43,10 @@ class VerseService {
 
     // NUEVA FUENTE: Versículo desde SQLite RV1909 usando referencias curadas
     try {
-      final offlineVerse = await offline_daily.DailyVerseService().getDailyVerse(date: today);
-      final ref = '${offlineVerse.book} ${offlineVerse.chapter}:${offlineVerse.verse}';
+      final offlineVerse = await offline_daily.DailyVerseService()
+          .getDailyVerse(date: today);
+      final ref =
+          '${offlineVerse.book} ${offlineVerse.chapter}:${offlineVerse.verse}';
       final model = Verse(
         id: today.year * 10000 + today.month * 100 + today.day,
         text: offlineVerse.text,
@@ -56,7 +58,9 @@ class VerseService {
       await CacheService.saveTodayVerse(model);
       _todayVerse = model;
       _lastDate = today;
-      debugPrint('DailyVerse => $ref | ${offlineVerse.tag ?? ''} | ${offlineVerse.text}');
+      debugPrint(
+        'DailyVerse => $ref | ${offlineVerse.tag ?? ''} | ${offlineVerse.text}',
+      );
       return _todayVerse!;
     } catch (e) {
       debugPrint('Error offline daily verse: $e');

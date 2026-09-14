@@ -20,4 +20,3 @@ class PrayerRepository {
     return all.where((p) => p.category == category).toList();
   }
 }
-

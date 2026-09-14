@@ -16,7 +16,9 @@ class EmotionPrayerRepository {
     final data = json.decode(jsonStr) as Map<String, dynamic>;
     _cache = data.map((category, list) {
       final prayers = (list as List<dynamic>)
-          .map((e) => EmotionPrayer.fromJson(category, e as Map<String, dynamic>))
+          .map(
+            (e) => EmotionPrayer.fromJson(category, e as Map<String, dynamic>),
+          )
           .toList();
       return MapEntry(category, prayers);
     });
@@ -27,4 +29,3 @@ class EmotionPrayerRepository {
     return _cache?[category] ?? <EmotionPrayer>[];
   }
 }
-

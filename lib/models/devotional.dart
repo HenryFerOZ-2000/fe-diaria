@@ -25,7 +25,9 @@ class Devotional {
       verse: json['verse'] as String,
       verseReference: json['verseReference'] as String,
       reflection: json['reflection'] as String,
-      date: json['date'] != null ? DateTime.parse(json['date'] as String) : null,
+      date: json['date'] != null
+          ? DateTime.parse(json['date'] as String)
+          : null,
       tags: json['tags'] != null ? List<String>.from(json['tags']) : null,
     );
   }
@@ -42,4 +44,3 @@ class Devotional {
     };
   }
 }
-

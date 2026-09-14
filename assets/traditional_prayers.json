@@ -34,16 +34,6 @@
     "title": "Consagración al Sagrado Corazón",
     "type": "fixed_text",
     "text": "Sagrado Corazón de Jesús, en ti confío. Me consagro a tu amor y misericordia. Toma mi vida, mis pensamientos y acciones, y hazlos tuyos. Que tu corazón sea mi refugio y mi camino seguro hacia el Padre. Amén."
-  },
-  {
-    "id": "gratitud_trad",
-    "title": "Cántico de María (Magnificat)",
-    "type": "bible_passage",
-    "book": "LUK",
-    "chapter": 1,
-    "verseStart": 46,
-    "verseEnd": 55,
-    "label": "Lucas 1:46-55"
   }
 ]
 

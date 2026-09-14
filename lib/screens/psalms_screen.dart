@@ -54,7 +54,8 @@ class _PsalmsScreenState extends State<PsalmsScreen> {
           ad.dispose();
         }
       },
-      onAdFailedToLoad: (error) => debugPrint('Failed to load banner ad: $error'),
+      onAdFailedToLoad: (error) =>
+          debugPrint('Failed to load banner ad: $error'),
     );
   }
 
@@ -96,7 +97,9 @@ class _PsalmsScreenState extends State<PsalmsScreen> {
                       label: Text(category),
                       selected: isSelected,
                       onSelected: (selected) {
-                        setState(() => _selectedCategory = selected ? category : null);
+                        setState(
+                          () => _selectedCategory = selected ? category : null,
+                        );
                       },
                     ),
                   );
@@ -105,48 +108,59 @@ class _PsalmsScreenState extends State<PsalmsScreen> {
             ),
           Expanded(
             child: _isLoading
-                ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: colorScheme.primary,
+                    ),
+                  )
                 : psalms.isEmpty
-                    ? EmptyState(
-                        title: 'No hay salmos disponibles',
-                        message: 'Intenta recargar más tarde',
-                        icon: Icons.library_books_outlined,
-                        onAction: _loadData,
-                        actionLabel: 'Recargar',
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        itemCount: psalms.length,
-                        itemBuilder: (context, index) {
-                          final psalm = psalms[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                            child: PrayerCard(
-                              title: psalm.title,
-                              text: psalm.text,
-                              reference: psalm.reference,
-                              icon: Icons.library_books_rounded,
-                            ),
-                          );
-                        },
-                      ),
+                ? EmptyState(
+                    title: 'No hay salmos disponibles',
+                    message: 'Intenta recargar más tarde',
+                    icon: Icons.library_books_outlined,
+                    onAction: _loadData,
+                    actionLabel: 'Recargar',
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    itemCount: psalms.length,
+                    itemBuilder: (context, index) {
+                      final psalm = psalms[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                        child: PrayerCard(
+                          title: psalm.title,
+                          text: psalm.text,
+                          reference: psalm.reference,
+                          icon: Icons.library_books_rounded,
+                        ),
+                      );
+                    },
+                  ),
           ),
           if (!_adsRemoved)
             Container(
               alignment: Alignment.center,
               width: double.infinity,
-              height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
+              height: _bannerAd != null
+                  ? _bannerAd!.size.height.toDouble()
+                  : 50,
               decoration: BoxDecoration(
                 color: isDark ? colorScheme.surface : AppColors.surface,
                 border: Border(
-                  top: BorderSide(color: colorScheme.outline.withOpacity(0.1), width: 1),
+                  top: BorderSide(
+                    color: colorScheme.outline.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
                 ),
               ),
               child: _bannerAd != null
                   ? AdWidget(ad: _bannerAd!)
                   : const SizedBox(
                       height: 50,
-                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     ),
             ),
         ],
@@ -154,4 +168,3 @@ class _PsalmsScreenState extends State<PsalmsScreen> {
     );
   }
 }
-

@@ -9,8 +9,9 @@ class SystemUiService {
       statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
       systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarIconBrightness:
-          isDark ? Brightness.light : Brightness.dark,
+      systemNavigationBarIconBrightness: isDark
+          ? Brightness.light
+          : Brightness.dark,
       systemNavigationBarDividerColor: Colors.transparent,
     );
   }
@@ -25,6 +26,8 @@ class SystemUiService {
   }
 
   static void applyFromPlatformBrightness() {
-    applyForBrightness(WidgetsBinding.instance.platformDispatcher.platformBrightness);
+    applyForBrightness(
+      WidgetsBinding.instance.platformDispatcher.platformBrightness,
+    );
   }
 }

@@ -5,6 +5,7 @@ import '../services/share_service.dart';
 import '../services/ads_service.dart';
 import '../services/storage_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../widgets/prayer_card.dart';
 
 class CategoryPrayersScreen extends StatefulWidget {
   const CategoryPrayersScreen({super.key});
@@ -29,7 +30,7 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
 
   void _loadBannerAd() {
     if (_adsRemoved) return;
-    
+
     _adsService.loadBannerAd(
       adSize: AdSize.banner,
       onAdLoaded: (ad) {
@@ -99,7 +100,7 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
             end: Alignment.bottomRight,
             colors: [
               Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).colorScheme.tertiary.withOpacity(0.05),
+              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
               Theme.of(context).scaffoldBackgroundColor,
             ],
           ),
@@ -118,12 +119,13 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 20,
-                          mainAxisSpacing: 20,
-                          childAspectRatio: 0.95,
-                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 20,
+                              mainAxisSpacing: 20,
+                              childAspectRatio: 0.95,
+                            ),
                         itemCount: categories.length,
                         itemBuilder: (context, index) {
                           final key = categories.keys.elementAt(index);
@@ -135,7 +137,10 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => CategoryPrayerDetailScreen(categoryKey: key),
+                                  builder: (context) =>
+                                      CategoryPrayerDetailScreen(
+                                        categoryKey: key,
+                                      ),
                                 ),
                               );
                             },
@@ -151,14 +156,14 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
                 Container(
                   alignment: Alignment.center,
                   width: double.infinity,
-                  height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
+                  height: _bannerAd != null
+                      ? _bannerAd!.size.height.toDouble()
+                      : 50,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? colorScheme.surface
-                        : Colors.white,
+                    color: isDark ? colorScheme.surface : Colors.white,
                     border: Border(
                       top: BorderSide(
-                        color: colorScheme.outline.withOpacity(0.1),
+                        color: colorScheme.outline.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -227,31 +232,31 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
   }) {
     // Obtener icono según la categoría
     IconData? categoryIcon = _getCategoryIcon(title);
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(28),
-        splashColor: colorScheme.primary.withOpacity(0.1),
-        highlightColor: colorScheme.primary.withOpacity(0.05),
+        splashColor: colorScheme.primary.withValues(alpha: 0.1),
+        highlightColor: colorScheme.primary.withValues(alpha: 0.05),
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
-              color: colorScheme.primary.withOpacity(0.15),
+              color: colorScheme.primary.withValues(alpha: 0.15),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withOpacity(0.08),
+                color: colorScheme.primary.withValues(alpha: 0.08),
                 blurRadius: 16,
                 offset: const Offset(0, 4),
                 spreadRadius: 0,
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
                 spreadRadius: 0,
@@ -267,7 +272,7 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withOpacity(0.1),
+                    color: colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -303,12 +308,16 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
     if (titleLower.contains('familia')) return Icons.family_restroom_rounded;
     if (titleLower.contains('salud')) return Icons.favorite_rounded;
     if (titleLower.contains('trabajo')) return Icons.work_rounded;
-    if (titleLower.contains('finanzas')) return Icons.account_balance_wallet_rounded;
+    if (titleLower.contains('finanzas'))
+      return Icons.account_balance_wallet_rounded;
     if (titleLower.contains('hogar')) return Icons.home_rounded;
-    if (titleLower.contains('protección') || titleLower.contains('proteccion')) return Icons.shield_rounded;
+    if (titleLower.contains('protección') || titleLower.contains('proteccion'))
+      return Icons.shield_rounded;
     if (titleLower.contains('descanso')) return Icons.bedtime_rounded;
-    if (titleLower.contains('mente') || titleLower.contains('paz')) return Icons.self_improvement_rounded;
-    if (titleLower.contains('ánimo') || titleLower.contains('animo')) return Icons.emoji_emotions_rounded;
+    if (titleLower.contains('mente') || titleLower.contains('paz'))
+      return Icons.self_improvement_rounded;
+    if (titleLower.contains('ánimo') || titleLower.contains('animo'))
+      return Icons.emoji_emotions_rounded;
     if (titleLower.contains('agradecimiento')) return Icons.celebration_rounded;
     return null;
   }
@@ -319,10 +328,12 @@ class CategoryPrayerDetailScreen extends StatefulWidget {
   const CategoryPrayerDetailScreen({super.key, required this.categoryKey});
 
   @override
-  State<CategoryPrayerDetailScreen> createState() => _CategoryPrayerDetailScreenState();
+  State<CategoryPrayerDetailScreen> createState() =>
+      _CategoryPrayerDetailScreenState();
 }
 
-class _CategoryPrayerDetailScreenState extends State<CategoryPrayerDetailScreen> {
+class _CategoryPrayerDetailScreenState
+    extends State<CategoryPrayerDetailScreen> {
   final AdsService _adsService = AdsService();
   BannerAd? _bannerAd;
   bool _adsRemoved = false;
@@ -338,7 +349,7 @@ class _CategoryPrayerDetailScreenState extends State<CategoryPrayerDetailScreen>
 
   void _loadBannerAd() {
     if (_adsRemoved) return;
-    
+
     _adsService.loadBannerAd(
       adSize: AdSize.banner,
       onAdLoaded: (ad) {
@@ -391,7 +402,9 @@ class _CategoryPrayerDetailScreenState extends State<CategoryPrayerDetailScreen>
                 end: Alignment.bottomRight,
                 colors: [
                   Theme.of(context).scaffoldBackgroundColor,
-                  Theme.of(context).colorScheme.tertiary.withOpacity(0.05),
+                  Theme.of(
+                    context,
+                  ).colorScheme.tertiary.withValues(alpha: 0.05),
                   Theme.of(context).scaffoldBackgroundColor,
                 ],
               ),
@@ -407,7 +420,9 @@ class _CategoryPrayerDetailScreenState extends State<CategoryPrayerDetailScreen>
                       title: title,
                       prayerText: prayerText,
                     ),
-                    const SizedBox(height: 90), // espacio para no tapar con banner flotante
+                    const SizedBox(
+                      height: 90,
+                    ), // espacio para no tapar con banner flotante
                   ],
                 ),
               ),
@@ -422,12 +437,16 @@ class _CategoryPrayerDetailScreenState extends State<CategoryPrayerDetailScreen>
               child: Container(
                 alignment: Alignment.center,
                 width: double.infinity,
-                height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
+                height: _bannerAd != null
+                    ? _bannerAd!.size.height.toDouble()
+                    : 50,
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   border: Border(
                     top: BorderSide(
-                      color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withValues(alpha: 0.1),
                       width: 1,
                     ),
                   ),
@@ -478,73 +497,21 @@ class _CategoryPrayerDetailScreenState extends State<CategoryPrayerDetailScreen>
     );
   }
 
-  Widget _buildPrayerCard({required BuildContext context, required String title, required String prayerText}) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.primary.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.menu_book_rounded,
-            color: colorScheme.primary,
-            size: 28,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            prayerText,
-            style: GoogleFonts.inter(
-              fontSize: 20,
-              height: 1.9,
-              color: colorScheme.onSurface,
-            ),
-            textAlign: TextAlign.center,
-            softWrap: true,
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                ShareService.shareAsText(
-                  text: prayerText,
-                  reference: title,
-                  title: title,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 2,
-              ),
-              child: Text(
-                'Compartir',
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ],
+  Widget _buildPrayerCard({
+    required BuildContext context,
+    required String title,
+    required String prayerText,
+  }) {
+    return PrayerCard(
+      title: title,
+      text: prayerText,
+      icon: Icons.menu_book_rounded,
+      accentColor: Theme.of(context).colorScheme.primary,
+      onShare: () => ShareService.shareAsText(
+        text: prayerText,
+        reference: title,
+        title: title,
       ),
     );
   }
-
 }

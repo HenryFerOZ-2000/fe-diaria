@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 
 class PrayersContentService {
-  static final PrayersContentService _instance = PrayersContentService._internal();
+  static final PrayersContentService _instance =
+      PrayersContentService._internal();
   factory PrayersContentService() => _instance;
   PrayersContentService._internal();
 

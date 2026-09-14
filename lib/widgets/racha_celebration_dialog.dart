@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 class RachaCelebrationDialog extends StatefulWidget {
   final int totalDays;
+
   const RachaCelebrationDialog({super.key, required this.totalDays});
 
   @override
@@ -11,31 +12,40 @@ class RachaCelebrationDialog extends StatefulWidget {
 
 class _RachaCelebrationDialogState extends State<RachaCelebrationDialog>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scale;
-  late Animation<double> _opacity;
-  bool _show = false;
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+  late final Animation<double> _scale;
+
+  bool get _isMilestone =>
+      const [3, 7, 14, 30, 50, 100, 365].contains(widget.totalDays);
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
-    )..repeat(reverse: true);
-    _scale = Tween<double>(begin: 1.0, end: 1.3).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
+      duration: const Duration(milliseconds: 720),
     );
-    _opacity = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+    _fade = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0, .72, curve: Curves.easeOut),
     );
-    Future.microtask(() {
-      if (mounted) {
-        setState(() {
-          _show = true;
-        });
-      }
+    _scale = Tween<double>(
+      begin: .88,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || MediaQuery.disableAnimationsOf(context)) return;
+      _controller.forward();
     });
+    if (WidgetsBinding
+        .instance
+        .platformDispatcher
+        .accessibilityFeatures
+        .disableAnimations) {
+      _controller.value = 1;
+    }
   }
 
   @override
@@ -44,115 +54,179 @@ class _RachaCelebrationDialogState extends State<RachaCelebrationDialog>
     super.dispose();
   }
 
+  void _openJourney() {
+    final navigator = Navigator.of(context);
+    navigator.pop();
+    Future.microtask(() => navigator.pushNamed('/streak'));
+  }
+
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final dark = theme.brightness == Brightness.dark;
+    final surface = dark ? const Color(0xFF251F2D) : const Color(0xFFFFFCF7);
+
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      child: Container(
-        padding: const EdgeInsets.all(26),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFFFFFF),
-          borderRadius: BorderRadius.circular(26),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 30,
-              offset: Offset(0, 10),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 24),
+      child: FadeTransition(
+        opacity: _fade,
+        child: ScaleTransition(
+          scale: _scale,
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 430),
+            decoration: BoxDecoration(
+              color: surface,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: scheme.outline.withValues(alpha: .14)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: dark ? .35 : .18),
+                  blurRadius: 38,
+                  offset: const Offset(0, 18),
+                ),
+              ],
             ),
-          ],
-          border: Border.all(
-            color: const Color(0xFFE9E9E9),
-            width: 1,
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AnimatedScale(
-              scale: _show ? 1.0 : 0.95,
-              duration: const Duration(milliseconds: 280),
-              curve: Curves.easeOutBack,
-              child: AnimatedOpacity(
-                opacity: _show ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 280),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    AnimatedBuilder(
-                      animation: _controller,
-                      builder: (context, child) {
-                        return AnimatedScale(
-                          duration: const Duration(milliseconds: 500),
-                          scale: _scale.value,
-                          child: AnimatedOpacity(
-                            duration: const Duration(milliseconds: 500),
-                            opacity: _opacity.value,
-                            child: child,
-                          ),
-                        );
-                      },
-                      child: const Icon(
-                        Icons.local_fire_department_rounded,
-                        color: Color(0xFFFFA726),
-                        size: 120,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    FadeTransition(
-                      opacity: _opacity,
-                      child: Column(
-                        children: [
-                          Text(
-                            '¡${widget.totalDays} días de racha!',
-                            style: GoogleFonts.playfairDisplay(
-                              color: const Color(0xFF222222),
-                              fontSize: 22,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '¡Sigue así, estás haciendo un gran trabajo!',
-                            style: GoogleFonts.inter(
-                              color: const Color(0xFF555555),
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
+              children: [
+                Positioned(
+                  right: -62,
+                  top: -72,
+                  child: Container(
+                    width: 210,
+                    height: 210,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          const Color(0xFFE3AF59).withValues(alpha: .22),
+                          Colors.transparent,
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.primary.withOpacity(0.9),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 28, 24, 22),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 92,
+                            height: 92,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color(
+                                0xFFE1B467,
+                              ).withValues(alpha: .12),
+                              border: Border.all(
+                                color: const Color(
+                                  0xFFE1B467,
+                                ).withValues(alpha: .30),
+                              ),
+                            ),
                           ),
-                        ),
-                        child: const Text(
-                          'CONTINUAR',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          Container(
+                            width: 66,
+                            height: 66,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [Color(0xFFF1C77E), Color(0xFFC98243)],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFFE0A857,
+                                  ).withValues(alpha: .28),
+                                  blurRadius: 22,
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.local_fire_department_rounded,
+                              color: Color(0xFF2A2030),
+                              size: 34,
+                            ),
+                          ),
+                          Positioned(
+                            top: 3,
+                            right: 3,
+                            child: Icon(
+                              Icons.auto_awesome_rounded,
+                              color: const Color(0xFFD29A45),
+                              size: 19,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        _isMilestone
+                            ? 'UN HITO EN TU CAMINO'
+                            : 'TU DÍA ESTÁ A SALVO',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          color: const Color(0xFFB27A34),
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.45,
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      Text(
+                        _isMilestone
+                            ? '${widget.totalDays} días de constancia'
+                            : 'Un día más caminando con Dios',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.playfairDisplay(
+                          color: scheme.onSurface,
+                          fontSize: 27,
+                          height: 1.08,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        _isMilestone
+                            ? 'Cada uno de estos días comenzó con una pequeña decisión: hacer espacio para Dios.'
+                            : 'Hoy hiciste espacio para detenerte, escuchar y volver a lo esencial.',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          color: scheme.onSurfaceVariant,
+                          fontSize: 13,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 22),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: FilledButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Continuar mi camino'),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      TextButton(
+                        onPressed: _openJourney,
+                        child: const Text('Ver mi recorrido'),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
-

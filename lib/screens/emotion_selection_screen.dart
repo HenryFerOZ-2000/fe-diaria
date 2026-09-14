@@ -37,7 +37,7 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
 
   void _loadBannerAd() {
     if (_adsRemoved) return;
-    
+
     _adsService.loadBannerAd(
       adSize: AdSize.banner,
       onAdLoaded: (ad) {
@@ -63,14 +63,54 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
 
   // 8 emociones simplificadas
   final List<Map<String, dynamic>> _emotions = [
-    {'id': 'ansioso', 'name': 'Ansioso', 'icon': Icons.psychology, 'color': Color(0xFFFF9800)},
-    {'id': 'triste', 'name': 'Triste', 'icon': Icons.sentiment_very_dissatisfied, 'color': Color(0xFF2196F3)},
-    {'id': 'cansado', 'name': 'Cansado', 'icon': Icons.bedtime, 'color': Color(0xFF9E9E9E)},
-    {'id': 'preocupado', 'name': 'Preocupado', 'icon': Icons.warning, 'color': Color(0xFFFFC107)},
-    {'id': 'agradecido', 'name': 'Agradecido', 'icon': Icons.favorite, 'color': Color(0xFF4CAF50)},
-    {'id': 'feliz', 'name': 'Feliz', 'icon': Icons.sentiment_very_satisfied, 'color': Color(0xFFFFEB3B)},
-    {'id': 'confundido', 'name': 'Confundido', 'icon': Icons.help, 'color': Color(0xFF9C27B0)},
-    {'id': 'miedo', 'name': 'Con miedo', 'icon': Icons.visibility_off, 'color': Color(0xFFF44336)},
+    {
+      'id': 'ansioso',
+      'name': 'Ansioso',
+      'icon': Icons.psychology,
+      'color': Color(0xFFFF9800),
+    },
+    {
+      'id': 'triste',
+      'name': 'Triste',
+      'icon': Icons.sentiment_very_dissatisfied,
+      'color': Color(0xFF2196F3),
+    },
+    {
+      'id': 'cansado',
+      'name': 'Cansado',
+      'icon': Icons.bedtime,
+      'color': Color(0xFF9E9E9E),
+    },
+    {
+      'id': 'preocupado',
+      'name': 'Preocupado',
+      'icon': Icons.warning,
+      'color': Color(0xFFFFC107),
+    },
+    {
+      'id': 'agradecido',
+      'name': 'Agradecido',
+      'icon': Icons.favorite,
+      'color': Color(0xFF4CAF50),
+    },
+    {
+      'id': 'feliz',
+      'name': 'Feliz',
+      'icon': Icons.sentiment_very_satisfied,
+      'color': Color(0xFFFFEB3B),
+    },
+    {
+      'id': 'confundido',
+      'name': 'Confundido',
+      'icon': Icons.help,
+      'color': Color(0xFF9C27B0),
+    },
+    {
+      'id': 'miedo',
+      'name': 'Con miedo',
+      'icon': Icons.visibility_off,
+      'color': Color(0xFFF44336),
+    },
   ];
 
   Future<void> _selectEmotion(String emotion) async {
@@ -82,10 +122,10 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
 
     try {
       final provider = Provider.of<AppProvider>(context, listen: false);
-      
+
       // Guardar emoción
       await provider.setUserEmotion(emotion);
-      
+
       // Recargar versículo y oración personalizados
       await provider.loadTodayVerse();
       await provider.loadTodayPrayers();
@@ -99,10 +139,8 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
       // Navegar a pantalla de detalle de emoción
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => EmotionDetailScreen(
-            emotion: emotion,
-            emotionName: emotionName,
-          ),
+          builder: (context) =>
+              EmotionDetailScreen(emotion: emotion, emotionName: emotionName),
         ),
       );
 
@@ -114,7 +152,7 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
       setState(() {
         _isLoading = false;
       });
-      
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -151,7 +189,7 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final theme = Theme.of(context);
-    
+
     return AppScaffold(
       title: '¿Cómo te sientes hoy?',
       body: Column(
@@ -181,7 +219,7 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.xxl),
-                  
+
                   // Grid de emociones (botones grandes)
                   if (_isLoading)
                     const Center(
@@ -201,14 +239,14 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
             Container(
               alignment: Alignment.center,
               width: double.infinity,
-              height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
+              height: _bannerAd != null
+                  ? _bannerAd!.size.height.toDouble()
+                  : 50,
               decoration: BoxDecoration(
-                color: isDark
-                    ? colorScheme.surface
-                    : AppColors.surface,
+                color: isDark ? colorScheme.surface : AppColors.surface,
                 border: Border(
                   top: BorderSide(
-                    color: colorScheme.outline.withOpacity(0.1),
+                    color: colorScheme.outline.withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
@@ -269,29 +307,32 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
     required TextTheme textTheme,
   }) {
     final emotionColor = emotion['color'] as Color;
-    
+
     return MainCard(
       onTap: onTap,
       borderRadius: AppRadius.xxl,
       border: Border.all(
-        color: emotionColor.withOpacity(0.2),
+        color: emotionColor.withValues(alpha: 0.2),
         width: 1.5,
       ),
       customShadows: [
         BoxShadow(
-          color: emotionColor.withOpacity(0.12),
+          color: emotionColor.withValues(alpha: 0.12),
           blurRadius: 16,
           offset: const Offset(0, 4),
           spreadRadius: 0,
         ),
         BoxShadow(
-          color: Colors.black.withOpacity(0.02),
+          color: Colors.black.withValues(alpha: 0.02),
           blurRadius: 8,
           offset: const Offset(0, 2),
           spreadRadius: 0,
         ),
       ],
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.lg),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.lg,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
@@ -299,7 +340,7 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: emotionColor.withOpacity(0.12),
+              color: emotionColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(AppRadius.md),
             ),
             child: Icon(
@@ -324,4 +365,3 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
     );
   }
 }
-

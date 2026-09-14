@@ -63,7 +63,8 @@ class _EmotionDetailScreenState extends State<EmotionDetailScreen> {
           ad.dispose();
         }
       },
-      onAdFailedToLoad: (error) => debugPrint('Failed to load banner ad: $error'),
+      onAdFailedToLoad: (error) =>
+          debugPrint('Failed to load banner ad: $error'),
     );
   }
 
@@ -84,131 +85,145 @@ class _EmotionDetailScreenState extends State<EmotionDetailScreen> {
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
           : _prayerData == null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.error_outline, size: 64, color: colorScheme.error),
-                      const SizedBox(height: AppSpacing.md),
-                      Text('No se pudo cargar la oración', style: theme.textTheme.bodyLarge),
-                      const SizedBox(height: AppSpacing.md),
-                      CustomButton(
-                        text: 'Reintentar',
-                        icon: Icons.refresh,
-                        onPressed: _loadData,
-                      ),
-                    ],
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 64, color: colorScheme.error),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'No se pudo cargar la oración',
+                    style: theme.textTheme.bodyLarge,
                   ),
-                )
-              : Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Título principal
-                            Text(
-                              'Dios está contigo en este momento de ${widget.emotionName.toLowerCase()}',
-                              style: theme.textTheme.displaySmall?.copyWith(
-                                color: colorScheme.primary,
+                  const SizedBox(height: AppSpacing.md),
+                  CustomButton(
+                    text: 'Reintentar',
+                    icon: Icons.refresh,
+                    onPressed: _loadData,
+                  ),
+                ],
+              ),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Título principal
+                        Text(
+                          'Dios está contigo en este momento de ${widget.emotionName.toLowerCase()}',
+                          style: theme.textTheme.displaySmall?.copyWith(
+                            color: colorScheme.primary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        // Oración
+                        PrayerCard(
+                          title: _prayerData!['title'] as String,
+                          text: _prayerData!['text'] as String,
+                          icon: Icons.favorite_rounded,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        // Versículo motivador
+                        if (_prayerData!['verse'] != null)
+                          MainCard(
+                            padding: const EdgeInsets.all(AppSpacing.lg),
+                            backgroundColor: colorScheme.tertiary.withValues(
+                              alpha: 0.1,
+                            ),
+                            border: Border.all(
+                              color: colorScheme.tertiary.withValues(
+                                alpha: 0.3,
                               ),
-                              textAlign: TextAlign.center,
+                              width: 2,
                             ),
-                            const SizedBox(height: AppSpacing.xl),
-                            // Oración
-                            PrayerCard(
-                              title: _prayerData!['title'] as String,
-                              text: _prayerData!['text'] as String,
-                              icon: Icons.favorite_rounded,
-                            ),
-                            const SizedBox(height: AppSpacing.lg),
-                            // Versículo motivador
-                            if (_prayerData!['verse'] != null)
-                              MainCard(
-                                padding: const EdgeInsets.all(AppSpacing.lg),
-                                backgroundColor: colorScheme.tertiary.withOpacity(0.1),
-                                border: Border.all(
-                                  color: colorScheme.tertiary.withOpacity(0.3),
-                                  width: 2,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
                                   children: [
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.book_rounded,
-                                          color: colorScheme.tertiary,
-                                        ),
-                                        const SizedBox(width: AppSpacing.sm),
-                                        Text(
-                                          'Versículo para ti',
-                                          style: theme.textTheme.titleMedium?.copyWith(
+                                    Icon(
+                                      Icons.book_rounded,
+                                      color: colorScheme.tertiary,
+                                    ),
+                                    const SizedBox(width: AppSpacing.sm),
+                                    Text(
+                                      'Versículo para ti',
+                                      style: theme.textTheme.titleMedium
+                                          ?.copyWith(
                                             color: colorScheme.tertiary,
                                             fontWeight: FontWeight.bold,
                                           ),
-                                        ),
-                                      ],
                                     ),
-                                    const SizedBox(height: AppSpacing.md),
-                                    Text(
-                                      _prayerData!['verse'] as String,
-                                      style: theme.textTheme.bodyLarge?.copyWith(
-                                        fontSize: 18,
-                                        height: 1.7,
-                                        fontStyle: FontStyle.italic,
-                                      ),
-                                    ),
-                                    if (_prayerData!['verseReference'] != null) ...[
-                                      const SizedBox(height: AppSpacing.sm),
-                                      Text(
-                                        _prayerData!['verseReference'] as String,
-                                        style: theme.textTheme.bodySmall?.copyWith(
-                                          color: colorScheme.tertiary,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.right,
-                                      ),
-                                    ],
                                   ],
                                 ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      child: CustomButton(
-                        text: 'Regresar',
-                        icon: Icons.arrow_back,
-                        onPressed: () => Navigator.of(context).pop(),
-                        width: double.infinity,
-                      ),
-                    ),
-                    if (!_adsRemoved)
-                      Container(
-                        alignment: Alignment.center,
-                        width: double.infinity,
-                        height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
-                        decoration: BoxDecoration(
-                          color: isDark ? colorScheme.surface : AppColors.surface,
-                          border: Border(
-                            top: BorderSide(color: colorScheme.outline.withOpacity(0.1), width: 1),
+                                const SizedBox(height: AppSpacing.md),
+                                Text(
+                                  _prayerData!['verse'] as String,
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    fontSize: 18,
+                                    height: 1.7,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                                if (_prayerData!['verseReference'] != null) ...[
+                                  const SizedBox(height: AppSpacing.sm),
+                                  Text(
+                                    _prayerData!['verseReference'] as String,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.tertiary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.right,
+                                  ),
+                                ],
+                              ],
+                            ),
                           ),
-                        ),
-                        child: _bannerAd != null
-                            ? AdWidget(ad: _bannerAd!)
-                            : const SizedBox(
-                                height: 50,
-                                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                              ),
-                      ),
-                  ],
+                      ],
+                    ),
+                  ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: CustomButton(
+                    text: 'Regresar',
+                    icon: Icons.arrow_back,
+                    onPressed: () => Navigator.of(context).pop(),
+                    width: double.infinity,
+                  ),
+                ),
+                if (!_adsRemoved)
+                  Container(
+                    alignment: Alignment.center,
+                    width: double.infinity,
+                    height: _bannerAd != null
+                        ? _bannerAd!.size.height.toDouble()
+                        : 50,
+                    decoration: BoxDecoration(
+                      color: isDark ? colorScheme.surface : AppColors.surface,
+                      border: Border(
+                        top: BorderSide(
+                          color: colorScheme.outline.withValues(alpha: 0.1),
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    child: _bannerAd != null
+                        ? AdWidget(ad: _bannerAd!)
+                        : const SizedBox(
+                            height: 50,
+                            child: Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                  ),
+              ],
+            ),
     );
   }
 }
-

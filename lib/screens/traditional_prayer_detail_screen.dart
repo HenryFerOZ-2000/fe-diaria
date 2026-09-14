@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../services/traditional_prayers_service.dart';
-import '../services/ads_service.dart';
-import '../services/storage_service.dart';
 import '../services/share_service.dart';
+import '../widgets/prayer_reading_experience.dart';
 
 /// Pantalla de detalle de una oración tradicional
 class TraditionalPrayerDetailScreen extends StatefulWidget {
@@ -20,298 +18,181 @@ class TraditionalPrayerDetailScreen extends StatefulWidget {
   });
 
   @override
-  State<TraditionalPrayerDetailScreen> createState() => _TraditionalPrayerDetailScreenState();
+  State<TraditionalPrayerDetailScreen> createState() =>
+      _TraditionalPrayerDetailScreenState();
 }
 
-class _TraditionalPrayerDetailScreenState extends State<TraditionalPrayerDetailScreen> {
+class _TraditionalPrayerDetailScreenState
+    extends State<TraditionalPrayerDetailScreen> {
   final TraditionalPrayersService _service = TraditionalPrayersService();
-  final AdsService _adsService = AdsService();
-  BannerAd? _bannerAd;
-  bool _adsRemoved = false;
   Map<String, dynamic>? _prayer;
   bool _isLoading = true;
+  bool _fadeIn = false;
 
   @override
   void initState() {
     super.initState();
     _loadPrayer();
-    _adsRemoved = StorageService().getAdsRemoved();
-    if (!_adsRemoved) {
-      _loadBannerAd();
-    }
   }
 
   Future<void> _loadPrayer() async {
     try {
       await _service.loadPrayers();
+      if (!mounted) return;
       setState(() {
-        _prayer = _service.getPrayer(widget.religion, widget.category, widget.prayerKey);
+        _prayer = _service.getPrayer(
+          widget.religion,
+          widget.category,
+          widget.prayerKey,
+        );
         _isLoading = false;
+        _fadeIn = true;
       });
     } catch (e) {
       debugPrint('Error loading prayer: $e');
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
     }
   }
 
-  void _loadBannerAd() {
-    if (_adsRemoved) return;
-    
-    _adsService.loadBannerAd(
-      adSize: AdSize.banner,
-      onAdLoaded: (ad) {
-        if (mounted && !_adsRemoved) {
-          setState(() {
-            _bannerAd = ad;
-          });
-        } else {
-          ad.dispose();
-        }
-      },
-      onAdFailedToLoad: (error) {
-        debugPrint('Failed to load banner ad: $error');
-      },
-    );
-  }
-
   @override
-  void dispose() {
-    _bannerAd?.dispose();
-    super.dispose();
+  void dispose() => super.dispose();
+
+  void _share() {
+    if (_prayer == null) return;
+    final title = _prayer!['titulo'] as String? ?? widget.prayerKey;
+    final text = _prayer!['texto'] as String? ?? '';
+    ShareService.shareAsText(text: text, reference: title, title: title);
   }
 
   @override
   Widget build(BuildContext context) {
-    // Actualizar estado de anuncios removidos
-    final storage = StorageService();
-    final adsRemovedNow = storage.getAdsRemoved();
-    if (adsRemovedNow && !_adsRemoved) {
-      _bannerAd?.dispose();
-      _bannerAd = null;
-      _adsRemoved = true;
-    } else if (!adsRemovedNow && _adsRemoved) {
-      _adsRemoved = false;
-      _loadBannerAd();
-    } else if (!adsRemovedNow && _bannerAd == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && !_adsRemoved && _bannerAd == null) {
-          _loadBannerAd();
-        }
-      });
-    }
-
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _prayer?['titulo'] as String? ?? widget.prayerKey,
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).colorScheme.tertiary.withOpacity(0.05),
-              Theme.of(context).scaffoldBackgroundColor,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: _isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(
-                          color: colorScheme.primary,
-                        ),
-                      )
-                    : _prayer == null
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.error_outline,
-                                  size: 64,
-                                  color: colorScheme.onSurface.withOpacity(0.5),
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'No se pudo cargar la oración',
-                                  style: GoogleFonts.inter(fontSize: 16),
-                                ),
-                              ],
-                            ),
-                          )
-                        : SingleChildScrollView(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildPrayerCard(
-                                  context: context,
-                                  title: _prayer!['titulo'] as String? ?? widget.prayerKey,
-                                  text: _prayer!['texto'] as String? ?? '',
-                                  colorScheme: colorScheme,
-                                ),
-                              ],
-                            ),
-                          ),
-              ),
-              // Banner Ad fijo en la parte inferior
-              if (!_adsRemoved)
-                Container(
-                  alignment: Alignment.center,
-                  width: double.infinity,
-                  height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? colorScheme.surface
-                        : Colors.white,
-                    border: Border(
-                      top: BorderSide(
-                        color: colorScheme.outline.withOpacity(0.1),
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                  child: _bannerAd != null
-                      ? AdWidget(ad: _bannerAd!)
-                      : const SizedBox(
-                          height: 50,
-                          child: Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        ),
-                ),
-              // Botón de regreso al inicio
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed('/home');
-                    },
-                    icon: const Icon(Icons.home, size: 24),
-                    label: Text(
-                      'Regresar al inicio',
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 2,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return PrayerReadingExperience(
+      loading: _isLoading,
+      error: !_isLoading && _prayer == null
+          ? 'No se encontró esta oración.'
+          : null,
+      category: widget.category,
+      title: _prayer?['titulo'] as String? ?? widget.prayerKey,
+      text: _prayer?['texto'] as String?,
+      accent: const Color(0xFF8D7BC2),
+      onBack: () => Navigator.pop(context),
+      onRetry: _loadPrayer,
+      onShare: _share,
     );
   }
 
-  Widget _buildPrayerCard({
-    required BuildContext context,
-    required String title,
-    required String text,
-    required ColorScheme colorScheme,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.primary.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+  // ignore: unused_element
+  Widget _buildLegacy(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        fit: StackFit.expand,
         children: [
-          Icon(
-            Icons.menu_book_rounded,
-            color: colorScheme.primary,
-            size: 32,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: colorScheme.primary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          Text(
-            text,
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              height: 1.8,
-              color: colorScheme.onSurface,
-            ),
-            textAlign: TextAlign.justify,
-            softWrap: true,
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                ShareService.shareAsText(
-                  text: text,
-                  reference: title,
-                  title: title,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 2,
-              ),
-              child: Text(
-                'Compartir',
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF1E1C2A), Color(0xFF2D2347)],
               ),
             ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withValues(alpha: 0.4),
+                  Colors.black.withValues(alpha: 0.1),
+                ],
+              ),
+            ),
+          ),
+          SafeArea(
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  )
+                : _prayer == null
+                ? _ErrorState(
+                    message: 'No se encontró contenido.',
+                    onRetry: _loadPrayer,
+                  )
+                : Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.arrow_back_ios_new_rounded,
+                                color: Colors.white,
+                              ),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                            const Spacer(),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.close_rounded,
+                                color: Colors.white,
+                              ),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.share_outlined,
+                                color: Colors.white,
+                              ),
+                              onPressed: _share,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 350),
+                          opacity: _fadeIn ? 1.0 : 0.0,
+                          child: SingleChildScrollView(
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
+                            child: Column(
+                              children: [
+                                Text(
+                                  _prayer!['titulo'] as String? ??
+                                      widget.prayerKey,
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.playfairDisplay(
+                                    color: Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Text(
+                                  _prayer!['texto'] as String? ?? '',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.inter(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    height: 1.55,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
           ),
         ],
       ),
@@ -319,3 +200,35 @@ class _TraditionalPrayerDetailScreenState extends State<TraditionalPrayerDetailS
   }
 }
 
+class _ErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  const _ErrorState({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white70, size: 44),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(color: Colors.white70, fontSize: 16),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton(
+              onPressed: onRetry,
+              style: OutlinedButton.styleFrom(foregroundColor: Colors.white),
+              child: const Text('Reintentar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -13,9 +13,18 @@ class PlanScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Plan actual', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700)),
+            Text(
+              'Plan actual',
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text('Plan: free (placeholder)', style: GoogleFonts.inter(fontSize: 14)),
+            Text(
+              'Plan: free (placeholder)',
+              style: GoogleFonts.inter(fontSize: 14),
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
@@ -29,7 +38,9 @@ class PlanScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Restaurar compras próximamente')),
+                  const SnackBar(
+                    content: Text('Restaurar compras próximamente'),
+                  ),
                 );
               },
               child: const Text('Restaurar compras'),
@@ -40,5 +51,3 @@ class PlanScreen extends StatelessWidget {
     );
   }
 }
-
-

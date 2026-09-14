@@ -12,12 +12,16 @@ class IntentionPrayerRepository {
 
   Future<void> _load() async {
     if (_cache != null) return;
-    final jsonStr = await rootBundle.loadString('assets/intention_prayers.json');
+    final jsonStr = await rootBundle.loadString(
+      'assets/intention_prayers.json',
+    );
     final data = json.decode(jsonStr) as Map<String, dynamic>;
     _cache = data.map((category, list) {
       final prayers = (list as List<dynamic>)
-          .map((e) =>
-              IntentionPrayer.fromJson(category, e as Map<String, dynamic>))
+          .map(
+            (e) =>
+                IntentionPrayer.fromJson(category, e as Map<String, dynamic>),
+          )
           .toList();
       return MapEntry(category, prayers);
     });
@@ -28,4 +32,3 @@ class IntentionPrayerRepository {
     return _cache?[category] ?? <IntentionPrayer>[];
   }
 }
-

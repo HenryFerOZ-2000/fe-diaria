@@ -6,22 +6,65 @@ import 'package:path_provider/path_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui' as ui;
 
-/// Servicio para compartir versículos como texto o imagen
+/// Comparte versículos y oraciones como texto o imagen.
+///
+/// Enlaces de tiendas: ver bloque de constantes al inicio de [ShareService].
 class ShareService {
-  /// Comparte un versículo como texto
+  // ---------------------------------------------------------------------------
+  // Enlaces de descarga (producción) — editar solo aquí.
+  // ---------------------------------------------------------------------------
+  static const String _playStoreUrl =
+      'https://play.google.com/store/apps/details?id=com.ozcorp.verbum';
+
+  /// **Reemplazar** cuando Verbum tenga ficha publicada en App Store.
+  /// Ejemplo: `https://apps.apple.com/app/idXXXXXXXX`
+  static const String verbumAppStoreUrl =
+      'https://apps.apple.com/us/search?term=Verbum';
+
+  static const String _shareSubject = 'Verbum';
+
+  /// Pie compacto: nombre + URLs en líneas separadas (mejor para tocar en WhatsApp/Telegram).
+  static String _footerStoreLinks() {
+    return 'Verbum\n$_playStoreUrl\n$verbumAppStoreUrl';
+  }
+
+  /// Título y referencia sin repetir la misma línea dos veces.
+  static String _headerLines({String? title, required String reference}) {
+    final t = title?.trim() ?? '';
+    final r = reference.trim();
+    if (t.isEmpty) return r;
+    if (r.isEmpty) return t;
+    if (t == r) return t;
+    return '$t\n$r';
+  }
+
+  /// Mensaje completo para compartir (texto o leyenda junto a imagen).
+  static String buildShareMessage({
+    required String text,
+    required String reference,
+    String? title,
+  }) {
+    final body = text.trim();
+    final header = _headerLines(title: title, reference: reference);
+    final core = header.isEmpty
+        ? body
+        : body.isEmpty
+        ? header
+        : '$header\n\n$body';
+    if (core.isEmpty) return _footerStoreLinks();
+    return '$core\n\n${_footerStoreLinks()}';
+  }
+
+  /// Comparte como texto.
   static Future<void> shareAsText({
     required String text,
     required String reference,
     String? title,
   }) async {
     try {
-      final shareText = title != null
-          ? '$text\n\n$reference\n\n- $title'
-          : '$text\n\n$reference';
-      
       await Share.share(
-        shareText,
-        subject: title ?? 'Verbum',
+        buildShareMessage(text: text, reference: reference, title: title),
+        subject: _shareSubject,
       );
     } catch (e) {
       debugPrint('Error sharing text: $e');
@@ -29,7 +72,7 @@ class ShareService {
     }
   }
 
-  /// Comparte un versículo como imagen
+  /// Comparte como imagen (misma leyenda que el texto, con enlaces).
   static Future<void> shareAsImage({
     required String text,
     required String reference,
@@ -39,7 +82,6 @@ class ShareService {
     Color? textColor,
   }) async {
     try {
-      // Crear la imagen del versículo
       final imageBytes = await _createVerseImage(
         text: text,
         reference: reference,
@@ -49,19 +91,18 @@ class ShareService {
         textColor: textColor,
       );
 
-      // Guardar temporalmente la imagen
       final tempDir = await getTemporaryDirectory();
-      final file = File('${tempDir.path}/verse_${DateTime.now().millisecondsSinceEpoch}.png');
+      final file = File(
+        '${tempDir.path}/verse_${DateTime.now().millisecondsSinceEpoch}.png',
+      );
       await file.writeAsBytes(imageBytes);
 
-      // Compartir la imagen
       await Share.shareXFiles(
         [XFile(file.path)],
-        text: '$text\n\n$reference',
-        subject: title ?? 'Verbum',
+        text: buildShareMessage(text: text, reference: reference, title: title),
+        subject: _shareSubject,
       );
 
-      // Limpiar después de un tiempo
       Future.delayed(const Duration(minutes: 5), () {
         try {
           if (file.existsSync()) {
@@ -74,7 +115,6 @@ class ShareService {
     } catch (e, stackTrace) {
       debugPrint('Error sharing image: $e');
       debugPrint('Stack trace: $stackTrace');
-      // Si falla compartir como imagen, compartir como texto
       try {
         await shareAsText(text: text, reference: reference, title: title);
       } catch (textError) {
@@ -84,7 +124,6 @@ class ShareService {
     }
   }
 
-  /// Crea una imagen del versículo
   static Future<Uint8List> _createVerseImage({
     required String text,
     required String reference,
@@ -93,37 +132,36 @@ class ShareService {
     Color? backgroundColor,
     Color? textColor,
   }) async {
-    // Configuración de la imagen
     const imageWidth = 1080.0;
     const imageHeight = 1920.0;
     const padding = 80.0;
 
-    // Colores
-    final bgColor = backgroundColor ?? 
-        (Theme.of(context).brightness == Brightness.dark 
-            ? const Color(0xFF1A1A1A) 
+    final bgColor =
+        backgroundColor ??
+        (Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF1A1A1A)
             : const Color(0xFFF5F5F5));
-    final txtColor = textColor ?? 
-        (Theme.of(context).brightness == Brightness.dark 
-            ? Colors.white 
+    final txtColor =
+        textColor ??
+        (Theme.of(context).brightness == Brightness.dark
+            ? Colors.white
             : Colors.black87);
 
-    // Crear el recorder
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     final size = Size(imageWidth, imageHeight);
 
-    // Dibujar fondo
     final backgroundPaint = Paint()..color = bgColor;
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), backgroundPaint);
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      backgroundPaint,
+    );
 
-    // Dibujar decoración de fondo (cruz sutil)
     final decorationPaint = Paint()
-      ..color = txtColor.withOpacity(0.05)
+      ..color = txtColor.withValues(alpha: 0.05)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
-    
-    // Cruz decorativa
+
     canvas.drawLine(
       Offset(size.width / 2, size.height * 0.1),
       Offset(size.width / 2, size.height * 0.9),
@@ -135,14 +173,13 @@ class ShareService {
       decorationPaint,
     );
 
-    // Título
     final titleTextPainter = TextPainter(
       text: TextSpan(
         text: title,
         style: GoogleFonts.playfairDisplay(
           fontSize: 48,
           fontWeight: FontWeight.bold,
-          color: txtColor.withOpacity(0.8),
+          color: txtColor.withValues(alpha: 0.8),
         ),
       ),
       textAlign: TextAlign.center,
@@ -151,13 +188,9 @@ class ShareService {
     titleTextPainter.layout(maxWidth: size.width - (padding * 2));
     titleTextPainter.paint(
       canvas,
-      Offset(
-        (size.width - titleTextPainter.width) / 2,
-        padding * 2,
-      ),
+      Offset((size.width - titleTextPainter.width) / 2, padding * 2),
     );
 
-    // Texto del versículo
     final verseTextPainter = TextPainter(
       text: TextSpan(
         text: text,
@@ -181,26 +214,28 @@ class ShareService {
       ),
     );
 
-    // Línea decorativa
     final linePaint = Paint()
-      ..color = txtColor.withOpacity(0.3)
+      ..color = txtColor.withValues(alpha: 0.3)
       ..strokeWidth = 2;
-    final lineY = padding * 2 + titleTextPainter.height + padding + 
-        verseTextPainter.height + padding * 1.5;
+    final lineY =
+        padding * 2 +
+        titleTextPainter.height +
+        padding +
+        verseTextPainter.height +
+        padding * 1.5;
     canvas.drawLine(
       Offset(padding, lineY),
       Offset(size.width - padding, lineY),
       linePaint,
     );
 
-    // Referencia
     final referenceTextPainter = TextPainter(
       text: TextSpan(
         text: reference,
         style: GoogleFonts.playfairDisplay(
           fontSize: 36,
           fontWeight: FontWeight.bold,
-          color: txtColor.withOpacity(0.7),
+          color: txtColor.withValues(alpha: 0.7),
           fontStyle: FontStyle.italic,
         ),
       ),
@@ -210,13 +245,9 @@ class ShareService {
     referenceTextPainter.layout(maxWidth: size.width - (padding * 2));
     referenceTextPainter.paint(
       canvas,
-      Offset(
-        (size.width - referenceTextPainter.width) / 2,
-        lineY + padding,
-      ),
+      Offset((size.width - referenceTextPainter.width) / 2, lineY + padding),
     );
 
-    // Convertir a imagen
     try {
       final picture = recorder.endRecording();
       final image = await picture.toImage(
@@ -224,7 +255,7 @@ class ShareService {
         imageHeight.toInt(),
       );
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      
+
       if (byteData == null) {
         throw Exception('Failed to convert image to bytes');
       }

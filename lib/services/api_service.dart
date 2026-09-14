@@ -8,7 +8,8 @@ import 'translation_service.dart';
 /// Servicio para obtener versículos desde APIs externas
 /// Prioriza versículos en español y usa APIs como último recurso
 class ApiService {
-  static const String _ourMannaApiUrl = 'https://beta.ourmanna.com/api/v1/get?format=json';
+  static const String _ourMannaApiUrl =
+      'https://beta.ourmanna.com/api/v1/get?format=json';
   static const int _timeoutSeconds = 10;
 
   final TranslationService _translationService = TranslationService();
@@ -19,7 +20,7 @@ class ApiService {
   Future<Verse?> getDailyVerse() async {
     try {
       final targetLanguage = LanguageService.getLanguage();
-      
+
       // Intentar primero con ourmanna.com
       final verse = await _getVerseFromOurManna();
       if (verse != null) {
@@ -84,14 +85,18 @@ class ApiService {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['verse'] != null && data['details'] != null) {
-          final verseText = data['verse']['details']['text'] as String? ?? 
-                          data['verse']['details']['reference'] as String? ?? '';
-          final reference = data['verse']['details']['reference'] as String? ?? 
-                          data['verse']['details']['text'] as String? ?? '';
-          
+          final verseText =
+              data['verse']['details']['text'] as String? ??
+              data['verse']['details']['reference'] as String? ??
+              '';
+          final reference =
+              data['verse']['details']['reference'] as String? ??
+              data['verse']['details']['text'] as String? ??
+              '';
+
           if (verseText.isNotEmpty) {
             final refParts = _parseReference(reference);
-            
+
             return Verse(
               id: DateTime.now().millisecondsSinceEpoch,
               text: verseText.trim(),
@@ -116,14 +121,16 @@ class ApiService {
       // Mapeo de referencias en inglés a español
       final verseMap = {
         'john+3:16': {
-          'text': 'Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.',
+          'text':
+              'Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.',
           'reference': 'Juan 3:16',
           'book': 'Juan',
           'chapter': 3,
           'verse': 16,
         },
         'proverbs+3:5-6': {
-          'text': 'Confía en el Señor de todo corazón, y no en tu propia inteligencia. Reconócelo en todos tus caminos, y él allanará tus sendas.',
+          'text':
+              'Confía en el Señor de todo corazón, y no en tu propia inteligencia. Reconócelo en todos tus caminos, y él allanará tus sendas.',
           'reference': 'Proverbios 3:5-6',
           'book': 'Proverbios',
           'chapter': 3,
@@ -144,42 +151,48 @@ class ApiService {
           'verse': 1,
         },
         'jeremiah+29:11': {
-          'text': 'Porque yo sé los planes que tengo para ustedes —afirma el Señor—, planes de bienestar y no de calamidad, a fin de darles un futuro y una esperanza.',
+          'text':
+              'Porque yo sé los planes que tengo para ustedes —afirma el Señor—, planes de bienestar y no de calamidad, a fin de darles un futuro y una esperanza.',
           'reference': 'Jeremías 29:11',
           'book': 'Jeremías',
           'chapter': 29,
           'verse': 11,
         },
         'isaiah+41:10': {
-          'text': 'No temas, porque yo estoy contigo; no desanimes, porque yo soy tu Dios. Te fortaleceré y te ayudaré; te sostendré con mi diestra victoriosa.',
+          'text':
+              'No temas, porque yo estoy contigo; no desanimes, porque yo soy tu Dios. Te fortaleceré y te ayudaré; te sostendré con mi diestra victoriosa.',
           'reference': 'Isaías 41:10',
           'book': 'Isaías',
           'chapter': 41,
           'verse': 10,
         },
         '1peter+5:7': {
-          'text': 'Echad toda vuestra ansiedad sobre él, porque él tiene cuidado de vosotros.',
+          'text':
+              'Echad toda vuestra ansiedad sobre él, porque él tiene cuidado de vosotros.',
           'reference': '1 Pedro 5:7',
           'book': '1 Pedro',
           'chapter': 5,
           'verse': 7,
         },
         'john+14:6': {
-          'text': 'Jesús le dijo: Yo soy el camino, y la verdad, y la vida; nadie viene al Padre, sino por mí.',
+          'text':
+              'Jesús le dijo: Yo soy el camino, y la verdad, y la vida; nadie viene al Padre, sino por mí.',
           'reference': 'Juan 14:6',
           'book': 'Juan',
           'chapter': 14,
           'verse': 6,
         },
         'philippians+4:6': {
-          'text': 'Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias.',
+          'text':
+              'Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias.',
           'reference': 'Filipenses 4:6',
           'book': 'Filipenses',
           'chapter': 4,
           'verse': 6,
         },
         'romans+8:28': {
-          'text': 'Y sabemos que a los que aman a Dios, todas las cosas les ayudan a bien, esto es, a los que conforme a su propósito son llamados.',
+          'text':
+              'Y sabemos que a los que aman a Dios, todas las cosas les ayudan a bien, esto es, a los que conforme a su propósito son llamados.',
           'reference': 'Romanos 8:28',
           'book': 'Romanos',
           'chapter': 8,
@@ -191,7 +204,9 @@ class ApiService {
       final popularVerses = verseMap.keys.toList();
 
       // Usar la fecha para seleccionar un versículo diferente cada día
-      final dayOfYear = DateTime.now().difference(DateTime(DateTime.now().year, 1, 1)).inDays;
+      final dayOfYear = DateTime.now()
+          .difference(DateTime(DateTime.now().year, 1, 1))
+          .inDays;
       final index = dayOfYear % popularVerses.length;
       final verseRef = popularVerses[index];
       final verseData = verseMap[verseRef];
@@ -218,7 +233,7 @@ class ApiService {
       // Formato típico: "Juan 3:16" o "Proverbios 3:5-6"
       final regex = RegExp(r'(\d*\s*[A-Za-záéíóúÁÉÍÓÚñÑ\s]+)\s+(\d+):(\d+)');
       final match = regex.firstMatch(reference);
-      
+
       if (match != null) {
         return {
           'book': match.group(1)?.trim() ?? '',
@@ -229,7 +244,7 @@ class ApiService {
     } catch (e) {
       debugPrint('Error parsing reference: $e');
     }
-    
+
     return {'book': '', 'chapter': 0, 'verse': 0};
   }
 }

@@ -13,6 +13,8 @@ class DailyContentService {
   List<String>? _morningPrayers;
   List<String>? _nightPrayers;
   List<String>? _familyPrayers;
+  List<String>? _morningPrayersEvangelical;
+  List<String>? _nightPrayersEvangelical;
   bool _isLoading = false;
 
   /// Obtiene el día del año (1-365) basado en la fecha actual
@@ -41,19 +43,55 @@ class DailyContentService {
       _verses = versesData.map((e) => e as Map<String, dynamic>).toList();
 
       // Cargar oraciones de la mañana
-      final morningJson = await rootBundle.loadString('assets/data/morning_prayers.json');
+      final morningJson = await rootBundle.loadString(
+        'assets/data/morning_prayers.json',
+      );
       final List<dynamic> morningData = json.decode(morningJson);
       _morningPrayers = morningData.map((e) => e as String).toList();
 
+      // Cargar oraciones evangélicas de la mañana (fallback a las generales)
+      try {
+        final morningEvangelicalJson = await rootBundle.loadString(
+          'assets/traditions/evangelical/morning_prayers.json',
+        );
+        final List<dynamic> morningEvangelicalData = json.decode(
+          morningEvangelicalJson,
+        );
+        _morningPrayersEvangelical = morningEvangelicalData
+            .map((e) => e as String)
+            .toList();
+      } catch (_) {
+        _morningPrayersEvangelical = _morningPrayers;
+      }
+
       // Cargar oraciones de la noche (estructura: array de objetos con campo "text")
-      final nightJson = await rootBundle.loadString('assets/data/night_prayers.json');
+      final nightJson = await rootBundle.loadString(
+        'assets/data/night_prayers.json',
+      );
       final List<dynamic> nightData = json.decode(nightJson);
       _nightPrayers = nightData
           .map((e) => (e as Map<String, dynamic>)['text'] as String)
           .toList();
 
+      // Cargar oraciones evangélicas de la noche (fallback a las generales)
+      try {
+        final nightEvangelicalJson = await rootBundle.loadString(
+          'assets/traditions/evangelical/night_prayers.json',
+        );
+        final List<dynamic> nightEvangelicalData = json.decode(
+          nightEvangelicalJson,
+        );
+        _nightPrayersEvangelical = nightEvangelicalData
+            .map((e) => (e as Map<String, dynamic>)['text'] as String)
+            .toList();
+      } catch (_) {
+        _nightPrayersEvangelical = _nightPrayers;
+      }
+
       // Cargar oraciones por intención y filtrar las de familia
-      final intentionJson = await rootBundle.loadString('assets/data/prayers_by_intention.json');
+      final intentionJson = await rootBundle.loadString(
+        'assets/data/prayers_by_intention.json',
+      );
       final List<dynamic> intentionData = json.decode(intentionJson);
       _familyPrayers = intentionData
           .where((e) {
@@ -69,7 +107,9 @@ class DailyContentService {
           .map((e) => e['text'] as String)
           .toList();
 
-      debugPrint('✓ Contenido cargado: ${_verses!.length} versículos, ${_morningPrayers!.length} oraciones mañana, ${_nightPrayers!.length} oraciones noche');
+      debugPrint(
+        '✓ Contenido cargado: ${_verses!.length} versículos, ${_morningPrayers!.length} oraciones mañana, ${_nightPrayers!.length} oraciones noche',
+      );
     } catch (e) {
       debugPrint('Error cargando contenido: $e');
       _verses = [];
@@ -84,58 +124,74 @@ class DailyContentService {
   /// Obtiene el versículo del día usando día del año (retorna solo el texto)
   String getTodayVerse() {
     if (_verses == null || _verses!.isEmpty) {
-      throw Exception('No hay versículos disponibles. Llama a loadContent() primero.');
+      throw Exception(
+        'No hay versículos disponibles. Llama a loadContent() primero.',
+      );
     }
 
     final dayOfYear = getDayOfYear();
     // Usar módulo para evitar errores si hay más o menos versículos que días
     final index = (dayOfYear - 1) % _verses!.length;
-    
+
     return _verses![index]['text'] as String;
   }
 
   /// Obtiene el versículo completo del día (con id, reference, etc.) como Map
   Map<String, dynamic> getTodayVerseData() {
     if (_verses == null || _verses!.isEmpty) {
-      throw Exception('No hay versículos disponibles. Llama a loadContent() primero.');
+      throw Exception(
+        'No hay versículos disponibles. Llama a loadContent() primero.',
+      );
     }
 
     final dayOfYear = getDayOfYear();
     final index = (dayOfYear - 1) % _verses!.length;
-    
+
     return _verses![index];
   }
 
   /// Obtiene la oración de la mañana del día usando día del año
-  String getMorningPrayer() {
-    if (_morningPrayers == null || _morningPrayers!.isEmpty) {
-      throw Exception('No hay oraciones de la mañana disponibles. Llama a loadContent() primero.');
+  String getMorningPrayer({String tradition = 'catolica'}) {
+    final source = tradition == 'cristiana' || tradition == 'general'
+        ? (_morningPrayersEvangelical ?? _morningPrayers)
+        : _morningPrayers;
+    if (source == null || source.isEmpty) {
+      throw Exception(
+        'No hay oraciones de la mañana disponibles. Llama a loadContent() primero.',
+      );
     }
 
     final dayOfYear = getDayOfYear();
     // Usar módulo para evitar errores si hay más o menos oraciones que días
-    final index = (dayOfYear - 1) % _morningPrayers!.length;
-    
-    return _morningPrayers![index];
+    final index = (dayOfYear - 1) % source.length;
+
+    return source[index];
   }
 
   /// Obtiene la oración de la noche del día usando día del año
-  String getNightPrayer() {
-    if (_nightPrayers == null || _nightPrayers!.isEmpty) {
-      throw Exception('No hay oraciones de la noche disponibles. Llama a loadContent() primero.');
+  String getNightPrayer({String tradition = 'catolica'}) {
+    final source = tradition == 'cristiana' || tradition == 'general'
+        ? (_nightPrayersEvangelical ?? _nightPrayers)
+        : _nightPrayers;
+    if (source == null || source.isEmpty) {
+      throw Exception(
+        'No hay oraciones de la noche disponibles. Llama a loadContent() primero.',
+      );
     }
 
     final dayOfYear = getDayOfYear();
     // Usar módulo para evitar errores si hay más o menos oraciones que días
-    final index = (dayOfYear - 1) % _nightPrayers!.length;
-    
-    return _nightPrayers![index];
+    final index = (dayOfYear - 1) % source.length;
+
+    return source[index];
   }
 
   /// Obtiene todos los versículos como lista de Maps
   List<Map<String, dynamic>> getAllVersesData() {
     if (_verses == null) {
-      throw Exception('No hay versículos disponibles. Llama a loadContent() primero.');
+      throw Exception(
+        'No hay versículos disponibles. Llama a loadContent() primero.',
+      );
     }
     return _verses!;
   }
@@ -143,7 +199,9 @@ class DailyContentService {
   /// Obtiene una oración diaria para familia (familia/hijos/relaciones) usando día del año
   String getFamilyPrayer() {
     if (_familyPrayers == null || _familyPrayers!.isEmpty) {
-      throw Exception('No hay oraciones para la familia disponibles. Llama a loadContent() primero.');
+      throw Exception(
+        'No hay oraciones para la familia disponibles. Llama a loadContent() primero.',
+      );
     }
 
     final dayOfYear = getDayOfYear();
@@ -158,7 +216,8 @@ class DailyContentService {
     _morningPrayers = null;
     _nightPrayers = null;
     _familyPrayers = null;
+    _morningPrayersEvangelical = null;
+    _nightPrayersEvangelical = null;
     _isLoading = false;
   }
 }
-

@@ -13,9 +13,13 @@ class DevotionalsService {
     if (_loaded) return;
 
     try {
-      final String jsonString = await rootBundle.loadString('assets/data/devotionals.json');
+      final String jsonString = await rootBundle.loadString(
+        'assets/data/devotionals.json',
+      );
       final List<dynamic> jsonList = json.decode(jsonString);
-      _devotionals = jsonList.map((json) => Devotional.fromJson(json as Map<String, dynamic>)).toList();
+      _devotionals = jsonList
+          .map((json) => Devotional.fromJson(json as Map<String, dynamic>))
+          .toList();
       _loaded = true;
     } catch (e) {
       debugPrint('Error loading devotionals: $e');
@@ -40,11 +44,11 @@ class DevotionalsService {
   /// Obtiene el devocional del día (basado en la fecha)
   Devotional? getTodayDevotional() {
     if (_devotionals.isEmpty) return null;
-    
+
     final today = DateTime.now();
     final dayOfYear = today.difference(DateTime(today.year, 1, 1)).inDays;
     final index = dayOfYear % _devotionals.length;
-    
+
     return _devotionals[index];
   }
 
@@ -56,4 +60,3 @@ class DevotionalsService {
     }).toList();
   }
 }
-

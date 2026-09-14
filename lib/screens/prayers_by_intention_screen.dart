@@ -13,7 +13,8 @@ class PrayersByIntentionScreen extends StatefulWidget {
   const PrayersByIntentionScreen({super.key});
 
   @override
-  State<PrayersByIntentionScreen> createState() => _PrayersByIntentionScreenState();
+  State<PrayersByIntentionScreen> createState() =>
+      _PrayersByIntentionScreenState();
 }
 
 class _PrayersByIntentionScreenState extends State<PrayersByIntentionScreen> {
@@ -54,7 +55,8 @@ class _PrayersByIntentionScreenState extends State<PrayersByIntentionScreen> {
           ad.dispose();
         }
       },
-      onAdFailedToLoad: (error) => debugPrint('Failed to load banner ad: $error'),
+      onAdFailedToLoad: (error) =>
+          debugPrint('Failed to load banner ad: $error'),
     );
   }
 
@@ -72,7 +74,9 @@ class _PrayersByIntentionScreenState extends State<PrayersByIntentionScreen> {
 
     final intentions = _service.getAvailableIntentions();
     final prayers = _selectedIntention != null
-        ? [_service.getPrayerForIntention(_selectedIntention!)].whereType<Map<String, dynamic>>().toList()
+        ? [
+            _service.getPrayerForIntention(_selectedIntention!),
+          ].whereType<Map<String, dynamic>>().toList()
         : _service.getAllPrayers();
 
     return AppScaffold(
@@ -92,7 +96,9 @@ class _PrayersByIntentionScreenState extends State<PrayersByIntentionScreen> {
                     label: Text(intention),
                     selected: isSelected,
                     onSelected: (selected) {
-                      setState(() => _selectedIntention = selected ? intention : null);
+                      setState(
+                        () => _selectedIntention = selected ? intention : null,
+                      );
                     },
                   );
                 }).toList(),
@@ -100,47 +106,58 @@ class _PrayersByIntentionScreenState extends State<PrayersByIntentionScreen> {
             ),
           Expanded(
             child: _isLoading
-                ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: colorScheme.primary,
+                    ),
+                  )
                 : prayers.isEmpty
-                    ? EmptyState(
-                        title: 'No hay oraciones disponibles',
-                        message: 'Intenta recargar más tarde',
-                        icon: Icons.healing_outlined,
-                        onAction: _loadData,
-                        actionLabel: 'Recargar',
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        itemCount: prayers.length,
-                        itemBuilder: (context, index) {
-                          final prayer = prayers[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                            child: PrayerCard(
-                              title: prayer['title'] as String,
-                              text: prayer['text'] as String,
-                              icon: Icons.healing_rounded,
-                            ),
-                          );
-                        },
-                      ),
+                ? EmptyState(
+                    title: 'No hay oraciones disponibles',
+                    message: 'Intenta recargar más tarde',
+                    icon: Icons.healing_outlined,
+                    onAction: _loadData,
+                    actionLabel: 'Recargar',
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    itemCount: prayers.length,
+                    itemBuilder: (context, index) {
+                      final prayer = prayers[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                        child: PrayerCard(
+                          title: prayer['title'] as String,
+                          text: prayer['text'] as String,
+                          icon: Icons.healing_rounded,
+                        ),
+                      );
+                    },
+                  ),
           ),
           if (!_adsRemoved)
             Container(
               alignment: Alignment.center,
               width: double.infinity,
-              height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
+              height: _bannerAd != null
+                  ? _bannerAd!.size.height.toDouble()
+                  : 50,
               decoration: BoxDecoration(
                 color: isDark ? colorScheme.surface : AppColors.surface,
                 border: Border(
-                  top: BorderSide(color: colorScheme.outline.withOpacity(0.1), width: 1),
+                  top: BorderSide(
+                    color: colorScheme.outline.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
                 ),
               ),
               child: _bannerAd != null
                   ? AdWidget(ad: _bannerAd!)
                   : const SizedBox(
                       height: 50,
-                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     ),
             ),
         ],
@@ -148,4 +165,3 @@ class _PrayersByIntentionScreenState extends State<PrayersByIntentionScreen> {
     );
   }
 }
-

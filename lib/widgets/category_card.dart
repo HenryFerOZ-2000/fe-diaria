@@ -26,9 +26,11 @@ class CategoryCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final iconBgColor = iconColor ?? colorScheme.primary;
-    final bgColor = backgroundColor ?? (theme.brightness == Brightness.dark 
-        ? AppColors.surfaceDark 
-        : AppColors.surface);
+    final bgColor =
+        backgroundColor ??
+        (theme.brightness == Brightness.dark
+            ? AppColors.surfaceDark
+            : AppColors.surface);
 
     return MainCard(
       onTap: onTap,
@@ -43,14 +45,10 @@ class CategoryCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
-              color: iconBgColor.withOpacity(0.15),
+              color: iconBgColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
-            child: Icon(
-              icon,
-              size: 28,
-              color: iconBgColor,
-            ),
+            child: Icon(icon, size: 28, color: iconBgColor),
           ),
           const SizedBox(height: AppSpacing.sm),
           // Título
@@ -98,4 +96,3 @@ class CategoryCard extends StatelessWidget {
     );
   }
 }
-

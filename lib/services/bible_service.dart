@@ -43,4 +43,3 @@ class BibleService {
     return chapters.length;
   }
 }
-

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../controllers/missions_controller.dart';
 import 'reading_chat_screen.dart';
 import '../services/share_service.dart';
+import '../widgets/prayer_reading_experience.dart';
 
 class ReadingScreen extends StatefulWidget {
   final String title;
@@ -37,7 +38,8 @@ class ReadingScreen extends StatefulWidget {
   State<ReadingScreen> createState() => _ReadingScreenState();
 }
 
-class _ReadingScreenState extends State<ReadingScreen> with SingleTickerProviderStateMixin {
+class _ReadingScreenState extends State<ReadingScreen>
+    with SingleTickerProviderStateMixin {
   bool _fadeIn = false;
 
   @override
@@ -52,6 +54,48 @@ class _ReadingScreenState extends State<ReadingScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    return PrayerReadingExperience(
+      loading: false,
+      category: 'Misión de hoy',
+      title: widget.title,
+      text: widget.content,
+      verseReference: widget.reference,
+      accent: const Color(0xFF77649A),
+      onBack: () => Navigator.pop(context),
+      onShare: () {
+        if (widget.onShare != null) {
+          widget.onShare!(widget.content, widget.reference);
+        } else {
+          ShareService.shareAsText(
+            text: widget.content,
+            reference: widget.reference ?? widget.title,
+            title: widget.title,
+          );
+        }
+      },
+      secondaryActionLabel: 'Chat',
+      secondaryActionIcon: Icons.forum_outlined,
+      onSecondaryAction: () {
+        if (widget.onOpenChat != null) {
+          widget.onOpenChat!(widget.content, widget.reference);
+        } else {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => ReadingChatScreen(
+                title: widget.title,
+                content: widget.content,
+                reference: widget.reference,
+              ),
+            ),
+          );
+        }
+      },
+      onNext: _handleNext,
+    );
+  }
+
+  // ignore: unused_element
+  Widget _buildLegacy(BuildContext context) {
     final bg = widget.backgroundImage;
 
     return Scaffold(
@@ -60,20 +104,14 @@ class _ReadingScreenState extends State<ReadingScreen> with SingleTickerProvider
         fit: StackFit.expand,
         children: [
           if (bg != null)
-            Image(
-              image: bg,
-              fit: BoxFit.cover,
-            )
+            Image(image: bg, fit: BoxFit.cover)
           else
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF1E1C2A),
-                    Color(0xFF2D2347),
-                  ],
+                  colors: [Color(0xFF1E1C2A), Color(0xFF2D2347)],
                 ),
               ),
             ),
@@ -83,8 +121,8 @@ class _ReadingScreenState extends State<ReadingScreen> with SingleTickerProvider
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withOpacity(0.4),
-                  Colors.black.withOpacity(0.1),
+                  Colors.black.withValues(alpha: 0.4),
+                  Colors.black.withValues(alpha: 0.1),
                 ],
               ),
             ),
@@ -97,26 +135,35 @@ class _ReadingScreenState extends State<ReadingScreen> with SingleTickerProvider
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+                        icon: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Colors.white,
+                        ),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.close_rounded, color: Colors.white),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
                       IconButton(
-                        icon: const Icon(Icons.share_outlined, color: Colors.white),
+                        icon: const Icon(
+                          Icons.close_rounded,
+                          color: Colors.white,
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.share_outlined,
+                          color: Colors.white,
+                        ),
                         onPressed: () {
-                        if (widget.onShare != null) {
-                          widget.onShare!(widget.content, widget.reference);
-                        } else {
-                          ShareService.shareAsText(
-                            text: widget.content,
-                            reference: widget.reference ?? widget.title,
-                            title: widget.title,
-                          );
-                        }
+                          if (widget.onShare != null) {
+                            widget.onShare!(widget.content, widget.reference);
+                          } else {
+                            ShareService.shareAsText(
+                              text: widget.content,
+                              reference: widget.reference ?? widget.title,
+                              title: widget.title,
+                            );
+                          }
                         },
                       ),
                     ],
@@ -132,7 +179,7 @@ class _ReadingScreenState extends State<ReadingScreen> with SingleTickerProvider
                           Text(
                             'Progress today',
                             style: GoogleFonts.inter(
-                              color: Colors.white.withOpacity(0.85),
+                              color: Colors.white.withValues(alpha: 0.85),
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
@@ -154,8 +201,10 @@ class _ReadingScreenState extends State<ReadingScreen> with SingleTickerProvider
                         child: LinearProgressIndicator(
                           value: widget.progress.clamp(0.0, 1.0),
                           minHeight: 8,
-                          backgroundColor: Colors.white.withOpacity(0.2),
-                          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFFB74D)),
+                          backgroundColor: Colors.white.withValues(alpha: 0.2),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Color(0xFFFFB74D),
+                          ),
                         ),
                       ),
                     ],
@@ -168,7 +217,10 @@ class _ReadingScreenState extends State<ReadingScreen> with SingleTickerProvider
                     opacity: _fadeIn ? 1.0 : 0.0,
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
                       child: Column(
                         children: [
                           Text(
@@ -191,7 +243,8 @@ class _ReadingScreenState extends State<ReadingScreen> with SingleTickerProvider
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          if (widget.reference != null && widget.reference!.isNotEmpty) ...[
+                          if (widget.reference != null &&
+                              widget.reference!.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             Text(
                               widget.reference!,
@@ -217,7 +270,10 @@ class _ReadingScreenState extends State<ReadingScreen> with SingleTickerProvider
                           label: 'Chat',
                           onTap: () {
                             if (widget.onOpenChat != null) {
-                              widget.onOpenChat!(widget.content, widget.reference);
+                              widget.onOpenChat!(
+                                widget.content,
+                                widget.reference,
+                              );
                             }
                             // Fallback: abre el chat si no se provee callback.
                             else {
@@ -247,16 +303,20 @@ class _ReadingScreenState extends State<ReadingScreen> with SingleTickerProvider
     );
   }
 
-  Widget _glassButton({required IconData icon, String? label, required VoidCallback onTap}) {
+  Widget _glassButton({
+    required IconData icon,
+    String? label,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         height: 54,
         padding: EdgeInsets.symmetric(horizontal: label != null ? 16 : 0),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.22),
+          color: Colors.white.withValues(alpha: 0.22),
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: Colors.white.withOpacity(0.3)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -273,7 +333,7 @@ class _ReadingScreenState extends State<ReadingScreen> with SingleTickerProvider
                   fontWeight: FontWeight.w600,
                 ),
               ),
-            ]
+            ],
           ],
         ),
       ),
@@ -319,7 +379,9 @@ class _ReadingScreenState extends State<ReadingScreen> with SingleTickerProvider
       return;
     }
 
-    final idx = widget.missions!.indexWhere((m) => m.id == widget.currentMissionId);
+    final idx = widget.missions!.indexWhere(
+      (m) => m.id == widget.currentMissionId,
+    );
     if (idx != -1 && idx + 1 < widget.missions!.length) {
       final next = widget.missions![idx + 1];
       Navigator.of(context).pop();
@@ -332,4 +394,3 @@ class _ReadingScreenState extends State<ReadingScreen> with SingleTickerProvider
     }
   }
 }
-

@@ -21,20 +21,10 @@ class Prayer {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'text': text,
-      'type': type,
-      'title': title,
-    };
+    return {'id': id, 'text': text, 'type': type, 'title': title};
   }
 
-  Prayer copyWith({
-    int? id,
-    String? text,
-    String? type,
-    String? title,
-  }) {
+  Prayer copyWith({int? id, String? text, String? type, String? title}) {
     return Prayer(
       id: id ?? this.id,
       text: text ?? this.text,
@@ -43,4 +33,3 @@ class Prayer {
     );
   }
 }
-

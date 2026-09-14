@@ -13,8 +13,11 @@ class RosaryService {
     if (_loaded) return;
 
     try {
-      final String jsonString = await rootBundle.loadString('assets/data/rosary_guide.json');
-      final Map<String, dynamic> jsonData = json.decode(jsonString) as Map<String, dynamic>;
+      final String jsonString = await rootBundle.loadString(
+        'assets/data/rosary_guide.json',
+      );
+      final Map<String, dynamic> jsonData =
+          json.decode(jsonString) as Map<String, dynamic>;
       _guide = RosaryGuide.fromJson(jsonData);
       _loaded = true;
     } catch (e) {
@@ -67,4 +70,3 @@ class RosaryService {
     return List.unmodifiable(_guide!.steps);
   }
 }
-

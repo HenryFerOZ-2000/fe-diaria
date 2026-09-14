@@ -7,11 +7,9 @@ class PassageRotationService {
   final EmotionPassageRepository _repo;
   final Random _random;
 
-  PassageRotationService({
-    EmotionPassageRepository? repository,
-    Random? random,
-  })  : _repo = repository ?? EmotionPassageRepository(),
-        _random = random ?? Random();
+  PassageRotationService({EmotionPassageRepository? repository, Random? random})
+    : _repo = repository ?? EmotionPassageRepository(),
+      _random = random ?? Random();
 
   String _keyFor(String emotion) => 'seen_passages_$emotion';
 
@@ -38,4 +36,3 @@ class PassageRotationService {
     await prefs.remove(_keyFor(emotion));
   }
 }
-

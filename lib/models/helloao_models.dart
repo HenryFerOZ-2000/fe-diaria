@@ -62,18 +62,16 @@ class HelloAoChapter {
       contentList = entries.map((e) => e.value).toList();
     } else {
       throw Exception(
-          'Formato inesperado de capítulo: se esperaba lista en content');
+        'Formato inesperado de capítulo: se esperaba lista en content',
+      );
     }
     final content = contentList.whereType<Map<String, dynamic>>();
 
-    final verses = content
-        .where((item) => item['type'] == 'verse')
-        .map((item) {
-          final number = (item['number'] as num?)?.toInt() ?? 0;
-          final rawContent = item['content'] as List<dynamic>? ?? const [];
-          return HelloAoVerse(number: number, content: rawContent);
-        })
-        .toList();
+    final verses = content.where((item) => item['type'] == 'verse').map((item) {
+      final number = (item['number'] as num?)?.toInt() ?? 0;
+      final rawContent = item['content'] as List<dynamic>? ?? const [];
+      return HelloAoVerse(number: number, content: rawContent);
+    }).toList();
 
     return HelloAoChapter(
       bookId: bookId,
@@ -82,4 +80,3 @@ class HelloAoChapter {
     );
   }
 }
-

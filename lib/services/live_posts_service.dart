@@ -1,14 +1,51 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 
-class LivePostsService {
+import 'post_social_service.dart';
+
+class LivePostsService implements PostSocialService {
   final FirebaseFirestore _firestore;
+  final FirebaseFunctions _functions;
 
-  LivePostsService({
-    FirebaseFirestore? firestore,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance;
+  LivePostsService({FirebaseFirestore? firestore, FirebaseFunctions? functions})
+    : _firestore = firestore ?? FirebaseFirestore.instance,
+      _functions =
+          functions ?? FirebaseFunctions.instanceFor(region: 'us-central1');
 
-  /// Toggle like en un post
+  Future<void> togglePrayerJoin(String postId, String uid) async {
+    await togglePostLike(postId, uid);
+  }
+
+  Stream<bool> isPrayerJoinedStream(String postId, String uid) {
+    if (uid.isEmpty) return Stream.value(false);
+    return isPostLikedStream(postId, uid);
+  }
+
+  Future<void> updatePrayerStatus(
+    String postId,
+    String uid,
+    String status,
+  ) async {
+    const allowed = {'active', 'answered', 'gratitude'};
+    if (!allowed.contains(status)) {
+      throw ArgumentError.value(status, 'status');
+    }
+    final postRef = _firestore.collection('live_posts').doc(postId);
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(postRef);
+      final authorUid = snapshot.data()?['authorUid'] as String? ?? '';
+      if (authorUid != uid) {
+        throw StateError('Solo el autor puede cambiar el estado.');
+      }
+      transaction.update(postRef, {
+        'prayerStatus': status,
+        'statusUpdatedAt': FieldValue.serverTimestamp(),
+      });
+    });
+  }
+
+  @override
   Future<void> togglePostLike(String postId, String uid) async {
     try {
       final postRef = _firestore.collection('live_posts').doc(postId);
@@ -32,7 +69,7 @@ class LivePostsService {
     }
   }
 
-  /// Verifica si un usuario dio like a un post
+  @override
   Stream<bool> isPostLikedStream(String postId, String uid) {
     return _firestore
         .collection('live_posts')
@@ -43,16 +80,26 @@ class LivePostsService {
         .map((snap) => snap.exists);
   }
 
-  /// Obtiene el likeCount de un post
+  @override
   Stream<int> getPostLikeCountStream(String postId) {
     return _firestore
         .collection('live_posts')
         .doc(postId)
         .snapshots()
-        .map((snap) => (snap.data()?['likeCount'] ?? 0) as int);
+        .map((snap) => firestoreIntCount(snap.data()?['likeCount']));
+  }
+
+  @override
+  Stream<int> getPostCommentCountStream(String postId) {
+    return _firestore
+        .collection('live_posts')
+        .doc(postId)
+        .snapshots()
+        .map((snap) => firestoreIntCount(snap.data()?['commentCount']));
   }
 
   /// Agrega un comentario raíz
+  @override
   Future<String> addComment({
     required String postId,
     required String uid,
@@ -62,27 +109,21 @@ class LivePostsService {
     String? authorPhoto,
   }) async {
     try {
-      final postRef = _firestore.collection('live_posts').doc(postId);
-      final commentsRef = postRef.collection('comments');
-      final commentRef = commentsRef.doc();
-
-      await _firestore.runTransaction((tx) async {
-        tx.set(commentRef, {
-          'text': text,
-          'authorUid': uid,
-          'authorName': authorName,
-          'authorUsername': authorUsername,
-          'authorPhoto': authorPhoto,
-          'createdAt': FieldValue.serverTimestamp(),
-          'likeCount': 0,
-          'replyCount': 0,
-          'parentId': null,
-          'rootId': null,
-        });
-        tx.update(postRef, {'commentCount': FieldValue.increment(1)});
+      final callable = _functions.httpsCallable('createLiveComment');
+      final result = await callable.call<Map<String, dynamic>>({
+        'postId': postId,
+        'text': text,
       });
-
-      return commentRef.id;
+      final commentId = (result.data['commentId'] as String?)?.trim() ?? '';
+      if (commentId.isEmpty) {
+        throw Exception('No se pudo crear el comentario.');
+      }
+      return commentId;
+    } on FirebaseFunctionsException catch (e) {
+      debugPrint(
+        '[LivePostsService] createLiveComment failed: ${e.code} ${e.message}',
+      );
+      rethrow;
     } catch (e) {
       debugPrint('[LivePostsService] Error adding comment: $e');
       rethrow;
@@ -90,6 +131,7 @@ class LivePostsService {
   }
 
   /// Responde a un comentario
+  @override
   Future<String> replyToComment({
     required String postId,
     required String uid,
@@ -101,31 +143,23 @@ class LivePostsService {
     String? authorPhoto,
   }) async {
     try {
-      final postRef = _firestore.collection('live_posts').doc(postId);
-      final commentsRef = postRef.collection('comments');
-      final commentRef = commentsRef.doc();
-      final threadRootId = rootId.trim().isEmpty ? parentCommentId : rootId;
-      final threadRootRef = commentsRef.doc(threadRootId);
-
-      await _firestore.runTransaction((tx) async {
-        tx.set(commentRef, {
-          'text': text,
-          'authorUid': uid,
-          'authorName': authorName,
-          'authorUsername': authorUsername,
-          'authorPhoto': authorPhoto,
-          'createdAt': FieldValue.serverTimestamp(),
-          'likeCount': 0,
-          'replyCount': 0,
-          'parentId': threadRootId,
-          'rootId': threadRootId,
-        });
-
-        tx.update(threadRootRef, {'replyCount': FieldValue.increment(1)});
-        tx.update(postRef, {'commentCount': FieldValue.increment(1)});
+      final callable = _functions.httpsCallable('replyLiveComment');
+      final result = await callable.call<Map<String, dynamic>>({
+        'postId': postId,
+        'text': text,
+        'parentCommentId': parentCommentId,
+        'rootId': rootId,
       });
-
-      return commentRef.id;
+      final commentId = (result.data['commentId'] as String?)?.trim() ?? '';
+      if (commentId.isEmpty) {
+        throw Exception('No se pudo crear la respuesta.');
+      }
+      return commentId;
+    } on FirebaseFunctionsException catch (e) {
+      debugPrint(
+        '[LivePostsService] replyLiveComment failed: ${e.code} ${e.message}',
+      );
+      rethrow;
     } catch (e) {
       debugPrint('[LivePostsService] Error replying to comment: $e');
       rethrow;
@@ -133,7 +167,12 @@ class LivePostsService {
   }
 
   /// Toggle like en un comentario
-  Future<void> toggleCommentLike(String postId, String commentId, String uid) async {
+  @override
+  Future<void> toggleCommentLike(
+    String postId,
+    String commentId,
+    String uid,
+  ) async {
     try {
       final commentRef = _firestore
           .collection('live_posts')
@@ -161,7 +200,12 @@ class LivePostsService {
   }
 
   /// Verifica si un usuario dio like a un comentario
-  Stream<bool> isCommentLikedStream(String postId, String commentId, String uid) {
+  @override
+  Stream<bool> isCommentLikedStream(
+    String postId,
+    String commentId,
+    String uid,
+  ) {
     return _firestore
         .collection('live_posts')
         .doc(postId)
@@ -174,7 +218,10 @@ class LivePostsService {
   }
 
   /// Obtiene comentarios raíz de un post
-  Stream<QuerySnapshot<Map<String, dynamic>>> getRootCommentsStream(String postId) {
+  @override
+  Stream<QuerySnapshot<Map<String, dynamic>>> getRootCommentsStream(
+    String postId,
+  ) {
     return _firestore
         .collection('live_posts')
         .doc(postId)
@@ -185,6 +232,7 @@ class LivePostsService {
   }
 
   /// Obtiene respuestas de un comentario
+  @override
   Stream<QuerySnapshot<Map<String, dynamic>>> getRepliesStream(
     String postId,
     String commentId,
@@ -199,6 +247,7 @@ class LivePostsService {
   }
 
   /// Verifica si un comentario raíz tiene al menos una respuesta
+  @override
   Stream<bool> hasRepliesStream(String postId, String commentId) {
     return _firestore
         .collection('live_posts')
@@ -209,5 +258,15 @@ class LivePostsService {
         .snapshots()
         .map((snap) => snap.docs.isNotEmpty);
   }
-}
 
+  @override
+  Stream<int> getCommentLikeCountStream(String postId, String commentId) {
+    return _firestore
+        .collection('live_posts')
+        .doc(postId)
+        .collection('comments')
+        .doc(commentId)
+        .snapshots()
+        .map((snap) => firestoreIntCount(snap.data()?['likeCount']));
+  }
+}

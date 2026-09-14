@@ -20,7 +20,9 @@ class BibleDb {
     try {
       await rootBundle.load(_assetPath);
     } catch (_) {
-      throw Exception('No se encontró el asset $_assetPath. Asegúrate de que el archivo exista y esté declarado en pubspec.yaml.');
+      throw Exception(
+        'No se encontró el asset $_assetPath. Asegúrate de que el archivo exista y esté declarado en pubspec.yaml.',
+      );
     }
     await init();
   }
@@ -38,7 +40,10 @@ class BibleDb {
         try {
           await file.parent.create(recursive: true);
           final data = await rootBundle.load(_assetPath);
-          final bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+          final bytes = data.buffer.asUint8List(
+            data.offsetInBytes,
+            data.lengthInBytes,
+          );
           await file.writeAsBytes(bytes, flush: true);
           _copying!.complete();
         } catch (e) {
@@ -98,8 +103,30 @@ class BibleDb {
       'SELECT DISTINCT chapter FROM verses WHERE book = ? ORDER BY chapter ASC',
       [book],
     );
+    return rows.map((r) => (r['chapter'] as int)).toList();
+  }
+
+  Future<List<Verse>> searchVerses(String query, {int limit = 60}) async {
+    await verifyAndInit();
+    final normalized = query.trim();
+    if (normalized.length < 2) return const [];
+    final rows = await _db!.query(
+      'verses',
+      columns: ['book', 'chapter', 'verse', 'text'],
+      where: 'text LIKE ?',
+      whereArgs: ['%$normalized%'],
+      orderBy: 'book ASC, chapter ASC, verse ASC',
+      limit: limit,
+    );
     return rows
-        .map((r) => (r['chapter'] as int))
+        .map(
+          (r) => Verse(
+            book: r['book'] as String,
+            chapter: r['chapter'] as int,
+            verse: r['verse'] as int,
+            text: r['text'] as String,
+          ),
+        )
         .toList();
   }
 
@@ -108,14 +135,11 @@ class BibleDb {
     return v?.text;
   }
 
-  Future<List<Map<String, dynamic>>> getChapterMap(String book, int chapter) async {
+  Future<List<Map<String, dynamic>>> getChapterMap(
+    String book,
+    int chapter,
+  ) async {
     final verses = await getChapter(book, chapter);
-    return verses
-        .map((v) => {
-              'verse': v.verse,
-              'text': v.text,
-            })
-        .toList();
+    return verses.map((v) => {'verse': v.verse, 'text': v.text}).toList();
   }
 }
-

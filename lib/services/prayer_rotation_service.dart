@@ -7,11 +7,9 @@ class PrayerRotationService {
   final PrayerRepository _repository;
   final Random _random;
 
-  PrayerRotationService({
-    PrayerRepository? repository,
-    Random? random,
-  })  : _repository = repository ?? PrayerRepository(),
-        _random = random ?? Random();
+  PrayerRotationService({PrayerRepository? repository, Random? random})
+    : _repository = repository ?? PrayerRepository(),
+      _random = random ?? Random();
 
   String _keyFor(String category) => 'seen_prayers_$category';
 
@@ -37,4 +35,3 @@ class PrayerRotationService {
     await prefs.remove(_keyFor(category));
   }
 }
-

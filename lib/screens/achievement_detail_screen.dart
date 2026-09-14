@@ -74,8 +74,8 @@ class AchievementDetailScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isUnlocked
                       ? (isDark
-                          ? Colors.amber[900]?.withOpacity(0.3)
-                          : Colors.amber[50])
+                            ? Colors.amber[900]?.withValues(alpha: 0.3)
+                            : Colors.amber[50])
                       : (isDark ? Colors.grey[850] : Colors.grey[100]),
                   shape: BoxShape.circle,
                   border: Border.all(
@@ -85,7 +85,7 @@ class AchievementDetailScreen extends StatelessWidget {
                   boxShadow: isUnlocked
                       ? [
                           BoxShadow(
-                            color: Colors.amber.withOpacity(0.3),
+                            color: Colors.amber.withValues(alpha: 0.3),
                             blurRadius: 20,
                             spreadRadius: 5,
                           ),
@@ -113,10 +113,7 @@ class AchievementDetailScreen extends StatelessWidget {
             // Descripción
             Text(
               achievement.description,
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.inter(fontSize: 16, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
@@ -129,7 +126,7 @@ class AchievementDetailScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -137,7 +134,7 @@ class AchievementDetailScreen extends StatelessWidget {
                 border: Border.all(
                   color: isUnlocked
                       ? Colors.amber
-                      : Colors.grey.withOpacity(0.2),
+                      : Colors.grey.withValues(alpha: 0.2),
                   width: isUnlocked ? 2 : 1,
                 ),
               ),
@@ -149,7 +146,9 @@ class AchievementDetailScreen extends StatelessWidget {
                     children: [
                       Icon(
                         isUnlocked ? Icons.check_circle : Icons.lock,
-                        color: isUnlocked ? Colors.amber[700] : Colors.grey[600],
+                        color: isUnlocked
+                            ? Colors.amber[700]
+                            : Colors.grey[600],
                         size: 24,
                       ),
                       const SizedBox(width: 8),
@@ -158,7 +157,9 @@ class AchievementDetailScreen extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
-                          color: isUnlocked ? Colors.amber[900] : Colors.grey[700],
+                          color: isUnlocked
+                              ? Colors.amber[900]
+                              : Colors.grey[700],
                         ),
                       ),
                     ],
@@ -207,14 +208,12 @@ class AchievementDetailScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
                 ],
-                border: Border.all(
-                  color: Colors.grey.withOpacity(0.1),
-                ),
+                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -257,25 +256,19 @@ class AchievementDetailScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
                 ],
-                border: Border.all(
-                  color: Colors.grey.withOpacity(0.1),
-                ),
+                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.stars,
-                        color: Colors.amber[700],
-                        size: 20,
-                      ),
+                      Icon(Icons.stars, color: Colors.amber[700], size: 20),
                       const SizedBox(width: 8),
                       Text(
                         'Recompensa',
@@ -308,14 +301,12 @@ class AchievementDetailScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
                 ],
-                border: Border.all(
-                  color: Colors.grey.withOpacity(0.1),
-                ),
+                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,4 +346,3 @@ class AchievementDetailScreen extends StatelessWidget {
     );
   }
 }
-

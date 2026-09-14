@@ -42,9 +42,9 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
 
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debes iniciar sesión')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Debes iniciar sesión')));
       return;
     }
 
@@ -70,9 +70,9 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al enviar reporte: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error al enviar reporte: $e')));
       }
     } finally {
       if (mounted) {
@@ -115,19 +115,19 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
               ),
               child: DropdownButtonFormField<String>(
                 initialValue: _selectedType,
                 decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   border: InputBorder.none,
                 ),
                 items: _types.map((type) {
-                  return DropdownMenuItem(
-                    value: type,
-                    child: Text(type),
-                  );
+                  return DropdownMenuItem(value: type, child: Text(type));
                 }).toList(),
                 onChanged: (value) {
                   if (value != null) {
@@ -179,19 +179,19 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
               ),
               child: DropdownButtonFormField<String>(
                 initialValue: _selectedReason,
                 decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   border: InputBorder.none,
                 ),
                 items: _reasons.map((reason) {
-                  return DropdownMenuItem(
-                    value: reason,
-                    child: Text(reason),
-                  );
+                  return DropdownMenuItem(value: reason, child: Text(reason));
                 }).toList(),
                 onChanged: (value) {
                   if (value != null) {
@@ -253,4 +253,3 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
     );
   }
 }
-

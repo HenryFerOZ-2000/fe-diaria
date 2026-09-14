@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 
 /// Servicio para gestionar las oraciones tradicionales
 class TraditionalPrayersService {
-  static final TraditionalPrayersService _instance = TraditionalPrayersService._internal();
+  static final TraditionalPrayersService _instance =
+      TraditionalPrayersService._internal();
   factory TraditionalPrayersService() => _instance;
   TraditionalPrayersService._internal();
 
@@ -12,7 +13,9 @@ class TraditionalPrayersService {
   /// Carga las oraciones desde el archivo JSON
   Future<void> loadPrayers() async {
     try {
-      final String jsonString = await rootBundle.loadString('assets/oraciones/oraciones.json');
+      final String jsonString = await rootBundle.loadString(
+        'assets/oraciones/oraciones.json',
+      );
       _prayersData = json.decode(jsonString) as Map<String, dynamic>;
     } catch (e) {
       throw Exception('Error loading traditional prayers: $e');
@@ -38,7 +41,11 @@ class TraditionalPrayersService {
   }
 
   /// Obtiene una oración específica
-  Map<String, dynamic>? getPrayer(String religion, String category, String prayerKey) {
+  Map<String, dynamic>? getPrayer(
+    String religion,
+    String category,
+    String prayerKey,
+  ) {
     final categoryPrayers = getPrayersByCategory(religion, category);
     return categoryPrayers[prayerKey] as Map<String, dynamic>?;
   }
@@ -87,4 +94,3 @@ class TraditionalPrayersService {
     return dayData.length;
   }
 }
-

@@ -12,7 +12,9 @@ class NightPrayersService {
     if (_loaded) return;
 
     try {
-      final String jsonString = await rootBundle.loadString('assets/data/night_prayers.json');
+      final String jsonString = await rootBundle.loadString(
+        'assets/data/night_prayers.json',
+      );
       final List<dynamic> jsonList = json.decode(jsonString);
       _prayers = jsonList.cast<Map<String, dynamic>>();
       _loaded = true;
@@ -52,4 +54,3 @@ class NightPrayersService {
     }).toList();
   }
 }
-

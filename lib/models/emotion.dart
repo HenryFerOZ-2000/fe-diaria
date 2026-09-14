@@ -87,15 +87,14 @@ class Emotion {
   }
 
   static String _colorToString(Color color) {
-    if (color.value == 0xFFFF9800) return '#FF9800';
-    if (color.value == 0xFF2196F3) return '#2196F3';
-    if (color.value == 0xFF9E9E9E) return '#9E9E9E';
-    if (color.value == 0xFFFFC107) return '#FFC107';
-    if (color.value == 0xFF4CAF50) return '#4CAF50';
-    if (color.value == 0xFFFFEB3B) return '#FFEB3B';
-    if (color.value == 0xFF9C27B0) return '#9C27B0';
-    if (color.value == 0xFFF44336) return '#F44336';
+    if (color.toARGB32() == 0xFFFF9800) return '#FF9800';
+    if (color.toARGB32() == 0xFF2196F3) return '#2196F3';
+    if (color.toARGB32() == 0xFF9E9E9E) return '#9E9E9E';
+    if (color.toARGB32() == 0xFFFFC107) return '#FFC107';
+    if (color.toARGB32() == 0xFF4CAF50) return '#4CAF50';
+    if (color.toARGB32() == 0xFFFFEB3B) return '#FFEB3B';
+    if (color.toARGB32() == 0xFF9C27B0) return '#9C27B0';
+    if (color.toARGB32() == 0xFFF44336) return '#F44336';
     return '#FF9800';
   }
 }
-

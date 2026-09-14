@@ -26,17 +26,19 @@ class MissionTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: completed
-            ? colorScheme.primary.withOpacity(0.12)
-            : colorScheme.surface.withOpacity(0.9),
+            ? colorScheme.primary.withValues(alpha: 0.12)
+            : colorScheme.surface.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: completed
-              ? colorScheme.primary.withOpacity(0.35)
-              : colorScheme.outline.withOpacity(0.12),
+              ? colorScheme.primary.withValues(alpha: 0.35)
+              : colorScheme.outline.withValues(alpha: 0.12),
         ),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.primary.withOpacity(completed ? 0.18 : 0.08),
+            color: colorScheme.primary.withValues(
+              alpha: completed ? 0.18 : 0.08,
+            ),
             blurRadius: completed ? 12 : 8,
             offset: const Offset(0, 6),
           ),
@@ -51,15 +53,11 @@ class MissionTile extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: completed
-                    ? colorScheme.primary.withOpacity(0.18)
-                    : colorScheme.primary.withOpacity(0.08),
+                    ? colorScheme.primary.withValues(alpha: 0.18)
+                    : colorScheme.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                color: colorScheme.primary,
-                size: 20,
-              ),
+              child: Icon(icon, color: colorScheme.primary, size: 20),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -74,10 +72,19 @@ class MissionTile extends StatelessWidget {
             ),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 220),
-              transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+              transitionBuilder: (child, anim) =>
+                  ScaleTransition(scale: anim, child: child),
               child: completed
-                  ? Icon(Icons.check_circle, color: colorScheme.primary, key: const ValueKey('done'))
-                  : Icon(Icons.circle_outlined, color: colorScheme.outline, key: const ValueKey('todo')),
+                  ? Icon(
+                      Icons.check_circle,
+                      color: colorScheme.primary,
+                      key: const ValueKey('done'),
+                    )
+                  : Icon(
+                      Icons.circle_outlined,
+                      color: colorScheme.outline,
+                      key: const ValueKey('todo'),
+                    ),
             ),
           ],
         ),
@@ -85,4 +92,3 @@ class MissionTile extends StatelessWidget {
     );
   }
 }
-

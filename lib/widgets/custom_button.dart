@@ -18,6 +18,9 @@ class CustomButton extends StatefulWidget {
   final double? fontSize;
   final FontWeight? fontWeight;
 
+  /// Gradiente opcional para CTAs destacados. Ignora [backgroundColor] cuando se usa.
+  final Gradient? gradient;
+
   const CustomButton({
     super.key,
     required this.text,
@@ -34,7 +37,34 @@ class CustomButton extends StatefulWidget {
     this.isTextButton = false,
     this.fontSize,
     this.fontWeight,
+    this.gradient,
   });
+
+  /// Atajo para un CTA primario con el gradiente de marca (morado -> dorado).
+  factory CustomButton.gradient({
+    Key? key,
+    required String text,
+    required VoidCallback? onPressed,
+    IconData? icon,
+    double? width,
+    double? height,
+    bool isLoading = false,
+  }) {
+    return CustomButton(
+      key: key,
+      text: text,
+      onPressed: onPressed,
+      icon: icon,
+      width: width,
+      height: height,
+      isLoading: isLoading,
+      gradient: const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [AppColors.primary, AppColors.primaryDark],
+      ),
+    );
+  }
 
   @override
   State<CustomButton> createState() => _CustomButtonState();
@@ -81,13 +111,16 @@ class _CustomButtonState extends State<CustomButton>
     final colorScheme = theme.colorScheme;
     final isEnabled = widget.onPressed != null && !widget.isLoading;
 
-    final bgColor = widget.backgroundColor ??
-        (widget.isOutlined
-            ? Colors.transparent
-            : (widget.isTextButton
-                ? Colors.transparent
-                : colorScheme.primary));
-    final fgColor = widget.foregroundColor ??
+    final bgColor = widget.gradient != null
+        ? null
+        : widget.backgroundColor ??
+              (widget.isOutlined
+                  ? Colors.transparent
+                  : (widget.isTextButton
+                        ? Colors.transparent
+                        : colorScheme.primary));
+    final fgColor =
+        widget.foregroundColor ??
         (widget.isOutlined || widget.isTextButton
             ? colorScheme.primary
             : AppColors.onPrimary);
@@ -106,7 +139,10 @@ class _CustomButtonState extends State<CustomButton>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.icon != null) ...[
-                Icon(widget.icon, size: widget.fontSize != null ? widget.fontSize! + 4 : 20),
+                Icon(
+                  widget.icon,
+                  size: widget.fontSize != null ? widget.fontSize! + 4 : 20,
+                ),
                 const SizedBox(width: AppSpacing.sm),
               ],
               Flexible(
@@ -133,27 +169,34 @@ class _CustomButtonState extends State<CustomButton>
       child: AnimatedBuilder(
         animation: _scaleAnimation,
         builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: child,
-          );
+          return Transform.scale(scale: _scaleAnimation.value, child: child);
         },
         child: Container(
           width: widget.width,
           height: widget.height,
-          padding: widget.padding ??
+          padding:
+              widget.padding ??
               const EdgeInsets.symmetric(
                 horizontal: AppSpacing.lg,
                 vertical: AppSpacing.md,
               ),
           decoration: BoxDecoration(
             color: bgColor,
+            gradient: widget.gradient,
             borderRadius: BorderRadius.circular(widget.borderRadius),
             border: widget.isOutlined
                 ? Border.all(color: fgColor, width: 1.5)
                 : null,
             boxShadow: !widget.isTextButton && isEnabled
-                ? AppShadows.medium
+                ? (widget.gradient != null
+                      ? [
+                          BoxShadow(
+                            color: AppColors.primary.withValues(alpha: 0.35),
+                            blurRadius: 16,
+                            offset: const Offset(0, 6),
+                          ),
+                        ]
+                      : AppShadows.medium)
                 : null,
           ),
           child: buttonContent,
@@ -168,4 +211,3 @@ class _CustomButtonState extends State<CustomButton>
     );
   }
 }
-

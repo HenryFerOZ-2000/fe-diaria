@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
+import 'verbum_ambient_background.dart';
 
 /// Scaffold personalizado con diseño consistente y gradientes
 class AppScaffold extends StatelessWidget {
@@ -55,7 +56,8 @@ class AppScaffold extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    final bgGradient = gradient ??
+    final bgGradient =
+        gradient ??
         LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -67,7 +69,7 @@ class AppScaffold extends StatelessWidget {
                 ]
               : [
                   AppColors.background,
-                  colorScheme.tertiary.withOpacity(0.05),
+                  colorScheme.tertiary.withValues(alpha: 0.05),
                   AppColors.background,
                 ],
         );
@@ -83,9 +85,11 @@ class AppScaffold extends StatelessWidget {
           margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: colorScheme.primary.withOpacity(0.08),
+            color: colorScheme.primary.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: colorScheme.primary.withOpacity(0.12)),
+            border: Border.all(
+              color: colorScheme.primary.withValues(alpha: 0.12),
+            ),
           ),
           child: Row(
             children: [
@@ -103,7 +107,10 @@ class AppScaffold extends StatelessWidget {
               const SizedBox(width: 8),
               TextButton(
                 onPressed: () async {
-                  final authProv = Provider.of<AuthProvider?>(context, listen: false);
+                  final authProv = Provider.of<AuthProvider?>(
+                    context,
+                    listen: false,
+                  );
                   if (authProv == null) {
                     Navigator.of(context).pushNamed('/welcome');
                     return;
@@ -111,7 +118,9 @@ class AppScaffold extends StatelessWidget {
                   try {
                     await authProv.signIn();
                     if (context.mounted && authProv.isSignedIn) {
-                      Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
+                      Navigator.of(
+                        context,
+                      ).pushNamedAndRemoveUntil('/home', (route) => false);
                     }
                   } catch (e) {
                     final err = e.toString().replaceFirst('Exception: ', '');
@@ -119,7 +128,9 @@ class AppScaffold extends StatelessWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            err.length > 120 ? '${err.substring(0, 120)}...' : err,
+                            err.length > 120
+                                ? '${err.substring(0, 120)}...'
+                                : err,
                           ),
                           duration: const Duration(seconds: 4),
                         ),
@@ -128,7 +139,10 @@ class AppScaffold extends StatelessWidget {
                   }
                 },
                 style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                   minimumSize: const Size(0, 0),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
@@ -150,12 +164,10 @@ class AppScaffold extends StatelessWidget {
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       appBar: showAppBar
           ? AppBar(
-              title: titleWidget ??
+              title:
+                  titleWidget ??
                   (title != null
-                      ? Text(
-                          title!,
-                          style: theme.textTheme.titleLarge,
-                        )
+                      ? Text(title!, style: theme.textTheme.titleLarge)
                       : null),
               centerTitle: centerTitle,
               backgroundColor: Colors.transparent,
@@ -170,11 +182,9 @@ class AppScaffold extends StatelessWidget {
       floatingActionButton: floatingActionButton,
       floatingActionButtonLocation: floatingActionButtonLocation,
       bottomNavigationBar: bottomNavigationBar,
-      body: Container(
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          gradient: bgGradient,
-        ),
+      body: VerbumAmbientBackground(
+        gradient: gradient == null ? null : bgGradient,
+        color: backgroundColor,
         child: SafeArea(
           child: Column(
             children: [
@@ -187,12 +197,10 @@ class AppScaffold extends StatelessWidget {
                   width: double.infinity,
                   height: bannerAd!.size.height.toDouble(),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColors.surfaceDark
-                        : Colors.white,
+                    color: isDark ? AppColors.surfaceDark : Colors.white,
                     border: Border(
                       top: BorderSide(
-                        color: colorScheme.outline.withOpacity(0.1),
+                        color: colorScheme.outline.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -205,12 +213,10 @@ class AppScaffold extends StatelessWidget {
                   width: double.infinity,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColors.surfaceDark
-                        : Colors.white,
+                    color: isDark ? AppColors.surfaceDark : Colors.white,
                     border: Border(
                       top: BorderSide(
-                        color: colorScheme.outline.withOpacity(0.1),
+                        color: colorScheme.outline.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -226,4 +232,3 @@ class AppScaffold extends StatelessWidget {
     );
   }
 }
-

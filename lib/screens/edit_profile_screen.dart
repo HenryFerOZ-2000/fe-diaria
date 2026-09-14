@@ -5,8 +5,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import '../services/social_service.dart';
+
 import '../services/profile_service.dart';
+import '../services/social_service.dart';
+import '../widgets/verbum_ambient_background.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -19,8 +21,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _auth = FirebaseAuth.instance;
   final _social = SocialService();
   final _profile = ProfileService();
-  final _displayCtrl = TextEditingController();
-  final _usernameCtrl = TextEditingController();
+  final _displayController = TextEditingController();
+  final _usernameController = TextEditingController();
   bool _loading = true;
   bool _saving = false;
   bool _uploadingPhoto = false;
@@ -34,55 +36,54 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _load();
   }
 
+  @override
+  void dispose() {
+    _displayController.dispose();
+    _usernameController.dispose();
+    super.dispose();
+  }
+
   Future<void> _load() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
-      setState(() {
-        _error = 'Inicia sesión para editar tu perfil';
-        _loading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _error = 'Inicia sesión para editar tu perfil';
+          _loading = false;
+        });
+      }
       return;
     }
     try {
-      final snap = await _profile.getUser(uid);
-      final data = snap.data() ?? {};
-      _displayCtrl.text = data['displayName'] ?? '';
-      _usernameCtrl.text = data['username'] ?? '';
+      final snapshot = await _profile.getUser(uid);
+      final data = snapshot.data() ?? {};
+      _displayController.text = data['displayName'] as String? ?? '';
+      _usernameController.text = data['username'] as String? ?? '';
       _photoUrl = data['photoURL'] as String?;
-    } catch (e) {
-      _error = 'Error al cargar perfil';
+    } catch (_) {
+      _error = 'No pudimos cargar tu perfil';
     } finally {
-      if (mounted) {
-        setState(() => _loading = false);
-      }
+      if (mounted) setState(() => _loading = false);
     }
   }
 
-  bool _validUsername(String value) {
-    return RegExp(r'^[a-z0-9._]{3,20}$').hasMatch(value);
-  }
+  bool _validUsername(String value) =>
+      RegExp(r'^[a-z0-9._]{3,20}$').hasMatch(value);
 
   Future<void> _save() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
-    final displayName = _displayCtrl.text.trim();
+    final displayName = _displayController.text.trim();
+    final username = _usernameController.text.trim().toLowerCase();
     if (displayName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('El nombre visible no puede estar vacío')),
-      );
+      _showMessage('Escribe el nombre con el que quieres aparecer.');
       return;
     }
-    final username = _usernameCtrl.text.trim().toLowerCase();
     if (!_validUsername(username)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Username inválido: usa 3-20 chars [a-z0-9._]')),
-      );
+      _showMessage('Revisa tu nombre de usuario antes de continuar.');
       return;
     }
-    setState(() {
-      _saving = true;
-      _error = null;
-    });
+    setState(() => _saving = true);
     try {
       await _social.setUsername(username);
       await _social.updateProfile(
@@ -90,62 +91,54 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         displayName: displayName,
         photoURL: _photoUrl,
       );
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Perfil actualizado')),
-        );
-        Navigator.of(context).pop();
-      }
-    } catch (e) {
-      if (mounted) {
-        final rawError = e.toString();
-        var message = 'Error: $rawError';
-        if (rawError.contains('username_taken') ||
-            rawError.contains('already-exists')) {
-          message = 'Este username ya está en uso. Prueba con otro.';
-        } else if (rawError.contains('username_invalid')) {
-          message = 'Username inválido: usa 3-20 caracteres [a-z0-9._]';
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
+      if (!mounted) return;
+      _showMessage('Perfil actualizado');
+      Navigator.pop(context);
+    } catch (error) {
+      if (!mounted) return;
+      final raw = error.toString();
+      if (raw.contains('username_taken') || raw.contains('already-exists')) {
+        _showMessage('Ese nombre de usuario ya está en uso.');
+      } else {
+        _showMessage('No pudimos guardar los cambios. Inténtalo nuevamente.');
       }
     } finally {
       if (mounted) setState(() => _saving = false);
     }
   }
 
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+    );
+  }
+
   Future<void> _pickAndUpload() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery, maxWidth: 900, imageQuality: 85);
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 900,
+      imageQuality: 85,
+    );
     if (picked == null) return;
     setState(() {
       _uploadingPhoto = true;
       _pickedFile = picked;
     });
     try {
-      final file = File(picked.path);
-      final ref = FirebaseStorage.instance.ref().child('users').child(uid).child('avatar.jpg');
-      await ref.putFile(file);
-      final url = await ref.getDownloadURL();
-      setState(() {
-        _photoUrl = url;
-      });
-      // guardar de inmediato para no perder consistencia
+      final reference = FirebaseStorage.instance
+          .ref()
+          .child('users')
+          .child(uid)
+          .child('avatar.jpg');
+      await reference.putFile(File(picked.path));
+      final url = await reference.getDownloadURL();
+      _photoUrl = url;
       await _social.updateProfile(uid: uid, photoURL: url);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Foto actualizada')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No se pudo subir la foto: $e')),
-        );
-      }
+      if (mounted) _showMessage('Foto actualizada');
+    } catch (_) {
+      if (mounted) _showMessage('No pudimos subir la foto.');
     } finally {
       if (mounted) setState(() => _uploadingPhoto = false);
     }
@@ -157,77 +150,237 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     if (_error != null) {
-      return Scaffold(body: Center(child: Text(_error!)));
+      return Scaffold(
+        appBar: AppBar(),
+        body: Center(child: Text(_error!)),
+      );
     }
 
+    final scheme = Theme.of(context).colorScheme;
+    final ImageProvider? image = _pickedFile != null
+        ? FileImage(File(_pickedFile!.path))
+        : (_photoUrl?.isNotEmpty == true ? NetworkImage(_photoUrl!) : null);
+    final username = _usernameController.text.trim().toLowerCase();
+    final usernameValid = username.isEmpty || _validUsername(username);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Editar perfil')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Foto', style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 32,
-                  backgroundImage: _pickedFile != null
-                      ? FileImage(File(_pickedFile!.path))
-                      : (_photoUrl != null ? NetworkImage(_photoUrl!) : null) as ImageProvider<Object>?,
-                  child: _pickedFile == null && _photoUrl == null
-                      ? const Icon(Icons.person)
-                      : null,
+      body: VerbumAmbientBackground(
+        child: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              AppBar(
+                title: Text(
+                  'Editar perfil',
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                const SizedBox(width: 12),
-                ElevatedButton(
-                  onPressed: _uploadingPhoto ? null : _pickAndUpload,
-                  child: _uploadingPhoto
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                        )
-                      : const Text('Cambiar foto'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _displayCtrl,
-              decoration: const InputDecoration(labelText: 'Nombre visible'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _usernameCtrl,
-              decoration: const InputDecoration(labelText: 'Username (min 3, max 20)'),
-              onChanged: (v) => setState(() {}),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Solo minúsculas, números, punto o guión bajo',
-              style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _saving ? null : _save,
-                child: _saving
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                      )
-                    : const Text('Guardar cambios'),
               ),
-            ),
-          ],
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    8,
+                    16,
+                    MediaQuery.paddingOf(context).bottom + 24,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Column(
+                          children: [
+                            Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: scheme.secondary,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 51,
+                                    backgroundColor: scheme.primaryContainer,
+                                    backgroundImage: image,
+                                    child: image == null
+                                        ? Icon(
+                                            Icons.person_outline_rounded,
+                                            size: 42,
+                                            color: scheme.primary,
+                                          )
+                                        : null,
+                                  ),
+                                ),
+                                Positioned(
+                                  right: -3,
+                                  bottom: 2,
+                                  child: IconButton.filled(
+                                    tooltip: 'Cambiar foto',
+                                    onPressed: _uploadingPhoto
+                                        ? null
+                                        : _pickAndUpload,
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: scheme.primary,
+                                      foregroundColor: scheme.onPrimary,
+                                      side: BorderSide(
+                                        color: scheme.surface,
+                                        width: 3,
+                                      ),
+                                    ),
+                                    icon: _uploadingPhoto
+                                        ? const SizedBox(
+                                            width: 17,
+                                            height: 17,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : const Icon(
+                                            Icons.photo_camera_outlined,
+                                            size: 19,
+                                          ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 13),
+                            Text(
+                              'Tu rostro en la comunidad',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      Text(
+                        'CÓMO QUIERES APARECER',
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          letterSpacing: 1.5,
+                          fontWeight: FontWeight.w700,
+                          color: scheme.secondary,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Tu identidad en Verbum',
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 13),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: scheme.surface.withValues(alpha: .92),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: scheme.outlineVariant),
+                        ),
+                        child: Column(
+                          children: [
+                            TextField(
+                              controller: _displayController,
+                              textCapitalization: TextCapitalization.words,
+                              textInputAction: TextInputAction.next,
+                              decoration: const InputDecoration(
+                                labelText: 'Nombre visible',
+                                hintText: '¿Cómo quieres que te llamemos?',
+                                prefixIcon: Icon(Icons.badge_outlined),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            TextField(
+                              controller: _usernameController,
+                              autocorrect: false,
+                              textCapitalization: TextCapitalization.none,
+                              decoration: InputDecoration(
+                                labelText: 'Nombre de usuario',
+                                hintText: 'tu.usuario',
+                                prefixText: '@',
+                                prefixIcon: const Icon(
+                                  Icons.alternate_email_rounded,
+                                ),
+                                errorText: usernameValid
+                                    ? null
+                                    : 'Usa entre 3 y 20 letras, números, punto o _',
+                              ),
+                              onChanged: (_) => setState(() {}),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.info_outline_rounded,
+                                  size: 15,
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                                const SizedBox(width: 7),
+                                Expanded(
+                                  child: Text(
+                                    'Tu usuario ayuda a que otros puedan reconocerte cuando compartes en Comunidad.',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 11,
+                                      height: 1.45,
+                                      color: scheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: _saving || !usernameValid ? null : _save,
+                          icon: _saving
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(Icons.check_rounded),
+                          label: Text(
+                            _saving ? 'Guardando…' : 'Guardar cambios',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Center(
+                        child: Text(
+                          'Puedes cambiar estos datos cuando quieras',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
-
-

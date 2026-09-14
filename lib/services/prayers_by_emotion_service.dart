@@ -12,7 +12,9 @@ class PrayersByEmotionService {
     if (_loaded) return;
 
     try {
-      final String jsonString = await rootBundle.loadString('assets/data/prayers_by_emotion.json');
+      final String jsonString = await rootBundle.loadString(
+        'assets/data/prayers_by_emotion.json',
+      );
       final List<dynamic> jsonList = json.decode(jsonString);
       _prayers = jsonList.cast<Map<String, dynamic>>();
       _loaded = true;
@@ -44,4 +46,3 @@ class PrayersByEmotionService {
     return _prayers.map((p) => p['emotion'] as String).toSet().toList();
   }
 }
-

@@ -76,9 +76,11 @@ class _MainCardState extends State<MainCard>
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final bgColor = widget.backgroundColor ??
+    final bgColor =
+        widget.backgroundColor ??
         (isDark ? AppColors.surfaceDark : AppColors.surface);
-    final shadows = widget.customShadows ??
+    final shadows =
+        widget.customShadows ??
         (isDark ? AppShadows.cardDark : AppShadows.card);
 
     Widget card = Container(
@@ -97,9 +99,7 @@ class _MainCardState extends State<MainCard>
             child: widget.child,
           ),
           if (widget.decoration != null)
-            Positioned.fill(
-              child: widget.decoration!,
-            ),
+            Positioned.fill(child: widget.decoration!),
         ],
       ),
     );
@@ -113,10 +113,7 @@ class _MainCardState extends State<MainCard>
         child: AnimatedBuilder(
           animation: _scaleAnimation,
           builder: (context, child) {
-            return Transform.scale(
-              scale: _scaleAnimation.value,
-              child: child,
-            );
+            return Transform.scale(scale: _scaleAnimation.value, child: child);
           },
           child: card,
         ),
@@ -126,4 +123,3 @@ class _MainCardState extends State<MainCard>
     return card;
   }
 }
-

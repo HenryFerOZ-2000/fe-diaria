@@ -21,10 +21,12 @@ class StreakService {
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
 
-  StreakService(this._storage,
-      {FirebaseAuth? auth, FirebaseFirestore? firestore})
-      : _auth = auth ?? FirebaseAuth.instance,
-        _firestore = firestore ?? FirebaseFirestore.instance;
+  StreakService(
+    this._storage, {
+    FirebaseAuth? auth,
+    FirebaseFirestore? firestore,
+  }) : _auth = auth ?? FirebaseAuth.instance,
+       _firestore = firestore ?? FirebaseFirestore.instance;
 
   String _toYmd(DateTime date) {
     final y = date.year.toString().padLeft(4, '0');
@@ -64,14 +66,21 @@ class StreakService {
     return StreakState(current: current, best: current, lastDateYmd: lastYmd);
   }
 
-  Future<void> _persist(String uid, StreakState state, {DateTime? lastDate}) async {
+  Future<void> _persist(
+    String uid,
+    StreakState state, {
+    DateTime? lastDate,
+  }) async {
     final data = {
       'streakCurrent': state.current,
       'streakBest': state.best,
       'lastStreakDate': lastDate != null ? _toYmd(lastDate) : state.lastDateYmd,
       'updatedAt': FieldValue.serverTimestamp(),
     };
-    await _firestore.collection('users').doc(uid).set(data, SetOptions(merge: true));
+    await _firestore
+        .collection('users')
+        .doc(uid)
+        .set(data, SetOptions(merge: true));
   }
 
   /// Obtiene la racha, priorizando Firestore, con fallback en caché local.
@@ -146,4 +155,3 @@ class StreakService {
     return state;
   }
 }
-

@@ -45,7 +45,9 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Reporte enviado correctamente. Gracias por tu feedback.'),
+            content: Text(
+              'Reporte enviado correctamente. Gracias por tu feedback.',
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -53,9 +55,9 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al enviar reporte: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error al enviar reporte: $e')));
       }
     } finally {
       if (mounted) {
@@ -98,12 +100,15 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
               ),
               child: DropdownButtonFormField<String>(
                 initialValue: _selectedCategory,
                 decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   border: InputBorder.none,
                 ),
                 items: _categories.map((category) {
@@ -154,10 +159,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
             const SizedBox(height: 8),
             Text(
               'Nota: Adjuntar captura de pantalla próximamente',
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
             ),
             const SizedBox(height: 32),
             // Botón enviar
@@ -189,4 +191,3 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
     );
   }
 }
-

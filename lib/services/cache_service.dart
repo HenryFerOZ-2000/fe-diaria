@@ -31,7 +31,7 @@ class CacheService {
     try {
       final today = DateTime.now();
       final todayString = '${today.year}-${today.month}-${today.day}';
-      
+
       await _verseBox.put(_todayVerseKey, verse.toJson());
       await _verseBox.put(_lastVerseDateKey, todayString);
       await _verseBox.put(_lastVerseIdKey, verse.id);
@@ -46,14 +46,12 @@ class CacheService {
       final today = DateTime.now();
       final todayString = '${today.year}-${today.month}-${today.day}';
       final lastDate = _verseBox.get(_lastVerseDateKey) as String?;
-      
+
       // Si es el mismo día, retornar el versículo guardado
       if (lastDate == todayString) {
         final verseData = _verseBox.get(_todayVerseKey);
         if (verseData != null) {
-          return Verse.fromJson(
-            Map<String, dynamic>.from(verseData as Map),
-          );
+          return Verse.fromJson(Map<String, dynamic>.from(verseData as Map));
         }
       }
     } catch (e) {
@@ -67,9 +65,7 @@ class CacheService {
     try {
       final verseData = _verseBox.get(_todayVerseKey);
       if (verseData != null) {
-        return Verse.fromJson(
-          Map<String, dynamic>.from(verseData as Map),
-        );
+        return Verse.fromJson(Map<String, dynamic>.from(verseData as Map));
       }
     } catch (e) {
       debugPrint('Error getting last verse: $e');
@@ -103,10 +99,10 @@ class CacheService {
     try {
       final today = DateTime.now();
       final todayString = '${today.year}-${today.month}-${today.day}';
-      final key = prayer.type == 'morning' 
-          ? _todayMorningPrayerKey 
+      final key = prayer.type == 'morning'
+          ? _todayMorningPrayerKey
           : _todayEveningPrayerKey;
-      
+
       await _prayerBox.put(key, prayer.toJson());
       await _prayerBox.put('${key}_date', todayString);
     } catch (e) {
@@ -119,19 +115,17 @@ class CacheService {
     try {
       final today = DateTime.now();
       final todayString = '${today.year}-${today.month}-${today.day}';
-      final key = type == 'morning' 
-          ? _todayMorningPrayerKey 
+      final key = type == 'morning'
+          ? _todayMorningPrayerKey
           : _todayEveningPrayerKey;
-      
+
       final lastDate = _prayerBox.get('${key}_date') as String?;
-      
+
       // Si es el mismo día, retornar la oración guardada
       if (lastDate == todayString) {
         final prayerData = _prayerBox.get(key);
         if (prayerData != null) {
-          return Prayer.fromJson(
-            Map<String, dynamic>.from(prayerData as Map),
-          );
+          return Prayer.fromJson(Map<String, dynamic>.from(prayerData as Map));
         }
       }
     } catch (e) {
@@ -143,15 +137,13 @@ class CacheService {
   /// Obtiene la última oración guardada
   static Prayer? getLastPrayer({required String type}) {
     try {
-      final key = type == 'morning' 
-          ? _todayMorningPrayerKey 
+      final key = type == 'morning'
+          ? _todayMorningPrayerKey
           : _todayEveningPrayerKey;
-      
+
       final prayerData = _prayerBox.get(key);
       if (prayerData != null) {
-        return Prayer.fromJson(
-          Map<String, dynamic>.from(prayerData as Map),
-        );
+        return Prayer.fromJson(Map<String, dynamic>.from(prayerData as Map));
       }
     } catch (e) {
       debugPrint('Error getting last prayer: $e');
@@ -169,4 +161,3 @@ class CacheService {
     }
   }
 }
-

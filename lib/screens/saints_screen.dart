@@ -3,6 +3,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../services/saints_service.dart';
 import '../services/ads_service.dart';
 import '../services/storage_service.dart';
+import '../faith/tradition_guard.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/prayer_card.dart';
 import '../widgets/empty_state.dart';
@@ -23,15 +24,27 @@ class _SaintsScreenState extends State<SaintsScreen> {
   BannerAd? _bannerAd;
   bool _adsRemoved = false;
   bool _isLoading = true;
+  bool _blockedByTradition = false;
 
   @override
   void initState() {
     super.initState();
+    if (_blockIfEvangelical()) return;
     _adsRemoved = StorageService().getAdsRemoved();
     if (!_adsRemoved) {
       _loadBannerAd();
     }
     _loadData();
+  }
+
+  bool _blockIfEvangelical() {
+    final blocked = TraditionGuard.blockCatholicOnlyModuleIfNeeded(
+      context: context,
+      moduleName: 'Santos del día',
+      isMounted: () => mounted,
+    );
+    _blockedByTradition = blocked;
+    return blocked;
   }
 
   Future<void> _loadData() async {
@@ -51,7 +64,8 @@ class _SaintsScreenState extends State<SaintsScreen> {
           ad.dispose();
         }
       },
-      onAdFailedToLoad: (error) => debugPrint('Failed to load banner ad: $error'),
+      onAdFailedToLoad: (error) =>
+          debugPrint('Failed to load banner ad: $error'),
     );
   }
 
@@ -63,6 +77,9 @@ class _SaintsScreenState extends State<SaintsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_blockedByTradition) {
+      return const SizedBox.shrink();
+    }
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
@@ -74,98 +91,119 @@ class _SaintsScreenState extends State<SaintsScreen> {
         children: [
           Expanded(
             child: _isLoading
-                ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: colorScheme.primary,
+                    ),
+                  )
                 : saints.isEmpty
-                    ? EmptyState(
-                        title: 'No hay santos disponibles',
-                        message: 'Intenta recargar más tarde',
-                        icon: Icons.auto_stories_outlined,
-                        onAction: _loadData,
-                        actionLabel: 'Recargar',
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        itemCount: saints.length,
-                        itemBuilder: (context, index) {
-                          final saint = saints[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                            child: MainCard(
-                              padding: const EdgeInsets.all(AppSpacing.lg),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                ? EmptyState(
+                    title: 'No hay santos disponibles',
+                    message: 'Intenta recargar más tarde',
+                    icon: Icons.auto_stories_outlined,
+                    onAction: _loadData,
+                    actionLabel: 'Recargar',
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    itemCount: saints.length,
+                    itemBuilder: (context, index) {
+                      final saint = saints[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                        child: MainCard(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(AppSpacing.md),
-                                        decoration: BoxDecoration(
-                                          color: colorScheme.secondary.withOpacity(0.15),
-                                          borderRadius: BorderRadius.circular(AppRadius.md),
-                                        ),
-                                        child: Icon(
-                                          Icons.auto_stories_rounded,
-                                          color: colorScheme.secondary,
-                                          size: 28,
-                                        ),
+                                  Container(
+                                    padding: const EdgeInsets.all(
+                                      AppSpacing.md,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: colorScheme.secondary.withValues(
+                                        alpha: 0.15,
                                       ),
-                                      const SizedBox(width: AppSpacing.md),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              saint['name'] as String,
-                                              style: theme.textTheme.titleLarge?.copyWith(
+                                      borderRadius: BorderRadius.circular(
+                                        AppRadius.md,
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      Icons.auto_stories_rounded,
+                                      color: colorScheme.secondary,
+                                      size: 28,
+                                    ),
+                                  ),
+                                  const SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          saint['name'] as String,
+                                          style: theme.textTheme.titleLarge
+                                              ?.copyWith(
                                                 fontWeight: FontWeight.bold,
                                               ),
-                                            ),
-                                            Text(
-                                              'Fiesta: ${saint['feastDay'] as String}',
-                                              style: theme.textTheme.bodySmall?.copyWith(
-                                                color: colorScheme.onSurfaceVariant,
-                                              ),
-                                            ),
-                                          ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  Text(
-                                    saint['description'] as String,
-                                    style: theme.textTheme.bodyMedium,
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  PrayerCard(
-                                    title: 'Oración',
-                                    text: saint['prayer'] as String,
-                                    icon: Icons.favorite_rounded,
-                                    accentColor: colorScheme.secondary,
+                                        Text(
+                                          'Fiesta: ${saint['feastDay'] as String}',
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                                color: colorScheme
+                                                    .onSurfaceVariant,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                          );
-                        },
-                      ),
+                              const SizedBox(height: AppSpacing.md),
+                              Text(
+                                saint['description'] as String,
+                                style: theme.textTheme.bodyMedium,
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              PrayerCard(
+                                title: 'Oración',
+                                text: saint['prayer'] as String,
+                                icon: Icons.favorite_rounded,
+                                accentColor: colorScheme.secondary,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
           if (!_adsRemoved)
             Container(
               alignment: Alignment.center,
               width: double.infinity,
-              height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
+              height: _bannerAd != null
+                  ? _bannerAd!.size.height.toDouble()
+                  : 50,
               decoration: BoxDecoration(
                 color: isDark ? colorScheme.surface : AppColors.surface,
                 border: Border(
-                  top: BorderSide(color: colorScheme.outline.withOpacity(0.1), width: 1),
+                  top: BorderSide(
+                    color: colorScheme.outline.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
                 ),
               ),
               child: _bannerAd != null
                   ? AdWidget(ad: _bannerAd!)
                   : const SizedBox(
                       height: 50,
-                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     ),
             ),
         ],
@@ -173,4 +211,3 @@ class _SaintsScreenState extends State<SaintsScreen> {
     );
   }
 }
-

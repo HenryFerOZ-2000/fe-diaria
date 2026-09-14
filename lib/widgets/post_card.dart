@@ -37,14 +37,12 @@ class PostCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.primary.withOpacity(0.06),
+            color: colorScheme.primary.withValues(alpha: 0.06),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
         ],
-        border: Border.all(
-          color: colorScheme.outline.withOpacity(0.08),
-        ),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,7 +50,7 @@ class PostCard extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(
-                backgroundColor: colorScheme.primary.withOpacity(0.15),
+                backgroundColor: colorScheme.primary.withValues(alpha: 0.15),
                 child: Text(
                   userName.isNotEmpty ? userName[0].toUpperCase() : '?',
                   style: GoogleFonts.inter(
@@ -78,7 +76,7 @@ class PostCard extends StatelessWidget {
                       timeAgo,
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: colorScheme.onSurface.withOpacity(0.6),
+                        color: colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -87,9 +85,12 @@ class PostCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: onJoin,
                 style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   foregroundColor: colorScheme.primary,
-                  backgroundColor: colorScheme.primary.withOpacity(0.08),
+                  backgroundColor: colorScheme.primary.withValues(alpha: 0.08),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -97,7 +98,10 @@ class PostCard extends StatelessWidget {
                 icon: const Icon(Icons.favorite, size: 16),
                 label: Text(
                   'Unirse ($joinCount)',
-                  style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 12),
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
                 ),
               ),
             ],
@@ -108,7 +112,7 @@ class PostCard extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 14,
               height: 1.6,
-              color: colorScheme.onSurface.withOpacity(0.9),
+              color: colorScheme.onSurface.withValues(alpha: 0.9),
             ),
           ),
           const SizedBox(height: 12),
@@ -121,7 +125,10 @@ class PostCard extends StatelessWidget {
               ),
               Text(
                 '$likes',
-                style: GoogleFonts.inter(fontSize: 13, color: colorScheme.onSurface.withOpacity(0.7)),
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
               ),
               const SizedBox(width: 16),
               IconButton(
@@ -131,7 +138,10 @@ class PostCard extends StatelessWidget {
               ),
               Text(
                 '$comments',
-                style: GoogleFonts.inter(fontSize: 13, color: colorScheme.onSurface.withOpacity(0.7)),
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
               ),
             ],
           ),
@@ -140,4 +150,3 @@ class PostCard extends StatelessWidget {
     );
   }
 }
-

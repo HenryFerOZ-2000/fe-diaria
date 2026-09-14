@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/storage_service.dart';
 import '../services/social_service.dart';
+import '../widgets/verbum_ambient_background.dart';
 
 class WelcomeAuthScreen extends StatefulWidget {
   const WelcomeAuthScreen({super.key});
@@ -39,12 +40,13 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
     });
     try {
       final authProvider = context.read<AuthProvider>();
-      final wasSignedIn = authProvider.isSignedIn;
       await authProvider.signIn();
-      
+
       if (mounted) {
         await Future.delayed(const Duration(milliseconds: 300));
         if (mounted && authProvider.isSignedIn) {
+          await StorageService()
+              .syncTraditionalPrayersReligionFromCloudForCurrentUser();
           // Sincronizar perfil con Firestore
           final social = SocialService();
           final user = authProvider.firebaseUser;
@@ -54,18 +56,9 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
               photoURL: user.photoURL,
             );
           }
-          
+
           await StorageService().setOnboardingCompleted(true);
-          
-          // Si es un nuevo usuario (no estaba logueado antes), verificar username
-          if (!wasSignedIn) {
-            final hasUsername = await social.hasUsername();
-            if (mounted && !hasUsername) {
-              Navigator.of(context).pushReplacementNamed('/setup-username');
-              return;
-            }
-          }
-          
+
           if (mounted) {
             Navigator.of(context).pushReplacementNamed('/home');
           }
@@ -94,9 +87,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
 
     try {
       final authProvider = context.read<AuthProvider>();
-      final wasSignedIn = authProvider.isSignedIn;
-      final isNewUser = _isSignUp;
-      
+
       if (_isSignUp) {
         if (_passwordController.text != _confirmPasswordController.text) {
           setState(() {
@@ -106,40 +97,34 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
           return;
         }
         await authProvider.signUpWithEmailPassword(
-              _emailController.text.trim(),
-              _passwordController.text,
-            );
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
       } else {
         await authProvider.signInWithEmailPassword(
-              _emailController.text.trim(),
-              _passwordController.text,
-            );
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
       }
 
       if (mounted) {
         await Future.delayed(const Duration(milliseconds: 300));
         if (mounted && authProvider.isSignedIn) {
+          await StorageService()
+              .syncTraditionalPrayersReligionFromCloudForCurrentUser();
           // Sincronizar perfil con Firestore
           final social = SocialService();
           final user = authProvider.firebaseUser;
           if (user != null) {
             await social.syncCurrentUserProfile(
-              displayName: user.displayName ?? _emailController.text.split('@').first,
+              displayName:
+                  user.displayName ?? _emailController.text.split('@').first,
               photoURL: user.photoURL,
             );
           }
-          
+
           await StorageService().setOnboardingCompleted(true);
-          
-          // Si es un nuevo usuario, verificar username
-          if (isNewUser || !wasSignedIn) {
-            final hasUsername = await social.hasUsername();
-            if (mounted && !hasUsername) {
-              Navigator.of(context).pushReplacementNamed('/setup-username');
-              return;
-            }
-          }
-          
+
           if (mounted) {
             Navigator.of(context).pushReplacementNamed('/home');
           }
@@ -158,7 +143,10 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
       } else if (e.toString().contains('invalid-email')) {
         errorMessage = 'Correo electrónico inválido';
       } else {
-        errorMessage = e.toString().replaceFirst('Exception: ', '').replaceFirst('FirebaseAuthException: ', '');
+        errorMessage = e
+            .toString()
+            .replaceFirst('Exception: ', '')
+            .replaceFirst('FirebaseAuthException: ', '');
       }
       setState(() {
         _error = errorMessage;
@@ -182,8 +170,8 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
 
     try {
       await context.read<AuthProvider>().sendPasswordResetEmail(
-            _emailController.text.trim(),
-          );
+        _emailController.text.trim(),
+      );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -225,125 +213,218 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 12),
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      colorScheme.primary.withOpacity(0.14),
-                      colorScheme.secondary.withOpacity(0.10),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: Colors.transparent,
+      body: VerbumAmbientBackground(
+        glowAlignment: const Alignment(1.15, -.9),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
                   children: [
-                    Text(
-                      'Bienvenido a\nVerbum',
-                      style: GoogleFonts.playfairDisplay(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w700,
-                        color: colorScheme.onSurface,
-                        height: 1.1,
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary.withValues(alpha: .10),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: colorScheme.primary.withValues(alpha: .18),
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.menu_book_rounded,
+                        color: colorScheme.primary,
+                        size: 20,
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Oraciones, Biblia y comunidad en un solo lugar. '
-                      'Únete para guardar tus avances, compartir peticiones y recibir inspiración diaria.',
-                      style: GoogleFonts.inter(
-                        fontSize: 14.5,
-                        height: 1.5,
-                        color: colorScheme.onSurface.withOpacity(0.78),
+                    const SizedBox(width: 11),
+                    Expanded(
+                      child: Text(
+                        'Verbum',
+                        style: GoogleFonts.playfairDisplay(
+                          color: colorScheme.onSurface,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 8,
-                      children: [
-                        _pill(context, Icons.favorite, 'Oraciones por emoción'),
-                        _pill(context, Icons.bolt, 'Rachas y progreso'),
-                        _pill(context, Icons.live_tv, 'En Vivo y comunidad'),
-                        _pill(context, Icons.menu_book, 'Biblia y devocionales'),
-                      ],
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 7,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary.withValues(
+                          alpha: isDark ? .20 : .09,
+                        ),
+                        borderRadius: BorderRadius.circular(99),
+                        border: Border.all(
+                          color: colorScheme.primary.withValues(alpha: .18),
+                        ),
+                      ),
+                      child: Text(
+                        'PASO 2 DE 2',
+                        style: GoogleFonts.inter(
+                          color: isDark
+                              ? colorScheme.primaryContainer
+                              : colorScheme.primary,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: .8,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 28),
-              Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 20, 18, 20),
+                const SizedBox(height: 18),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        colorScheme.primary.withValues(
+                          alpha: isDark ? 0.24 : 0.16,
+                        ),
+                        colorScheme.secondary.withValues(
+                          alpha: isDark ? 0.18 : 0.12,
+                        ),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    border: Border.all(
+                      color: colorScheme.primary.withValues(alpha: 0.16),
+                    ),
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(
+                          alpha: isDark ? 0.24 : 0.08,
+                        ),
+                        blurRadius: 26,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Inicia sesión para continuar',
-                        style: GoogleFonts.inter(
-                          fontSize: 17,
+                        'Tu camino puede\nacompañarte siempre',
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 32,
                           fontWeight: FontWeight.w800,
+                          letterSpacing: -0.6,
+                          height: 1.0,
+                          color: colorScheme.onSurface,
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      // Tabs para Google y Email/Password
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildTabButton(
-                              context,
-                              label: 'Google',
-                              icon: Icons.login,
-                              isSelected: _selectedTab == 0,
-                              onTap: () => setState(() {
-                                _selectedTab = 0;
-                                _error = null;
-                              }),
+                      const SizedBox(height: 8),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 500),
+                        child: Text(
+                          'Guarda tus oraciones, progreso y comunidades en todos tus dispositivos.',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            height: 1.5,
+                            color: colorScheme.onSurface.withValues(
+                              alpha: 0.76,
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildTabButton(
-                              context,
-                              label: 'Email',
-                              icon: Icons.email,
-                              isSelected: _selectedTab == 1,
-                              onTap: () => setState(() {
-                                _selectedTab = 1;
-                                _error = null;
-                              }),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                      const SizedBox(height: 20),
-                      // Contenido según tab seleccionado
+                      const SizedBox(height: 4),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(
+                      color: colorScheme.outline.withValues(alpha: 0.14),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(
+                          alpha: isDark ? 0.18 : 0.07,
+                        ),
+                        blurRadius: 24,
+                        offset: const Offset(0, 12),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Guarda tu camino',
+                        style: GoogleFonts.inter(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.2,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Elige cómo quieres continuar. Crear una cuenta es opcional.',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          height: 1.4,
+                          color: colorScheme.onSurface.withValues(alpha: 0.70),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
                       if (_selectedTab == 0) _buildGoogleSignIn(context),
                       if (_selectedTab == 1) _buildEmailPasswordForm(context),
+                      if (_selectedTab == 0) ...[
+                        const SizedBox(height: 10),
+                        Align(
+                          alignment: Alignment.center,
+                          child: TextButton.icon(
+                            onPressed: () => setState(() {
+                              _selectedTab = 1;
+                              _error = null;
+                            }),
+                            icon: Icon(
+                              Icons.email_outlined,
+                              size: 17,
+                              color: colorScheme.primary,
+                            ),
+                            label: Text(
+                              'Usar correo electrónico',
+                              style: GoogleFonts.inter(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                       if (_error != null) ...[
                         const SizedBox(height: 12),
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 11,
+                          ),
                           decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.08),
+                            color: Colors.red.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.red.withOpacity(0.15)),
+                            border: Border.all(
+                              color: Colors.red.withValues(alpha: 0.15),
+                            ),
                           ),
                           child: Text(
                             _error!,
@@ -361,16 +442,28 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                         child: OutlinedButton(
                           onPressed: _isLoading ? null : _continueAsGuest,
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 13),
-                            side: BorderSide(color: colorScheme.primary.withOpacity(0.6)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            side: BorderSide(
+                              color: colorScheme.primary.withValues(
+                                alpha: 0.28,
+                              ),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            backgroundColor: colorScheme.surfaceContainerHighest
+                                .withValues(alpha: 0.2),
                           ),
                           child: Text(
-                            _isLoading ? 'Procesando...' : 'Continuar sin iniciar sesión',
+                            _isLoading
+                                ? 'Procesando...'
+                                : 'Explorar sin crear una cuenta',
                             style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15,
-                              color: colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.78,
+                              ),
                             ),
                           ),
                         ),
@@ -378,84 +471,48 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                     ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.info_outline, size: 18, color: colorScheme.primary.withOpacity(0.9)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Al continuar, aceptas cuidar la comunidad: respeto, apoyo y oración por los demás.',
-                          style: GoogleFonts.inter(
-                            fontSize: 12.5,
-                            height: 1.5,
-                            color: colorScheme.onSurface.withOpacity(0.7),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'Como invitado no se sincronizan tus datos en la nube. Inicia sesión para guardar rachas, favoritos y progreso entre dispositivos.',
-                          style: GoogleFonts.inter(
-                            fontSize: 12.5,
-                            height: 1.5,
-                            color: colorScheme.onSurface.withOpacity(0.7),
-                          ),
-                        ),
-                      ],
+                const SizedBox(height: 10),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      'Al continuar aceptas nuestros',
+                      style: GoogleFonts.inter(
+                        fontSize: 11.2,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTabButton(BuildContext context, {
-    required String label,
-    required IconData icon,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? colorScheme.primary.withOpacity(0.1)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected
-                ? colorScheme.primary
-                : colorScheme.primary.withOpacity(0.3),
-            width: isSelected ? 2 : 1,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 20, color: colorScheme.primary),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                fontSize: 14,
-                color: colorScheme.primary,
-              ),
+                    TextButton(
+                      onPressed: () =>
+                          Navigator.of(context).pushNamed('/terms'),
+                      style: TextButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                      ),
+                      child: const Text('Términos'),
+                    ),
+                    Text(
+                      'y',
+                      style: GoogleFonts.inter(
+                        fontSize: 11.2,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () =>
+                          Navigator.of(context).pushNamed('/privacy-policy'),
+                      style: TextButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                      ),
+                      child: const Text('Privacidad'),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -466,14 +523,14 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
     return Column(
       children: [
         Text(
-          'Sin registro complejo: usa tu cuenta de Google para sincronizar tus oraciones, rachas y favoritos.',
+          'La forma más rápida de conservar tu progreso.',
           style: GoogleFonts.inter(
-            fontSize: 14,
-            height: 1.5,
-            color: colorScheme.onSurface.withOpacity(0.7),
+            fontSize: 13.5,
+            height: 1.45,
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
@@ -482,11 +539,14 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                 ? const SizedBox(
                     width: 18,
                     height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
                   )
-                : const Icon(Icons.login),
+                : const Icon(Icons.g_mobiledata_rounded, size: 27),
             label: Text(
-              _isLoading ? 'Conectando...' : 'Comenzar con Google',
+              _isLoading ? 'Conectando...' : 'Continuar con Google',
               style: GoogleFonts.inter(
                 fontWeight: FontWeight.w700,
                 fontSize: 15,
@@ -496,7 +556,10 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
               padding: const EdgeInsets.symmetric(vertical: 14),
               backgroundColor: colorScheme.primary,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 2,
             ),
           ),
         ),
@@ -511,26 +574,70 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => setState(() {
+                _selectedTab = 0;
+                _error = null;
+              }),
+              icon: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 14,
+                color: colorScheme.onSurface.withValues(alpha: 0.72),
+              ),
+              label: Text(
+                'Volver a Google',
+                style: GoogleFonts.inter(
+                  fontSize: 12.8,
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface.withValues(alpha: 0.78),
+                ),
+              ),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                minimumSize: const Size(0, 28),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: const VisualDensity(
+                  horizontal: -2,
+                  vertical: -2,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          _buildAuthModeSelector(context),
+          const SizedBox(height: 12),
           Text(
             _isSignUp
                 ? 'Crea una cuenta con tu correo electrónico'
-                : 'Inicia sesión con tu correo y contraseña',
+                : 'Ingresa con tu correo y contraseña',
             style: GoogleFonts.inter(
-              fontSize: 14,
-              height: 1.5,
-              color: colorScheme.onSurface.withOpacity(0.7),
+              fontSize: 13.5,
+              height: 1.45,
+              color: colorScheme.onSurface.withValues(alpha: 0.74),
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
           TextFormField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            autofillHints: const [AutofillHints.email],
             decoration: InputDecoration(
               labelText: 'Correo electrónico',
               prefixIcon: const Icon(Icons.email_outlined),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               filled: true,
-              fillColor: colorScheme.surface.withOpacity(0.5),
+              fillColor: colorScheme.surfaceContainerHighest.withValues(
+                alpha: 0.35,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 14,
+              ),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -542,20 +649,42 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           TextFormField(
             controller: _passwordController,
             obscureText: _obscurePassword,
+            textInputAction: _isSignUp
+                ? TextInputAction.next
+                : TextInputAction.done,
+            autofillHints: _isSignUp
+                ? const [AutofillHints.newPassword]
+                : const [AutofillHints.password],
+            onFieldSubmitted: _isSignUp
+                ? null
+                : (_) => _handleEmailPasswordAuth(),
             decoration: InputDecoration(
               labelText: 'Contraseña',
               prefixIcon: const Icon(Icons.lock_outline),
               suffixIcon: IconButton(
-                icon: Icon(_obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined),
-                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                icon: Icon(
+                  _obscurePassword
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                ),
+                onPressed: () =>
+                    setState(() => _obscurePassword = !_obscurePassword),
               ),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               filled: true,
-              fillColor: colorScheme.surface.withOpacity(0.5),
+              fillColor: colorScheme.surfaceContainerHighest.withValues(
+                alpha: 0.35,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 14,
+              ),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -572,16 +701,33 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
             TextFormField(
               controller: _confirmPasswordController,
               obscureText: _obscureConfirmPassword,
+              textInputAction: TextInputAction.done,
+              autofillHints: const [AutofillHints.newPassword],
+              onFieldSubmitted: (_) => _handleEmailPasswordAuth(),
               decoration: InputDecoration(
                 labelText: 'Confirmar contraseña',
                 prefixIcon: const Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
-                  icon: Icon(_obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined),
-                  onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                  icon: Icon(
+                    _obscureConfirmPassword
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                  ),
+                  onPressed: () => setState(
+                    () => _obscureConfirmPassword = !_obscureConfirmPassword,
+                  ),
                 ),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 filled: true,
-                fillColor: colorScheme.surface.withOpacity(0.5),
+                fillColor: colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.35,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 14,
+                ),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -611,7 +757,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
               ),
             ),
           ],
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -620,13 +766,19 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 backgroundColor: colorScheme.primary,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 2,
               ),
               child: _isLoading
                   ? const SizedBox(
                       width: 18,
                       height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : Text(
                       _isSignUp ? 'Crear cuenta' : 'Iniciar sesión',
@@ -637,60 +789,74 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                     ),
             ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                _isSignUp ? '¿Ya tienes cuenta? ' : '¿No tienes cuenta? ',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: colorScheme.onSurface.withOpacity(0.7),
-                ),
-              ),
-              TextButton(
-                onPressed: () => setState(() {
-                  _isSignUp = !_isSignUp;
-                  _error = null;
-                  _confirmPasswordController.clear();
-                }),
-                child: Text(
-                  _isSignUp ? 'Iniciar sesión' : 'Crear cuenta',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
   }
 
-  Widget _pill(BuildContext context, IconData icon, String text) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: colorScheme.primary.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: colorScheme.primary),
-          const SizedBox(width: 6),
-          Text(
-            text,
-            style: GoogleFonts.inter(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w600,
-              color: colorScheme.primary,
+  Widget _buildAuthModeSelector(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+
+    Widget option({required String label, required bool signUp}) {
+      final selected = _isSignUp == signUp;
+      return Expanded(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: _isLoading
+                ? null
+                : () => setState(() {
+                    _isSignUp = signUp;
+                    _error = null;
+                    _confirmPasswordController.clear();
+                  }),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: selected ? scheme.surface : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: selected
+                    ? [
+                        BoxShadow(
+                          color: Colors.black.withValues(
+                            alpha: dark ? .20 : .08,
+                          ),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Text(
+                label,
+                style: GoogleFonts.inter(
+                  color: selected ? scheme.primary : scheme.onSurfaceVariant,
+                  fontSize: 13,
+                  fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                ),
+              ),
             ),
           ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest.withValues(alpha: .55),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: scheme.outline.withValues(alpha: .12)),
+      ),
+      child: Row(
+        children: [
+          option(label: 'Iniciar sesión', signUp: false),
+          option(label: 'Crear cuenta', signUp: true),
         ],
       ),
     );

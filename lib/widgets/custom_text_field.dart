@@ -63,7 +63,7 @@ class _CustomTextFieldState extends State<CustomTextField>
       parent: _focusAnimationController,
       curve: Curves.easeInOut,
     );
-    
+
     if (widget.focusNode != null) {
       widget.focusNode!.addListener(_onFocusChange);
     }
@@ -122,51 +122,34 @@ class _CustomTextFieldState extends State<CustomTextField>
             suffixIcon: widget.suffixIcon != null
                 ? GestureDetector(
                     onTap: widget.onSuffixTap,
-                    child: Icon(
-                      widget.suffixIcon,
-                      color: colorScheme.primary,
-                    ),
+                    child: Icon(widget.suffixIcon, color: colorScheme.primary),
                   )
                 : null,
-            contentPadding: widget.contentPadding ??
+            contentPadding:
+                widget.contentPadding ??
                 const EdgeInsets.symmetric(
                   horizontal: AppSpacing.md,
                   vertical: AppSpacing.md,
                 ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: BorderSide(
-                color: colorScheme.outline,
-                width: 1,
-              ),
+              borderSide: BorderSide(color: colorScheme.outline, width: 1),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: BorderSide(
-                color: colorScheme.outline,
-                width: 1,
-              ),
+              borderSide: BorderSide(color: colorScheme.outline, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: BorderSide(
-                color: colorScheme.primary,
-                width: 2,
-              ),
+              borderSide: BorderSide(color: colorScheme.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(
-                color: AppColors.error,
-                width: 1,
-              ),
+              borderSide: const BorderSide(color: AppColors.error, width: 1),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(
-                color: AppColors.error,
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: AppColors.error, width: 2),
             ),
           ),
         );
@@ -174,4 +157,3 @@ class _CustomTextFieldState extends State<CustomTextField>
     );
   }
 }
-

@@ -4,6 +4,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../services/traditional_prayers_service.dart';
 import '../services/storage_service.dart';
 import '../services/ads_service.dart';
+import '../widgets/verbum_header_actions.dart';
 import 'traditional_prayers_list_screen.dart';
 import 'traditional_prayers_religion_selection_screen.dart';
 
@@ -12,10 +13,12 @@ class TraditionalPrayersCategoriesScreen extends StatefulWidget {
   const TraditionalPrayersCategoriesScreen({super.key});
 
   @override
-  State<TraditionalPrayersCategoriesScreen> createState() => _TraditionalPrayersCategoriesScreenState();
+  State<TraditionalPrayersCategoriesScreen> createState() =>
+      _TraditionalPrayersCategoriesScreenState();
 }
 
-class _TraditionalPrayersCategoriesScreenState extends State<TraditionalPrayersCategoriesScreen> {
+class _TraditionalPrayersCategoriesScreenState
+    extends State<TraditionalPrayersCategoriesScreen> {
   final TraditionalPrayersService _service = TraditionalPrayersService();
   final AdsService _adsService = AdsService();
   BannerAd? _bannerAd;
@@ -37,13 +40,15 @@ class _TraditionalPrayersCategoriesScreenState extends State<TraditionalPrayersC
   Future<void> _loadData() async {
     try {
       await _service.loadPrayers();
-      final religion = StorageService().getTraditionalPrayersReligion();
+      final religion = StorageService()
+          .getValidatedTraditionalPrayersReligion();
       if (religion.isEmpty) {
         // Si no hay religión seleccionada, volver a la pantalla de selección
         if (mounted) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => const TraditionalPrayersReligionSelectionScreen(),
+              builder: (context) =>
+                  const TraditionalPrayersReligionSelectionScreen(),
             ),
           );
         }
@@ -64,7 +69,7 @@ class _TraditionalPrayersCategoriesScreenState extends State<TraditionalPrayersC
 
   void _loadBannerAd() {
     if (_adsRemoved) return;
-    
+
     _adsService.loadBannerAd(
       adSize: AdSize.banner,
       onAdLoaded: (ad) {
@@ -124,20 +129,21 @@ class _TraditionalPrayersCategoriesScreenState extends State<TraditionalPrayersC
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () async {
-              await Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const TraditionalPrayersReligionSelectionScreen(),
-                ),
-              );
-              // Recargar datos después de cambiar religión
-              if (mounted) {
-                _loadData();
-              }
-            },
-            tooltip: 'Cambiar religión',
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: VerbumHeaderButton(
+              icon: Icons.tune_rounded,
+              tooltip: 'Cambiar tradición',
+              onPressed: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const TraditionalPrayersReligionSelectionScreen(),
+                  ),
+                );
+                if (mounted) _loadData();
+              },
+            ),
           ),
         ],
       ),
@@ -148,7 +154,7 @@ class _TraditionalPrayersCategoriesScreenState extends State<TraditionalPrayersC
             end: Alignment.bottomRight,
             colors: [
               Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).colorScheme.tertiary.withOpacity(0.05),
+              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
               Theme.of(context).scaffoldBackgroundColor,
             ],
           ),
@@ -164,83 +170,87 @@ class _TraditionalPrayersCategoriesScreenState extends State<TraditionalPrayersC
                         ),
                       )
                     : _categories.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.error_outline,
-                                  size: 64,
-                                  color: colorScheme.onSurface.withOpacity(0.5),
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'No se encontraron categorías',
-                                  style: GoogleFonts.inter(fontSize: 16),
-                                ),
-                              ],
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              size: 64,
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.5,
+                              ),
                             ),
-                          )
-                        : SingleChildScrollView(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Categorías',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w700,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-                                GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            const SizedBox(height: 16),
+                            Text(
+                              'No se encontraron categorías',
+                              style: GoogleFonts.inter(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Categorías',
+                              style: GoogleFonts.inter(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 20,
                                     mainAxisSpacing: 20,
                                     childAspectRatio: 0.95,
                                   ),
-                                  itemCount: _categories.length,
-                                  itemBuilder: (context, index) {
-                                    final category = _categories[index];
-                                    return _buildCategoryButton(
-                                      context: context,
-                                      colorScheme: colorScheme,
-                                      category: category,
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) => TraditionalPrayersListScreen(
+                              itemCount: _categories.length,
+                              itemBuilder: (context, index) {
+                                final category = _categories[index];
+                                return _buildCategoryButton(
+                                  context: context,
+                                  colorScheme: colorScheme,
+                                  category: category,
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            TraditionalPrayersListScreen(
                                               religion: _religion,
                                               category: category,
                                             ),
-                                          ),
-                                        );
-                                      },
+                                      ),
                                     );
                                   },
-                                ),
-                              ],
+                                );
+                              },
                             ),
-                          ),
+                          ],
+                        ),
+                      ),
               ),
               // Banner Ad fijo en la parte inferior
               if (!_adsRemoved)
                 Container(
                   alignment: Alignment.center,
                   width: double.infinity,
-                  height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
+                  height: _bannerAd != null
+                      ? _bannerAd!.size.height.toDouble()
+                      : 50,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? colorScheme.surface
-                        : Colors.white,
+                    color: isDark ? colorScheme.surface : Colors.white,
                     border: Border(
                       top: BorderSide(
-                        color: colorScheme.outline.withOpacity(0.1),
+                        color: colorScheme.outline.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -299,31 +309,31 @@ class _TraditionalPrayersCategoriesScreenState extends State<TraditionalPrayersC
     final displayName = _service.getCategoryDisplayName(category);
     // Obtener icono según la categoría
     IconData? categoryIcon = _getCategoryIcon(category);
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(28),
-        splashColor: colorScheme.primary.withOpacity(0.1),
-        highlightColor: colorScheme.primary.withOpacity(0.05),
+        splashColor: colorScheme.primary.withValues(alpha: 0.1),
+        highlightColor: colorScheme.primary.withValues(alpha: 0.05),
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
-              color: colorScheme.primary.withOpacity(0.15),
+              color: colorScheme.primary.withValues(alpha: 0.15),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withOpacity(0.08),
+                color: colorScheme.primary.withValues(alpha: 0.08),
                 blurRadius: 16,
                 offset: const Offset(0, 4),
                 spreadRadius: 0,
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
                 spreadRadius: 0,
@@ -339,7 +349,7 @@ class _TraditionalPrayersCategoriesScreenState extends State<TraditionalPrayersC
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withOpacity(0.1),
+                    color: colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -389,4 +399,3 @@ class _TraditionalPrayersCategoriesScreenState extends State<TraditionalPrayersC
     }
   }
 }
-

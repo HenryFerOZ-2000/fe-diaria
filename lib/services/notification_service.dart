@@ -14,11 +14,15 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
+  /// Mismo id que en AndroidManifest (default_notification_channel_id) para FCM.
+  static const String fcmAndroidChannelId = 'fcm_default_channel';
+
   final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
 
   /// Obtiene los detalles de si la app se abrió desde una notificación
-  Future<NotificationAppLaunchDetails?> getNotificationAppLaunchDetails() async {
+  Future<NotificationAppLaunchDetails?>
+  getNotificationAppLaunchDetails() async {
     return await _notifications.getNotificationAppLaunchDetails();
   }
 
@@ -28,7 +32,9 @@ class NotificationService {
     // tz.local ya está configurado automáticamente con la zona horaria del sistema
     // No necesitamos cambiarlo manualmente
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -44,8 +50,97 @@ class NotificationService {
       initSettings,
       onDidReceiveNotificationResponse: _onNotificationTapped,
     );
-    
+
+    if (kDebugMode) {
+      debugPrint(
+        '[Verbum/Notifications] initialize: flutter_local_notifications listo',
+      );
+    }
+
+    await _ensureFcmAndroidChannel();
+
     // El manejo de notificaciones al abrir la app se hace en main.dart
+  }
+
+  Future<void> _ensureFcmAndroidChannel() async {
+    final android = _notifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    if (android == null) return;
+    const channel = AndroidNotificationChannel(
+      fcmAndroidChannelId,
+      'Push (Verbum)',
+      description: 'Notificaciones remotas de la aplicación',
+      importance: Importance.high,
+    );
+    await android.createNotificationChannel(channel);
+  }
+
+  /// Muestra una push recibida en primer plano (FCM no pinta bandeja en Android).
+  Future<void> showFcmForegroundNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    final androidDetails = AndroidNotificationDetails(
+      fcmAndroidChannelId,
+      'Push (Verbum)',
+      channelDescription: 'Notificaciones remotas',
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    await _notifications.show(
+      id,
+      title,
+      body,
+      NotificationDetails(android: androidDetails, iOS: iosDetails),
+      payload: payload,
+    );
+  }
+
+  /// Diagnóstico en consola (notificaciones locales; FCM ver PushMessagingService).
+  Future<void> printDiagnosticsToConsole() async {
+    debugPrint(
+      '[Verbum/Notifications] ========== DIAGNÓSTICO LOCAL ==========',
+    );
+    debugPrint(
+      '[Verbum/Notifications] Tipo: notificaciones LOCALES programadas '
+      '(flutter_local_notifications).',
+    );
+    debugPrint(
+      '[Verbum/Notifications] Push FCM: usa el mismo botón de diagnóstico; '
+      'se imprime bloque [Verbum/FCM] después de este bloque.',
+    );
+
+    final androidPlugin = _notifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    if (androidPlugin != null) {
+      final enabled = await androidPlugin.areNotificationsEnabled();
+      debugPrint(
+        '[Verbum/Notifications] Android: canal del sistema habilitado=$enabled',
+      );
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      debugPrint(
+        '[Verbum/Notifications] iOS: revisa permisos en Ajustes > Verbum > Notificaciones '
+        '(locales + FCM; confirma Push en Xcode si no llegan remotas).',
+      );
+    }
+
+    debugPrint('[Verbum/Notifications] ======================================');
   }
 
   /// Solicita permisos de notificaciones explícitamente
@@ -54,20 +149,24 @@ class NotificationService {
     // Android 13+
     final androidResult = await _notifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.requestNotificationsPermission();
-    
+
     // iOS - los permisos se solicitan automáticamente al inicializar
     // Verificar si están concedidos
     final iosResult = await _notifications
         .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
-        ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
-    
+          IOSFlutterLocalNotificationsPlugin
+        >()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
+
+    if (kDebugMode) {
+      debugPrint(
+        '[Verbum/Notifications] requestPermissions: android=$androidResult ios=$iosResult',
+      );
+    }
+
     // Retornar true si al menos una plataforma concedió permisos
     // o si ya estaban concedidos
     return androidResult ?? iosResult ?? false;
@@ -79,20 +178,21 @@ class NotificationService {
     // Android
     final androidPlugin = _notifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (androidPlugin != null) {
       final granted = await androidPlugin.areNotificationsEnabled();
       if (granted != null) {
         return granted;
       }
     }
-    
+
     // iOS - No hay forma directa de verificar sin solicitar
     // En iOS, si se solicita y el usuario ya concedió, retorna true
     // Si no se han concedido, mostrará el diálogo
     // Por ahora, asumimos que si no es Android, retornamos null
     // y el código que llama debe manejar esto
-    
+
     // Si no se puede determinar, retornar null para indicar incertidumbre
     return false;
   }
@@ -100,8 +200,12 @@ class NotificationService {
   void _onNotificationTapped(NotificationResponse response) {
     // La notificación abrirá la app automáticamente
     // El payload puede usarse para navegar a una pantalla específica
-    debugPrint('Notification tapped: ${response.payload}');
-    
+    debugPrint(
+      '[Verbum/Notifications] onNotificationTapped: '
+      'id=${response.id} actionId=${response.actionId} '
+      'payload=${response.payload}',
+    );
+
     // El payload será manejado por el main.dart a través del navigatorObserver
     // 'verse' -> Tab 0 (Versículo del Día)
     // 'prayer' -> Tab 1 (Oración del Día)
@@ -112,7 +216,13 @@ class NotificationService {
   /// Programa las notificaciones diarias según las preferencias del usuario
   Future<void> scheduleDailyNotifications() async {
     final storageService = StorageService();
-    
+
+    if (kDebugMode) {
+      debugPrint(
+        '[Verbum/Notifications] scheduleDailyNotifications: iniciando…',
+      );
+    }
+
     // Verificar si las notificaciones están habilitadas globalmente
     if (!storageService.getNotificationEnabled()) {
       await cancelAllNotifications();
@@ -134,10 +244,14 @@ class NotificationService {
       final timeParts = morningTime.split(':');
       final hour = int.parse(timeParts[0]);
       final minute = int.parse(timeParts[1]);
-      
+
       final morningTitle = _getMorningNotificationTitle(language);
-      final morningBody = _getMorningNotificationBody(verse, morningPrayer, language);
-      
+      final morningBody = _getMorningNotificationBody(
+        verse,
+        morningPrayer,
+        language,
+      );
+
       await _scheduleNotification(
         id: 0,
         title: morningTitle,
@@ -182,7 +296,7 @@ class NotificationService {
     if (storageService.getEveningNotificationEnabled()) {
       final eveningTitle = _getEveningNotificationTitle(language);
       final eveningBody = _getEveningNotificationBody(eveningPrayer, language);
-      
+
       await _scheduleNotification(
         id: 1,
         title: eveningTitle,
@@ -215,23 +329,29 @@ class NotificationService {
     } else {
       await cancelHourlyReminders();
     }
+
+    if (kDebugMode) {
+      debugPrint(
+        '[Verbum/Notifications] scheduleDailyNotifications: programación aplicada',
+      );
+    }
   }
 
   /// Programa las notificaciones de recordatorio cada 3 horas (9:00 - 21:00)
   Future<void> scheduleHourlyReminders() async {
     await cancelHourlyReminders();
-    
+
     final language = LanguageService.getLanguage();
     final reminders = _getHourlyReminderMessages(language);
-    
+
     // Programar recordatorios cada 3 horas desde las 9:00 hasta las 21:00
     // Horarios: 9:00, 12:00, 15:00, 18:00, 21:00
     final hours = [9, 12, 15, 18, 21];
-    
+
     for (int i = 0; i < hours.length; i++) {
       final hour = hours[i];
       final messageIndex = i % reminders.length;
-      
+
       await _scheduleNotification(
         id: 10 + i, // IDs 10-14 para recordatorios
         title: reminders[messageIndex]['title'] as String,
@@ -262,14 +382,8 @@ class NotificationService {
             'title': 'Prayer Reminder 🙏',
             'body': "Don't forget to pray today 🤍",
           },
-          {
-            'title': 'Take a moment',
-            'body': 'Take a moment to talk with God',
-          },
-          {
-            'title': 'Prayer Time',
-            'body': "Don't forget to pray today 🤍",
-          },
+          {'title': 'Take a moment', 'body': 'Take a moment to talk with God'},
+          {'title': 'Prayer Time', 'body': "Don't forget to pray today 🤍"},
         ];
       case 'pt':
         return [
@@ -281,10 +395,7 @@ class NotificationService {
             'title': 'Reserve um momento',
             'body': 'Reserve um momento para falar com Deus',
           },
-          {
-            'title': 'Hora da Oração',
-            'body': 'Não esqueça de orar hoje 🤍',
-          },
+          {'title': 'Hora da Oração', 'body': 'Não esqueça de orar hoje 🤍'},
         ];
       default:
         return [
@@ -296,10 +407,7 @@ class NotificationService {
             'title': 'Tómate un momento',
             'body': 'Tómate un momento para hablar con Dios',
           },
-          {
-            'title': 'Hora de Orar',
-            'body': 'No olvides orar hoy 🤍',
-          },
+          {'title': 'Hora de Orar', 'body': 'No olvides orar hoy 🤍'},
         ];
     }
   }
@@ -404,7 +512,7 @@ class NotificationService {
     final title = _getMorningNotificationTitle(language);
     final body = _getTestNotificationBody(language);
     final channelName = _getChannelName('verse', language);
-    
+
     final androidDetails = AndroidNotificationDetails(
       'daily_verse_channel',
       channelName,
@@ -420,12 +528,13 @@ class NotificationService {
       iOS: iosDetails,
     );
 
-    await _notifications.show(
-      999,
-      title,
-      body,
-      notificationDetails,
-    );
+    if (kDebugMode) {
+      debugPrint(
+        '[Verbum/Notifications] showTestNotification: mostrando id=999',
+      );
+    }
+
+    await _notifications.show(999, title, body, notificationDetails);
   }
 
   /// Obtiene el título de la notificación de la mañana (versículo)
@@ -441,22 +550,27 @@ class NotificationService {
   }
 
   /// Obtiene el cuerpo de la notificación de la mañana
-  String _getMorningNotificationBody(Verse verse, Prayer? prayer, String language) {
+  String _getMorningNotificationBody(
+    Verse verse,
+    Prayer? prayer,
+    String language,
+  ) {
     final userName = StorageService().getUserName();
     final greeting = userName.isNotEmpty ? '$userName, ' : '';
-    
-    String body = '${greeting}tu versículo del día:\n\n${verse.text}\n\n${verse.reference}\n\n- Verbum';
-    
+
+    String body =
+        '${greeting}tu versículo del día:\n\n${verse.text}\n\n${verse.reference}\n\n- Verbum';
+
     if (prayer != null) {
       // Truncar oración si es muy larga
-      final prayerText = prayer.text.length > 100 
-          ? '${prayer.text.substring(0, 100)}...' 
+      final prayerText = prayer.text.length > 100
+          ? '${prayer.text.substring(0, 100)}...'
           : prayer.text;
       body += '\n\n✨ Tu oración del día:\n$prayerText';
     }
-    
+
     body += '\n\n👉 Toca para responder: ¿Cómo te sientes hoy?';
-    
+
     return body;
   }
 
@@ -552,7 +666,7 @@ class NotificationService {
   String _getVerseReadyBody(Verse verse, String language) {
     final userName = StorageService().getUserName();
     final greeting = userName.isNotEmpty ? '$userName, ' : '';
-    
+
     switch (language) {
       case 'en':
         return '${greeting}your verse of the day:\n\n${verse.text}\n\n${verse.reference}';
@@ -587,11 +701,11 @@ class NotificationService {
           return 'Tómate un momento para orar hoy';
       }
     }
-    
-    final prayerText = prayer.text.length > 150 
-        ? '${prayer.text.substring(0, 150)}...' 
+
+    final prayerText = prayer.text.length > 150
+        ? '${prayer.text.substring(0, 150)}...'
         : prayer.text;
-    
+
     switch (language) {
       case 'en':
         return 'Your prayer for today:\n\n$prayerText';
@@ -626,4 +740,3 @@ class NotificationService {
     }
   }
 }
-

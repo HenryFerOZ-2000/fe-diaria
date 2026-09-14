@@ -63,12 +63,7 @@ class RosaryMystery {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'day': day,
-      'mysteries': mysteries,
-    };
+    return {'id': id, 'name': name, 'day': day, 'mysteries': mysteries};
   }
 }
 
@@ -104,4 +99,3 @@ class RosaryStep {
     };
   }
 }
-

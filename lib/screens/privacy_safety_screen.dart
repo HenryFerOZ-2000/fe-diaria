@@ -76,13 +76,16 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
                   icon: Icons.devices,
                   title: 'Sesiones y dispositivos',
                   subtitle: 'Ver y gestionar sesiones activas',
-                  onTap: () => Navigator.of(context).pushNamed('/sessions-devices'),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed('/sessions-devices'),
                 ),
                 _buildListTile(
                   icon: Icons.security,
                   title: 'Autenticación en dos pasos',
                   subtitle: 'Añade una capa extra de seguridad',
-                  onTap: () => _showPlaceholder('Autenticación en dos pasos próximamente'),
+                  onTap: () => _showPlaceholder(
+                    'Autenticación en dos pasos próximamente',
+                  ),
                 ),
                 const SizedBox(height: 24),
                 // B) Bloqueos y reportes
@@ -92,13 +95,15 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
                   icon: Icons.block_outlined,
                   title: 'Usuarios bloqueados',
                   subtitle: 'Gestiona usuarios que has bloqueado',
-                  onTap: () => Navigator.of(context).pushNamed('/blocked-users'),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed('/blocked-users'),
                 ),
                 _buildListTile(
                   icon: Icons.flag_outlined,
                   title: 'Reportar contenido',
                   subtitle: 'Reporta contenido inapropiado',
-                  onTap: () => Navigator.of(context).pushNamed('/report-content'),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed('/report-content'),
                 ),
                 const SizedBox(height: 24),
                 // C) Información legal y control
@@ -108,7 +113,8 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
                   icon: Icons.privacy_tip_outlined,
                   title: 'Política de privacidad',
                   subtitle: 'Lee nuestra política de privacidad',
-                  onTap: () => Navigator.of(context).pushNamed('/privacy-policy'),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed('/privacy-policy'),
                 ),
                 _buildListTile(
                   icon: Icons.description_outlined,
@@ -121,7 +127,8 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
                   title: 'Eliminar cuenta',
                   subtitle: 'Elimina permanentemente tu cuenta',
                   titleColor: Colors.red,
-                  onTap: () => Navigator.of(context).pushNamed('/delete-account'),
+                  onTap: () =>
+                      Navigator.of(context).pushNamed('/delete-account'),
                 ),
                 const SizedBox(height: 32),
               ],
@@ -153,7 +160,7 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
       ),
       child: ListTile(
         leading: Icon(icon, color: titleColor),
@@ -182,23 +189,21 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
       await _service.sendPasswordResetEmail(user!.email!);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Email de restablecimiento enviado'),
-          ),
+          const SnackBar(content: Text('Email de restablecimiento enviado')),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
   }
 
   void _showPlaceholder(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }

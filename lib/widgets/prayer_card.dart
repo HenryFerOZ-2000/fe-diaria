@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'main_card.dart';
+import 'prayer_reading_experience.dart';
 
 /// Tarjeta reutilizable para mostrar oraciones con diseño elegante
 class PrayerCard extends StatelessWidget {
@@ -12,6 +13,7 @@ class PrayerCard extends StatelessWidget {
   final VoidCallback? onFavorite;
   final bool isFavorite;
   final Color? accentColor;
+  final bool openReaderOnTap;
 
   const PrayerCard({
     super.key,
@@ -23,6 +25,7 @@ class PrayerCard extends StatelessWidget {
     this.onFavorite,
     this.isFavorite = false,
     this.accentColor,
+    this.openReaderOnTap = true,
   });
 
   @override
@@ -32,6 +35,18 @@ class PrayerCard extends StatelessWidget {
     final accent = accentColor ?? colorScheme.primary;
 
     return MainCard(
+      onTap: openReaderOnTap
+          ? () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => PrayerTextReadingScreen(
+                  title: title,
+                  text: text,
+                  reference: reference,
+                  accent: accent,
+                ),
+              ),
+            )
+          : null,
       padding: const EdgeInsets.all(AppSpacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,14 +58,10 @@ class PrayerCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: accent.withOpacity(0.15),
+                    color: accent.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
-                  child: Icon(
-                    icon,
-                    color: accent,
-                    size: 28,
-                  ),
+                  child: Icon(icon, color: accent, size: 28),
                 ),
                 const SizedBox(width: AppSpacing.md),
               ],
@@ -83,12 +94,31 @@ class PrayerCard extends StatelessWidget {
           // Texto de la oración
           Text(
             text,
+            maxLines: openReaderOnTap ? 4 : null,
+            overflow: openReaderOnTap ? TextOverflow.ellipsis : null,
             style: theme.textTheme.bodyLarge?.copyWith(
               fontSize: 17,
               height: 1.7,
             ),
             textAlign: TextAlign.justify,
           ),
+          if (openReaderOnTap) ...[
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                Text(
+                  'ABRIR MODO ORACIÓN',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: accent,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1,
+                  ),
+                ),
+                const Spacer(),
+                Icon(Icons.arrow_outward_rounded, size: 18, color: accent),
+              ],
+            ),
+          ],
           // Referencia si existe
           if (reference != null) ...[
             const SizedBox(height: AppSpacing.md),
@@ -98,17 +128,13 @@ class PrayerCard extends StatelessWidget {
                 vertical: AppSpacing.sm,
               ),
               decoration: BoxDecoration(
-                color: accent.withOpacity(0.1),
+                color: accent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.format_quote,
-                    size: 16,
-                    color: accent,
-                  ),
+                  Icon(Icons.format_quote, size: 16, color: accent),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
                     reference!,
@@ -127,4 +153,3 @@ class PrayerCard extends StatelessWidget {
     );
   }
 }
-

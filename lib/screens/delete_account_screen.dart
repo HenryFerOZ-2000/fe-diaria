@@ -64,9 +64,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     } catch (e) {
       debugPrint('Error deleting account: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al eliminar cuenta: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error al eliminar cuenta: $e')));
         setState(() => _isDeleting = false);
       }
     }
@@ -135,7 +135,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
               ),
               child: CheckboxListTile(
                 title: Text(
@@ -168,7 +168,9 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
                         ),
                       )
                     : Text(
@@ -205,4 +207,3 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
     );
   }
 }
-

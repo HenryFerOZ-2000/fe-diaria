@@ -6,13 +6,14 @@ import 'verse_service.dart';
 /// Implementa fallback a contenido local si la API falla
 class BibleApiService {
   final VerseService _localService = VerseService();
-  
+
   // TODO: Configurar estas variables cuando tengas API keys
   // ignore: unused_field
-  static const String _apiBaseUrl = 'https://api.bible.example.com'; // URL de ejemplo
+  static const String _apiBaseUrl =
+      'https://api.bible.example.com'; // URL de ejemplo
   // ignore: unused_field
   static const String _apiKey = ''; // API key aquí cuando esté disponible
-  
+
   /// Obtiene un versículo del día desde la API o fallback local
   Future<Verse?> getTodayVerse() async {
     try {
@@ -23,7 +24,7 @@ class BibleApiService {
       // if (response.statusCode == 200) {
       //   return Verse.fromJson(json.decode(response.body));
       // }
-      
+
       // Por ahora, usar fallback local
       return await _getLocalFallback();
     } catch (e) {
@@ -34,7 +35,11 @@ class BibleApiService {
   }
 
   /// Obtiene un versículo por referencia desde la API o fallback local
-  Future<Verse?> getVerseByReference(String book, int chapter, int verse) async {
+  Future<Verse?> getVerseByReference(
+    String book,
+    int chapter,
+    int verse,
+  ) async {
     try {
       // TODO: Implementar llamada real a la API
       // final response = await http.get(
@@ -43,7 +48,7 @@ class BibleApiService {
       // if (response.statusCode == 200) {
       //   return Verse.fromJson(json.decode(response.body));
       // }
-      
+
       return await _getLocalFallback();
     } catch (e) {
       debugPrint('Error fetching verse by reference from API: $e');
@@ -62,7 +67,7 @@ class BibleApiService {
       //   final List<dynamic> data = json.decode(response.body);
       //   return data.map((v) => Verse.fromJson(v)).toList();
       // }
-      
+
       return await _getLocalVersesByTopic(topic);
     } catch (e) {
       debugPrint('Error fetching verses by topic from API: $e');
@@ -108,4 +113,3 @@ class BibleApiService {
     return false; // Por ahora siempre usar local
   }
 }
-

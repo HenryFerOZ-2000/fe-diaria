@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/app_provider.dart';
 import '../services/notification_service.dart';
+import '../services/push_messaging_service.dart';
 import '../services/language_service.dart';
 import '../l10n/app_localizations.dart';
 import 'personalization_screen.dart';
@@ -81,7 +83,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> _showLanguageSelector(BuildContext context, AppProvider provider) async {
+  Future<void> _showLanguageSelector(
+    BuildContext context,
+    AppProvider provider,
+  ) async {
     final currentLanguage = LanguageService.getLanguage();
     final localizations = AppLocalizations.of(context);
 
@@ -101,7 +106,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -204,7 +211,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             border: Border.all(
               color: isSelected
                   ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                  : Theme.of(
+                      context,
+                    ).colorScheme.outline.withValues(alpha: 0.2),
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -217,7 +226,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   languageName,
                   style: GoogleFonts.inter(
                     fontSize: 16,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                     color: isSelected
                         ? Theme.of(context).colorScheme.onPrimaryContainer
                         : Theme.of(context).colorScheme.onSurface,
@@ -239,7 +250,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
-    
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -261,7 +272,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             end: Alignment.bottomRight,
             colors: [
               Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).colorScheme.tertiary.withOpacity(0.05),
+              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
               Theme.of(context).scaffoldBackgroundColor,
             ],
           ),
@@ -313,10 +324,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         style: GoogleFonts.inter(fontSize: 16),
                       ),
                       subtitle: Text(
-                        provider.userName.isNotEmpty || provider.userEmotion.isNotEmpty
-                            ? provider.userName.isNotEmpty 
-                                ? '${provider.userName} - ${_getEmotionDisplayName(provider.userEmotion)}'
-                                : _getEmotionDisplayName(provider.userEmotion)
+                        provider.userName.isNotEmpty ||
+                                provider.userEmotion.isNotEmpty
+                            ? provider.userName.isNotEmpty
+                                  ? '${provider.userName} - ${_getEmotionDisplayName(provider.userEmotion)}'
+                                  : _getEmotionDisplayName(provider.userEmotion)
                             : 'Configura tu nombre y emoción',
                         style: GoogleFonts.inter(
                           fontSize: 14,
@@ -356,7 +368,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         style: GoogleFonts.inter(fontSize: 16),
                       ),
                       subtitle: Text(
-                        _getReligionDisplayName(StorageService().getTraditionalPrayersReligion()),
+                        _getReligionDisplayName(
+                          StorageService()
+                              .getValidatedTraditionalPrayersReligion(),
+                        ),
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.primary,
@@ -371,11 +386,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onTap: () async {
                         final result = await Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => const TraditionalPrayersReligionSelectionScreen(),
+                            builder: (context) =>
+                                const TraditionalPrayersReligionSelectionScreen(),
                           ),
                         );
-                        if (result == true || mounted) {
+                        if (!mounted) return;
+                        if (result == true) {
                           setState(() {});
+                          if (!mounted) return;
+                          final selectedReligion = StorageService()
+                              .getValidatedTraditionalPrayersReligion();
+                          final displayName = _getReligionDisplayName(
+                            selectedReligion,
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Tu tradición fue actualizada a $displayName.',
+                              ),
+                              duration: const Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
                         }
                       },
                     ),
@@ -431,13 +463,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           IconButton(
                             icon: const Icon(Icons.remove_circle_outline),
                             onPressed: provider.fontSize > 0.8
-                                ? () => provider.setFontSize(provider.fontSize - 0.1)
+                                ? () => provider.setFontSize(
+                                    provider.fontSize - 0.1,
+                                  )
                                 : null,
                           ),
                           IconButton(
                             icon: const Icon(Icons.add_circle_outline),
                             onPressed: provider.fontSize < 1.4
-                                ? () => provider.setFontSize(provider.fontSize + 0.1)
+                                ? () => provider.setFontSize(
+                                    provider.fontSize + 0.1,
+                                  )
                                 : null,
                           ),
                         ],
@@ -511,7 +547,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         if (value) {
                           // Si se activa, solicitar permisos primero
                           final notificationService = NotificationService();
-                          final granted = await notificationService.requestPermissions();
+                          final granted = await notificationService
+                              .requestPermissions();
                           if (granted) {
                             provider.setNotificationEnabled(true);
                           } else {
@@ -519,7 +556,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Se necesitan permisos de notificaciones para activar esta función'),
+                                  content: Text(
+                                    'Se necesitan permisos de notificaciones para activar esta función',
+                                  ),
                                   duration: Duration(seconds: 3),
                                 ),
                               );
@@ -546,12 +585,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           'Versículo del día a las ${provider.morningVerseNotificationTime}',
                           style: GoogleFonts.roboto(
                             fontSize: 14,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                         ),
                         value: provider.morningNotificationEnabled,
-                        onChanged: (value) => provider.setMorningNotificationEnabled(value),
-                        secondary: const Icon(Icons.wb_sunny, color: Colors.orange),
+                        onChanged: (value) =>
+                            provider.setMorningNotificationEnabled(value),
+                        secondary: const Icon(
+                          Icons.wb_sunny,
+                          color: Colors.orange,
+                        ),
                       ),
                       if (provider.morningNotificationEnabled) ...[
                         const Divider(height: 1),
@@ -568,12 +613,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          leading: const Icon(Icons.access_time, color: Colors.orange),
+                          leading: const Icon(
+                            Icons.access_time,
+                            color: Colors.orange,
+                          ),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => _selectTime(
                             context,
                             provider.morningVerseNotificationTime,
-                            (time) => provider.setMorningVerseNotificationTime(time),
+                            (time) =>
+                                provider.setMorningVerseNotificationTime(time),
                           ),
                         ),
                       ],
@@ -588,12 +637,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           'Oración de la noche a las ${provider.eveningPrayerNotificationTime}',
                           style: GoogleFonts.roboto(
                             fontSize: 14,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                         ),
                         value: provider.eveningNotificationEnabled,
-                        onChanged: (value) => provider.setEveningNotificationEnabled(value),
-                        secondary: const Icon(Icons.nightlight_round, color: Colors.indigo),
+                        onChanged: (value) =>
+                            provider.setEveningNotificationEnabled(value),
+                        secondary: const Icon(
+                          Icons.nightlight_round,
+                          color: Colors.indigo,
+                        ),
                       ),
                       if (provider.eveningNotificationEnabled) ...[
                         const Divider(height: 1),
@@ -610,12 +665,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          leading: const Icon(Icons.access_time, color: Colors.indigo),
+                          leading: const Icon(
+                            Icons.access_time,
+                            color: Colors.indigo,
+                          ),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () => _selectTime(
                             context,
                             provider.eveningPrayerNotificationTime,
-                            (time) => provider.setEveningPrayerNotificationTime(time),
+                            (time) =>
+                                provider.setEveningPrayerNotificationTime(time),
                           ),
                         ),
                       ],
@@ -630,11 +689,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           'Recordatorios de oración de 9:00 a 21:00',
                           style: GoogleFonts.roboto(
                             fontSize: 14,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                         ),
                         value: provider.hourlyRemindersEnabled,
-                        onChanged: (value) => provider.setHourlyRemindersEnabled(value),
+                        onChanged: (value) =>
+                            provider.setHourlyRemindersEnabled(value),
                         secondary: Icon(
                           Icons.schedule,
                           color: Theme.of(context).colorScheme.primary,
@@ -650,12 +712,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           localizations.testNotificationDescription,
                           style: GoogleFonts.roboto(
                             fontSize: 14,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                         ),
                         trailing: const Icon(Icons.send),
                         onTap: _testNotification,
                       ),
+                      if (kDebugMode) ...[
+                        const Divider(height: 1),
+                        ListTile(
+                          title: Text(
+                            'Diagnóstico de notificaciones (dev)',
+                            style: GoogleFonts.roboto(fontSize: 16),
+                          ),
+                          subtitle: Text(
+                            'Imprime estado en consola (FCM no está integrado)',
+                            style: GoogleFonts.roboto(
+                              fontSize: 14,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          trailing: const Icon(Icons.bug_report_outlined),
+                          onTap: () async {
+                            await NotificationService()
+                                .printDiagnosticsToConsole();
+                            await PushMessagingService()
+                                .printDiagnosticsToConsole();
+                            if (!context.mounted) return;
+                            final token = await PushMessagingService()
+                                .getTokenForDiagnostics();
+                            if (!context.mounted) return;
+                            final preview = token != null && token.length > 36
+                                ? '${token.substring(0, 36)}…'
+                                : (token ?? 'null');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Logs en consola. FCM token (preview): $preview',
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ],
                   ],
                 ),
@@ -725,12 +828,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildSettingsCard({required List<Widget> children}) {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: children,
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Column(children: children),
     );
   }
 
@@ -763,6 +862,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       return 'Católica';
     } else if (religion == 'cristiana') {
       return 'Cristiana Evangélica';
+    } else if (religion == 'general') {
+      return 'Cristiana general';
     }
     return religion;
   }

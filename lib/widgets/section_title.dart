@@ -37,7 +37,7 @@ class SectionTitle extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: titleColor.withOpacity(0.1),
+                color: titleColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Icon(icon, color: titleColor, size: 24),
@@ -46,9 +46,7 @@ class SectionTitle extends StatelessWidget {
           ],
           Text(
             title,
-            style: theme.textTheme.headlineLarge?.copyWith(
-              color: titleColor,
-            ),
+            style: theme.textTheme.headlineLarge?.copyWith(color: titleColor),
             textAlign: textAlign,
           ),
           if (subtitle != null) ...[
@@ -66,4 +64,3 @@ class SectionTitle extends StatelessWidget {
     );
   }
 }
-

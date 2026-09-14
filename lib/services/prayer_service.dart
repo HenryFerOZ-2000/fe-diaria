@@ -5,6 +5,7 @@ import 'cache_service.dart';
 import 'language_service.dart';
 import 'translation_service.dart';
 import 'daily_content_service.dart';
+import 'storage_service.dart';
 
 /// Servicio para gestionar oraciones diarias
 /// Integra API externa con caché local y fallback
@@ -17,47 +18,66 @@ class PrayerService {
   final PrayerApiService _apiService = PrayerApiService();
   final TranslationService _translationService = TranslationService();
   final DailyContentService _dailyContent = DailyContentService();
+  final StorageService _storageService = StorageService();
   DateTime? _lastDate;
   Prayer? _todayMorningPrayer;
   Prayer? _todayEveningPrayer;
+  String? _lastTradition;
 
   /// Obtiene la oración de la mañana del día actual
   Future<Prayer> getTodayMorningPrayer() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
+    final tradition = _currentTradition();
 
     // Si ya tenemos la oración de hoy, retornarla
     if (_lastDate != null &&
         _todayMorningPrayer != null &&
+        _lastTradition == tradition &&
         _lastDate!.isAtSameMomentAs(today)) {
       return _todayMorningPrayer!;
     }
 
     // Verificar caché
     final cachedPrayer = CacheService.getTodayPrayer(type: 'morning');
-    if (cachedPrayer != null) {
+    if (cachedPrayer != null &&
+        _isPrayerForTradition(cachedPrayer.id, tradition)) {
       _todayMorningPrayer = cachedPrayer;
       _lastDate = today;
+      _lastTradition = tradition;
       return _todayMorningPrayer!;
     }
 
     // Intentar obtener desde contenidos locales usando día del año
     try {
       await _dailyContent.loadContent();
-      final text = _dailyContent.getMorningPrayer();
+      final text = _dailyContent.getMorningPrayer(tradition: tradition);
       if (text.isNotEmpty) {
         final targetLanguage = LanguageService.getLanguage();
-        final translatedText = await _translationService.translateText(text, targetLanguage);
+        final translatedText = await _translationService.translateText(
+          text,
+          targetLanguage,
+        );
         final dayOfYear = _dailyContent.getDayOfYear();
         final prayer = Prayer(
-          id: _buildStableId(type: 'morning', index: dayOfYear),
+          id: _buildStableId(
+            type: 'morning',
+            index: dayOfYear,
+            tradition: tradition,
+          ),
           text: translatedText,
           type: 'morning',
-          title: targetLanguage == 'es' ? 'Oración de la Mañana' : await _translationService.translateText('Oración de la Mañana', targetLanguage),
+          title: targetLanguage == 'es'
+              ? 'Oración de la Mañana'
+              : await _translationService.translateText(
+                  'Oración de la Mañana',
+                  targetLanguage,
+                ),
         );
         await CacheService.saveTodayPrayer(prayer);
         _todayMorningPrayer = prayer;
         _lastDate = today;
+        _lastTradition = tradition;
         return prayer;
       }
     } catch (e) {
@@ -70,23 +90,26 @@ class PrayerService {
       // Traducir la oración al idioma del usuario
       final targetLanguage = LanguageService.getLanguage();
       final translatedPrayer = await _translatePrayer(prayer, targetLanguage);
-      
+
       await CacheService.saveTodayPrayer(translatedPrayer);
       _todayMorningPrayer = translatedPrayer;
       _lastDate = today;
       return translatedPrayer;
     } catch (e) {
       debugPrint('Error getting morning prayer: $e');
-      
+
       // Fallback a última oración guardada
       final lastPrayer = CacheService.getLastPrayer(type: 'morning');
       if (lastPrayer != null) {
         final targetLanguage = LanguageService.getLanguage();
-        final translatedPrayer = await _translatePrayer(lastPrayer, targetLanguage);
+        final translatedPrayer = await _translatePrayer(
+          lastPrayer,
+          targetLanguage,
+        );
         _todayMorningPrayer = translatedPrayer;
         return translatedPrayer;
       }
-      
+
       // Último recurso: obtener una oración local
       final prayer = await _apiService.getDailyPrayer(type: 'morning');
       final targetLanguage = LanguageService.getLanguage();
@@ -100,39 +123,56 @@ class PrayerService {
   Future<Prayer> getTodayEveningPrayer() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
+    final tradition = _currentTradition();
 
     // Si ya tenemos la oración de hoy, retornarla
     if (_lastDate != null &&
         _todayEveningPrayer != null &&
+        _lastTradition == tradition &&
         _lastDate!.isAtSameMomentAs(today)) {
       return _todayEveningPrayer!;
     }
 
     // Verificar caché
     final cachedPrayer = CacheService.getTodayPrayer(type: 'evening');
-    if (cachedPrayer != null) {
+    if (cachedPrayer != null &&
+        _isPrayerForTradition(cachedPrayer.id, tradition)) {
       _todayEveningPrayer = cachedPrayer;
       _lastDate = today;
+      _lastTradition = tradition;
       return _todayEveningPrayer!;
     }
 
     // Intentar obtener desde contenidos locales usando día del año
     try {
       await _dailyContent.loadContent();
-      final text = _dailyContent.getNightPrayer();
+      final text = _dailyContent.getNightPrayer(tradition: tradition);
       if (text.isNotEmpty) {
         final targetLanguage = LanguageService.getLanguage();
-        final translatedText = await _translationService.translateText(text, targetLanguage);
+        final translatedText = await _translationService.translateText(
+          text,
+          targetLanguage,
+        );
         final dayOfYear = _dailyContent.getDayOfYear();
         final prayer = Prayer(
-          id: _buildStableId(type: 'evening', index: dayOfYear),
+          id: _buildStableId(
+            type: 'evening',
+            index: dayOfYear,
+            tradition: tradition,
+          ),
           text: translatedText,
           type: 'evening',
-          title: targetLanguage == 'es' ? 'Oración de la Noche' : await _translationService.translateText('Oración de la Noche', targetLanguage),
+          title: targetLanguage == 'es'
+              ? 'Oración de la Noche'
+              : await _translationService.translateText(
+                  'Oración de la Noche',
+                  targetLanguage,
+                ),
         );
         await CacheService.saveTodayPrayer(prayer);
         _todayEveningPrayer = prayer;
         _lastDate = today;
+        _lastTradition = tradition;
         return prayer;
       }
     } catch (e) {
@@ -145,23 +185,26 @@ class PrayerService {
       // Traducir la oración al idioma del usuario
       final targetLanguage = LanguageService.getLanguage();
       final translatedPrayer = await _translatePrayer(prayer, targetLanguage);
-      
+
       await CacheService.saveTodayPrayer(translatedPrayer);
       _todayEveningPrayer = translatedPrayer;
       _lastDate = today;
       return translatedPrayer;
     } catch (e) {
       debugPrint('Error getting evening prayer: $e');
-      
+
       // Fallback a última oración guardada
       final lastPrayer = CacheService.getLastPrayer(type: 'evening');
       if (lastPrayer != null) {
         final targetLanguage = LanguageService.getLanguage();
-        final translatedPrayer = await _translatePrayer(lastPrayer, targetLanguage);
+        final translatedPrayer = await _translatePrayer(
+          lastPrayer,
+          targetLanguage,
+        );
         _todayEveningPrayer = translatedPrayer;
         return translatedPrayer;
       }
-      
+
       // Último recurso: obtener una oración local
       final prayer = await _apiService.getDailyPrayer(type: 'evening');
       final targetLanguage = LanguageService.getLanguage();
@@ -218,10 +261,36 @@ class PrayerService {
     }
   }
 
+  String _currentTradition() {
+    final v = _storageService.getValidatedTraditionalPrayersReligion().trim();
+    return v.isEmpty ? 'catolica' : v;
+  }
 
-  int _buildStableId({required String type, required int index}) {
+  /// Tras cambiar tradición en Ajustes: evita mezclar oraciones en memoria con la tradición anterior.
+  void resetInMemoryDailyPrayers() {
+    _lastDate = null;
+    _todayMorningPrayer = null;
+    _todayEveningPrayer = null;
+    _lastTradition = null;
+  }
+
+  int _buildStableId({
+    required String type,
+    required int index,
+    required String tradition,
+  }) {
     // IDs estables: 1xxxx para morning, 2xxxx para evening
+    final traditionOffset = tradition == 'cristiana' || tradition == 'general'
+        ? 50000
+        : 0;
     final base = type == 'morning' ? 10000 : 20000;
-    return base + index;
+    return traditionOffset + base + index;
+  }
+
+  bool _isPrayerForTradition(int id, String tradition) {
+    final isEvangelicalId = id >= 50000;
+    return tradition == 'cristiana' || tradition == 'general'
+        ? isEvangelicalId
+        : !isEvangelicalId;
   }
 }

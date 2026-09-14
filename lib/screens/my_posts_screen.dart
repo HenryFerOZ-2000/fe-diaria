@@ -43,23 +43,27 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
       await callable.call<Map<String, dynamic>>({'postId': postId});
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Publicación eliminada')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Publicación eliminada')));
       }
     } on FirebaseFunctionsException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al eliminar (${e.code}): ${e.message ?? 'sin detalle'}')),
+          SnackBar(
+            content: Text(
+              'Error al eliminar (${e.code}): ${e.message ?? 'sin detalle'}',
+            ),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al eliminar: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error al eliminar: $e')));
       }
     }
   }
@@ -68,15 +72,11 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     if (_uid == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mis oraciones'),
-      ),
+      appBar: AppBar(title: const Text('Mis oraciones')),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: _firestore
             .collection('live_posts')
@@ -93,7 +93,8 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
             );
           }
           final docs = snapshot.data?.docs ?? [];
-          if (snapshot.connectionState == ConnectionState.waiting && docs.isEmpty) {
+          if (snapshot.connectionState == ConnectionState.waiting &&
+              docs.isEmpty) {
             return const Center(child: CircularProgressIndicator());
           }
           if (docs.isEmpty) {
@@ -110,7 +111,11 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ListTile(
-                  title: Text(text, maxLines: 2, overflow: TextOverflow.ellipsis),
+                  title: Text(
+                    text,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   subtitle: Text('Estado: $status'),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete_outline),
@@ -126,4 +131,3 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
     );
   }
 }
-

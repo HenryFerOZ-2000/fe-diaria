@@ -31,7 +31,7 @@ class FavoritesScreen extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: [
               Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).colorScheme.tertiary.withOpacity(0.05),
+              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
               Theme.of(context).scaffoldBackgroundColor,
             ],
           ),
@@ -53,7 +53,9 @@ class FavoritesScreen extends StatelessWidget {
                         Icon(
                           Icons.favorite_border,
                           size: 80,
-                          color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withValues(alpha: 0.5),
                         ),
                         const SizedBox(height: 24),
                         Text(
@@ -74,7 +76,9 @@ class FavoritesScreen extends StatelessWidget {
                             AppLocalizations.of(context).noFavoritesDescription,
                             style: GoogleFonts.inter(
                               fontSize: 14,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                             ),
                             textAlign: TextAlign.center,
                             softWrap: true,
@@ -93,31 +97,31 @@ class FavoritesScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 itemCount: favorites.length,
                 itemBuilder: (context, index) {
-                final verse = favorites[index];
-                return TweenAnimationBuilder<double>(
-                  duration: Duration(milliseconds: 300 + (index * 50)),
-                  tween: Tween(begin: 0.0, end: 1.0),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Transform.translate(
-                        offset: Offset(0, 20 * (1 - value)),
-                        child: child,
+                  final verse = favorites[index];
+                  return TweenAnimationBuilder<double>(
+                    duration: Duration(milliseconds: 300 + (index * 50)),
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, child) {
+                      return Opacity(
+                        opacity: value,
+                        child: Transform.translate(
+                          offset: Offset(0, 20 * (1 - value)),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: _FavoriteCard(
+                      verse: verse,
+                      onShare: () => ShareService.shareAsText(
+                        text: verse.text,
+                        reference: verse.reference,
+                        title: AppLocalizations.of(context).favorite,
                       ),
-                    );
-                  },
-                  child: _FavoriteCard(
-                    verse: verse,
-                    onShare: () => ShareService.shareAsText(
-                      text: verse.text,
-                      reference: verse.reference,
-                      title: AppLocalizations.of(context).favorite,
+                      onRemove: () => provider.toggleFavorite(verse),
                     ),
-                    onRemove: () => provider.toggleFavorite(verse),
-                  ),
-                );
-              },
+                  );
+                },
               ),
             );
           },
@@ -155,9 +159,10 @@ class _FavoriteCardState extends State<_FavoriteCard>
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -173,10 +178,10 @@ class _FavoriteCardState extends State<_FavoriteCard>
       child: Card(
         margin: const EdgeInsets.only(bottom: 16),
         elevation: 2,
-        shadowColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shadowColor: Theme.of(
+          context,
+        ).colorScheme.primary.withValues(alpha: 0.1),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         color: Theme.of(context).colorScheme.surface,
         surfaceTintColor: Colors.transparent,
         child: InkWell(
@@ -190,7 +195,9 @@ class _FavoriteCardState extends State<_FavoriteCard>
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.1),
                 width: 1,
               ),
             ),
@@ -217,8 +224,12 @@ class _FavoriteCardState extends State<_FavoriteCard>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                        Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.3),
+                        Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.1),
                       ],
                     ),
                   ),
@@ -251,12 +262,19 @@ class _FavoriteCardState extends State<_FavoriteCard>
                             onTap: widget.onShare,
                             borderRadius: BorderRadius.circular(20),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),

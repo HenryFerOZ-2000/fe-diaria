@@ -105,33 +105,42 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Cargar inicialmente primero
     _loadStats();
-    
+
     // Suscribirse a actualizaciones en tiempo real
-    _statsSubscription = _service.statsStream().listen((stats) {
-      debugPrint('[SpiritualStatsScreen] 📊 Stream update: currentStreak=${stats.currentStreak}, bestStreak=${stats.bestStreak}');
-      if (mounted) {
-        setState(() {
-          _stats = stats;
-          _isLoading = false;
-        });
-        debugPrint('[SpiritualStatsScreen] ✅ UI updated with currentStreak=${_stats.currentStreak}');
-      }
-    }, onError: (e) {
-      debugPrint('[SpiritualStatsScreen] ❌ Error in stats stream: $e');
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    });
+    _statsSubscription = _service.statsStream().listen(
+      (stats) {
+        debugPrint(
+          '[SpiritualStatsScreen] 📊 Stream update: currentStreak=${stats.currentStreak}, bestStreak=${stats.bestStreak}',
+        );
+        if (mounted) {
+          setState(() {
+            _stats = stats;
+            _isLoading = false;
+          });
+          debugPrint(
+            '[SpiritualStatsScreen] ✅ UI updated with currentStreak=${_stats.currentStreak}',
+          );
+        }
+      },
+      onError: (e) {
+        debugPrint('[SpiritualStatsScreen] ❌ Error in stats stream: $e');
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      },
+    );
   }
 
   Future<void> _loadStats() async {
     setState(() => _isLoading = true);
     try {
       final stats = await _service.getStats();
-      debugPrint('[SpiritualStatsScreen] 📥 Initial load: currentStreak=${stats.currentStreak}, bestStreak=${stats.bestStreak}');
+      debugPrint(
+        '[SpiritualStatsScreen] 📥 Initial load: currentStreak=${stats.currentStreak}, bestStreak=${stats.bestStreak}',
+      );
       if (mounted) {
         setState(() {
           _stats = stats;
@@ -220,7 +229,8 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: 12,
       crossAxisSpacing: 12,
-      childAspectRatio: 1.15, // Aumentado ligeramente para dar más espacio vertical
+      childAspectRatio:
+          1.15, // Aumentado ligeramente para dar más espacio vertical
       children: [
         _StatsCard(
           title: 'Días activos',
@@ -285,17 +295,11 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
           onTap: () {
             Navigator.of(context).pushNamed(
               '/achievement-detail',
-              arguments: {
-                'achievement': achievement,
-                'stats': _stats,
-              },
+              arguments: {'achievement': achievement, 'stats': _stats},
             );
           },
           borderRadius: BorderRadius.circular(12),
-          child: _AchievementCard(
-            achievement: achievement,
-            stats: _stats,
-          ),
+          child: _AchievementCard(achievement: achievement, stats: _stats),
         );
       },
     );
@@ -320,23 +324,19 @@ class _StatsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.grey[850]
-            : Colors.white,
+        color: isDark ? Colors.grey[850] : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
-        ),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
       ),
       padding: const EdgeInsets.all(12),
       child: Column(
@@ -347,7 +347,7 @@ class _StatsCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 20),
@@ -402,10 +402,7 @@ class _AchievementCard extends StatelessWidget {
   final Achievement achievement;
   final SpiritualStats stats;
 
-  const _AchievementCard({
-    required this.achievement,
-    required this.stats,
-  });
+  const _AchievementCard({required this.achievement, required this.stats});
 
   @override
   Widget build(BuildContext context) {
@@ -417,19 +414,19 @@ class _AchievementCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: isUnlocked
-            ? (isDark ? Colors.amber[900]?.withOpacity(0.3) : Colors.amber[50])
+            ? (isDark
+                  ? Colors.amber[900]?.withValues(alpha: 0.3)
+                  : Colors.amber[50])
             : (isDark ? Colors.grey[850] : Colors.white),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isUnlocked
-              ? Colors.amber
-              : Colors.grey.withOpacity(0.3),
+          color: isUnlocked ? Colors.amber : Colors.grey.withValues(alpha: 0.3),
           width: isUnlocked ? 2 : 1,
         ),
         boxShadow: isUnlocked
             ? [
                 BoxShadow(
-                  color: Colors.amber.withOpacity(0.3),
+                  color: Colors.amber.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -446,9 +443,7 @@ class _AchievementCard extends StatelessWidget {
             child: Icon(
               achievement.icon,
               size: 28,
-              color: isUnlocked
-                  ? Colors.amber[700]
-                  : Colors.grey[400],
+              color: isUnlocked ? Colors.amber[700] : Colors.grey[400],
             ),
           ),
           const SizedBox(height: 6),
@@ -470,28 +465,19 @@ class _AchievementCard extends StatelessWidget {
             LinearProgressIndicator(
               value: progressPercent,
               backgroundColor: Colors.grey[300],
-              valueColor: AlwaysStoppedAnimation<Color>(
-                Colors.amber[700]!,
-              ),
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.amber[700]!),
               minHeight: 3,
             ),
             const SizedBox(height: 2),
             Text(
               '$progress/${achievement.target}',
-              style: GoogleFonts.inter(
-                fontSize: 8,
-                color: Colors.grey[600],
-              ),
+              style: GoogleFonts.inter(fontSize: 8, color: Colors.grey[600]),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ] else ...[
             const SizedBox(height: 2),
-            Icon(
-              Icons.check_circle,
-              size: 14,
-              color: Colors.amber[700],
-            ),
+            Icon(Icons.check_circle, size: 14, color: Colors.amber[700]),
           ],
         ],
       ),

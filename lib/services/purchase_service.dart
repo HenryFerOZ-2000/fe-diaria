@@ -19,12 +19,16 @@ class PurchaseService {
   Future<void> initialize() async {
     final available = await _iap.isAvailable();
     if (!available) return;
-    _subscription ??= _iap.purchaseStream.listen(_onPurchaseUpdated, onDone: () {
-      _subscription?.cancel();
-      _subscription = null;
-    }, onError: (Object error) {
-      debugPrint('IAP error: $error');
-    });
+    _subscription ??= _iap.purchaseStream.listen(
+      _onPurchaseUpdated,
+      onDone: () {
+        _subscription?.cancel();
+        _subscription = null;
+      },
+      onError: (Object error) {
+        debugPrint('IAP error: $error');
+      },
+    );
   }
 
   Future<bool> get isAdsRemoved async {
@@ -49,8 +53,9 @@ class PurchaseService {
       if (already) return;
 
       const Set<String> ids = {removeAdsProductId};
-      final ProductDetailsResponse response =
-          await _iap.queryProductDetails(ids);
+      final ProductDetailsResponse response = await _iap.queryProductDetails(
+        ids,
+      );
       if (response.notFoundIDs.isNotEmpty || response.productDetails.isEmpty) {
         debugPrint('Product not found: $ids');
         return;
@@ -64,7 +69,8 @@ class PurchaseService {
   }
 
   Future<void> _onPurchaseUpdated(
-      List<PurchaseDetails> purchaseDetailsList) async {
+    List<PurchaseDetails> purchaseDetailsList,
+  ) async {
     for (final purchase in purchaseDetailsList) {
       if (purchase.productID == removeAdsProductId) {
         if (purchase.status == PurchaseStatus.purchased ||
@@ -78,5 +84,3 @@ class PurchaseService {
     }
   }
 }
-
-

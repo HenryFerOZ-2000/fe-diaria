@@ -12,7 +12,9 @@ class SaintsService {
     if (_loaded) return;
 
     try {
-      final String jsonString = await rootBundle.loadString('assets/data/saints.json');
+      final String jsonString = await rootBundle.loadString(
+        'assets/data/saints.json',
+      );
       final List<dynamic> jsonList = json.decode(jsonString);
       _saints = jsonList.cast<Map<String, dynamic>>();
       _loaded = true;
@@ -45,4 +47,3 @@ class SaintsService {
     }).toList();
   }
 }
-

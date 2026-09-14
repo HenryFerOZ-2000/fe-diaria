@@ -9,7 +9,8 @@ class LanguageSelectionScreen extends StatefulWidget {
   const LanguageSelectionScreen({super.key});
 
   @override
-  State<LanguageSelectionScreen> createState() => _LanguageSelectionScreenState();
+  State<LanguageSelectionScreen> createState() =>
+      _LanguageSelectionScreenState();
 }
 
 class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
@@ -35,12 +36,13 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
-    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
 
     _animationController.forward();
   }
@@ -64,9 +66,9 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
 
     // Navegar a la pantalla principal
     if (mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const MainScreen()),
-      );
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const MainScreen()));
     }
   }
 
@@ -80,7 +82,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
             end: Alignment.bottomRight,
             colors: [
               Theme.of(context).colorScheme.primary,
-              Theme.of(context).colorScheme.primary.withOpacity(0.7),
+              Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
             ],
           ),
         ),
@@ -99,7 +101,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -124,7 +126,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
                         'Selecciona tu idioma',
                         style: GoogleFonts.roboto(
                           fontSize: 18,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -183,21 +185,18 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
           decoration: BoxDecoration(
             color: isSelected
                 ? Colors.white
-                : Colors.white.withOpacity(0.2),
+                : Colors.white.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isSelected
                   ? Theme.of(context).colorScheme.primary
-                  : Colors.white.withOpacity(0.3),
+                  : Colors.white.withValues(alpha: 0.3),
               width: 2,
             ),
           ),
           child: Row(
             children: [
-              Text(
-                flag,
-                style: const TextStyle(fontSize: 32),
-              ),
+              Text(flag, style: const TextStyle(fontSize: 32)),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
@@ -223,4 +222,3 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
     );
   }
 }
-

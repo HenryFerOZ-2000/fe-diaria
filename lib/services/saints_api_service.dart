@@ -5,13 +5,14 @@ import 'saints_service.dart';
 /// Implementa fallback a contenido local si la API falla
 class SaintsApiService {
   final SaintsService _localService = SaintsService();
-  
+
   // TODO: Configurar estas variables cuando tengas API keys
   // ignore: unused_field
-  static const String _apiBaseUrl = 'https://api.saints.example.com'; // URL de ejemplo
+  static const String _apiBaseUrl =
+      'https://api.saints.example.com'; // URL de ejemplo
   // ignore: unused_field
   static const String _apiKey = ''; // API key aquí cuando esté disponible
-  
+
   /// Obtiene el santo del día desde la API o fallback local
   Future<Map<String, dynamic>?> getTodaySaint() async {
     try {
@@ -22,7 +23,7 @@ class SaintsApiService {
       // if (response.statusCode == 200) {
       //   return json.decode(response.body) as Map<String, dynamic>;
       // }
-      
+
       // Por ahora, usar fallback local
       return await _getLocalFallback();
     } catch (e) {
@@ -43,7 +44,7 @@ class SaintsApiService {
       //   final List<dynamic> data = json.decode(response.body);
       //   return data.cast<Map<String, dynamic>>();
       // }
-      
+
       return await _getLocalSaintsByDate(date);
     } catch (e) {
       debugPrint('Error fetching saints by date from API: $e');
@@ -61,7 +62,7 @@ class SaintsApiService {
       // if (response.statusCode == 200) {
       //   return json.decode(response.body) as Map<String, dynamic>;
       // }
-      
+
       return await _getLocalSaintByName(name);
     } catch (e) {
       debugPrint('Error fetching saint by name from API: $e');
@@ -75,7 +76,7 @@ class SaintsApiService {
       await _localService.loadSaints();
       final saints = _localService.getAllSaints();
       if (saints.isEmpty) return null;
-      
+
       // Retornar un santo aleatorio como ejemplo
       // En producción, se podría mapear por fecha
       return saints.first;
@@ -86,7 +87,9 @@ class SaintsApiService {
   }
 
   /// Fallback: Obtiene santos por fecha desde contenido local
-  Future<List<Map<String, dynamic>>> _getLocalSaintsByDate(DateTime date) async {
+  Future<List<Map<String, dynamic>>> _getLocalSaintsByDate(
+    DateTime date,
+  ) async {
     try {
       await _localService.loadSaints();
       // Por ahora retornar todos los santos disponibles
@@ -128,4 +131,3 @@ class SaintsApiService {
     return false; // Por ahora siempre usar local
   }
 }
-

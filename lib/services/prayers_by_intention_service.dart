@@ -12,7 +12,9 @@ class PrayersByIntentionService {
     if (_loaded) return;
 
     try {
-      final String jsonString = await rootBundle.loadString('assets/data/prayers_by_intention.json');
+      final String jsonString = await rootBundle.loadString(
+        'assets/data/prayers_by_intention.json',
+      );
       final List<dynamic> jsonList = json.decode(jsonString);
       _prayers = jsonList.cast<Map<String, dynamic>>();
       _loaded = true;
@@ -26,7 +28,8 @@ class PrayersByIntentionService {
   Map<String, dynamic>? getPrayerForIntention(String intention) {
     try {
       return _prayers.firstWhere(
-        (p) => (p['intention'] as String).toLowerCase() == intention.toLowerCase(),
+        (p) =>
+            (p['intention'] as String).toLowerCase() == intention.toLowerCase(),
         orElse: () => _prayers.first,
       );
     } catch (e) {
@@ -44,4 +47,3 @@ class PrayersByIntentionService {
     return List.unmodifiable(_prayers);
   }
 }
-

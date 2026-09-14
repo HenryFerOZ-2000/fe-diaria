@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "title": "Oración de la Noche",
+    "text": "Señor Jesús, gracias por sostenerme durante este día. Perdona mis faltas y limpia mi corazón. En tus manos dejo mi descanso y mi vida.",
+    "category": "noche",
+    "tags": ["descanso", "gratitud", "perdon"]
+  },
+  {
+    "id": 2,
+    "title": "Oración de Confianza",
+    "text": "Padre celestial, hoy descanso en tu fidelidad. Guarda mi hogar, protege a mi familia y renueva mis fuerzas para el nuevo día.",
+    "category": "noche",
+    "tags": ["confianza", "familia", "proteccion"]
+  },
+  {
+    "id": 3,
+    "title": "Oración de Paz",
+    "text": "Dios de paz, aquieta mis pensamientos y llévate toda ansiedad. Que tu presencia me acompañe mientras duermo.",
+    "category": "noche",
+    "tags": ["paz", "descanso", "consuelo"]
+  },
+  {
+    "id": 4,
+    "title": "Oración de Gratitud",
+    "text": "Señor, gracias por cada provisión de hoy. Aun en lo difícil, reconozco tu bondad y tu cuidado constante.",
+    "category": "noche",
+    "tags": ["gratitud", "fe", "esperanza"]
+  },
+  {
+    "id": 5,
+    "title": "Oración de Restauración",
+    "text": "Padre, restaura mi mente y mis emociones en esta noche. Sana mis heridas y dame un descanso profundo en tu amor.",
+    "category": "noche",
+    "tags": ["sanidad", "descanso", "restauracion"]
+  },
+  {
+    "id": 6,
+    "title": "Oración por la Familia",
+    "text": "Dios, bendice a mi familia esta noche. Cúbrenos con tu paz, guarda nuestro hogar y fortalece nuestra unidad en Cristo.",
+    "category": "noche",
+    "tags": ["familia", "bendicion", "proteccion"]
+  },
+  {
+    "id": 7,
+    "title": "Oración de Entrega",
+    "text": "Señor Jesús, te entrego mis cargas, mis dudas y mis temores. Tú eres mi refugio seguro y mi esperanza eterna.",
+    "category": "noche",
+    "tags": ["entrega", "esperanza", "confianza"]
+  },
+  {
+    "id": 8,
+    "title": "Oración de Perdón",
+    "text": "Padre, examina mi corazón y perdóname donde fallé hoy. Ayúdame a perdonar a otros como tú me perdonaste.",
+    "category": "noche",
+    "tags": ["perdon", "arrepentimiento", "gracia"]
+  },
+  {
+    "id": 9,
+    "title": "Oración de Esperanza",
+    "text": "Dios fiel, aunque hoy hubo luchas, sé que mañana tu misericordia será nueva. Mi confianza está en ti.",
+    "category": "noche",
+    "tags": ["esperanza", "fe", "fortaleza"]
+  },
+  {
+    "id": 10,
+    "title": "Oración Final",
+    "text": "Señor, te alabo por este día que termina. Que tu Espíritu Santo guarde mi descanso y me despierte con gozo para seguirte.",
+    "category": "noche",
+    "tags": ["alabanza", "descanso", "nuevo_dia"]
+  }
+]

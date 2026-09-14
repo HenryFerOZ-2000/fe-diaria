@@ -4,7 +4,8 @@ import 'storage_service.dart';
 
 /// Servicio para personalización de contenido basado en emociones y nombre del usuario
 class PersonalizationService {
-  static final PersonalizationService _instance = PersonalizationService._internal();
+  static final PersonalizationService _instance =
+      PersonalizationService._internal();
   factory PersonalizationService() => _instance;
   PersonalizationService._internal();
 
@@ -19,7 +20,13 @@ class PersonalizationService {
     'preocupado': ['preocupación', 'confianza', 'preocupaciones', 'carga'],
     'agradecido': ['gratitud', 'alabanza', 'bendición', 'agradecimiento'],
     'feliz': ['alegría', 'gozo', 'felicidad', 'bendición'],
-    'confundido': ['sabiduría', 'guía', 'dirección', 'claridad', 'entendimiento'],
+    'confundido': [
+      'sabiduría',
+      'guía',
+      'dirección',
+      'claridad',
+      'entendimiento',
+    ],
     'miedo': ['miedo', 'valentía', 'confianza', 'protección', 'seguridad'],
   };
 
@@ -57,7 +64,7 @@ class PersonalizationService {
   /// Obtiene versículos recomendados basados en la emoción del usuario
   Future<List<Verse>> getVersesForEmotion(String emotion) async {
     final allVerses = await _verseService.loadLocalVerses();
-    
+
     if (emotion.isEmpty || !_emotionKeywords.containsKey(emotion)) {
       return allVerses;
     }
@@ -89,7 +96,7 @@ class PersonalizationService {
   /// Obtiene el versículo del día personalizado según la emoción
   Future<Verse> getPersonalizedVerse(String emotion) async {
     final verses = await getVersesForEmotion(emotion);
-    
+
     if (verses.isEmpty) {
       return await _verseService.getTodayVerse();
     }
@@ -98,7 +105,7 @@ class PersonalizationService {
     final today = DateTime.now();
     final dayOfYear = today.difference(DateTime(today.year, 1, 1)).inDays;
     final index = dayOfYear % verses.length;
-    
+
     return verses[index];
   }
 
@@ -248,4 +255,3 @@ class PersonalizationService {
     return 'Dios Padre, bendice a $name en este día. Guía sus pasos, protege su camino y llénalo de Tu amor y paz. Que Tu presencia sea constante en su vida y que siempre camine en Tus caminos. Amén.';
   }
 }
-

@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/verse.dart';
 import '../models/prayer.dart';
 
@@ -8,14 +10,18 @@ import '../models/prayer.dart';
 class StorageService {
   static const String _favoritesBoxName = 'favorites';
   static const String _settingsBoxName = 'settings';
-  
+
   // Claves de configuración
   static const String _darkModeKey = 'darkMode';
   static const String _notificationEnabledKey = 'notificationEnabled';
-  static const String _morningVerseNotificationTimeKey = 'morningVerseNotificationTime'; // AM - Versículo
-  static const String _eveningPrayerNotificationTimeKey = 'eveningPrayerNotificationTime'; // PM - Oración
-  static const String _morningNotificationEnabledKey = 'morningNotificationEnabled';
-  static const String _eveningNotificationEnabledKey = 'eveningNotificationEnabled';
+  static const String _morningVerseNotificationTimeKey =
+      'morningVerseNotificationTime'; // AM - Versículo
+  static const String _eveningPrayerNotificationTimeKey =
+      'eveningPrayerNotificationTime'; // PM - Oración
+  static const String _morningNotificationEnabledKey =
+      'morningNotificationEnabled';
+  static const String _eveningNotificationEnabledKey =
+      'eveningNotificationEnabled';
   static const String _hourlyRemindersEnabledKey = 'hourlyRemindersEnabled';
   static const String _fontSizeKey = 'fontSize';
   static const String _readingModeKey = 'readingMode';
@@ -23,17 +29,25 @@ class StorageService {
   static const String _userNameKey = 'userName';
   static const String _userEmotionKey = 'userEmotion';
   static const String _onboardingCompletedKey = 'onboardingCompleted';
-  static const String _traditionalPrayersReligionKey = 'traditionalPrayersReligion'; // 'catolica' o 'cristiana'
+
+  /// Tradición de fe de la app (`catolica` | `cristiana` | `general`).
+  /// visibilidad de módulos en Categorías, copy en Comunidad y tono del chat (vía Cloud Function).
+  static const String _traditionalPrayersReligionKey =
+      'traditionalPrayersReligion';
   static const String _streakCountKey = 'streakCount';
   static const String _lastStreakDateKey = 'lastStreakDate';
   static const String _savedPrayersKey = 'savedPrayers';
 
   // Monetización
   static const String _adsRemovedKey = 'adsRemoved'; // Pago único realizado
-  static const String _dailyInterstitialDateKey = 'dailyInterstitialDate'; // yyyy-MM-dd
-  static const String _dailyInterstitialCountKey = 'dailyInterstitialCount'; // 0..2
-  static const String _morningInterstitialShownDateKey = 'morningInterstitialShownDate'; // yyyy-MM-dd
-  static const String _nightInterstitialShownDateKey = 'nightInterstitialShownDate'; // yyyy-MM-dd
+  static const String _dailyInterstitialDateKey =
+      'dailyInterstitialDate'; // yyyy-MM-dd
+  static const String _dailyInterstitialCountKey =
+      'dailyInterstitialCount'; // 0..2
+  static const String _morningInterstitialShownDateKey =
+      'morningInterstitialShownDate'; // yyyy-MM-dd
+  static const String _nightInterstitialShownDateKey =
+      'nightInterstitialShownDate'; // yyyy-MM-dd
 
   static Future<void> init() async {
     try {
@@ -72,7 +86,10 @@ class StorageService {
   List<Verse> getFavorites() {
     final keys = _favoritesBox.keys;
     return keys
-        .map((key) => Verse.fromJson(_favoritesBox.get(key) as Map<String, dynamic>))
+        .map(
+          (key) =>
+              Verse.fromJson(_favoritesBox.get(key) as Map<String, dynamic>),
+        )
         .toList()
       ..sort((a, b) => b.id.compareTo(a.id)); // Más recientes primero
   }
@@ -87,7 +104,8 @@ class StorageService {
   }
 
   bool getNotificationEnabled() {
-    return _settingsBox.get(_notificationEnabledKey, defaultValue: false) as bool;
+    return _settingsBox.get(_notificationEnabledKey, defaultValue: false)
+        as bool;
   }
 
   Future<void> setNotificationEnabled(bool value) async {
@@ -96,7 +114,11 @@ class StorageService {
 
   // Notificación de la mañana (versículo) - AM
   String getMorningVerseNotificationTime() {
-    return _settingsBox.get(_morningVerseNotificationTimeKey, defaultValue: '09:00') as String;
+    return _settingsBox.get(
+          _morningVerseNotificationTimeKey,
+          defaultValue: '09:00',
+        )
+        as String;
   }
 
   Future<void> setMorningVerseNotificationTime(String time) async {
@@ -105,7 +127,11 @@ class StorageService {
 
   // Notificación de la noche (oración) - PM
   String getEveningPrayerNotificationTime() {
-    return _settingsBox.get(_eveningPrayerNotificationTimeKey, defaultValue: '21:00') as String;
+    return _settingsBox.get(
+          _eveningPrayerNotificationTimeKey,
+          defaultValue: '21:00',
+        )
+        as String;
   }
 
   Future<void> setEveningPrayerNotificationTime(String time) async {
@@ -114,7 +140,8 @@ class StorageService {
 
   // Notificación de la mañana habilitada
   bool getMorningNotificationEnabled() {
-    return _settingsBox.get(_morningNotificationEnabledKey, defaultValue: true) as bool;
+    return _settingsBox.get(_morningNotificationEnabledKey, defaultValue: true)
+        as bool;
   }
 
   Future<void> setMorningNotificationEnabled(bool value) async {
@@ -123,7 +150,8 @@ class StorageService {
 
   // Notificación de la noche habilitada
   bool getEveningNotificationEnabled() {
-    return _settingsBox.get(_eveningNotificationEnabledKey, defaultValue: true) as bool;
+    return _settingsBox.get(_eveningNotificationEnabledKey, defaultValue: true)
+        as bool;
   }
 
   Future<void> setEveningNotificationEnabled(bool value) async {
@@ -132,7 +160,8 @@ class StorageService {
 
   // Recordatorios cada 3 horas habilitados
   bool getHourlyRemindersEnabled() {
-    return _settingsBox.get(_hourlyRemindersEnabledKey, defaultValue: true) as bool;
+    return _settingsBox.get(_hourlyRemindersEnabledKey, defaultValue: true)
+        as bool;
   }
 
   Future<void> setHourlyRemindersEnabled(bool value) async {
@@ -187,7 +216,8 @@ class StorageService {
 
   // Onboarding
   bool getOnboardingCompleted() {
-    return _settingsBox.get(_onboardingCompletedKey, defaultValue: false) as bool;
+    return _settingsBox.get(_onboardingCompletedKey, defaultValue: false)
+        as bool;
   }
 
   Future<void> setOnboardingCompleted(bool value) async {
@@ -211,26 +241,34 @@ class StorageService {
 
   int getDailyInterstitialCount() {
     final today = _todayString();
-    final savedDate = _settingsBox.get(_dailyInterstitialDateKey, defaultValue: '') as String;
+    final savedDate =
+        _settingsBox.get(_dailyInterstitialDateKey, defaultValue: '') as String;
     if (savedDate != today) return 0;
     return _settingsBox.get(_dailyInterstitialCountKey, defaultValue: 0) as int;
   }
 
   Future<void> incrementDailyInterstitialCount() async {
     final today = _todayString();
-    final savedDate = _settingsBox.get(_dailyInterstitialDateKey, defaultValue: '') as String;
+    final savedDate =
+        _settingsBox.get(_dailyInterstitialDateKey, defaultValue: '') as String;
     if (savedDate != today) {
       await _settingsBox.put(_dailyInterstitialDateKey, today);
       await _settingsBox.put(_dailyInterstitialCountKey, 1);
     } else {
-      final current = _settingsBox.get(_dailyInterstitialCountKey, defaultValue: 0) as int;
-      await _settingsBox.put(_dailyInterstitialCountKey, (current + 1).clamp(0, 2));
+      final current =
+          _settingsBox.get(_dailyInterstitialCountKey, defaultValue: 0) as int;
+      await _settingsBox.put(
+        _dailyInterstitialCountKey,
+        (current + 1).clamp(0, 2),
+      );
     }
   }
 
   bool getMorningInterstitialShownToday() {
     final today = _todayString();
-    final savedDate = _settingsBox.get(_morningInterstitialShownDateKey, defaultValue: '') as String;
+    final savedDate =
+        _settingsBox.get(_morningInterstitialShownDateKey, defaultValue: '')
+            as String;
     return savedDate == today;
   }
 
@@ -240,7 +278,9 @@ class StorageService {
 
   bool getNightInterstitialShownToday() {
     final today = _todayString();
-    final savedDate = _settingsBox.get(_nightInterstitialShownDateKey, defaultValue: '') as String;
+    final savedDate =
+        _settingsBox.get(_nightInterstitialShownDateKey, defaultValue: '')
+            as String;
     return savedDate == today;
   }
 
@@ -249,19 +289,110 @@ class StorageService {
   }
 
   // Oraciones tradicionales - Preferencia de religión
-  String getTraditionalPrayersReligion() {
-    return _settingsBox.get(_traditionalPrayersReligionKey, defaultValue: '') as String;
+  String _traditionalPrayersReligionKeyForCurrentUser() {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null || uid.isEmpty) {
+      return _traditionalPrayersReligionKey;
+    }
+    // Aislar preferencia por usuario para evitar que una cuenta herede la tradición de otra.
+    return '$_traditionalPrayersReligionKey:$uid';
   }
 
-  Future<void> setTraditionalPrayersReligion(String religion) async {
-    await _settingsBox.put(_traditionalPrayersReligionKey, religion);
+  String getTraditionalPrayersReligion() {
+    final key = _traditionalPrayersReligionKeyForCurrentUser();
+    return _settingsBox.get(key, defaultValue: '') as String;
   }
+
+  /// Retorna solo valores válidos para tradición.
+  /// Compatibilidad hacia atrás: si hay valor legacy/inesperado, devuelve '' para forzar selección.
+  String getValidatedTraditionalPrayersReligion() {
+    final value = getTraditionalPrayersReligion().trim();
+    if (value == 'catolica' || value == 'cristiana' || value == 'general') {
+      return value;
+    }
+    return '';
+  }
+
+  /// Preferencia validada es cristiana evangélica (para bloqueo de módulos católicos y coherencia de UI).
+  bool get isEvangelicalTradition =>
+      getValidatedTraditionalPrayersReligion() == 'cristiana';
+
+  Future<void> setTraditionalPrayersReligion(String religion) async {
+    final normalized = religion.trim();
+    final key = _traditionalPrayersReligionKeyForCurrentUser();
+    String toSave = '';
+    if (normalized == 'catolica' ||
+        normalized == 'cristiana' ||
+        normalized == 'general') {
+      toSave = normalized;
+    }
+    // Fallback seguro para inputs inesperados.
+    await _settingsBox.put(key, toSave);
+    await _saveTraditionalPrayersReligionToCloud(toSave);
+  }
+
+  Future<void> _saveTraditionalPrayersReligionToCloud(String religion) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        _traditionalPrayersReligionKey: religion,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Error saving tradition to cloud: $e');
+    }
+  }
+
+  /// Sincroniza tradición desde Firestore al almacenamiento local del usuario actual.
+  /// Mantiene compatibilidad: si no existe en cloud, conserva local.
+  Future<void> syncTraditionalPrayersReligionFromCloudForCurrentUser() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    try {
+      final key = _traditionalPrayersReligionKeyForCurrentUser();
+      var localValue = (_settingsBox.get(key, defaultValue: '') as String)
+          .trim();
+      // Si la tradición se eligió antes de iniciar sesión, migrarla al espacio
+      // privado del usuario recién autenticado.
+      if (localValue.isEmpty) {
+        final guestValue =
+            (_settingsBox.get(_traditionalPrayersReligionKey, defaultValue: '')
+                    as String)
+                .trim();
+        if (_isValidTradition(guestValue)) {
+          localValue = guestValue;
+          await _settingsBox.put(key, guestValue);
+        }
+      }
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      final cloudValue =
+          (doc.data()?[_traditionalPrayersReligionKey] as String?)?.trim() ??
+          '';
+      if (_isValidTradition(cloudValue)) {
+        await _settingsBox.put(key, cloudValue);
+      } else if (_isValidTradition(localValue)) {
+        // Migración suave: si cloud no tiene valor pero local sí, subir local.
+        await _saveTraditionalPrayersReligionToCloud(localValue);
+      }
+    } catch (e) {
+      debugPrint('Error syncing tradition from cloud: $e');
+    }
+  }
+
+  bool _isValidTradition(String value) =>
+      value == 'catolica' || value == 'cristiana' || value == 'general';
 
   // Intenciones del día
   static const String _dailyIntentionsKey = 'dailyIntentions';
 
   List<String> getDailyIntentions() {
-    final saved = _settingsBox.get(_dailyIntentionsKey, defaultValue: <String>[]) as List<dynamic>?;
+    final saved =
+        _settingsBox.get(_dailyIntentionsKey, defaultValue: <String>[])
+            as List<dynamic>?;
     return saved?.cast<String>() ?? [];
   }
 
@@ -312,7 +443,8 @@ class StorageService {
   }
 
   DateTime? getLastStreakDate() {
-    final raw = _settingsBox.get(_lastStreakDateKey, defaultValue: '') as String;
+    final raw =
+        _settingsBox.get(_lastStreakDateKey, defaultValue: '') as String;
     if (raw.isEmpty) return null;
     return DateTime.tryParse(raw);
   }
@@ -327,7 +459,9 @@ class StorageService {
 
   // Oraciones guardadas
   List<Prayer> getSavedPrayers() {
-    final raw = _settingsBox.get(_savedPrayersKey, defaultValue: <dynamic>[]) as List<dynamic>;
+    final raw =
+        _settingsBox.get(_savedPrayersKey, defaultValue: <dynamic>[])
+            as List<dynamic>;
     return raw
         .map((item) {
           try {
@@ -359,4 +493,3 @@ class StorageService {
     await saveSavedPrayers(current);
   }
 }
-

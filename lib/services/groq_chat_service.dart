@@ -1,6 +1,8 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 
+import 'storage_service.dart';
+
 /// Represents a chat message in the conversation.
 class ChatMessage {
   final String role; // 'user', 'assistant', or 'system'
@@ -32,7 +34,8 @@ class ChatResponse {
   ChatResponse({required this.messages, required this.rawContent});
 
   factory ChatResponse.fromJson(Map<String, dynamic> json) {
-    final msgList = (json['messages'] as List<dynamic>?)
+    final msgList =
+        (json['messages'] as List<dynamic>?)
             ?.map((e) => e.toString())
             .toList() ??
         [];
@@ -61,15 +64,28 @@ class GroqChatService {
   ///
   /// [userText] - The user's message text.
   /// [conversation] - Previous messages in the conversation for context.
+  /// [faithTraditionStorage] - Si es null, se usa [StorageService.getValidatedTraditionalPrayersReligion].
+  /// Valor vacío se interpreta como católico (misma experiencia que antes).
   Future<ChatResponse> sendMessage({
     required String userText,
     List<ChatMessage> conversation = const [],
+    String? faithTraditionStorage,
   }) async {
     try {
+      final raw =
+          (faithTraditionStorage ??
+                  StorageService().getValidatedTraditionalPrayersReligion())
+              .trim();
+      final faithTradition = raw.isEmpty ? 'catolica' : raw;
+      if (kDebugMode) {
+        debugPrint('[GroqChatService] faithTradition=$faithTradition');
+      }
+
       final callable = _functions.httpsCallable('chatWithGroq');
       final result = await callable.call<Map<String, dynamic>>({
         'userText': userText,
         'conversation': conversation.map((m) => m.toJson()).toList(),
+        'faithTradition': faithTradition,
       });
 
       final data = result.data;

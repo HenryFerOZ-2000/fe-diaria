@@ -23,10 +23,10 @@ class FavoritesService {
         .collection('favorites')
         .doc(docId)
         .set({
-      'type': type,
-      'refId': refId,
-      'createdAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+          'type': type,
+          'refId': refId,
+          'createdAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
   }
 
   Future<void> removeFavorite({
@@ -44,7 +44,9 @@ class FavoritesService {
         .delete();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> favoritesStream({int limit = 100}) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> favoritesStream({
+    int limit = 100,
+  }) {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
       return const Stream<QuerySnapshot<Map<String, dynamic>>>.empty();
@@ -58,5 +60,3 @@ class FavoritesService {
         .snapshots();
   }
 }
-
-

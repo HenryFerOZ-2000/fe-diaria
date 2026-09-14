@@ -20,7 +20,10 @@ class ProfileService {
     return _firestore.collection('users').doc(uid).snapshots();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> userPosts(String uid, {int limit = 30}) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> userPosts(
+    String uid, {
+    int limit = 30,
+  }) {
     return _firestore
         .collection('live_posts')
         .where('authorUid', isEqualTo: uid)
@@ -52,7 +55,9 @@ class ProfileService {
         'Trying Firestore fallback...',
       );
     } catch (e) {
-      debugPrint('deleteLivePost callable unexpected error: $e. Trying Firestore fallback...');
+      debugPrint(
+        'deleteLivePost callable unexpected error: $e. Trying Firestore fallback...',
+      );
     }
 
     await _firestore.collection('live_posts').doc(postId).delete();
@@ -62,7 +67,10 @@ class ProfileService {
     }, SetOptions(merge: true));
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> followers(String uid, {int limit = 50}) {
+  Future<QuerySnapshot<Map<String, dynamic>>> followers(
+    String uid, {
+    int limit = 50,
+  }) {
     return _firestore
         .collection('users')
         .doc(uid)
@@ -72,7 +80,10 @@ class ProfileService {
         .get();
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> following(String uid, {int limit = 50}) {
+  Future<QuerySnapshot<Map<String, dynamic>>> following(
+    String uid, {
+    int limit = 50,
+  }) {
     return _firestore
         .collection('users')
         .doc(uid)
@@ -82,5 +93,3 @@ class ProfileService {
         .get();
   }
 }
-
-

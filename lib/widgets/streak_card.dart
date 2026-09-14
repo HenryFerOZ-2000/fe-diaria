@@ -2,133 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../controllers/streak_controller.dart';
 
-/// Tarjeta de racha reutilizable.
-/// Usa los colores existentes del tema; no modifica la paleta global.
-class StreakCard extends StatelessWidget {
-  final int currentStreak;
-  final int goalDays;
-  final double progressPercent; // 0.0 - 1.0
-
-  const StreakCard({
-    super.key,
-    required this.currentStreak,
-    required this.goalDays,
-    required this.progressPercent,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final progress = progressPercent.clamp(0.0, 1.0);
-    const progressColor = Color(0xFF9D7DFF);
-    const backgroundColor = Color(0xFF2C243F);
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: progressColor.withOpacity(0.25),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Text('🔥', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  '$currentStreak días seguidos',
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Text(
-                '${(progress * 100).round()}%',
-                style: GoogleFonts.inter(
-                  color: Colors.white70,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 10,
-              backgroundColor: Colors.white.withOpacity(0.12),
-              valueColor: const AlwaysStoppedAnimation<Color>(progressColor),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Meta: $goalDays días',
-            style: GoogleFonts.inter(
-              color: Colors.white60,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Ícono de fuego animado.
 class FireAnimatedIcon extends StatelessWidget {
   final bool play;
+  final double size;
 
-  const FireAnimatedIcon({
-    super.key,
-    required this.play,
-  });
+  const FireAnimatedIcon({super.key, required this.play, this.size = 23});
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedScale(
-      duration: const Duration(milliseconds: 300),
-      scale: play ? 1.2 : 1.0,
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 1, end: play ? 1.12 : 1),
+      duration: const Duration(milliseconds: 520),
       curve: Curves.easeOutBack,
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 300),
-        opacity: play ? 1.0 : 0.85,
-        curve: Curves.easeIn,
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [Color(0xFFFFA726), Color(0xFFFF7043)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+      builder: (context, scale, child) =>
+          Transform.scale(scale: scale, child: child),
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFF2C477), Color(0xFFC98043)],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFE6A65E).withValues(alpha: .30),
+              blurRadius: 18,
+              spreadRadius: 1,
             ),
-          ),
-          child: const Icon(
-            Icons.local_fire_department_rounded,
-            color: Colors.white,
-            size: 48,
-          ),
+          ],
+        ),
+        child: Icon(
+          Icons.local_fire_department_rounded,
+          color: const Color(0xFF2A1D31),
+          size: size,
         ),
       ),
     );
   }
 }
 
-/// Fila de días de la semana con check.
 class StreakWeekRow extends StatelessWidget {
   final List<StreakDay> days;
 
@@ -136,101 +51,300 @@ class StreakWeekRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final todayIndex = DateTime.now().weekday - 1;
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: days.map((day) {
-        final completed = day.completed;
-        final circleColor = completed ? Colors.orangeAccent : const Color(0xFF2D2347);
-        return Column(
-          children: [
-            Container(
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: circleColor,
-                border: Border.all(
-                  color: completed ? Colors.transparent : Colors.white.withOpacity(0.25),
-                  width: 1.2,
+      children: List.generate(days.length, (index) {
+        final day = days[index];
+        final isToday = index == todayIndex;
+        return Expanded(
+          child: Column(
+            children: [
+              Text(
+                day.label,
+                style: GoogleFonts.inter(
+                  color: isToday
+                      ? Colors.white
+                      : Colors.white.withValues(alpha: .52),
+                  fontSize: 10.5,
+                  fontWeight: isToday ? FontWeight.w800 : FontWeight.w600,
                 ),
               ),
-              child: completed
-                  ? const Icon(
-                      Icons.check,
-                      color: Colors.white,
-                      size: 18,
-                    )
-                  : const SizedBox.shrink(),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              day.label,
-              style: GoogleFonts.inter(
-                color: const Color(0xFF2C2C2C),
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
+              const SizedBox(height: 5),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 240),
+                width: 25,
+                height: 25,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: day.completed
+                      ? const Color(0xFFE7B868)
+                      : Colors.white.withValues(alpha: isToday ? .10 : .045),
+                  border: Border.all(
+                    color: day.completed
+                        ? const Color(0xFFF5D79D)
+                        : Colors.white.withValues(alpha: isToday ? .65 : .14),
+                    width: isToday ? 1.5 : 1,
+                  ),
+                ),
+                child: day.completed
+                    ? const Icon(
+                        Icons.check_rounded,
+                        color: Color(0xFF241A2B),
+                        size: 15,
+                      )
+                    : isToday
+                    ? Center(
+                        child: Container(
+                          width: 4,
+                          height: 4,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFE7B868),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      )
+                    : null,
               ),
-            ),
-          ],
+            ],
+          ),
         );
-      }).toList(),
+      }),
     );
   }
 }
 
-/// Tarjeta de racha estilo Duolingo.
+/// Tarjeta principal de constancia mostrada en la pantalla Hoy.
 class StreakCardDuolingoStyle extends StatelessWidget {
   final int totalDays;
   final bool playAnimation;
   final List<StreakDay> weekDays;
+  final int completedMoments;
+  final int totalMoments;
+  final VoidCallback? onTap;
 
   const StreakCardDuolingoStyle({
     super.key,
     required this.totalDays,
     required this.playAnimation,
     required this.weekDays,
+    this.completedMoments = 0,
+    this.totalMoments = 3,
+    this.onTap,
   });
+
+  int get _nextMilestone {
+    const milestones = [3, 7, 14, 30, 50, 100, 365];
+    for (final milestone in milestones) {
+      if (totalDays < milestone) return milestone;
+    }
+    return ((totalDays ~/ 365) + 1) * 365;
+  }
+
+  String get _todayMessage {
+    final remaining = (totalMoments - completedMoments).clamp(0, totalMoments);
+    if (remaining == 0) return 'Tu constancia está a salvo hoy';
+    if (totalDays == 0 && completedMoments == 0) {
+      return 'Comienza hoy tu recorrido';
+    }
+    if (remaining == 1) return '1 momento pendiente para hoy';
+    return '$remaining momentos pendientes para hoy';
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFFFFF),
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 18,
-            offset: const Offset(0, 6),
-          ),
-        ],
-        border: Border.all(
-          color: const Color(0xFFE9E9E9),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          FireAnimatedIcon(
-            play: playAnimation,
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '$totalDays días',
-            style: GoogleFonts.inter(
-              color: const Color(0xFF2C2C2C),
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
+    final reducedMotion = MediaQuery.disableAnimationsOf(context);
+    final milestone = _nextMilestone;
+    const milestones = [3, 7, 14, 30, 50, 100, 365];
+    final milestoneStart = milestone == 3
+        ? 0
+        : milestones.lastWhere((value) => value < milestone, orElse: () => 0);
+    final denominator = (milestone - milestoneStart).clamp(1, 9999);
+    final progress = ((totalDays - milestoneStart) / denominator).clamp(
+      0.0,
+      1.0,
+    );
+
+    return Semantics(
+      button: onTap != null,
+      label: '$totalDays días de constancia. $_todayMessage',
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(24),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
+          child: Ink(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(17, 15, 17, 15),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF241C32),
+                  Color(0xFF443052),
+                  Color(0xFF65453E),
+                ],
+                stops: [0, .62, 1],
+              ),
+              border: Border.all(color: Colors.white.withValues(alpha: .10)),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF35233F).withValues(alpha: .25),
+                  blurRadius: 24,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  right: -28,
+                  top: -35,
+                  child: Container(
+                    width: 125,
+                    height: 125,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          const Color(0xFFE6B76B).withValues(alpha: .16),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        FireAnimatedIcon(play: !reducedMotion && playAnimation),
+                        const SizedBox(width: 11),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'TU CONSTANCIA',
+                                style: GoogleFonts.inter(
+                                  color: const Color(0xFFEBCB91),
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.45,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    '$totalDays',
+                                    style: GoogleFonts.playfairDisplay(
+                                      color: Colors.white,
+                                      fontSize: 30,
+                                      height: 1,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 7),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(bottom: 4),
+                                      child: Text(
+                                        totalDays == 1
+                                            ? 'día caminando'
+                                            : 'días caminando',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.inter(
+                                          color: Colors.white.withValues(
+                                            alpha: .76,
+                                          ),
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 19,
+                          color: Colors.white.withValues(alpha: .62),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 9),
+                    Row(
+                      children: [
+                        Icon(
+                          completedMoments >= totalMoments
+                              ? Icons.verified_rounded
+                              : Icons.timelapse_rounded,
+                          color: const Color(0xFFEBCB91),
+                          size: 15,
+                        ),
+                        const SizedBox(width: 7),
+                        Expanded(
+                          child: Text(
+                            _todayMessage,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.inter(
+                              color: Colors.white.withValues(alpha: .82),
+                              fontSize: 10.8,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    StreakWeekRow(days: weekDays),
+                    const SizedBox(height: 13),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(99),
+                            child: LinearProgressIndicator(
+                              value: progress,
+                              minHeight: 5,
+                              backgroundColor: Colors.white.withValues(
+                                alpha: .10,
+                              ),
+                              valueColor: const AlwaysStoppedAnimation(
+                                Color(0xFFE7B868),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          '${milestone - totalDays} para $milestone días',
+                          style: GoogleFonts.inter(
+                            color: Colors.white.withValues(alpha: .66),
+                            fontSize: 9.8,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 14),
-          StreakWeekRow(days: weekDays),
-        ],
+        ),
       ),
     );
   }
 }
-

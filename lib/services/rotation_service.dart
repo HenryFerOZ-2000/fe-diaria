@@ -42,4 +42,3 @@ class RotationService<T> {
     await prefs.remove(_key(category));
   }
 }
-

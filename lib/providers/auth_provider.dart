@@ -20,7 +20,9 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> _init() async {
     // Escuchar cambios de Firebase Auth (más confiable)
-    _authStateSubscription = FirebaseAuth.instance.authStateChanges().listen((user) {
+    _authStateSubscription = FirebaseAuth.instance.authStateChanges().listen((
+      user,
+    ) {
       _firebaseUser = user;
       // Si hay usuario de Firebase pero no de Google Sign In, intentar obtenerlo
       if (user != null && _user == null) {
@@ -33,7 +35,7 @@ class AuthProvider extends ChangeNotifier {
       }
       notifyListeners();
     });
-    
+
     // Intentar sign-in silencioso
     _user = await _authService.signInSilently();
     _firebaseUser = FirebaseAuth.instance.currentUser;

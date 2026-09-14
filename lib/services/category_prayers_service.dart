@@ -3,7 +3,8 @@ import 'verse_service.dart';
 
 /// Servicio para oraciones por categorías (no usa el nombre del usuario)
 class CategoryPrayersService {
-  static final CategoryPrayersService _instance = CategoryPrayersService._internal();
+  static final CategoryPrayersService _instance =
+      CategoryPrayersService._internal();
   factory CategoryPrayersService() => _instance;
   CategoryPrayersService._internal();
 
@@ -11,17 +12,17 @@ class CategoryPrayersService {
 
   // Lista de categorías públicas (clave -> título visible)
   Map<String, String> get categories => const {
-        'familia': 'Mi familia',
-        'salud': 'Mi salud',
-        'trabajo': 'Mi trabajo',
-        'finanzas': 'Mis finanzas',
-        'hogar': 'Mi hogar',
-        'proteccion': 'Mi protección',
-        'descanso': 'Mi descanso',
-        'mente': 'Mi mente / paz',
-        'animo': 'Mi ánimo',
-        'agradecimiento': 'Mi agradecimiento',
-      };
+    'familia': 'Mi familia',
+    'salud': 'Mi salud',
+    'trabajo': 'Mi trabajo',
+    'finanzas': 'Mis finanzas',
+    'hogar': 'Mi hogar',
+    'proteccion': 'Mi protección',
+    'descanso': 'Mi descanso',
+    'mente': 'Mi mente / paz',
+    'animo': 'Mi ánimo',
+    'agradecimiento': 'Mi agradecimiento',
+  };
 
   // Conjunto de oraciones variadas por categoría (mínimo 4-6 para rotar)
   static final Map<String, List<String>> _categoryPrayers = {
@@ -180,7 +181,10 @@ class CategoryPrayersService {
   }
 
   /// Obtiene un versículo sugerido considerando el texto específico de la oración mostrada
-  Future<Verse> getSuggestedVerseForPrayer(String categoryKey, String prayerText) async {
+  Future<Verse> getSuggestedVerseForPrayer(
+    String categoryKey,
+    String prayerText,
+  ) async {
     final verses = await _verseService.loadLocalVerses();
     if (verses.isEmpty) {
       return _verseService.getTodayVerse();
@@ -284,10 +288,87 @@ class CategoryPrayersService {
   /// Extrae palabras clave del texto de la oración (muy simple, filtrando stopwords)
   Set<String> _extractKeywordsFromPrayer(String text) {
     final stopwords = <String>{
-      'el','la','los','las','un','una','unos','unas','y','o','u','de','del','al','a','ante','bajo','cabe','con','contra','desde','durante','en','entre','hacia','hasta','mediante','para','por','según','sin','so','sobre','tras',
-      'mi','mis','me','mío','mía','míos','mías','tu','tus','tuyo','tuya','suyo','suya','sus','nuestro','nuestra','nuestros','nuestras',
-      'que','como','porque','pero','si','sí','no','más','menos','muy','ya','hoy','cada','este','esta','estos','estas','ese','esa','esos','esas','aquel','aquella','aquellos','aquellas',
-      'señor','padre','dios','amén'
+      'el',
+      'la',
+      'los',
+      'las',
+      'un',
+      'una',
+      'unos',
+      'unas',
+      'y',
+      'o',
+      'u',
+      'de',
+      'del',
+      'al',
+      'a',
+      'ante',
+      'bajo',
+      'cabe',
+      'con',
+      'contra',
+      'desde',
+      'durante',
+      'en',
+      'entre',
+      'hacia',
+      'hasta',
+      'mediante',
+      'para',
+      'por',
+      'según',
+      'sin',
+      'so',
+      'sobre',
+      'tras',
+      'mi',
+      'mis',
+      'me',
+      'mío',
+      'mía',
+      'míos',
+      'mías',
+      'tu',
+      'tus',
+      'tuyo',
+      'tuya',
+      'suyo',
+      'suya',
+      'sus',
+      'nuestro',
+      'nuestra',
+      'nuestros',
+      'nuestras',
+      'que',
+      'como',
+      'porque',
+      'pero',
+      'si',
+      'sí',
+      'no',
+      'más',
+      'menos',
+      'muy',
+      'ya',
+      'hoy',
+      'cada',
+      'este',
+      'esta',
+      'estos',
+      'estas',
+      'ese',
+      'esa',
+      'esos',
+      'esas',
+      'aquel',
+      'aquella',
+      'aquellos',
+      'aquellas',
+      'señor',
+      'padre',
+      'dios',
+      'amén',
     };
     final normalized = text
         .toLowerCase()
@@ -302,7 +383,26 @@ class CategoryPrayersService {
   /// Stem rudimentario para español (recorta sufijos comunes)
   String _stemEs(String w) {
     var s = w;
-    for (final suf in ['mente','ción','ciones','sión','siones','idades','idad','amente','mente','es','s','ar','er','ir','ando','endo','ado','ido']) {
+    for (final suf in [
+      'mente',
+      'ción',
+      'ciones',
+      'sión',
+      'siones',
+      'idades',
+      'idad',
+      'amente',
+      'mente',
+      'es',
+      's',
+      'ar',
+      'er',
+      'ir',
+      'ando',
+      'endo',
+      'ado',
+      'ido',
+    ]) {
       if (s.endsWith(suf) && s.length > suf.length + 3) {
         s = s.substring(0, s.length - suf.length);
         break;

@@ -77,9 +77,9 @@ class TranslationService {
   String _translateWithDictionary(String text, String targetLanguage) {
     // Diccionario de traducciones comunes para versículos bíblicos
     final dictionary = _getTranslationDictionary();
-    
+
     final lowerText = text.toLowerCase().trim();
-    
+
     // Buscar traducción exacta
     if (dictionary.containsKey(lowerText)) {
       final translations = dictionary[lowerText];
@@ -120,22 +120,13 @@ class TranslationService {
         'es': 'El Señor es mi pastor',
         'pt': 'O Senhor é o meu pastor',
       },
-      'i know the plans': {
-        'es': 'Yo sé los planes',
-        'pt': 'Eu sei os planos',
-      },
-      'do not fear': {
-        'es': 'No temas',
-        'pt': 'Não temas',
-      },
+      'i know the plans': {'es': 'Yo sé los planes', 'pt': 'Eu sei os planos'},
+      'do not fear': {'es': 'No temas', 'pt': 'Não temas'},
       'cast all your anxiety': {
         'es': 'Echad toda vuestra ansiedad',
         'pt': 'Lancem sobre ele toda a ansiedade',
       },
-      'i am the way': {
-        'es': 'Yo soy el camino',
-        'pt': 'Eu sou o caminho',
-      },
+      'i am the way': {'es': 'Yo soy el camino', 'pt': 'Eu sou o caminho'},
       'do not be anxious': {
         'es': 'Por nada estéis afanosos',
         'pt': 'Não se preocupem com nada',
@@ -195,4 +186,3 @@ class TranslationService {
     return reference;
   }
 }
-

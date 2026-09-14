@@ -9,11 +9,9 @@ class DailyProgressService {
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
 
-  DailyProgressService({
-    FirebaseFirestore? firestore,
-    FirebaseAuth? auth,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance;
+  DailyProgressService({FirebaseFirestore? firestore, FirebaseAuth? auth})
+    : _firestore = firestore ?? FirebaseFirestore.instance,
+      _auth = auth ?? FirebaseAuth.instance;
 
   String _getTodayDateId() {
     // Usar la fecha LOCAL del dispositivo, no UTC
@@ -22,7 +20,9 @@ class DailyProgressService {
     final year = now.year;
     final month = now.month.toString().padLeft(2, '0');
     final day = now.day.toString().padLeft(2, '0');
-    debugPrint('[DailyProgressService] 📅 Today date ID (local): $year-$month-$day (device timezone)');
+    debugPrint(
+      '[DailyProgressService] 📅 Today date ID (local): $year-$month-$day (device timezone)',
+    );
     return '$year-$month-$day';
   }
 
@@ -68,19 +68,29 @@ class DailyProgressService {
         .doc(dateId)
         .snapshots()
         .map((snapshot) {
-      if (!snapshot.exists || snapshot.data() == null) {
-        return DailyProgress.empty(dateId);
-      }
-      return DailyProgress.fromFirestore(dateId, snapshot.data()!);
-    });
+          if (!snapshot.exists || snapshot.data() == null) {
+            return DailyProgress.empty(dateId);
+          }
+          return DailyProgress.fromFirestore(dateId, snapshot.data()!);
+        });
   }
 
   /// Marca una misión como completada o no completada
   /// Calcula automáticamente el progressPercent
-  Future<void> setMissionDone(String missionId, {bool done = true, int totalMissions = 4}) async {
+  Future<void> setMissionDone(
+    String missionId, {
+    bool done = true,
+    List<String> requiredMissionIds = const [
+      'verse_of_day',
+      'prayer_day',
+      'daily_practice',
+    ],
+  }) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
-      debugPrint('[DailyProgressService] setMissionDone: No user authenticated');
+      debugPrint(
+        '[DailyProgressService] setMissionDone: No user authenticated',
+      );
       return;
     }
 
@@ -95,14 +105,24 @@ class DailyProgressService {
       // Leer el documento actual
       final progressDoc = await progressRef.get();
       final currentData = progressDoc.data() ?? {};
-      final currentMissions = Map<String, bool>.from(currentData['missions'] ?? {});
+      final currentMissions = <String, bool>{};
+      final rawMissions = currentData['missions'];
+      if (rawMissions is Map) {
+        for (final entry in rawMissions.entries) {
+          currentMissions[entry.key.toString()] = entry.value == true;
+        }
+      }
 
       // Actualizar la misión
       currentMissions[missionId] = done;
 
       // Calcular progreso
-      final completedCount = currentMissions.values.where((d) => d == true).length;
-      final progressPercent = (completedCount / totalMissions) * 100.0;
+      final completedCount = requiredMissionIds
+          .where((id) => currentMissions[id] == true)
+          .length;
+      final progressPercent = requiredMissionIds.isEmpty
+          ? 0.0
+          : (completedCount / requiredMissionIds.length) * 100.0;
 
       // Escribir con merge para no sobrescribir otros campos
       final now = Timestamp.now();
@@ -113,7 +133,9 @@ class DailyProgressService {
         if (!progressDoc.exists) 'createdAt': now,
       }, SetOptions(merge: true));
 
-      debugPrint('[DailyProgressService] setMissionDone: ✅ Mission $missionId = $done, progress = $progressPercent%');
+      debugPrint(
+        '[DailyProgressService] setMissionDone: ✅ Mission $missionId = $done, progress = $progressPercent%',
+      );
     } catch (e, stackTrace) {
       debugPrint('[DailyProgressService] ❌ ERROR setting mission done: $e');
       debugPrint('[DailyProgressService] Stack trace: $stackTrace');
@@ -121,7 +143,7 @@ class DailyProgressService {
   }
 
   /// Mapea IDs de misiones del UI a IDs internos estables
-  /// IDs internos: verse_of_day, prayer_day, prayer_night, pray_family
+  /// IDs internos estables usados en Firestore.
   static String mapMissionIdToInternal(String uiId) {
     switch (uiId) {
       case 'verse':
@@ -130,6 +152,8 @@ class DailyProgressService {
         return 'prayer_day';
       case 'night':
         return 'prayer_night';
+      case 'practice':
+        return 'daily_practice';
       case 'family':
         return 'pray_family';
       default:
@@ -137,4 +161,3 @@ class DailyProgressService {
     }
   }
 }
-

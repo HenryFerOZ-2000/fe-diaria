@@ -9,7 +9,8 @@ import {FieldValue, Timestamp} from "firebase-admin/firestore";
 import Groq from "groq-sdk";
 // eslint-disable-next-line import/no-unresolved
 import {GROQ_API_KEY} from "./secrets/groq.secrets";
-import {CHAT_PROMPT, FREE_TIER_CHAT_DAILY_LIMIT, GROQ_MAX_COMPLETION_TOKENS,
+import {CHAT_PROMPT, CHAT_PROMPT_EVANGELICAL, CHAT_PROMPT_GENERAL, FREE_TIER_CHAT_DAILY_LIMIT,
+  GROQ_MAX_COMPLETION_TOKENS,
   GROQ_MODEL, GROQ_TEMPERATURE} from "./groqConfig";
 import {ChatMessage, ChatRequest, ChatResponse} from "./chat.interfaces";
 
@@ -108,8 +109,15 @@ export const seedFirestore = onRequest(async (req, res) => {
   }
 });
 
-type CreateLivePostInput = {text?: unknown};
+type CreateLivePostInput = {text?: unknown; category?: unknown};
 type DeleteLivePostInput = {postId?: unknown};
+type CreateLiveCommentInput = {postId?: unknown; text?: unknown};
+type ReplyLiveCommentInput = {
+  postId?: unknown;
+  text?: unknown;
+  parentCommentId?: unknown;
+  rootId?: unknown;
+};
 
 const parseAuthHeader = (authHeader?: string): string | null => {
   if (!authHeader) return null;
@@ -133,6 +141,60 @@ const validateText = (text: string): string => {
     );
   }
   return trimmed;
+};
+
+const BLOCKED_TERMS = [
+  "puta",
+  "puto",
+  "mierda",
+  "joder",
+  "pendejo",
+  "cabron",
+  "estupido",
+  "idiota",
+  "imbecil",
+  "malparido",
+  "hijueputa",
+  "hijo de puta",
+  "fuck",
+  "shit",
+  "bitch",
+  "asshole",
+  "porn",
+  "porno",
+  "suicidate",
+  "kill yourself",
+  "matarte",
+  "matate",
+];
+
+const normalizeForModeration = (value: string): string => {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+const assertContentPolicy = (text: string): void => {
+  const normalized = normalizeForModeration(text);
+  const compact = normalized.replace(/\s+/g, "");
+  for (const term of BLOCKED_TERMS) {
+    const normalizedTerm = normalizeForModeration(term);
+    if (!normalizedTerm) continue;
+    const termCompact = normalizedTerm.replace(/\s+/g, "");
+    if (
+      normalized.includes(normalizedTerm) ||
+      compact.includes(termCompact)
+    ) {
+      throw new HttpsError(
+        "failed-precondition",
+        "Tu contenido no cumple nuestras normas de convivencia.",
+      );
+    }
+  }
 };
 
 const checkRateLimit = (
@@ -197,6 +259,7 @@ const resolveAuthorProfile = async (uid: string): Promise<AuthorProfile> => {
 const createLivePostTx = async (
   uid: string,
   text: string,
+  category: string,
 ): Promise<string> => {
   const now = Timestamp.now();
   const liveUntil = Timestamp.fromMillis(now.toMillis() + 60_000);
@@ -218,6 +281,7 @@ const createLivePostTx = async (
     const postRef = postsRef.doc();
     tx.set(postRef, {
       text,
+      category,
       status: "active",
       authorUid: uid,
       authorName: authorProfile.displayName ?? authorProfile.username ?? uid,
@@ -255,6 +319,96 @@ const createLivePostTx = async (
     }, {merge: true});
 
     return postRef.id;
+  });
+};
+
+const resolveCommentAuthorProfile = async (uid: string): Promise<AuthorProfile> => {
+  const profile = await resolveAuthorProfile(uid);
+  const safeUsername = (profile.username ?? uid).trim().toLowerCase();
+  return {
+    username: safeUsername.length > 0 ? safeUsername : uid,
+    displayName: (profile.displayName ?? profile.username ?? uid).trim() || uid,
+    photoURL: profile.photoURL ?? undefined,
+  };
+};
+
+const createLiveCommentTx = async (
+  uid: string,
+  postId: string,
+  text: string,
+): Promise<string> => {
+  const postRef = db.collection("live_posts").doc(postId);
+  const commentRef = postRef.collection("comments").doc();
+  const authorProfile = await resolveCommentAuthorProfile(uid);
+
+  return db.runTransaction(async (tx) => {
+    const postSnap = await tx.get(postRef);
+    if (!postSnap.exists) {
+      throw new HttpsError("not-found", "Publicación no encontrada.");
+    }
+
+    tx.set(commentRef, {
+      text,
+      authorUid: uid,
+      authorName: authorProfile.displayName,
+      authorUsername: authorProfile.username,
+      authorPhoto: authorProfile.photoURL ?? null,
+      createdAt: FieldValue.serverTimestamp(),
+      likeCount: 0,
+      replyCount: 0,
+      parentId: null,
+      rootId: null,
+    });
+
+    tx.update(postRef, {commentCount: FieldValue.increment(1)});
+    return commentRef.id;
+  });
+};
+
+const replyLiveCommentTx = async (
+  uid: string,
+  postId: string,
+  text: string,
+  parentCommentId: string,
+  rootId: string,
+): Promise<string> => {
+  const postRef = db.collection("live_posts").doc(postId);
+  const commentsRef = postRef.collection("comments");
+  const commentRef = commentsRef.doc();
+  const threadRootId = rootId.trim().length > 0 ? rootId.trim() : parentCommentId.trim();
+  const threadRootRef = commentsRef.doc(threadRootId);
+  const authorProfile = await resolveCommentAuthorProfile(uid);
+
+  return db.runTransaction(async (tx) => {
+    const postSnap = await tx.get(postRef);
+    if (!postSnap.exists) {
+      throw new HttpsError("not-found", "Publicación no encontrada.");
+    }
+    const parentSnap = await tx.get(commentsRef.doc(parentCommentId));
+    if (!parentSnap.exists) {
+      throw new HttpsError("not-found", "Comentario padre no encontrado.");
+    }
+    const rootSnap = await tx.get(threadRootRef);
+    if (!rootSnap.exists) {
+      throw new HttpsError("not-found", "Comentario raíz no encontrado.");
+    }
+
+    tx.set(commentRef, {
+      text,
+      authorUid: uid,
+      authorName: authorProfile.displayName,
+      authorUsername: authorProfile.username,
+      authorPhoto: authorProfile.photoURL ?? null,
+      createdAt: FieldValue.serverTimestamp(),
+      likeCount: 0,
+      replyCount: 0,
+      parentId: threadRootId,
+      rootId: threadRootId,
+    });
+
+    tx.update(threadRootRef, {replyCount: FieldValue.increment(1)});
+    tx.update(postRef, {commentCount: FieldValue.increment(1)});
+    return commentRef.id;
   });
 };
 
@@ -763,19 +917,24 @@ export const createLivePost = onCall(
 
     const data = request.data as CreateLivePostInput | undefined;
     const textValue = data?.text;
+    const categoryValue = data?.category;
 
     if (typeof textValue !== "string") {
       throw new HttpsError("invalid-argument", "text requerido");
     }
 
     const clean = validateText(textValue);
+    assertContentPolicy(clean);
+    const allowedCategories = ["Salud", "Familia", "Fortaleza", "Gratitud"];
+    const category = typeof categoryValue === "string" &&
+      allowedCategories.includes(categoryValue) ? categoryValue : "Fortaleza";
 
     if (!request.auth?.uid) {
       throw new HttpsError("unauthenticated", "login requerido");
     }
 
     try {
-      const postId = await createLivePostTx(request.auth.uid, clean);
+      const postId = await createLivePostTx(request.auth.uid, clean, category);
       logger.info("createLivePost success", {postId});
       return {ok: true, postId};
     } catch (error) {
@@ -799,12 +958,18 @@ export const createLivePostHttp = onRequest(async (req, res) => {
     );
     const uid = await authenticate(token);
     const text = (req.body as CreateLivePostInput | undefined)?.text;
+    const categoryValue =
+      (req.body as CreateLivePostInput | undefined)?.category;
     if (typeof text !== "string") {
       res.status(400).json({ok: false, error: "Texto inválido"});
       return;
     }
     const clean = validateText(text);
-    const postId = await createLivePostTx(uid, clean);
+    assertContentPolicy(clean);
+    const allowedCategories = ["Salud", "Familia", "Fortaleza", "Gratitud"];
+    const category = typeof categoryValue === "string" &&
+      allowedCategories.includes(categoryValue) ? categoryValue : "Fortaleza";
+    const postId = await createLivePostTx(uid, clean, category);
     res.json({ok: true, postId});
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error";
@@ -812,6 +977,76 @@ export const createLivePostHttp = onRequest(async (req, res) => {
     res.status(400).json({ok: false, error: message});
   }
 });
+
+export const createLiveComment = onCall(
+  {region: "us-central1"},
+  async (request) => {
+    if (!request.auth?.uid) {
+      throw new HttpsError("unauthenticated", "login requerido");
+    }
+
+    const data = request.data as CreateLiveCommentInput | undefined;
+    const postIdValue = data?.postId;
+    const textValue = data?.text;
+
+    if (typeof postIdValue !== "string" || postIdValue.trim().length === 0) {
+      throw new HttpsError("invalid-argument", "postId requerido");
+    }
+    if (typeof textValue !== "string") {
+      throw new HttpsError("invalid-argument", "text requerido");
+    }
+
+    const clean = validateText(textValue);
+    assertContentPolicy(clean);
+    const postId = postIdValue.trim();
+
+    const commentId = await createLiveCommentTx(request.auth.uid, postId, clean);
+    return {ok: true, commentId};
+  },
+);
+
+export const replyLiveComment = onCall(
+  {region: "us-central1"},
+  async (request) => {
+    if (!request.auth?.uid) {
+      throw new HttpsError("unauthenticated", "login requerido");
+    }
+
+    const data = request.data as ReplyLiveCommentInput | undefined;
+    const postIdValue = data?.postId;
+    const textValue = data?.text;
+    const parentCommentIdValue = data?.parentCommentId;
+    const rootIdValue = data?.rootId;
+
+    if (typeof postIdValue !== "string" || postIdValue.trim().length === 0) {
+      throw new HttpsError("invalid-argument", "postId requerido");
+    }
+    if (typeof textValue !== "string") {
+      throw new HttpsError("invalid-argument", "text requerido");
+    }
+    if (
+      typeof parentCommentIdValue !== "string" ||
+      parentCommentIdValue.trim().length === 0
+    ) {
+      throw new HttpsError("invalid-argument", "parentCommentId requerido");
+    }
+    if (typeof rootIdValue !== "string") {
+      throw new HttpsError("invalid-argument", "rootId requerido");
+    }
+
+    const clean = validateText(textValue);
+    assertContentPolicy(clean);
+    const commentId = await replyLiveCommentTx(
+      request.auth.uid,
+      postIdValue.trim(),
+      clean,
+      parentCommentIdValue.trim(),
+      rootIdValue.trim(),
+    );
+
+    return {ok: true, commentId};
+  },
+);
 
 export const deleteLivePost = onCall(
   {region: "us-central1"},
@@ -939,7 +1174,13 @@ export const chatWithGroq = onCall(
     // Check rate limit
     await checkChatRateLimit(uid);
 
-    const {userText, conversation} = request.data as ChatRequest;
+    const {userText, conversation, faithTradition} = request.data as ChatRequest;
+    const normalizedTradition =
+      typeof faithTradition === "string" ? faithTradition.trim().toLowerCase() : "";
+
+    const systemPrompt = normalizedTradition === "cristiana" ?
+      CHAT_PROMPT_EVANGELICAL :
+      normalizedTradition === "general" ? CHAT_PROMPT_GENERAL : CHAT_PROMPT;
 
     // Validate input
     if (!userText || typeof userText !== "string") {
@@ -953,6 +1194,13 @@ export const chatWithGroq = onCall(
       conversation : [];
 
     try {
+      logger.info("chatWithGroq tradition resolved", {
+        uid,
+        normalizedTradition: normalizedTradition || "catolica(default)",
+        promptVariant: normalizedTradition === "cristiana" ?
+          "evangelical" : normalizedTradition === "general" ? "general" : "catholic",
+      });
+
       const groq = new Groq({apiKey: GROQ_API_KEY});
 
       const response = await groq.chat.completions.create({
@@ -962,7 +1210,7 @@ export const chatWithGroq = onCall(
         messages: [
           {
             role: "system",
-            content: CHAT_PROMPT,
+            content: systemPrompt,
           },
           ...messages,
           {role: "user", content: userText},

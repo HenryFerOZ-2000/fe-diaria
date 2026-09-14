@@ -16,7 +16,8 @@ class AppProvider extends ChangeNotifier {
   final StorageService _storageService = StorageService();
   late final StreakService _streakService = StreakService(_storageService);
   final NotificationService _notificationService = NotificationService();
-  final PersonalizationService _personalizationService = PersonalizationService();
+  final PersonalizationService _personalizationService =
+      PersonalizationService();
 
   Verse? _todayVerse;
   Prayer? _todayMorningPrayer;
@@ -27,8 +28,10 @@ class AppProvider extends ChangeNotifier {
   List<Prayer> _savedPrayers = [];
   bool _darkMode = false;
   bool _notificationEnabled = false;
-  String _morningVerseNotificationTime = '09:00'; // AM - Versículo (9:00 AM por defecto)
-  String _eveningPrayerNotificationTime = '21:00'; // PM - Oración (9:00 PM por defecto)
+  String _morningVerseNotificationTime =
+      '09:00'; // AM - Versículo (9:00 AM por defecto)
+  String _eveningPrayerNotificationTime =
+      '21:00'; // PM - Oración (9:00 PM por defecto)
   bool _morningNotificationEnabled = true;
   bool _eveningNotificationEnabled = true;
   bool _hourlyRemindersEnabled = true;
@@ -42,14 +45,14 @@ class AppProvider extends ChangeNotifier {
   Prayer? get todayMorningPrayer => _todayMorningPrayer;
   Prayer? get todayEveningPrayer => _todayEveningPrayer;
   Prayer? get todayFamilyPrayer => _todayFamilyPrayer;
-  
+
   /// Obtiene la oración del día según la hora actual
   /// Mañana: 5:00 AM - 5:59 PM
   /// Noche: 6:00 PM - 4:59 AM
   Prayer? get currentPrayer {
     final now = DateTime.now();
     final hour = now.hour;
-    
+
     // Oración de la mañana: 5:00 AM (5) a 5:59 PM (17)
     // Oración de la noche: 6:00 PM (18) a 4:59 AM (4)
     if (hour >= 5 && hour < 18) {
@@ -58,14 +61,14 @@ class AppProvider extends ChangeNotifier {
       return _todayEveningPrayer;
     }
   }
-  
+
   /// Verifica si es hora de oración de la mañana
   bool get isMorningPrayerTime {
     final now = DateTime.now();
     final hour = now.hour;
     return hour >= 5 && hour < 18;
   }
-  
+
   bool get isLoading => _isLoading;
   List<Verse> get favorites => _favorites;
   bool get darkMode => _darkMode;
@@ -81,7 +84,7 @@ class AppProvider extends ChangeNotifier {
   List<Prayer> get savedPrayers => _savedPrayers;
   int get streakCount => _streakCount;
   int get streakGoal => _streakGoal;
-  
+
   // Personalización
   String get userName => _storageService.getUserName();
   String get userEmotion => _storageService.getUserEmotion();
@@ -94,18 +97,23 @@ class AppProvider extends ChangeNotifier {
     try {
       _darkMode = _storageService.getDarkMode();
       _notificationEnabled = _storageService.getNotificationEnabled();
-      _morningVerseNotificationTime = _storageService.getMorningVerseNotificationTime();
-      _eveningPrayerNotificationTime = _storageService.getEveningPrayerNotificationTime();
-      _morningNotificationEnabled = _storageService.getMorningNotificationEnabled();
-      _eveningNotificationEnabled = _storageService.getEveningNotificationEnabled();
+      _morningVerseNotificationTime = _storageService
+          .getMorningVerseNotificationTime();
+      _eveningPrayerNotificationTime = _storageService
+          .getEveningPrayerNotificationTime();
+      _morningNotificationEnabled = _storageService
+          .getMorningNotificationEnabled();
+      _eveningNotificationEnabled = _storageService
+          .getEveningNotificationEnabled();
       _hourlyRemindersEnabled = _storageService.getHourlyRemindersEnabled();
       _fontSize = _storageService.getFontSize();
       _readingMode = _storageService.getReadingMode();
       _soundEnabled = _storageService.getSoundEnabled();
-      
+
       // Si las notificaciones están habilitadas, verificar permisos y programar
       if (_notificationEnabled) {
-        final permissionsGranted = await _notificationService.arePermissionsGranted();
+        final permissionsGranted = await _notificationService
+            .arePermissionsGranted();
         if (permissionsGranted) {
           // Si los permisos están concedidos, programar notificaciones
           await _notificationService.scheduleDailyNotifications();
@@ -115,7 +123,7 @@ class AppProvider extends ChangeNotifier {
           await _storageService.setNotificationEnabled(false);
         }
       }
-      
+
       await loadTodayVerse();
       await loadTodayPrayers();
       await loadTodayFamilyPrayer();
@@ -134,17 +142,19 @@ class AppProvider extends ChangeNotifier {
     try {
       _isLoading = true;
       notifyListeners();
-      
+
       // Si hay una emoción seleccionada, usar versículo personalizado
       final emotion = _storageService.getUserEmotion();
       if (emotion.isNotEmpty) {
-        _todayVerse = await _personalizationService.getPersonalizedVerse(emotion);
+        _todayVerse = await _personalizationService.getPersonalizedVerse(
+          emotion,
+        );
       } else {
         _todayVerse = await _verseService.getTodayVerse();
       }
-      
+
       await _updateDailyStreak();
-      
+
       // Actualizar widgets
       await WidgetService.updateWidget(
         verse: _todayVerse,
@@ -171,17 +181,19 @@ class AppProvider extends ChangeNotifier {
     try {
       _isLoading = true;
       notifyListeners();
-      
+
       // Si hay una emoción seleccionada, usar versículo personalizado
       final emotion = _storageService.getUserEmotion();
       if (emotion.isNotEmpty) {
-        _todayVerse = await _personalizationService.getPersonalizedVerse(emotion);
+        _todayVerse = await _personalizationService.getPersonalizedVerse(
+          emotion,
+        );
       } else {
         _todayVerse = await _verseService.refreshTodayVerse();
       }
-      
+
       await _updateDailyStreak();
-      
+
       // Actualizar widgets
       await WidgetService.updateWidget(
         verse: _todayVerse,
@@ -202,14 +214,14 @@ class AppProvider extends ChangeNotifier {
       // (Sin personalización ni {nombre}; sin pertenencia)
       _todayMorningPrayer = await _prayerService.getTodayMorningPrayer();
       _todayEveningPrayer = await _prayerService.getTodayEveningPrayer();
-      
+
       // Actualizar widgets
       await WidgetService.updateWidget(
         verse: _todayVerse,
         morningPrayer: _todayMorningPrayer,
         eveningPrayer: _todayEveningPrayer,
       );
-      
+
       notifyListeners();
     } catch (e) {
       debugPrint('Error loading today prayers: $e');
@@ -350,7 +362,9 @@ class AppProvider extends ChangeNotifier {
     try {
       final state = await _streakService.resetIfNeeded();
       _streakCount = state.current;
-      debugPrint('Streak update: current=${state.current}, best=${state.best}, last=${state.lastDateYmd}');
+      debugPrint(
+        'Streak update: current=${state.current}, best=${state.best}, last=${state.lastDateYmd}',
+      );
       notifyListeners();
     } catch (e) {
       debugPrint('Streak update error: $e');
@@ -361,7 +375,9 @@ class AppProvider extends ChangeNotifier {
     try {
       final state = await _streakService.recordToday();
       _streakCount = state.current;
-      debugPrint('Streak recorded: current=${state.current}, best=${state.best}, last=${state.lastDateYmd}');
+      debugPrint(
+        'Streak recorded: current=${state.current}, best=${state.best}, last=${state.lastDateYmd}',
+      );
       notifyListeners();
     } catch (e) {
       debugPrint('Streak record error: $e');
@@ -387,4 +403,3 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
-

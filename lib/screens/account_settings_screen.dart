@@ -34,10 +34,8 @@ class AccountSettingsScreen extends StatelessWidget {
   }
 
   void _placeholder(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Disponible próximamente')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Disponible próximamente')));
   }
 }
-
-

@@ -40,16 +40,16 @@ class _DailyIntentionsScreenState extends State<DailyIntentionsScreen> {
 
   void _saveIntention() {
     if (_intentionController.text.trim().isEmpty) return;
-    
+
     final intention = _intentionController.text.trim();
     _intentions.add(intention);
     StorageService().saveDailyIntentions(_intentions);
     _intentionController.clear();
     setState(() {});
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Intención guardada')),
-    );
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Intención guardada')));
   }
 
   void _deleteIntention(int index) {
@@ -69,7 +69,8 @@ class _DailyIntentionsScreenState extends State<DailyIntentionsScreen> {
           ad.dispose();
         }
       },
-      onAdFailedToLoad: (error) => debugPrint('Failed to load banner ad: $error'),
+      onAdFailedToLoad: (error) =>
+          debugPrint('Failed to load banner ad: $error'),
     );
   }
 
@@ -123,10 +124,7 @@ class _DailyIntentionsScreenState extends State<DailyIntentionsScreen> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   if (_intentions.isNotEmpty) ...[
-                    Text(
-                      'Mis Intenciones',
-                      style: theme.textTheme.titleLarge,
-                    ),
+                    Text('Mis Intenciones', style: theme.textTheme.titleLarge),
                     const SizedBox(height: AppSpacing.md),
                     ..._intentions.asMap().entries.map((entry) {
                       final index = entry.key;
@@ -162,18 +160,25 @@ class _DailyIntentionsScreenState extends State<DailyIntentionsScreen> {
             Container(
               alignment: Alignment.center,
               width: double.infinity,
-              height: _bannerAd != null ? _bannerAd!.size.height.toDouble() : 50,
+              height: _bannerAd != null
+                  ? _bannerAd!.size.height.toDouble()
+                  : 50,
               decoration: BoxDecoration(
                 color: isDark ? colorScheme.surface : AppColors.surface,
                 border: Border(
-                  top: BorderSide(color: colorScheme.outline.withOpacity(0.1), width: 1),
+                  top: BorderSide(
+                    color: colorScheme.outline.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
                 ),
               ),
               child: _bannerAd != null
                   ? AdWidget(ad: _bannerAd!)
                   : const SizedBox(
                       height: 50,
-                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     ),
             ),
         ],
@@ -181,4 +186,3 @@ class _DailyIntentionsScreenState extends State<DailyIntentionsScreen> {
     );
   }
 }
-

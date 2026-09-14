@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/prayer_model.dart';
 import '../services/prayer_rotation_service.dart';
+import '../widgets/prayer_reading_experience.dart';
 
 class PrayerReadScreen extends StatefulWidget {
   final String category;
@@ -61,86 +62,101 @@ class _PrayerReadScreenState extends State<PrayerReadScreen> {
   @override
   Widget build(BuildContext context) {
     final categoryTitle = _categoryTitle(widget.category);
+    return PrayerReadingExperience(
+      loading: _loading,
+      category: categoryTitle,
+      title: _current?.title,
+      text: _current?.text,
+      verseReference: _current?.verseRef,
+      tags: _current?.tags ?? const [],
+      accent: const Color(0xFF77649A),
+      onBack: () => Navigator.pop(context),
+      onShare: _sharePrayer,
+      onNext: _loadNext,
+    );
+  }
+
+  // ignore: unused_element
+  Widget _buildLegacy(BuildContext context) {
+    final categoryTitle = _categoryTitle(widget.category);
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Oración - $categoryTitle'),
-      ),
+      appBar: AppBar(title: Text('Oración - $categoryTitle')),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
         child: _loading
             ? const Center(child: CircularProgressIndicator())
             : _current == null
-                ? const Center(child: Text('No se encontró contenido.'))
-                : Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        Text(
-                          _current!.title,
-                          style: theme.textTheme.headlineSmall,
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 12),
-                        Card(
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Text(
-                                  _current!.text,
-                                  style: theme.textTheme.bodyLarge
-                                      ?.copyWith(height: 1.4),
-                                ),
-                                if (_current!.verseRef != null) ...[
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    _current!.verseRef!,
-                                    style: theme.textTheme.labelLarge?.copyWith(
-                                      color: theme.colorScheme.primary,
-                                    ),
-                                    textAlign: TextAlign.end,
-                                  ),
-                                ],
-                                const SizedBox(height: 8),
-                                Wrap(
-                                  spacing: 6,
-                                  children: _current!.tags
-                                      .map((t) => Chip(label: Text(t)))
-                                      .toList(),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const Spacer(),
-                        Row(
+            ? const Center(child: Text('No se encontró contenido.'))
+            : Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    Text(
+                      _current!.title,
+                      style: theme.textTheme.headlineSmall,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: _sharePrayer,
-                                child: const Text('Compartir'),
+                            Text(
+                              _current!.text,
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                height: 1.4,
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: _loadNext,
-                                child: const Text('Siguiente'),
+                            if (_current!.verseRef != null) ...[
+                              const SizedBox(height: 12),
+                              Text(
+                                _current!.verseRef!,
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  color: theme.colorScheme.primary,
+                                ),
+                                textAlign: TextAlign.end,
                               ),
+                            ],
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 6,
+                              children: _current!.tags
+                                  .map((t) => Chip(label: Text(t)))
+                                  .toList(),
                             ),
                           ],
                         ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: _sharePrayer,
+                            child: const Text('Compartir'),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _loadNext,
+                            child: const Text('Siguiente'),
+                          ),
+                        ),
                       ],
                     ),
-                  ),
+                  ],
+                ),
+              ),
       ),
     );
   }
 }
-

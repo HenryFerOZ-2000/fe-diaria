@@ -29,7 +29,7 @@ class LanguageService {
     try {
       final locale = ui.PlatformDispatcher.instance.locale;
       final languageCode = locale.languageCode.toLowerCase();
-      
+
       // Mapear códigos de idioma a nuestros códigos soportados
       if (languageCode == 'es' || languageCode.startsWith('es')) {
         _systemLanguage = 'es';
@@ -53,12 +53,12 @@ class LanguageService {
       if (_box != null && _box!.containsKey(_languageKey)) {
         return _box!.get(_languageKey) as String;
       }
-      
+
       // Si no, usar el idioma del sistema detectado
       if (_systemLanguage != null) {
         return _systemLanguage!;
       }
-      
+
       // Si no se pudo detectar, detectar ahora
       _detectSystemLanguage();
       return _systemLanguage ?? _defaultLanguage;
@@ -153,4 +153,3 @@ class LanguageService {
     }
   }
 }
-

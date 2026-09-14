@@ -5,18 +5,14 @@ class ChatBubble extends StatelessWidget {
   final String text;
   final bool isUser;
 
-  const ChatBubble({
-    super.key,
-    required this.text,
-    this.isUser = false,
-  });
+  const ChatBubble({super.key, required this.text, this.isUser = false});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final bubbleColor = isUser
-        ? colorScheme.primary.withOpacity(0.15)
-        : colorScheme.surface.withOpacity(0.95);
+        ? colorScheme.primary.withValues(alpha: 0.15)
+        : colorScheme.surface.withValues(alpha: 0.95);
     final align = isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
 
     return Column(
@@ -37,13 +33,13 @@ class ChatBubble extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.primary.withOpacity(0.08),
+                color: colorScheme.primary.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),
             ],
             border: Border.all(
-              color: colorScheme.primary.withOpacity(0.08),
+              color: colorScheme.primary.withValues(alpha: 0.08),
             ),
           ),
           child: Text(
@@ -59,4 +55,3 @@ class ChatBubble extends StatelessWidget {
     );
   }
 }
-

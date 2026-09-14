@@ -69,46 +69,47 @@ class _HelloAoTranslationSettingsScreenState
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'No se pudo cargar la lista',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(_error!, textAlign: TextAlign.center),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _load,
-                        child: const Text('Reintentar'),
-                      ),
-                    ],
+          ? Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'No se pudo cargar la lista',
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
-                )
-              : ListView.separated(
-                  itemCount: _options.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
-                  itemBuilder: (_, index) {
-                    final t = _options[index];
-                    final subtitle = [
-                      t.englishName,
-                      t.languageName,
-                    ].where((e) => e != null && e.isNotEmpty).join(' • ');
-                    return RadioListTile<String>(
-                      value: t.id,
-                      groupValue: _selectedId,
-                      title: Text(t.name),
-                      subtitle: subtitle.isNotEmpty ? Text(subtitle) : null,
-                      onChanged: (val) {
-                        if (val != null) _onSelect(val);
-                      },
-                    );
-                  },
-                ),
+                  const SizedBox(height: 8),
+                  Text(_error!, textAlign: TextAlign.center),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _load,
+                    child: const Text('Reintentar'),
+                  ),
+                ],
+              ),
+            )
+          : RadioGroup<String>(
+              groupValue: _selectedId,
+              onChanged: (value) {
+                if (value != null) _onSelect(value);
+              },
+              child: ListView.separated(
+                itemCount: _options.length,
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (_, index) {
+                  final t = _options[index];
+                  final subtitle = [
+                    t.englishName,
+                    t.languageName,
+                  ].where((e) => e != null && e.isNotEmpty).join(' • ');
+                  return RadioListTile<String>(
+                    value: t.id,
+                    title: Text(t.name),
+                    subtitle: subtitle.isNotEmpty ? Text(subtitle) : null,
+                  );
+                },
+              ),
+            ),
     );
   }
 }
-

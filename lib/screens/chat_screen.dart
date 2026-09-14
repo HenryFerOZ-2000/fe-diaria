@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/chat_bubble.dart';
+import '../widgets/verbum_header_actions.dart';
 import '../services/groq_chat_service.dart' as groq;
 import '../providers/auth_provider.dart';
 
@@ -21,7 +22,9 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final List<ChatMessage> _messages = [
-    ChatMessage(text: 'Hola, soy tu compañero espiritual. ¿En qué te acompaño hoy?'),
+    ChatMessage(
+      text: 'Hola, soy tu compañero espiritual. ¿En qué te acompaño hoy?',
+    ),
   ];
   final List<groq.ChatMessage> _conversationHistory = [];
   final TextEditingController _controller = TextEditingController();
@@ -64,10 +67,13 @@ class _ChatScreenState extends State<ChatScreen> {
     final auth = context.read<AuthProvider>();
     if (!auth.isSignedIn) {
       setState(() {
-        _messages.add(ChatMessage(
-          text: 'Para usar el chat con IA, necesitas iniciar sesión. Ve a Perfil → Continuar con Google.',
-          isUser: false,
-        ));
+        _messages.add(
+          ChatMessage(
+            text:
+                'Para usar el chat con IA, necesitas iniciar sesión. Ve a Perfil → Continuar con Google.',
+            isUser: false,
+          ),
+        );
         _isLoading = false;
       });
       _scrollToBottom();
@@ -92,16 +98,15 @@ class _ChatScreenState extends State<ChatScreen> {
           _isLoading = false;
         });
         // Add full response to history
-        _conversationHistory.add(groq.ChatMessage.assistant(response.rawContent));
+        _conversationHistory.add(
+          groq.ChatMessage.assistant(response.rawContent),
+        );
         _scrollToBottom();
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _messages.add(ChatMessage(
-            text: _errorToMessage(e),
-            isUser: false,
-          ));
+          _messages.add(ChatMessage(text: _errorToMessage(e), isUser: false));
           _isLoading = false;
         });
         _scrollToBottom();
@@ -119,7 +124,49 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      title: 'Chat Espiritual',
+      centerTitle: false,
+      titleWidget: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF493878), Color(0xFFB58A45)],
+              ),
+              borderRadius: BorderRadius.circular(13),
+            ),
+            child: const Icon(
+              Icons.auto_awesome,
+              color: Colors.white,
+              size: 19,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Acompañamiento',
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Text(
+                'UN ESPACIO SEGURO PARA HABLAR',
+                style: GoogleFonts.inter(
+                  fontSize: 8,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.1,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      actions: const [VerbumHeaderActions()],
       showBanner: false,
       body: Column(
         children: [
@@ -134,9 +181,21 @@ class _ChatScreenState extends State<ChatScreen> {
                   return _buildTypingIndicator(context);
                 }
                 final msg = _messages[index];
-                return ChatBubble(
-                  text: msg.text,
-                  isUser: msg.isUser,
+                return TweenAnimationBuilder<double>(
+                  key: ValueKey('msg_$index'),
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 260),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Transform.translate(
+                        offset: Offset(0, (1 - value) * 12),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: ChatBubble(text: msg.text, isUser: msg.isUser),
                 );
               },
             ),
@@ -155,11 +214,13 @@ class _ChatScreenState extends State<ChatScreen> {
         margin: const EdgeInsets.only(right: 40, bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: colorScheme.surface.withOpacity(0.95),
-          borderRadius: BorderRadius.circular(16).copyWith(
-            bottomLeft: const Radius.circular(0),
+          color: colorScheme.surface.withValues(alpha: 0.95),
+          borderRadius: BorderRadius.circular(
+            16,
+          ).copyWith(bottomLeft: const Radius.circular(0)),
+          border: Border.all(
+            color: colorScheme.primary.withValues(alpha: 0.08),
           ),
-          border: Border.all(color: colorScheme.primary.withOpacity(0.08)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -177,7 +238,7 @@ class _ChatScreenState extends State<ChatScreen> {
               'Pensando...',
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: colorScheme.onSurface.withOpacity(0.7),
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -194,7 +255,7 @@ class _ChatScreenState extends State<ChatScreen> {
         color: colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: colorScheme.primary.withOpacity(0.08),
+            color: colorScheme.primary.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, -4),
           ),
@@ -207,22 +268,28 @@ class _ChatScreenState extends State<ChatScreen> {
               controller: _controller,
               decoration: InputDecoration(
                 hintText: 'Escribe tu mensaje',
-                hintStyle: GoogleFonts.inter(color: colorScheme.onSurface.withOpacity(0.6)),
+                hintStyle: GoogleFonts.inter(
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
                 filled: true,
-                fillColor: colorScheme.surface.withOpacity(0.9),
+                fillColor: colorScheme.surface.withValues(alpha: 0.9),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.3)),
+                  borderSide: BorderSide(
+                    color: colorScheme.outline.withValues(alpha: 0.3),
+                  ),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
               ),
               onSubmitted: _sendMessage,
             ),
           ),
           const SizedBox(width: 8),
-          IconButton(
+          _SendButton(
             onPressed: () => _sendMessage(_controller.text),
-            icon: const Icon(Icons.send_rounded),
             color: colorScheme.primary,
           ),
         ],
@@ -231,3 +298,64 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
+/// Botón de envío circular con gradiente y animación de presión.
+class _SendButton extends StatefulWidget {
+  final VoidCallback onPressed;
+  final Color color;
+
+  const _SendButton({required this.onPressed, required this.color});
+
+  @override
+  State<_SendButton> createState() => _SendButtonState();
+}
+
+class _SendButtonState extends State<_SendButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(milliseconds: 120),
+    vsync: this,
+  );
+  late final Animation<double> _scale = Tween<double>(
+    begin: 1.0,
+    end: 0.88,
+  ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => _controller.forward(),
+      onTapUp: (_) => _controller.reverse(),
+      onTapCancel: () => _controller.reverse(),
+      onTap: widget.onPressed,
+      child: ScaleTransition(
+        scale: _scale,
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [widget.color, widget.color.withValues(alpha: 0.75)],
+            ),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: widget.color.withValues(alpha: 0.35),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+        ),
+      ),
+    );
+  }
+}

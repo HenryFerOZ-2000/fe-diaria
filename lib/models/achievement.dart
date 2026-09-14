@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'spiritual_stats.dart';
 
-enum AchievementType {
-  streak,
-  verses,
-  prayers,
-  posts,
-}
+enum AchievementType { streak, verses, prayers, posts }
 
 class Achievement {
   final String id;
@@ -51,4 +46,3 @@ class Achievement {
     }
   }
 }
-

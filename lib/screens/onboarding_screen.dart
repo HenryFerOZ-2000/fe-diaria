@@ -30,17 +30,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
       // Marcar onboarding como completado (sin pedir nombre; el usuario puede configurar nombre de usuario después)
       await storageService.setOnboardingCompleted(true);
-      
+
       // Solicitar permisos de notificaciones
       final permissionsGranted = await notificationService.requestPermissions();
-      
+
       if (permissionsGranted) {
         // Si se concedieron permisos, activar todas las notificaciones por defecto
         await storageService.setNotificationEnabled(true);
         await storageService.setMorningNotificationEnabled(true);
         await storageService.setEveningNotificationEnabled(true);
         await storageService.setHourlyRemindersEnabled(true);
-        
+
         // Programar todas las notificaciones
         await notificationService.scheduleDailyNotifications();
       } else {
@@ -52,7 +52,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       }
 
       if (!mounted) return;
-      
+
       // Navegar al home
       Navigator.of(context).pushReplacementNamed('/home');
     } catch (e) {
@@ -60,7 +60,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       setState(() {
         _isLoading = false;
       });
-      
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -74,7 +74,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: Container(
@@ -89,9 +89,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ],
           ),
         ),
-        child: SafeArea(
-          child: _buildWelcomePage(colorScheme),
-        ),
+        child: SafeArea(child: _buildWelcomePage(colorScheme)),
       ),
     );
   }
@@ -107,17 +105,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: colorScheme.primary.withOpacity(0.1),
+              color: colorScheme.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.favorite,
-              size: 64,
-              color: colorScheme.primary,
-            ),
+            child: Icon(Icons.favorite, size: 64, color: colorScheme.primary),
           ),
           const SizedBox(height: 48),
-          
+
           // Título
           Text(
             'Bienvenido',
@@ -130,7 +124,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          
+
           // Mensaje
           Text(
             'Déjanos acompañarte cada día con versículos y oraciones que llenarán tu corazón de paz y esperanza.',
@@ -142,7 +136,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             textAlign: TextAlign.center,
           ),
           const Spacer(),
-          
+
           // Botón completar onboarding (sin pedir nombre; nombre de usuario se configura después si inicia sesión)
           SizedBox(
             width: double.infinity,
@@ -180,6 +174,4 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
     );
   }
-
 }
-

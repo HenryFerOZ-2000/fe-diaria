@@ -13,9 +13,13 @@ class PsalmsService {
     if (_loaded) return;
 
     try {
-      final String jsonString = await rootBundle.loadString('assets/data/psalms.json');
+      final String jsonString = await rootBundle.loadString(
+        'assets/data/psalms.json',
+      );
       final List<dynamic> jsonList = json.decode(jsonString);
-      _psalms = jsonList.map((json) => Psalm.fromJson(json as Map<String, dynamic>)).toList();
+      _psalms = jsonList
+          .map((json) => Psalm.fromJson(json as Map<String, dynamic>))
+          .toList();
       _loaded = true;
     } catch (e) {
       debugPrint('Error loading psalms: $e');
@@ -30,7 +34,9 @@ class PsalmsService {
 
   /// Obtiene salmos por categoría
   List<Psalm> getPsalmsByCategory(String category) {
-    return _psalms.where((p) => p.category.toLowerCase() == category.toLowerCase()).toList();
+    return _psalms
+        .where((p) => p.category.toLowerCase() == category.toLowerCase())
+        .toList();
   }
 
   /// Obtiene todas las categorías disponibles
@@ -56,4 +62,3 @@ class PsalmsService {
     }).toList();
   }
 }
-

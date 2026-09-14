@@ -11,8 +11,10 @@ class AdsService {
   bool _isBannerAdReady = false;
 
   // IDs de prueba de Google AdMob
-  static const String _testBannerAdUnitId = 'ca-app-pub-3940256099942544/6300978111';
-  static const String _testInterstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
+  static const String _testBannerAdUnitId =
+      'ca-app-pub-3940256099942544/6300978111';
+  static const String _testInterstitialAdUnitId =
+      'ca-app-pub-3940256099942544/1033173712';
 
   Future<void> initialize() async {
     await MobileAds.instance.initialize();
@@ -86,4 +88,3 @@ class AdsService {
     return interstitialAd;
   }
 }
-

@@ -15,4 +15,3 @@ class _BibleScreenState extends State<BibleScreen> {
     return const BibleBooksScreen();
   }
 }
-

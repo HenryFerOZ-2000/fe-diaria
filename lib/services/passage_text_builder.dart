@@ -28,4 +28,3 @@ class PassageTextBuilder {
     return '';
   }
 }
-

@@ -15,28 +15,45 @@ class DailyProgress {
     this.updatedAt,
   });
 
-  factory DailyProgress.fromFirestore(String dateId, Map<String, dynamic> data) {
-    final missionsMap = Map<String, bool>.from(data['missions'] ?? {});
-    final progressPercent = (data['progressPercent'] ?? 0.0) as double;
-    
+  factory DailyProgress.fromFirestore(
+    String dateId,
+    Map<String, dynamic> data,
+  ) {
+    final missionsMap = <String, bool>{};
+    final rawMissions = data['missions'];
+    if (rawMissions is Map) {
+      for (final entry in rawMissions.entries) {
+        // Registros antiguos pueden contener null u otros tipos. Solo true
+        // representa una misión completada; el resto se trata como pendiente.
+        missionsMap[entry.key.toString()] = entry.value == true;
+      }
+    }
+    final progressPercent = data['progressPercent'] is num
+        ? (data['progressPercent'] as num).toDouble()
+        : 0.0;
+
     DateTime? createdAt;
     DateTime? updatedAt;
-    
+
     if (data['createdAt'] != null) {
       final ts = data['createdAt'];
       if (ts is DateTime) {
         createdAt = ts;
       } else if (ts is Map && ts['_seconds'] != null) {
-        createdAt = DateTime.fromMillisecondsSinceEpoch((ts['_seconds'] as int) * 1000);
+        createdAt = DateTime.fromMillisecondsSinceEpoch(
+          (ts['_seconds'] as int) * 1000,
+        );
       }
     }
-    
+
     if (data['updatedAt'] != null) {
       final ts = data['updatedAt'];
       if (ts is DateTime) {
         updatedAt = ts;
       } else if (ts is Map && ts['_seconds'] != null) {
-        updatedAt = DateTime.fromMillisecondsSinceEpoch((ts['_seconds'] as int) * 1000);
+        updatedAt = DateTime.fromMillisecondsSinceEpoch(
+          (ts['_seconds'] as int) * 1000,
+        );
       }
     }
 
@@ -58,7 +75,7 @@ class DailyProgress {
   }
 
   bool isMissionDone(String missionId) => missions[missionId] == true;
-  
-  int get completedCount => missions.values.where((done) => done == true).length;
-}
 
+  int get completedCount =>
+      missions.values.where((done) => done == true).length;
+}

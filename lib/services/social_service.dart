@@ -21,7 +21,8 @@ class SocialService {
     if (user == null) return;
     final uid = user.uid;
     final effectiveDisplayName =
-        (displayName ?? user.displayName ?? user.email?.split('@').first ?? uid).trim();
+        (displayName ?? user.displayName ?? user.email?.split('@').first ?? uid)
+            .trim();
 
     await _firestore.collection('users').doc(uid).set({
       'uid': uid,
@@ -44,7 +45,7 @@ class SocialService {
   /// Genera un username automático basado en email o displayName
   String generateAutoUsername(String? email, String? displayName) {
     String base = '';
-    
+
     // Priorizar displayName si está disponible
     if (displayName != null && displayName.trim().isNotEmpty) {
       base = displayName.trim().toLowerCase();
@@ -53,27 +54,29 @@ class SocialService {
       base = email.split('@').first.toLowerCase();
     } else {
       // Fallback: usar timestamp
-      base = 'user${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+      base =
+          'user${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
     }
-    
+
     // Limpiar y normalizar: solo letras, números, punto y guión bajo
     base = base.replaceAll(RegExp(r'[^a-z0-9._]'), '');
-    
+
     // Asegurar longitud mínima de 3
     if (base.length < 3) {
-      base = '$base${DateTime.now().millisecondsSinceEpoch.toString().substring(10)}';
+      base =
+          '$base${DateTime.now().millisecondsSinceEpoch.toString().substring(10)}';
     }
-    
+
     // Limitar a 20 caracteres
     if (base.length > 20) {
       base = base.substring(0, 20);
     }
-    
+
     // Si termina con punto o guión bajo, agregar número
     if (base.endsWith('.') || base.endsWith('_')) {
       base = '${base}1';
     }
-    
+
     return base;
   }
 
@@ -81,7 +84,7 @@ class SocialService {
     final callable = _functions.httpsCallable('setUsername');
     await callable.call({'username': username});
   }
-  
+
   /// Verifica si el usuario tiene un username configurado
   Future<bool> hasUsername() async {
     final user = _auth.currentUser;
@@ -100,7 +103,6 @@ class SocialService {
     return _firestore.collection('users').doc(uid).snapshots();
   }
 
-
   Future<void> updateProfile({
     required String uid,
     String? displayName,
@@ -116,8 +118,9 @@ class SocialService {
     if (bio != null) data['bio'] = bio;
     if (isPublic != null) data['isPublic'] = isPublic;
     if (photoURL != null) data['photoURL'] = photoURL;
-    await _firestore.collection('users').doc(uid).set(data, SetOptions(merge: true));
+    await _firestore
+        .collection('users')
+        .doc(uid)
+        .set(data, SetOptions(merge: true));
   }
-
 }
-

@@ -12,6 +12,8 @@ export interface ChatMessage {
 export interface ChatRequest {
   userText: string;
   conversation?: ChatMessage[];
+  /** App tradition: `catolica`, `cristiana`, or denomination-neutral `general`. */
+  faithTradition?: string;
 }
 
 /**

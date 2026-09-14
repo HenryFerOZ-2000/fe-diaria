@@ -39,10 +39,7 @@ class SessionsDevicesScreen extends StatelessWidget {
               child: Text(
                 'Esta funcionalidad te permitirá ver y gestionar todas tus sesiones activas y dispositivos conectados.',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
+                style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600]),
               ),
             ),
           ],
@@ -51,4 +48,3 @@ class SessionsDevicesScreen extends StatelessWidget {
     );
   }
 }
-
