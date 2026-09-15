@@ -19,18 +19,21 @@ class DeepLinkService {
   void initialize(GlobalKey<NavigatorState> navigatorKey) {
     if (_subscription != null) return;
     _navigatorKey = navigatorKey;
-    _subscription = _appLinks.uriLinkStream.listen(
-      _handle,
-      onError: (_) {},
-    );
+    _subscription = _appLinks.uriLinkStream.listen(_handle, onError: (_) {});
   }
 
   void _handle(Uri uri) {
     final id = _pathId(uri);
     if (id == null) return;
+    openSpiritualPath(id);
+  }
+
+  void openSpiritualPath(String id) {
+    final exists = SpiritualPathsCatalog.paths.any((path) => path.id == id);
+    if (!exists) return;
     final navigator = _navigatorKey?.currentState;
     if (navigator == null) {
-      _pending = uri;
+      _pending = Uri(scheme: 'verbum', host: 'camino', path: id);
       WidgetsBinding.instance.addPostFrameCallback((_) => flushPending());
       return;
     }
@@ -47,7 +50,9 @@ class DeepLinkService {
   }
 
   String? _pathId(Uri uri) {
-    if (uri.scheme == 'verbum' && uri.host == 'camino' && uri.pathSegments.isNotEmpty) {
+    if (uri.scheme == 'verbum' &&
+        uri.host == 'camino' &&
+        uri.pathSegments.isNotEmpty) {
       return uri.pathSegments.first;
     }
     if ((uri.scheme == 'https' || uri.scheme == 'http') &&
@@ -59,17 +64,14 @@ class DeepLinkService {
   }
 
   void _open(NavigatorState navigator, String id) {
-    final exists = SpiritualPathsCatalog.paths.any((path) => path.id == id);
-    if (!exists) return;
     AppAnalyticsService.event(
       'spiritual_path_invite_opened',
       parameters: {'path_id': id},
     );
     navigator.push(
       MaterialPageRoute(
-        builder: (_) => SpiritualPathDetailScreen(
-          path: SpiritualPathsCatalog.byId(id),
-        ),
+        builder: (_) =>
+            SpiritualPathDetailScreen(path: SpiritualPathsCatalog.byId(id)),
       ),
     );
   }

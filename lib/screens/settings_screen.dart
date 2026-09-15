@@ -129,7 +129,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               isSelected: currentLanguage == 'es',
               onTap: () async {
                 await LanguageService.setLanguage('es');
-                Navigator.pop(context);
+                if (!mounted) return;
+                Navigator.pop(this.context);
                 // Recargar datos con nuevo idioma
                 await provider.loadTodayVerse();
                 await provider.loadTodayPrayers();
@@ -150,7 +151,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               isSelected: currentLanguage == 'en',
               onTap: () async {
                 await LanguageService.setLanguage('en');
-                Navigator.pop(context);
+                if (!mounted) return;
+                Navigator.pop(this.context);
                 await provider.loadTodayVerse();
                 await provider.loadTodayPrayers();
                 // Actualizar notificaciones con nuevo idioma
@@ -170,7 +172,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               isSelected: currentLanguage == 'pt',
               onTap: () async {
                 await LanguageService.setLanguage('pt');
-                Navigator.pop(context);
+                if (!mounted) return;
+                Navigator.pop(this.context);
                 await provider.loadTodayVerse();
                 await provider.loadTodayPrayers();
                 // Actualizar notificaciones con nuevo idioma
@@ -399,7 +402,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           final displayName = _getReligionDisplayName(
                             selectedReligion,
                           );
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          ScaffoldMessenger.of(this.context).showSnackBar(
                             SnackBar(
                               content: Text(
                                 'Tu tradición fue actualizada a $displayName.',
@@ -554,7 +557,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           } else {
                             // Si no se conceden permisos, mostrar mensaje
                             if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
+                              ScaffoldMessenger.of(this.context).showSnackBar(
                                 const SnackBar(
                                   content: Text(
                                     'Se necesitan permisos de notificaciones para activar esta función',

@@ -45,11 +45,12 @@ class _TraditionalPrayerScreenState extends State<TraditionalPrayerScreen> {
         _loading = false;
       });
     } catch (error) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _error = error.toString().replaceFirst('Exception: ', '');
           _loading = false;
         });
+      }
     }
   }
 

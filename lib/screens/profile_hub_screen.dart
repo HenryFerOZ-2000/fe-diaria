@@ -264,6 +264,13 @@ class _ProfileContent extends StatelessWidget {
                     onTap: onTraditionTap,
                   ),
                   _ProfileAction(
+                    icon: Icons.tune_rounded,
+                    title: 'Mi ritmo espiritual',
+                    subtitle: 'Tiempo, emoción y momento preferido',
+                    onTap: () =>
+                        Navigator.pushNamed(context, '/personalization'),
+                  ),
+                  _ProfileAction(
                     icon: Icons.notifications_none_rounded,
                     title: 'Recordatorios y preferencias',
                     subtitle: 'Horarios, contenido, idioma y apariencia',

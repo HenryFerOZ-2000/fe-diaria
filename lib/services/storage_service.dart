@@ -28,6 +28,8 @@ class StorageService {
   static const String _soundEnabledKey = 'soundEnabled';
   static const String _userNameKey = 'userName';
   static const String _userEmotionKey = 'userEmotion';
+  static const String _preferredDailyMinutesKey = 'preferredDailyMinutes';
+  static const String _preferredMomentKey = 'preferredSpiritualMoment';
   static const String _onboardingCompletedKey = 'onboardingCompleted';
 
   /// Tradición de fe de la app (`catolica` | `cristiana` | `general`).
@@ -212,6 +214,24 @@ class StorageService {
 
   Future<void> setUserEmotion(String emotion) async {
     await _settingsBox.put(_userEmotionKey, emotion);
+  }
+
+  int getPreferredDailyMinutes() {
+    final value = _settingsBox.get(_preferredDailyMinutesKey, defaultValue: 5);
+    return value is int ? value.clamp(3, 15) : 5;
+  }
+
+  Future<void> setPreferredDailyMinutes(int minutes) async {
+    await _settingsBox.put(_preferredDailyMinutesKey, minutes.clamp(3, 15));
+  }
+
+  String getPreferredSpiritualMoment() {
+    final value = _settingsBox.get(_preferredMomentKey, defaultValue: 'auto');
+    return value is String ? value : 'auto';
+  }
+
+  Future<void> setPreferredSpiritualMoment(String moment) async {
+    await _settingsBox.put(_preferredMomentKey, moment);
   }
 
   // Onboarding

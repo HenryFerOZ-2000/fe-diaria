@@ -394,6 +394,32 @@ class CommunityService {
     });
   }
 
+  Future<void> setCommunitySpiritualPath({
+    required String communityId,
+    required String editorUid,
+    String? pathId,
+  }) async {
+    final reference = _firestore.collection('communities').doc(communityId);
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(reference);
+      if (!snapshot.exists) throw Exception('La comunidad no existe.');
+      final data = snapshot.data() ?? <String, dynamic>{};
+      final admins = ((data['adminIds'] as List?) ?? const [])
+          .map((value) => value?.toString() ?? '')
+          .toSet();
+      if (!admins.contains(editorUid)) {
+        throw Exception('Solo un administrador puede elegir el camino.');
+      }
+      transaction.update(reference, {
+        'activeSpiritualPathId': pathId?.isNotEmpty == true
+            ? pathId
+            : FieldValue.delete(),
+        'spiritualPathUpdatedAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    });
+  }
+
   Future<void> removeCommunityAdmin({
     required String communityId,
     required String actorUid,

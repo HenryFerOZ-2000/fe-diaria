@@ -31,8 +31,9 @@ class _SpiritualPathsScreenState extends State<SpiritualPathsScreen> {
   Future<_PathsState> _load() async {
     final activeId = await _service.activePathId();
     final entries = await Future.wait(
-      SpiritualPathsCatalog.paths.map((path) async =>
-          MapEntry(path.id, await _service.progressFor(path.id))),
+      SpiritualPathsCatalog.paths.map(
+        (path) async => MapEntry(path.id, await _service.progressFor(path.id)),
+      ),
     );
     return _PathsState(activeId: activeId, progress: Map.fromEntries(entries));
   }
@@ -84,14 +85,17 @@ class _SpiritualPathsScreenState extends State<SpiritualPathsScreen> {
                         _PathsHero(activePath: active, onOpen: _open),
                         const SizedBox(height: 28),
                         _SectionHeader(
-                          eyebrow: active == null ? 'EMPIEZA POR AQUÍ' : 'EXPLORA',
+                          eyebrow: active == null
+                              ? 'EMPIEZA POR AQUÍ'
+                              : 'EXPLORA',
                           title: active == null
                               ? 'Elige lo que hoy necesitas'
                               : 'Otros caminos para después',
                         ),
                         const SizedBox(height: 13),
                         ...SpiritualPathsCatalog.paths.map((path) {
-                          final progress = state.progress[path.id] ??
+                          final progress =
+                              state.progress[path.id] ??
                               SpiritualPathProgress(pathId: path.id);
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 13),
@@ -129,7 +133,8 @@ class _PathsHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final recommended = activePath ??
+    final recommended =
+        activePath ??
         SpiritualPathsCatalog.recommend(hour: DateTime.now().hour);
     return Container(
       padding: const EdgeInsets.all(22),
@@ -160,7 +165,10 @@ class _PathsHero extends StatelessWidget {
                   color: Colors.white.withValues(alpha: .12),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: const Icon(Icons.route_rounded, color: Color(0xFFF0D9A1)),
+                child: const Icon(
+                  Icons.route_rounded,
+                  color: Color(0xFFF0D9A1),
+                ),
               ),
               const Spacer(),
               Text(
@@ -176,7 +184,9 @@ class _PathsHero extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            activePath == null ? 'Un camino para este momento' : 'Continúa tu camino',
+            activePath == null
+                ? 'Un camino para este momento'
+                : 'Continúa tu camino',
             style: GoogleFonts.inter(
               fontSize: 11,
               color: Colors.white.withValues(alpha: .66),
@@ -207,7 +217,11 @@ class _PathsHero extends StatelessWidget {
               backgroundColor: Colors.white,
               foregroundColor: const Color(0xFF34284F),
             ),
-            icon: Icon(activePath == null ? Icons.arrow_forward_rounded : Icons.play_arrow_rounded),
+            icon: Icon(
+              activePath == null
+                  ? Icons.arrow_forward_rounded
+                  : Icons.play_arrow_rounded,
+            ),
             label: Text(activePath == null ? 'Conocer el camino' : 'Continuar'),
           ),
         ],
@@ -221,7 +235,12 @@ class _PathCard extends StatelessWidget {
   final SpiritualPathProgress progress;
   final bool active;
   final VoidCallback onTap;
-  const _PathCard({required this.path, required this.progress, required this.active, required this.onTap});
+  const _PathCard({
+    required this.path,
+    required this.progress,
+    required this.active,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -274,7 +293,9 @@ class _PathCard extends StatelessWidget {
                         ),
                         if (active || complete)
                           Icon(
-                            complete ? Icons.check_circle_rounded : Icons.bolt_rounded,
+                            complete
+                                ? Icons.check_circle_rounded
+                                : Icons.bolt_rounded,
                             size: 17,
                             color: complete ? scheme.tertiary : path.accent,
                           ),
@@ -283,7 +304,10 @@ class _PathCard extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       '${path.days.length} días · ${path.minutesPerDay} min al día',
-                      style: GoogleFonts.inter(fontSize: 11, color: scheme.onSurfaceVariant),
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: scheme.onSurfaceVariant,
+                      ),
                     ),
                     if (value > 0) ...[
                       const SizedBox(height: 9),
@@ -316,11 +340,25 @@ class _SectionHeader extends StatelessWidget {
   const _SectionHeader({required this.eyebrow, required this.title});
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(eyebrow, style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: Theme.of(context).colorScheme.secondary)),
-          const SizedBox(height: 4),
-          Text(title, style: GoogleFonts.playfairDisplay(fontSize: 22, fontWeight: FontWeight.w700)),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        eyebrow,
+        style: GoogleFonts.inter(
+          fontSize: 9,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 1.4,
+          color: Theme.of(context).colorScheme.secondary,
+        ),
+      ),
+      const SizedBox(height: 4),
+      Text(
+        title,
+        style: GoogleFonts.playfairDisplay(
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    ],
+  );
 }

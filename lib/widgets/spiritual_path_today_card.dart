@@ -7,6 +7,7 @@ import '../screens/spiritual_path_detail_screen.dart';
 import '../screens/spiritual_paths_screen.dart';
 import '../services/spiritual_path_service.dart';
 import '../services/personalization_service.dart';
+import '../services/storage_service.dart';
 
 class SpiritualPathTodayCard extends StatefulWidget {
   const SpiritualPathTodayCard({super.key});
@@ -27,9 +28,16 @@ class _SpiritualPathTodayCardState extends State<SpiritualPathTodayCard> {
 
   Future<_TodayPathState> _load() async {
     final activeId = await _service.activePathId();
+    final storage = StorageService();
+    final preference = storage.getPreferredSpiritualMoment();
+    final recommendationHour = preference == 'evening'
+        ? 21
+        : preference == 'morning'
+        ? 9
+        : DateTime.now().hour;
     final path = activeId == null
         ? SpiritualPathsCatalog.recommend(
-            hour: DateTime.now().hour,
+            hour: recommendationHour,
             emotion: PersonalizationService().getUserEmotion(),
           )
         : SpiritualPathsCatalog.byId(activeId);
@@ -38,12 +46,15 @@ class _SpiritualPathTodayCardState extends State<SpiritualPathTodayCard> {
       path: path,
       progress: progress,
       isActive: activeId != null,
+      preferredMinutes: storage.getPreferredDailyMinutes(),
     );
   }
 
   Future<void> _open(_TodayPathState state) async {
     await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => SpiritualPathDetailScreen(path: state.path)),
+      MaterialPageRoute(
+        builder: (_) => SpiritualPathDetailScreen(path: state.path),
+      ),
     );
     if (mounted) setState(() => _state = _load());
   }
@@ -65,7 +76,10 @@ class _SpiritualPathTodayCardState extends State<SpiritualPathTodayCard> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color.alphaBlend(path.accent.withValues(alpha: .11), scheme.surface),
+                Color.alphaBlend(
+                  path.accent.withValues(alpha: .11),
+                  scheme.surface,
+                ),
                 scheme.surface.withValues(alpha: .92),
               ],
             ),
@@ -92,7 +106,9 @@ class _SpiritualPathTodayCardState extends State<SpiritualPathTodayCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          state.isActive ? 'TU CAMINO ACTIVO' : 'PARA ESTE MOMENTO',
+                          state.isActive
+                              ? 'TU CAMINO ACTIVO'
+                              : 'PARA ESTE MOMENTO',
                           style: GoogleFonts.inter(
                             fontSize: 8.5,
                             letterSpacing: 1.25,
@@ -113,7 +129,9 @@ class _SpiritualPathTodayCardState extends State<SpiritualPathTodayCard> {
                   TextButton(
                     onPressed: () async {
                       await Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const SpiritualPathsScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => const SpiritualPathsScreen(),
+                        ),
                       );
                       if (mounted) setState(() => _state = _load());
                     },
@@ -125,7 +143,7 @@ class _SpiritualPathTodayCardState extends State<SpiritualPathTodayCard> {
               Text(
                 state.isActive
                     ? 'Día $next · ${path.days[next - 1].title}'
-                    : path.subtitle,
+                    : '${path.subtitle} · Ritmo de ${state.preferredMinutes} min',
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -153,8 +171,16 @@ class _SpiritualPathTodayCardState extends State<SpiritualPathTodayCard> {
                     backgroundColor: path.accent,
                     foregroundColor: Colors.white,
                   ),
-                  icon: Icon(state.isActive ? Icons.play_arrow_rounded : Icons.route_rounded),
-                  label: Text(state.isActive ? 'Continuar mi camino' : 'Explorar este camino'),
+                  icon: Icon(
+                    state.isActive
+                        ? Icons.play_arrow_rounded
+                        : Icons.route_rounded,
+                  ),
+                  label: Text(
+                    state.isActive
+                        ? 'Continuar mi camino'
+                        : 'Explorar este camino',
+                  ),
                 ),
               ),
             ],
@@ -169,5 +195,11 @@ class _TodayPathState {
   final SpiritualPath path;
   final SpiritualPathProgress progress;
   final bool isActive;
-  const _TodayPathState({required this.path, required this.progress, required this.isActive});
+  final int preferredMinutes;
+  const _TodayPathState({
+    required this.path,
+    required this.progress,
+    required this.isActive,
+    required this.preferredMinutes,
+  });
 }

@@ -42,6 +42,7 @@ import 'screens/help_support_screen.dart';
 import 'screens/faq_screen.dart';
 import 'screens/report_problem_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/personalization_screen.dart';
 import 'screens/spiritual_paths_screen.dart';
 import 'screens/comments_screen.dart';
 import 'screens/my_posts_screen.dart';
@@ -54,6 +55,7 @@ import 'screens/traditional_prayers_religion_selection_screen.dart';
 import 'services/content_validator.dart';
 import 'services/daily_content_service.dart';
 import 'theme/app_theme.dart';
+import 'widgets/verbum_bottom_navigation.dart';
 import 'screens/welcome_auth_screen.dart';
 import 'bible/ui/bible_books_screen.dart';
 
@@ -140,6 +142,21 @@ void main() async {
 
   runApp(const MyApp());
   DeepLinkService.instance.initialize(_navigatorKey);
+  NotificationService.payloadStream.listen(_handleNotificationPayload);
+}
+
+void _handleNotificationPayload(String payload) {
+  final navigator = _navigatorKey.currentState;
+  if (navigator == null) return;
+  if (payload.startsWith('spiritual_path:')) {
+    DeepLinkService.instance.openSpiritualPath(
+      payload.substring('spiritual_path:'.length),
+    );
+  } else if (payload == 'emotion') {
+    navigator.pushNamed('/emotion-selection');
+  } else {
+    navigator.pushNamedAndRemoveUntil('/home', (route) => false);
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -230,6 +247,7 @@ class MyApp extends StatelessWidget {
               '/report-problem': (context) => const ReportProblemScreen(),
               '/settings': (context) => const SettingsScreen(),
               '/spiritual-paths': (context) => const SpiritualPathsScreen(),
+              '/personalization': (context) => const PersonalizationScreen(),
               '/comments': (context) {
                 final args =
                     ModalRoute.of(context)?.settings.arguments
@@ -243,9 +261,7 @@ class MyApp extends StatelessWidget {
             },
             navigatorObservers: [
               _NotificationNavigatorObserver(),
-              FirebaseAnalyticsObserver(
-                analytics: FirebaseAnalytics.instance,
-              ),
+              FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
             ],
           );
         },
@@ -266,6 +282,15 @@ class _NotificationNavigatorObserver extends NavigatorObserver {
         if (route.navigator != null) {
           route.navigator!.pushNamed('/emotion-selection');
           _notificationPayload = null; // Limpiar payload
+        }
+      });
+    } else if (_notificationPayload?.startsWith('spiritual_path:') == true) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (route.navigator != null) {
+          DeepLinkService.instance.openSpiritualPath(
+            _notificationPayload!.substring('spiritual_path:'.length),
+          );
+          _notificationPayload = null;
         }
       });
     }
@@ -354,9 +379,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final dark = theme.brightness == Brightness.dark;
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
@@ -368,61 +390,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           ),
         ),
       ),
-      bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.fromLTRB(12, 3, 12, 9),
-        child: Container(
-          decoration: BoxDecoration(
-            color: dark
-                ? const Color(0xFF262130).withValues(alpha: .97)
-                : const Color(0xFFFFFCF7).withValues(alpha: .98),
-            borderRadius: BorderRadius.circular(23),
-            border: Border.all(color: scheme.outline.withValues(alpha: .14)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: dark ? .28 : .11),
-                blurRadius: 24,
-                offset: const Offset(0, 9),
-              ),
-            ],
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: NavigationBar(
-            height: 63,
-            backgroundColor: Colors.transparent,
-            indicatorColor: scheme.primary.withValues(alpha: dark ? .24 : .11),
-            selectedIndex: _currentIndex,
-            onDestinationSelected: _onDestinationSelected,
-            animationDuration: const Duration(milliseconds: 280),
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.chat_bubble_outline_rounded),
-                selectedIcon: Icon(Icons.chat_bubble_rounded),
-                label: 'Chat',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.groups_2_outlined),
-                selectedIcon: Icon(Icons.groups_2_rounded),
-                label: 'Comunidad',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.auto_awesome_outlined),
-                selectedIcon: Icon(Icons.auto_awesome_rounded),
-                label: 'Hoy',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.favorite_border_rounded),
-                selectedIcon: Icon(Icons.favorite_rounded),
-                label: 'Oraciones',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.menu_book_outlined),
-                selectedIcon: Icon(Icons.menu_book_rounded),
-                label: 'Biblia',
-              ),
-            ],
-          ),
-        ),
+      bottomNavigationBar: VerbumBottomNavigation(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: _onDestinationSelected,
       ),
     );
   }

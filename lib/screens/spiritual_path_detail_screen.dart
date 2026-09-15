@@ -12,7 +12,8 @@ class SpiritualPathDetailScreen extends StatefulWidget {
   const SpiritualPathDetailScreen({super.key, required this.path});
 
   @override
-  State<SpiritualPathDetailScreen> createState() => _SpiritualPathDetailScreenState();
+  State<SpiritualPathDetailScreen> createState() =>
+      _SpiritualPathDetailScreenState();
 }
 
 class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
@@ -28,14 +29,12 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
   void _reload() => _progress = _service.progressFor(widget.path.id);
 
   Future<void> _openDay(int number) async {
-    await _service.start(widget.path.id);
+    await _service.start(widget.path.id, pathTitle: widget.path.title);
     if (!mounted) return;
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => SpiritualPathDayScreen(
-          path: widget.path,
-          dayNumber: number,
-        ),
+        builder: (_) =>
+            SpiritualPathDayScreen(path: widget.path, dayNumber: number),
       ),
     );
     if (mounted) setState(_reload);
@@ -112,15 +111,20 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
                         ),
                         const SizedBox(height: 13),
                         ...path.days.map((day) {
-                          final done = progress.completedDays.contains(day.number);
-                          final available = day.number <= next || done || complete;
+                          final done = progress.completedDays.contains(
+                            day.number,
+                          );
+                          final available =
+                              day.number <= next || done || complete;
                           return _DayTile(
                             day: day,
                             done: done,
                             current: day.number == next && !complete,
                             available: available,
                             accent: path.accent,
-                            onTap: available ? () => _openDay(day.number) : null,
+                            onTap: available
+                                ? () => _openDay(day.number)
+                                : null,
                           );
                         }),
                       ],
@@ -149,15 +153,15 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
                           complete
                               ? Icons.replay_rounded
                               : started
-                                  ? Icons.play_arrow_rounded
-                                  : Icons.route_rounded,
+                              ? Icons.play_arrow_rounded
+                              : Icons.route_rounded,
                         ),
                         label: Text(
                           complete
                               ? 'Recorrer de nuevo'
                               : started
-                                  ? 'Continuar con el día $next'
-                                  : 'Comenzar este camino',
+                              ? 'Continuar con el día $next'
+                              : 'Comenzar este camino',
                         ),
                       ),
                     ),
@@ -233,13 +237,35 @@ class _PathHero extends StatelessWidget {
           const SizedBox(height: 18),
           Row(
             children: [
-              const Icon(Icons.calendar_today_outlined, color: Colors.white70, size: 16),
+              const Icon(
+                Icons.calendar_today_outlined,
+                color: Colors.white70,
+                size: 16,
+              ),
               const SizedBox(width: 6),
-              Text('${path.days.length} días', style: GoogleFonts.inter(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+              Text(
+                '${path.days.length} días',
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(width: 17),
-              const Icon(Icons.schedule_rounded, color: Colors.white70, size: 16),
+              const Icon(
+                Icons.schedule_rounded,
+                color: Colors.white70,
+                size: 16,
+              ),
               const SizedBox(width: 6),
-              Text('${path.minutesPerDay} min diarios', style: GoogleFonts.inter(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+              Text(
+                '${path.minutesPerDay} min diarios',
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
           if (value > 0) ...[
@@ -254,7 +280,10 @@ class _PathHero extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 7),
-            Text('${progress.completedDays.length} de ${path.days.length} días completados', style: GoogleFonts.inter(color: Colors.white70, fontSize: 10.5)),
+            Text(
+              '${progress.completedDays.length} de ${path.days.length} días completados',
+              style: GoogleFonts.inter(color: Colors.white70, fontSize: 10.5),
+            ),
           ],
         ],
       ),
@@ -269,7 +298,14 @@ class _DayTile extends StatelessWidget {
   final bool available;
   final Color accent;
   final VoidCallback? onTap;
-  const _DayTile({required this.day, required this.done, required this.current, required this.available, required this.accent, required this.onTap});
+  const _DayTile({
+    required this.day,
+    required this.done,
+    required this.current,
+    required this.available,
+    required this.accent,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -286,7 +322,11 @@ class _DayTile extends StatelessWidget {
             decoration: BoxDecoration(
               color: scheme.surface.withValues(alpha: available ? .92 : .55),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: current ? accent.withValues(alpha: .55) : scheme.outlineVariant),
+              border: Border.all(
+                color: current
+                    ? accent.withValues(alpha: .55)
+                    : scheme.outlineVariant,
+              ),
             ),
             child: Row(
               children: [
@@ -299,20 +339,51 @@ class _DayTile extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: done
-                      ? const Icon(Icons.check_rounded, color: Colors.white, size: 19)
-                      : Text('${day.number}', style: GoogleFonts.inter(fontWeight: FontWeight.w800, color: available ? accent : scheme.outline)),
+                      ? const Icon(
+                          Icons.check_rounded,
+                          color: Colors.white,
+                          size: 19,
+                        )
+                      : Text(
+                          '${day.number}',
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w800,
+                            color: available ? accent : scheme.outline,
+                          ),
+                        ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(day.title, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: available ? scheme.onSurface : scheme.onSurfaceVariant)),
-                      Text(day.subtitle, style: GoogleFonts.inter(fontSize: 10.5, color: scheme.onSurfaceVariant)),
+                      Text(
+                        day.title,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: available
+                              ? scheme.onSurface
+                              : scheme.onSurfaceVariant,
+                        ),
+                      ),
+                      Text(
+                        day.subtitle,
+                        style: GoogleFonts.inter(
+                          fontSize: 10.5,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                Icon(available ? Icons.chevron_right_rounded : Icons.lock_outline_rounded, size: 19, color: scheme.outline),
+                Icon(
+                  available
+                      ? Icons.chevron_right_rounded
+                      : Icons.lock_outline_rounded,
+                  size: 19,
+                  color: scheme.outline,
+                ),
               ],
             ),
           ),

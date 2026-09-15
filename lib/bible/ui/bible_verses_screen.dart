@@ -9,6 +9,7 @@ import '../../widgets/app_scaffold.dart';
 import '../data/bible_db.dart';
 import '../domain/verse.dart';
 import '../services/bible_reading_preferences.dart';
+import '../../services/read_aloud_service.dart';
 
 class BibleVersesScreen extends StatefulWidget {
   final String bookId;
@@ -42,6 +43,8 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
   int _maxChapter = 1;
   bool _didScrollToInitial = false;
   Timer? _positionDebounce;
+  final _readAloud = ReadAloudService();
+  bool _speaking = false;
 
   @override
   void initState() {
@@ -56,7 +59,37 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
     _positionDebounce?.cancel();
     _scrollController.removeListener(_rememberVisibleVerse);
     _scrollController.dispose();
+    _readAloud.stop();
     super.dispose();
+  }
+
+  Future<void> _toggleReadAloud() async {
+    if (_speaking) {
+      await _readAloud.stop();
+      if (mounted) setState(() => _speaking = false);
+      return;
+    }
+    if (_verses.isEmpty) return;
+    final chosen = _selectedVerses.isEmpty ? _verses : _selectedVerses;
+    final text = chosen
+        .map((verse) => '${verse.verse}. ${_sanitize(verse.text)}')
+        .join(' ');
+    setState(() => _speaking = true);
+    try {
+      await _readAloud.speak(
+        '${widget.bookName}, capítulo ${widget.chapter}. $text',
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo iniciar la lectura en voz alta.'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _speaking = false);
+    }
   }
 
   Future<List<Verse>> _loadChapter() async {
@@ -272,6 +305,13 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
       showBanner: false,
       showGuestNotice: false,
       actions: [
+        IconButton(
+          tooltip: _speaking ? 'Detener audio' : 'Escuchar capítulo',
+          onPressed: _toggleReadAloud,
+          icon: Icon(
+            _speaking ? Icons.stop_circle_outlined : Icons.headphones_rounded,
+          ),
+        ),
         TextButton(
           onPressed: _showReaderSettings,
           child: Text(

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/app_provider.dart';
 import '../services/personalization_service.dart';
+import '../services/storage_service.dart';
 
 /// Pantalla de personalización del usuario
 class PersonalizationScreen extends StatefulWidget {
@@ -17,6 +18,8 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
   final _personalizationService = PersonalizationService();
   String? _selectedEmotion;
   bool _isLoading = false;
+  int _selectedMinutes = 5;
+  String _preferredMoment = 'auto';
 
   final List<Map<String, dynamic>> _emotions = [
     {
@@ -92,6 +95,8 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
     if (emotion.isNotEmpty) {
       _selectedEmotion = emotion;
     }
+    _selectedMinutes = StorageService().getPreferredDailyMinutes();
+    _preferredMoment = StorageService().getPreferredSpiritualMoment();
   }
 
   @override
@@ -125,6 +130,8 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
       if (_selectedEmotion != null) {
         await provider.setUserEmotion(_selectedEmotion!);
       }
+      await StorageService().setPreferredDailyMinutes(_selectedMinutes);
+      await StorageService().setPreferredSpiritualMoment(_preferredMoment);
 
       // Recargar versículo personalizado si hay emoción
       if (_selectedEmotion != null) {
@@ -216,6 +223,15 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
                 ),
                 const SizedBox(height: 16),
                 _buildEmotionGrid(isDark, colorScheme),
+                const SizedBox(height: 32),
+
+                _buildSectionHeader(
+                  'Tu ritmo diario',
+                  Icons.schedule_rounded,
+                  colorScheme,
+                ),
+                const SizedBox(height: 14),
+                _buildRhythmPreferences(colorScheme),
                 const SizedBox(height: 32),
 
                 // Botón de guardar
@@ -422,6 +438,66 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
                   ),
                 ],
               ),
+      ),
+    );
+  }
+
+  Widget _buildRhythmPreferences(ColorScheme colorScheme) {
+    const moments = <String, String>{
+      'auto': 'Según mi día',
+      'morning': 'Mañana',
+      'evening': 'Noche',
+    };
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '¿Cuánto tiempo quieres dedicar normalmente?',
+            style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            children: [3, 5, 10]
+                .map(
+                  (minutes) => ChoiceChip(
+                    label: Text('$minutes min'),
+                    selected: _selectedMinutes == minutes,
+                    onSelected: (_) =>
+                        setState(() => _selectedMinutes = minutes),
+                  ),
+                )
+                .toList(),
+          ),
+          const SizedBox(height: 17),
+          Text(
+            '¿Cuándo prefieres encontrar tu momento principal?',
+            style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: moments.entries
+                .map(
+                  (entry) => ChoiceChip(
+                    label: Text(entry.value),
+                    selected: _preferredMoment == entry.key,
+                    onSelected: (_) =>
+                        setState(() => _preferredMoment = entry.key),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
       ),
     );
   }

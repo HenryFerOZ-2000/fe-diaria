@@ -108,6 +108,7 @@ lib/generated_plugin_registrant.dart
 **/android/**/GeneratedPluginRegistrant.java
 **/android/key.properties
 *.jks
+*.keystore
 
 # Firebase
 **/ios/firebase_app_id_file.json

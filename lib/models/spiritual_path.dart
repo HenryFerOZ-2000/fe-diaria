@@ -63,8 +63,9 @@ class SpiritualPathProgress {
     this.lastCompletedAt,
   });
 
-  double progressFor(int totalDays) =>
-      totalDays == 0 ? 0 : (completedDays.length / totalDays).clamp(0, 1);
+  double progressFor(int totalDays) => totalDays == 0
+      ? 0
+      : (completedDays.length / totalDays).clamp(0, 1).toDouble();
 
   int nextDay(int totalDays) {
     for (var day = 1; day <= totalDays; day++) {

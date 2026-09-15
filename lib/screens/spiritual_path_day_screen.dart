@@ -50,7 +50,9 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('La lectura en voz alta no está disponible en este dispositivo.'),
+            content: Text(
+              'La lectura en voz alta no está disponible en este dispositivo.',
+            ),
           ),
         );
       }
@@ -93,7 +95,6 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
   @override
   Widget build(BuildContext context) {
     final path = widget.path;
-    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: const Color(0xFF241C38),
       body: SafeArea(
@@ -106,7 +107,10 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                   IconButton(
                     tooltip: 'Volver',
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                    icon: const Icon(
+                      Icons.arrow_back_rounded,
+                      color: Colors.white,
+                    ),
                   ),
                   Expanded(
                     child: Column(
@@ -137,7 +141,9 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                     tooltip: _speaking ? 'Detener audio' : 'Escuchar el día',
                     onPressed: _toggleNarration,
                     icon: Icon(
-                      _speaking ? Icons.stop_circle_outlined : Icons.headphones_rounded,
+                      _speaking
+                          ? Icons.stop_circle_outlined
+                          : Icons.headphones_rounded,
                       color: Colors.white,
                     ),
                   ),
@@ -261,8 +267,14 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                               height: 17,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : Icon(_page == 3 ? Icons.check_rounded : Icons.arrow_forward_rounded),
-                      label: Text(_page == 3 ? 'Completar este día' : 'Continuar'),
+                          : Icon(
+                              _page == 3
+                                  ? Icons.check_rounded
+                                  : Icons.arrow_forward_rounded,
+                            ),
+                      label: Text(
+                        _page == 3 ? 'Completar este día' : 'Continuar',
+                      ),
                     ),
                   ),
                 ],
@@ -370,7 +382,11 @@ class _ReadingPage extends StatelessWidget {
             ),
             if (footer != null) ...[
               const SizedBox(height: 24),
-              Container(width: 38, height: 1, color: accent.withValues(alpha: .55)),
+              Container(
+                width: 38,
+                height: 1,
+                color: accent.withValues(alpha: .55),
+              ),
               const SizedBox(height: 10),
               Text(
                 footer!,
@@ -392,7 +408,11 @@ class _CompletionDialog extends StatelessWidget {
   final SpiritualPath path;
   final SpiritualPathDay day;
   final VoidCallback onClose;
-  const _CompletionDialog({required this.path, required this.day, required this.onClose});
+  const _CompletionDialog({
+    required this.path,
+    required this.day,
+    required this.onClose,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -405,12 +425,19 @@ class _CompletionDialog extends StatelessWidget {
           color: path.accent.withValues(alpha: .12),
           shape: BoxShape.circle,
         ),
-        child: Icon(finished ? Icons.celebration_rounded : Icons.auto_awesome_rounded, color: path.accent, size: 31),
+        child: Icon(
+          finished ? Icons.celebration_rounded : Icons.auto_awesome_rounded,
+          color: path.accent,
+          size: 31,
+        ),
       ),
       title: Text(
         finished ? 'Has completado el camino' : 'Tu paso de hoy está completo',
         textAlign: TextAlign.center,
-        style: GoogleFonts.playfairDisplay(fontSize: 23, fontWeight: FontWeight.w700),
+        style: GoogleFonts.playfairDisplay(
+          fontSize: 23,
+          fontWeight: FontWeight.w700,
+        ),
       ),
       content: Text(
         finished
@@ -429,7 +456,10 @@ class _CompletionDialog extends StatelessWidget {
           ),
           child: const Text('Compartir'),
         ),
-        FilledButton(onPressed: onClose, child: const Text('Guardar este momento')),
+        FilledButton(
+          onPressed: onClose,
+          child: const Text('Guardar este momento'),
+        ),
       ],
     );
   }

@@ -38,19 +38,21 @@ class _IntentionPrayerReadScreenState extends State<IntentionPrayerReadScreen> {
     });
     try {
       final prayer = await _rotation.next(widget.categoryKey);
-      if (prayer == null)
+      if (prayer == null) {
         throw Exception('No hay oraciones configuradas para esta intención.');
+      }
       if (!mounted) return;
       setState(() {
         _current = prayer;
         _loading = false;
       });
     } catch (error) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _error = error.toString().replaceFirst('Exception: ', '');
           _loading = false;
         });
+      }
     }
   }
 

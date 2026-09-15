@@ -50,8 +50,8 @@ class _ReadingChatScreenState extends State<ReadingChatScreen> {
     _controller.clear();
     final contextText = _history.isEmpty
         ? 'Estoy meditando este contenido cristiano: "${widget.content}" '
-            '${widget.reference?.isNotEmpty == true ? '(${widget.reference})' : ''}. '
-            'Acompáñame de manera breve, cálida y práctica. Mi pregunta es: $trimmed'
+              '${widget.reference?.isNotEmpty == true ? '(${widget.reference})' : ''}. '
+              'Acompáñame de manera breve, cálida y práctica. Mi pregunta es: $trimmed'
         : trimmed;
     try {
       final response = await _chatService.sendMessage(
@@ -204,7 +204,10 @@ class _ReadingChatScreenState extends State<ReadingChatScreen> {
                           alignment: Alignment.centerLeft,
                           child: Container(
                             margin: const EdgeInsets.symmetric(vertical: 6),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 11,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: .08),
                               borderRadius: BorderRadius.circular(14),
@@ -287,7 +290,9 @@ class _ReadingChatScreenState extends State<ReadingChatScreen> {
                       ),
                       const SizedBox(width: 10),
                       GestureDetector(
-                        onTap: _loading ? null : () => _sendMessage(_controller.text),
+                        onTap: _loading
+                            ? null
+                            : () => _sendMessage(_controller.text),
                         child: Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(

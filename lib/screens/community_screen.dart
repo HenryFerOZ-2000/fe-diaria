@@ -19,6 +19,9 @@ import '../faith/faith_tradition.dart';
 import '../faith/tradition_capabilities.dart';
 import '../widgets/verbum_ambient_background.dart';
 import '../widgets/verbum_header_actions.dart';
+import '../data/spiritual_paths_catalog.dart';
+import '../models/spiritual_path.dart';
+import 'spiritual_path_detail_screen.dart';
 
 class CommunityScreen extends StatelessWidget {
   const CommunityScreen({super.key});
@@ -655,6 +658,18 @@ class _CommunityBasicView extends StatelessWidget {
           isVerified: isVerified,
           inviteCode: inviteCode,
         ),
+        if (isAdmin ||
+            ((data['activeSpiritualPathId'] as String?)?.isNotEmpty ==
+                true)) ...[
+          const SizedBox(height: 14),
+          _CommunityPathCard(
+            communityId: communityId,
+            currentUid: currentUid,
+            pathId: data['activeSpiritualPathId'] as String?,
+            isAdmin: isAdmin,
+            communityService: communityService,
+          ),
+        ],
         const SizedBox(height: 18),
         Row(
           children: [
@@ -1066,6 +1081,179 @@ class _CommunityBasicView extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+}
+
+class _CommunityPathCard extends StatelessWidget {
+  final String communityId;
+  final String currentUid;
+  final String? pathId;
+  final bool isAdmin;
+  final CommunityService communityService;
+
+  const _CommunityPathCard({
+    required this.communityId,
+    required this.currentUid,
+    required this.pathId,
+    required this.isAdmin,
+    required this.communityService,
+  });
+
+  Future<void> _choose(BuildContext context) async {
+    final selected = await showModalBottomSheet<SpiritualPath>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 4, 18, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Camino de la comunidad',
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 23,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                'Elige un recorrido que todos puedan realizar juntos.',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 14),
+              ...SpiritualPathsCatalog.paths.map(
+                (path) => ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: CircleAvatar(
+                    backgroundColor: path.accent.withValues(alpha: .12),
+                    child: Icon(path.icon, color: path.accent),
+                  ),
+                  title: Text(path.title),
+                  subtitle: Text(path.subtitle),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () => Navigator.pop(sheetContext, path),
+                ),
+              ),
+              if (pathId?.isNotEmpty == true)
+                TextButton.icon(
+                  onPressed: () async {
+                    Navigator.pop(sheetContext);
+                    await communityService.setCommunitySpiritualPath(
+                      communityId: communityId,
+                      editorUid: currentUid,
+                    );
+                  },
+                  icon: const Icon(Icons.stop_circle_outlined),
+                  label: const Text('Finalizar el camino actual'),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (selected == null) return;
+    await communityService.setCommunitySpiritualPath(
+      communityId: communityId,
+      editorUid: currentUid,
+      pathId: selected.id,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final hasPath = pathId?.isNotEmpty == true;
+    final path = hasPath ? SpiritualPathsCatalog.byId(pathId!) : null;
+    final accent = path?.accent ?? scheme.secondary;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: path != null
+            ? () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => SpiritualPathDetailScreen(path: path),
+                ),
+              )
+            : () => _choose(context),
+        borderRadius: BorderRadius.circular(23),
+        child: Ink(
+          padding: const EdgeInsets.all(17),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.alphaBlend(accent.withValues(alpha: .14), scheme.surface),
+                scheme.surface,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(23),
+            border: Border.all(color: accent.withValues(alpha: .28)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 45,
+                height: 45,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: .12),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Icon(
+                  path?.icon ?? Icons.group_work_outlined,
+                  color: accent,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'CAMINO DE LA COMUNIDAD',
+                      style: GoogleFonts.inter(
+                        color: accent,
+                        fontSize: 8,
+                        letterSpacing: 1.1,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      path?.title ?? 'Elijan un camino para recorrer juntos',
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    if (path != null)
+                      Text(
+                        path.subtitle,
+                        style: GoogleFonts.inter(
+                          fontSize: 10.5,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              if (isAdmin)
+                IconButton(
+                  tooltip: 'Cambiar camino',
+                  onPressed: () => _choose(context),
+                  icon: const Icon(Icons.tune_rounded),
+                )
+              else
+                const Icon(Icons.chevron_right_rounded),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

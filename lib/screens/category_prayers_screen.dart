@@ -305,19 +305,26 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
 
   IconData? _getCategoryIcon(String title) {
     final titleLower = title.toLowerCase();
-    if (titleLower.contains('familia')) return Icons.family_restroom_rounded;
+    if (titleLower.contains('familia')) {
+      return Icons.family_restroom_rounded;
+    }
     if (titleLower.contains('salud')) return Icons.favorite_rounded;
     if (titleLower.contains('trabajo')) return Icons.work_rounded;
-    if (titleLower.contains('finanzas'))
+    if (titleLower.contains('finanzas')) {
       return Icons.account_balance_wallet_rounded;
+    }
     if (titleLower.contains('hogar')) return Icons.home_rounded;
-    if (titleLower.contains('protección') || titleLower.contains('proteccion'))
+    if (titleLower.contains('protección') ||
+        titleLower.contains('proteccion')) {
       return Icons.shield_rounded;
+    }
     if (titleLower.contains('descanso')) return Icons.bedtime_rounded;
-    if (titleLower.contains('mente') || titleLower.contains('paz'))
+    if (titleLower.contains('mente') || titleLower.contains('paz')) {
       return Icons.self_improvement_rounded;
-    if (titleLower.contains('ánimo') || titleLower.contains('animo'))
+    }
+    if (titleLower.contains('ánimo') || titleLower.contains('animo')) {
       return Icons.emoji_emotions_rounded;
+    }
     if (titleLower.contains('agradecimiento')) return Icons.celebration_rounded;
     return null;
   }

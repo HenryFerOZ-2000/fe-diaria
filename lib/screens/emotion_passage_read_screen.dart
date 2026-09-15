@@ -38,19 +38,21 @@ class _EmotionPassageReadScreenState extends State<EmotionPassageReadScreen> {
     });
     try {
       final prayer = await _rotation.next(widget.emotionKey);
-      if (prayer == null)
+      if (prayer == null) {
         throw Exception('No hay oraciones configuradas para esta emoción.');
+      }
       if (!mounted) return;
       setState(() {
         _prayer = prayer;
         _loading = false;
       });
     } catch (error) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _error = error.toString().replaceFirst('Exception: ', '');
           _loading = false;
         });
+      }
     }
   }
 
