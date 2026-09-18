@@ -33,10 +33,6 @@ android {
         options.compilerArgs.add("-Xlint:-options")
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-    }
-
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.ozcorp.verbum"
@@ -44,7 +40,7 @@ android {
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion  // Requerido para Google Mobile Ads
         targetSdk = flutter.targetSdkVersion
-        versionCode = 9
+        versionCode = 10
         versionName = flutter.versionName
     }
 
@@ -77,6 +73,12 @@ android {
             isMinifyEnabled = false
             isShrinkResources = false
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
     }
 }
 
