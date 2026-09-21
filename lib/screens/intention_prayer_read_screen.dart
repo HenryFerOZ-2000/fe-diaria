@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../faith/content_provenance.dart';
 import '../models/intention_prayer.dart';
 import '../repositories/intention_prayer_repository.dart';
 import '../services/rotation_service.dart';
@@ -84,6 +85,7 @@ class _IntentionPrayerReadScreenState extends State<IntentionPrayerReadScreen> {
 
   @override
   Widget build(BuildContext context) => PrayerReadingExperience(
+    provenance: ContentProvenance.aiGenerated,
     loading: _loading,
     error: _error,
     category: widget.categoryKey,

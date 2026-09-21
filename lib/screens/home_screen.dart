@@ -15,6 +15,7 @@ import '../services/daily_progress_service.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/verbum_header_actions.dart';
 import '../widgets/spiritual_path_today_card.dart';
+import '../features/liturgy/presentation/today_liturgy_section.dart';
 
 Mission _buildDailyPracticeMission(DateTime date) {
   final practices = <Mission>[
@@ -138,7 +139,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         Mission(
           id: 'verse',
           title: 'Recibe la Palabra',
-          description: 'Lee despacio el mensaje que Dios tiene para ti hoy.',
+          description:
+              'Lee despacio el versículo bíblico de hoy en la edición RV1909.',
           icon: Icons.menu_book_rounded,
           durationMinutes: 1,
         ),
@@ -483,6 +485,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  const TodayLiturgySection(),
                   const SpiritualPathTodayCard(),
                   const SizedBox(height: 22),
                   _buildMissionsSection(context, provider),

@@ -23,16 +23,21 @@ class PrayerService {
   Prayer? _todayMorningPrayer;
   Prayer? _todayEveningPrayer;
   String? _lastTradition;
+  String? _morningContext;
+  String? _eveningContext;
 
   /// Obtiene la oración de la mañana del día actual
   Future<Prayer> getTodayMorningPrayer() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final tradition = _currentTradition();
+    final context = '${today.toIso8601String()}:$tradition';
+    _prepareDailyContext(today, tradition);
 
     // Si ya tenemos la oración de hoy, retornarla
     if (_lastDate != null &&
         _todayMorningPrayer != null &&
+        _morningContext == context &&
         _lastTradition == tradition &&
         _lastDate!.isAtSameMomentAs(today)) {
       return _todayMorningPrayer!;
@@ -41,8 +46,9 @@ class PrayerService {
     // Verificar caché
     final cachedPrayer = CacheService.getTodayPrayer(type: 'morning');
     if (cachedPrayer != null &&
-        _isPrayerForTradition(cachedPrayer.id, tradition)) {
+        _isPrayerForTradition(cachedPrayer.id, tradition, 'morning')) {
       _todayMorningPrayer = cachedPrayer;
+      _morningContext = context;
       _lastDate = today;
       _lastTradition = tradition;
       return _todayMorningPrayer!;
@@ -76,6 +82,7 @@ class PrayerService {
         );
         await CacheService.saveTodayPrayer(prayer);
         _todayMorningPrayer = prayer;
+        _morningContext = context;
         _lastDate = today;
         _lastTradition = tradition;
         return prayer;
@@ -93,6 +100,7 @@ class PrayerService {
 
       await CacheService.saveTodayPrayer(translatedPrayer);
       _todayMorningPrayer = translatedPrayer;
+      _morningContext = context;
       _lastDate = today;
       return translatedPrayer;
     } catch (e) {
@@ -100,13 +108,15 @@ class PrayerService {
 
       // Fallback a última oración guardada
       final lastPrayer = CacheService.getLastPrayer(type: 'morning');
-      if (lastPrayer != null) {
+      if (lastPrayer != null &&
+          _isPrayerForTradition(lastPrayer.id, tradition, 'morning')) {
         final targetLanguage = LanguageService.getLanguage();
         final translatedPrayer = await _translatePrayer(
           lastPrayer,
           targetLanguage,
         );
         _todayMorningPrayer = translatedPrayer;
+        _morningContext = context;
         return translatedPrayer;
       }
 
@@ -115,6 +125,7 @@ class PrayerService {
       final targetLanguage = LanguageService.getLanguage();
       final translatedPrayer = await _translatePrayer(prayer, targetLanguage);
       _todayMorningPrayer = translatedPrayer;
+      _morningContext = context;
       return translatedPrayer;
     }
   }
@@ -124,10 +135,13 @@ class PrayerService {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final tradition = _currentTradition();
+    final context = '${today.toIso8601String()}:$tradition';
+    _prepareDailyContext(today, tradition);
 
     // Si ya tenemos la oración de hoy, retornarla
     if (_lastDate != null &&
         _todayEveningPrayer != null &&
+        _eveningContext == context &&
         _lastTradition == tradition &&
         _lastDate!.isAtSameMomentAs(today)) {
       return _todayEveningPrayer!;
@@ -136,8 +150,9 @@ class PrayerService {
     // Verificar caché
     final cachedPrayer = CacheService.getTodayPrayer(type: 'evening');
     if (cachedPrayer != null &&
-        _isPrayerForTradition(cachedPrayer.id, tradition)) {
+        _isPrayerForTradition(cachedPrayer.id, tradition, 'evening')) {
       _todayEveningPrayer = cachedPrayer;
+      _eveningContext = context;
       _lastDate = today;
       _lastTradition = tradition;
       return _todayEveningPrayer!;
@@ -171,6 +186,7 @@ class PrayerService {
         );
         await CacheService.saveTodayPrayer(prayer);
         _todayEveningPrayer = prayer;
+        _eveningContext = context;
         _lastDate = today;
         _lastTradition = tradition;
         return prayer;
@@ -188,6 +204,7 @@ class PrayerService {
 
       await CacheService.saveTodayPrayer(translatedPrayer);
       _todayEveningPrayer = translatedPrayer;
+      _eveningContext = context;
       _lastDate = today;
       return translatedPrayer;
     } catch (e) {
@@ -195,13 +212,15 @@ class PrayerService {
 
       // Fallback a última oración guardada
       final lastPrayer = CacheService.getLastPrayer(type: 'evening');
-      if (lastPrayer != null) {
+      if (lastPrayer != null &&
+          _isPrayerForTradition(lastPrayer.id, tradition, 'evening')) {
         final targetLanguage = LanguageService.getLanguage();
         final translatedPrayer = await _translatePrayer(
           lastPrayer,
           targetLanguage,
         );
         _todayEveningPrayer = translatedPrayer;
+        _eveningContext = context;
         return translatedPrayer;
       }
 
@@ -210,6 +229,7 @@ class PrayerService {
       final targetLanguage = LanguageService.getLanguage();
       final translatedPrayer = await _translatePrayer(prayer, targetLanguage);
       _todayEveningPrayer = translatedPrayer;
+      _eveningContext = context;
       return translatedPrayer;
     }
   }
@@ -266,12 +286,22 @@ class PrayerService {
     return v.isEmpty ? 'catolica' : v;
   }
 
+  void _prepareDailyContext(DateTime today, String tradition) {
+    if (_lastDate != today || _lastTradition != tradition) {
+      resetInMemoryDailyPrayers();
+      _lastDate = today;
+      _lastTradition = tradition;
+    }
+  }
+
   /// Tras cambiar tradición en Ajustes: evita mezclar oraciones en memoria con la tradición anterior.
   void resetInMemoryDailyPrayers() {
     _lastDate = null;
     _todayMorningPrayer = null;
     _todayEveningPrayer = null;
     _lastTradition = null;
+    _morningContext = null;
+    _eveningContext = null;
   }
 
   int _buildStableId({
@@ -287,10 +317,10 @@ class PrayerService {
     return traditionOffset + base + index;
   }
 
-  bool _isPrayerForTradition(int id, String tradition) {
-    final isEvangelicalId = id >= 50000;
-    return tradition == 'cristiana' || tradition == 'general'
-        ? isEvangelicalId
-        : !isEvangelicalId;
+  bool _isPrayerForTradition(int id, String tradition, String type) {
+    // Legacy timestamp IDs do not identify a tradition. Reload the bundled
+    // catalog instead of accepting every large ID as evangelical content.
+    final first = _buildStableId(type: type, index: 1, tradition: tradition);
+    return id >= first && id <= first + 365;
   }
 }

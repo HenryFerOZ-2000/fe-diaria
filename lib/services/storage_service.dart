@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/verse.dart';
 import '../models/prayer.dart';
+import '../features/liturgy/domain/calendar_selection.dart';
 
 /// Servicio de almacenamiento local usando Hive
 /// Gestiona favoritos y configuraciones de la aplicación
@@ -36,6 +37,7 @@ class StorageService {
   /// visibilidad de módulos en Categorías, copy en Comunidad y tono del chat (vía Cloud Function).
   static const String _traditionalPrayersReligionKey =
       'traditionalPrayersReligion';
+  static const String _catholicCalendarCountryKey = 'catholicCalendarCountry';
   static const String _streakCountKey = 'streakCount';
   static const String _lastStreakDateKey = 'lastStreakDate';
   static const String _savedPrayersKey = 'savedPrayers';
@@ -309,8 +311,18 @@ class StorageService {
   }
 
   // Oraciones tradicionales - Preferencia de religión
+  String? _currentUserIdOrNull() {
+    try {
+      return FirebaseAuth.instance.currentUser?.uid;
+    } on Object {
+      // El almacenamiento local también debe estar disponible durante el
+      // arranque, antes de que Firebase termine de inicializarse.
+      return null;
+    }
+  }
+
   String _traditionalPrayersReligionKeyForCurrentUser() {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final uid = _currentUserIdOrNull();
     if (uid == null || uid.isEmpty) {
       return _traditionalPrayersReligionKey;
     }
@@ -349,6 +361,37 @@ class StorageService {
     // Fallback seguro para inputs inesperados.
     await _settingsBox.put(key, toSave);
     await _saveTraditionalPrayersReligionToCloud(toSave);
+  }
+
+  String _catholicCalendarCountryKeyForCurrentUser() {
+    final uid = _currentUserIdOrNull();
+    if (uid == null || uid.isEmpty) return _catholicCalendarCountryKey;
+    return '$_catholicCalendarCountryKey:$uid';
+  }
+
+  String? getCatholicCalendarCountry() {
+    final value = _settingsBox.get(_catholicCalendarCountryKeyForCurrentUser());
+    if (value == null) return null;
+    if (value is! String) return '';
+    if (value == 'GENERAL') return value;
+    if (!RegExp(r'^[A-Z]{2}$').hasMatch(value)) return '';
+    return value;
+  }
+
+  Future<void> setCatholicCalendarSelection(CalendarSelection selection) async {
+    await _settingsBox.put(
+      _catholicCalendarCountryKeyForCurrentUser(),
+      selection.countryCode ?? 'GENERAL',
+    );
+  }
+
+  ValueListenable<Box> faithPreferencesListenable() {
+    return _settingsBox.listenable(
+      keys: [
+        _traditionalPrayersReligionKeyForCurrentUser(),
+        _catholicCalendarCountryKeyForCurrentUser(),
+      ],
+    );
   }
 
   Future<void> _saveTraditionalPrayersReligionToCloud(String religion) async {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../faith/content_provenance.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/category_prayers_service.dart';
 import '../services/share_service.dart';
@@ -510,6 +511,7 @@ class _CategoryPrayerDetailScreenState
     required String prayerText,
   }) {
     return PrayerCard(
+      provenance: ContentProvenance.aiGenerated,
       title: title,
       text: prayerText,
       icon: Icons.menu_book_rounded,

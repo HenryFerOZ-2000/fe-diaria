@@ -11,6 +11,8 @@ class CacheService {
   static const String _lastVerseDateKey = 'last_verse_date';
   static const String _lastVerseIdKey = 'last_verse_id';
   static const String _todayVerseKey = 'today_verse';
+  static const String _verseSourceKey = 'verse_source';
+  static const String _verifiedVerseSource = 'rv1909-v1';
   static const String _todayMorningPrayerKey = 'today_morning_prayer';
   static const String _todayEveningPrayerKey = 'today_evening_prayer';
 
@@ -35,6 +37,7 @@ class CacheService {
       await _verseBox.put(_todayVerseKey, verse.toJson());
       await _verseBox.put(_lastVerseDateKey, todayString);
       await _verseBox.put(_lastVerseIdKey, verse.id);
+      await _verseBox.put(_verseSourceKey, _verifiedVerseSource);
     } catch (e) {
       debugPrint('Error saving verse to cache: $e');
     }
@@ -48,7 +51,7 @@ class CacheService {
       final lastDate = _verseBox.get(_lastVerseDateKey) as String?;
 
       // Si es el mismo día, retornar el versículo guardado
-      if (lastDate == todayString) {
+      if (lastDate == todayString && _hasVerifiedVerseSource()) {
         final verseData = _verseBox.get(_todayVerseKey);
         if (verseData != null) {
           return Verse.fromJson(Map<String, dynamic>.from(verseData as Map));
@@ -63,6 +66,7 @@ class CacheService {
   /// Obtiene el último versículo guardado (del día anterior si es necesario)
   static Verse? getLastVerse() {
     try {
+      if (!_hasVerifiedVerseSource()) return null;
       final verseData = _verseBox.get(_todayVerseKey);
       if (verseData != null) {
         return Verse.fromJson(Map<String, dynamic>.from(verseData as Map));
@@ -79,7 +83,7 @@ class CacheService {
       final today = DateTime.now();
       final todayString = '${today.year}-${today.month}-${today.day}';
       final lastDate = _verseBox.get(_lastVerseDateKey) as String?;
-      return lastDate == todayString;
+      return lastDate == todayString && _hasVerifiedVerseSource();
     } catch (e) {
       return false;
     }
@@ -92,6 +96,10 @@ class CacheService {
     } catch (e) {
       return null;
     }
+  }
+
+  static bool _hasVerifiedVerseSource() {
+    return _verseBox.get(_verseSourceKey) == _verifiedVerseSource;
   }
 
   /// Guarda la oración del día en caché

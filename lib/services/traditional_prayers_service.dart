@@ -1,5 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import '../bible/data/bible_db.dart';
+import '../bible/domain/verse.dart';
+import '../faith/content_provenance.dart';
+import '../faith/biblical_prayer_passages.dart';
 
 /// Servicio para gestionar las oraciones tradicionales
 class TraditionalPrayersService {
@@ -12,6 +16,7 @@ class TraditionalPrayersService {
 
   /// Carga las oraciones desde el archivo JSON
   Future<void> loadPrayers() async {
+    if (_prayersData != null) return;
     try {
       final String jsonString = await rootBundle.loadString(
         'assets/oraciones/oraciones.json',
@@ -25,7 +30,9 @@ class TraditionalPrayersService {
   /// Obtiene las categorías disponibles para una religión
   List<String> getCategories(String religion) {
     if (_prayersData == null) return [];
-    final religionData = _prayersData![religion] as Map<String, dynamic>?;
+    final religionData =
+        _prayersData![religion == 'general' ? 'cristiana' : religion]
+            as Map<String, dynamic>?;
     if (religionData == null) return [];
     return religionData.keys.toList();
   }
@@ -33,11 +40,13 @@ class TraditionalPrayersService {
   /// Obtiene las oraciones de una categoría específica
   Map<String, dynamic> getPrayersByCategory(String religion, String category) {
     if (_prayersData == null) return {};
-    final religionData = _prayersData![religion] as Map<String, dynamic>?;
+    final religionData =
+        _prayersData![religion == 'general' ? 'cristiana' : religion]
+            as Map<String, dynamic>?;
     if (religionData == null) return {};
     final categoryData = religionData[category] as Map<String, dynamic>?;
     if (categoryData == null) return {};
-    return categoryData;
+    return Map<String, dynamic>.from(categoryData);
   }
 
   /// Obtiene una oración específica
@@ -47,7 +56,55 @@ class TraditionalPrayersService {
     String prayerKey,
   ) {
     final categoryPrayers = getPrayersByCategory(religion, category);
-    return categoryPrayers[prayerKey] as Map<String, dynamic>?;
+    final prayer = categoryPrayers[prayerKey] as Map<String, dynamic>?;
+    if (prayer == null) return null;
+    return {
+      ...prayer,
+      'provenance': ContentProvenance.forBundledPrayer(
+        prayer['titulo'] as String? ?? prayerKey,
+      ),
+    };
+  }
+
+  /// Biblical quotations are resolved from one edition, never from loose copies.
+  Future<Map<String, dynamic>?> readPrayer(
+    String religion,
+    String category,
+    String prayerKey, {
+    Future<List<Verse>> Function(String, int)? chapterLoader,
+  }) async {
+    await loadPrayers();
+    final prayer = getPrayer(religion, category, prayerKey);
+    if (prayer == null) return null;
+    final passages = biblicalPrayerPassages(religion, prayerKey);
+    if (passages.isEmpty) return prayer;
+    final load = chapterLoader ?? BibleDb.instance.getChapter;
+    final blocks = <String>[];
+    for (final passage in passages) {
+      final chapter = await load(passage.book, passage.chapter);
+      final verses =
+          chapter
+              .where((v) => v.verse >= passage.first && v.verse <= passage.last)
+              .toList()
+            ..sort((a, b) => a.verse.compareTo(b.verse));
+      if (verses.length != passage.last - passage.first + 1 ||
+          List.generate(
+            verses.length,
+            (i) => passage.first + i,
+          ).any((n) => !verses.any((v) => v.verse == n))) {
+        throw StateError(
+          'No está disponible el pasaje completo: ${passage.reference}',
+        );
+      }
+      blocks.add(
+        '${passage.reference}\n${verses.map((v) => '${v.verse}. ${v.text}').join('\n')}',
+      );
+    }
+    return {
+      ...prayer,
+      'texto': blocks.join('\n\n'),
+      'provenance': ContentProvenance.bible,
+    };
   }
 
   /// Obtiene el nombre de la categoría en formato legible

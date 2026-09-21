@@ -9,6 +9,9 @@ import '../services/language_service.dart';
 import '../l10n/app_localizations.dart';
 import 'personalization_screen.dart';
 import '../services/storage_service.dart';
+import '../faith/faith_tradition.dart';
+import '../features/liturgy/application/calendar_region_resolver.dart';
+import '../features/liturgy/presentation/catholic_calendar_settings_tile.dart';
 import 'traditional_prayers_religion_selection_screen.dart';
 
 /// Pantalla de configuración con todas las opciones de la aplicación
@@ -282,6 +285,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         child: Consumer<AppProvider>(
           builder: (context, provider, child) {
+            final storage = StorageService();
+            final tradition = faithTraditionFromStorageString(
+              storage.getValidatedTraditionalPrayersReligion(),
+            );
+            final calendarProfile = CalendarRegionResolver(
+              readStoredCountry: storage.getCatholicCalendarCountry,
+            ).resolve(tradition);
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
@@ -393,7 +403,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 const TraditionalPrayersReligionSelectionScreen(),
                           ),
                         );
-                        if (!mounted) return;
+                        if (!mounted || !context.mounted) return;
                         if (result == true) {
                           setState(() {});
                           if (!mounted) return;
@@ -412,6 +422,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           );
                         }
+                      },
+                    ),
+                    if (tradition == FaithTradition.catholic)
+                      const Divider(height: 1),
+                    CatholicCalendarSettingsTile(
+                      tradition: tradition,
+                      selection: calendarProfile.selection,
+                      onChanged: (selection) async {
+                        await storage.setCatholicCalendarSelection(selection);
+                        if (!mounted || !context.mounted) return;
+                        setState(() {});
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              selection.countryCode == 'EC'
+                                  ? 'Usaremos Ecuador cuando haya contenido local verificado.'
+                                  : 'Ahora usas el Calendario Romano General.',
+                            ),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
                       },
                     ),
                   ],

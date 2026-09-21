@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../faith/content_provenance.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/prayer_model.dart';
 import '../services/prayer_rotation_service.dart';
@@ -63,6 +64,7 @@ class _PrayerReadScreenState extends State<PrayerReadScreen> {
   Widget build(BuildContext context) {
     final categoryTitle = _categoryTitle(widget.category);
     return PrayerReadingExperience(
+      provenance: ContentProvenance.aiGenerated,
       loading: _loading,
       category: categoryTitle,
       title: _current?.title,

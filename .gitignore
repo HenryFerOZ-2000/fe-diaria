@@ -101,6 +101,7 @@ lib/generated_plugin_registrant.dart
 # Android related
 **/android/**/gradle-wrapper.jar
 **/android/.gradle
+**/android/.kotlin/
 **/android/build/
 **/android/captures/
 **/android/gradlew
@@ -109,6 +110,7 @@ lib/generated_plugin_registrant.dart
 **/android/**/GeneratedPluginRegistrant.java
 **/android/key.properties
 *.jks
+**/node_modules/
 *.keystore
 
 # Firebase

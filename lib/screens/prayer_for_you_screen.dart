@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../faith/content_provenance.dart';
 import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../providers/app_provider.dart';
@@ -205,6 +206,7 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => PrayerTextReadingScreen(
+            provenance: ContentProvenance.aiGenerated,
             title: userName.isNotEmpty
                 ? 'Oración para $userName'
                 : 'Tu oración personalizada',

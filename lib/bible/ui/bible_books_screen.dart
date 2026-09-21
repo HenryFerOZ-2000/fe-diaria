@@ -10,6 +10,8 @@ import '../domain/verse.dart';
 import '../services/bible_reading_preferences.dart';
 import 'bible_chapters_screen.dart';
 import 'bible_verses_screen.dart';
+import 'catholic_bible_screen.dart';
+import '../../screens/content_sources_screen.dart';
 
 class BibleBooksScreen extends StatefulWidget {
   const BibleBooksScreen({super.key});
@@ -189,6 +191,42 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
       children: [
         _buildHero(context),
+        const SizedBox(height: 12),
+        Card(
+          child: Column(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.menu_book_outlined),
+                title: const Text('Estás leyendo Reina-Valera 1909'),
+                subtitle: const Text(
+                  '66 libros · Sin conexión · Edición protestante',
+                ),
+                trailing: const Icon(Icons.info_outline),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ContentSourcesScreen(),
+                  ),
+                ),
+              ),
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.public),
+                title: const Text('Consultar la Biblia católica'),
+                subtitle: const Text(
+                  '73 libros · El Libro del Pueblo de Dios · En línea',
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CatholicBibleScreen(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
         const SizedBox(height: 14),
         _buildSearch(context),
         if (query.length >= 2) ...[
@@ -550,12 +588,12 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
       child: Row(
         children: [
           _TestamentOption(
-            label: 'Antiguo Testamento',
+            label: 'Antiguo · 39 libros',
             selected: _testament == BibleTestament.old,
             onTap: () => setState(() => _testament = BibleTestament.old),
           ),
           _TestamentOption(
-            label: 'Nuevo Testamento',
+            label: 'Nuevo · 27 libros',
             selected: _testament == BibleTestament.newTestament,
             onTap: () =>
                 setState(() => _testament = BibleTestament.newTestament),

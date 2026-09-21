@@ -99,6 +99,10 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
     ]);
     final verses = results[0] as List<Verse>;
     final chapters = results[1] as List<int>;
+    if (verses.isEmpty ||
+        !verses.any((verse) => verse.verse == widget.initialVerse)) {
+      throw StateError('Referencia no disponible en Reina-Valera 1909.');
+    }
     _verses = verses;
     if (chapters.isNotEmpty) _maxChapter = chapters.last;
     await _savePosition(widget.initialVerse);
@@ -204,7 +208,10 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
 
   Future<void> _copySelection() async {
     await Clipboard.setData(
-      ClipboardData(text: '${_selectionReference()}\n${_selectionText()}'),
+      ClipboardData(
+        text:
+            '${_selectionReference()} · Reina-Valera 1909\n${_selectionText()}',
+      ),
     );
     if (!mounted) return;
     ScaffoldMessenger.of(
@@ -214,7 +221,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
 
   void _shareSelection() {
     Share.share(
-      '${_selectionReference()}\n${_selectionText()}\n\nCompartido desde Verbum',
+      '${_selectionReference()} · Reina-Valera 1909\n${_selectionText()}\n\nCompartido desde Verbum',
       subject: _selectionReference(),
     );
   }

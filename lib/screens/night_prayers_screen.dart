@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../faith/content_provenance.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../services/night_prayers_service.dart';
 import '../services/ads_service.dart';
@@ -96,6 +97,7 @@ class _NightPrayersScreenState extends State<NightPrayersScreen> {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: AppSpacing.md),
                         child: PrayerCard(
+                          provenance: ContentProvenance.aiGenerated,
                           title: prayer['title'] as String,
                           text: prayer['text'] as String,
                           icon: Icons.bedtime_rounded,

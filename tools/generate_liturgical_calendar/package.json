@@ -1,0 +1,13 @@
+{
+  "name": "verbum-liturgical-calendar-generator",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "node generate.mjs",
+    "audit": "node audit.mjs"
+  },
+  "dependencies": {
+    "@romcal/calendar.general-roman": "3.0.0-dev.140",
+    "romcal": "3.0.0-dev.140"
+  }
+}

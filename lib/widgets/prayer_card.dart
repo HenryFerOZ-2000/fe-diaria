@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../faith/content_provenance.dart';
 import '../theme/app_theme.dart';
 import 'main_card.dart';
 import 'prayer_reading_experience.dart';
@@ -14,6 +15,7 @@ class PrayerCard extends StatelessWidget {
   final bool isFavorite;
   final Color? accentColor;
   final bool openReaderOnTap;
+  final ContentProvenance provenance;
 
   const PrayerCard({
     super.key,
@@ -26,6 +28,7 @@ class PrayerCard extends StatelessWidget {
     this.isFavorite = false,
     this.accentColor,
     this.openReaderOnTap = true,
+    this.provenance = ContentProvenance.unverified,
   });
 
   @override
@@ -42,6 +45,7 @@ class PrayerCard extends StatelessWidget {
                   title: title,
                   text: text,
                   reference: reference,
+                  provenance: provenance,
                   accent: accent,
                 ),
               ),

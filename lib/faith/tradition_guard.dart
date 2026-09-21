@@ -12,7 +12,8 @@ class TraditionGuard {
     required String moduleName,
     required bool Function() isMounted,
   }) {
-    if (!StorageService().isEvangelicalTradition) return false;
+    final tradition = StorageService().getValidatedTraditionalPrayersReligion();
+    if (tradition != 'cristiana' && tradition != 'general') return false;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!isMounted()) return;

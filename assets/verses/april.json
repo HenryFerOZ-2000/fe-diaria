@@ -1,32 +1,752 @@
 [
-  {"id": 401, "day": 1, "theme": "paz", "reference": "Salmo 23:2", "text": "Dios te conduce a aguas de reposo; su presencia tranquiliza tu alma."},
-  {"id": 402, "day": 2, "theme": "confianza", "reference": "Isaías 41:13", "text": "El Señor toma tu mano y te dice: no temas, Yo te ayudo."},
-  {"id": 403, "day": 3, "theme": "fortaleza", "reference": "Salmo 28:7", "text": "El Señor es tu fuerza y tu escudo; en Él tu corazón se apoya y canta."},
-  {"id": 404, "day": 4, "theme": "fe", "reference": "Lucas 1:37", "text": "Nada es imposible para Dios; confía en su poder y bondad."},
-  {"id": 405, "day": 5, "theme": "protección", "reference": "Salmo 125:2", "text": "Como los montes rodean a Jerusalén, así el Señor te rodea siempre."},
-  {"id": 406, "day": 6, "theme": "amor de Dios", "reference": "1 Juan 3:1", "text": "Mira cuán grande amor nos dio el Padre: te llama su hijo amado."},
-  {"id": 407, "day": 7, "theme": "ánimo", "reference": "Salmo 27:13", "text": "Aún verás la bondad de Dios en la tierra de los vivos; espera en Él."},
-  {"id": 408, "day": 8, "theme": "agradecimiento", "reference": "Salmo 100:4", "text": "Entra con gratitud a su presencia; tu corazón se alegra ante su rostro."},
-  {"id": 409, "day": 9, "theme": "sabiduría", "reference": "Proverbios 3:7", "text": "No te apoyes en tu propia opinión; teme a Dios y apártate del mal."},
-  {"id": 410, "day": 10, "theme": "provisión", "reference": "Salmo 145:16", "text": "Dios abre su mano y sacia tu necesidad con su bondad."},
-  {"id": 411, "day": 11, "theme": "paz", "reference": "Isaías 26:12", "text": "El Señor te concede paz; todo lo bueno que logras, Él lo realiza en ti."},
-  {"id": 412, "day": 12, "theme": "esperanza", "reference": "Salmo 33:22", "text": "Que tu amor, Señor, descanse sobre nosotros, porque esperamos en ti."},
-  {"id": 413, "day": 13, "theme": "fortaleza", "reference": "Salmo 18:32", "text": "Dios te ciñe de poder y allana tus pasos con firmeza."},
-  {"id": 414, "day": 14, "theme": "fe", "reference": "Marcos 5:36", "text": "No temas; solo cree. Jesús sostiene tu corazón con esperanza."},
-  {"id": 415, "day": 15, "theme": "confianza", "reference": "Salmo 62:8", "text": "Confía en Él en todo tiempo; derrama delante de Él tu corazón."},
-  {"id": 416, "day": 16, "theme": "protección", "reference": "Salmo 121:1-2", "text": "Tu ayuda viene del Señor, creador del cielo y la tierra."},
-  {"id": 417, "day": 17, "theme": "amor de Dios", "reference": "Romanos 8:32", "text": "Si Dios te dio a su Hijo, ¿cómo no te dará también lo demás?"},
-  {"id": 418, "day": 18, "theme": "ánimo", "reference": "Salmo 138:3", "text": "Cuando clamas, Dios te responde y fortalece tu alma valiente."},
-  {"id": 419, "day": 19, "theme": "agradecimiento", "reference": "Salmo 9:1", "text": "Te alabo, Señor, con todo mi corazón; contaré tus maravillas."},
-  {"id": 420, "day": 20, "theme": "sabiduría", "reference": "Proverbios 2:10-11", "text": "La sabiduría entrará en tu corazón y te guardará el buen juicio."},
-  {"id": 421, "day": 21, "theme": "provisión", "reference": "Salmo 37:4", "text": "Deléitate en el Señor y Él concederá los deseos justos de tu corazón."},
-  {"id": 422, "day": 22, "theme": "paz", "reference": "Salmo 119:165", "text": "Amar su palabra te da gran paz; tropiezas menos cuando la guardas."},
-  {"id": 423, "day": 23, "theme": "esperanza", "reference": "Romanos 8:28", "text": "Dios obra para bien en los que le aman; confía en su propósito."},
-  {"id": 424, "day": 24, "theme": "fortaleza", "reference": "Isaías 40:29", "text": "A quien no tiene fuerzas, Él se las multiplica con ternura."},
-  {"id": 425, "day": 25, "theme": "fe", "reference": "Juan 20:29", "text": "Bienaventurados los que creen sin ver; su confianza honra a Dios."},
-  {"id": 426, "day": 26, "theme": "confianza", "reference": "Salmo 91:2", "text": "Dios es tu refugio y fortaleza; en Él descansa tu confianza hoy."},
-  {"id": 427, "day": 27, "theme": "protección", "reference": "Salmo 34:19", "text": "Muchas aflicciones tiene el justo, pero de todas le librará el Señor."},
-  {"id": 428, "day": 28, "theme": "amor de Dios", "reference": "Efesios 2:4-5", "text": "Dios, rico en misericordia, te dio vida por su gran amor."},
-  {"id": 429, "day": 29, "theme": "ánimo", "reference": "Salmo 31:24", "text": "Esfuérzate; Él fortalece a quienes esperan en su bondad."},
-  {"id": 430, "day": 30, "theme": "agradecimiento", "reference": "Filipenses 4:6", "text": "Presenta tus peticiones con gratitud; su paz guardará tu corazón."}
+  {
+    "id": 401,
+    "day": 1,
+    "theme": "paz",
+    "reference": "Salmo 23:2",
+    "text": "En lugares de delicados pastos me hará yacer: junto á aguas de reposo me pastoreará.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 23,
+        "verseStart": 2,
+        "verseEnd": 2
+      }
+    ],
+    "book": "PSA",
+    "chapter": 23,
+    "verse": 2,
+    "verseEnd": 2
+  },
+  {
+    "id": 402,
+    "day": 2,
+    "theme": "confianza",
+    "reference": "Isaías 41:13",
+    "text": "Porque yo Jehová soy tu Dios, que te ase de tu mano derecha, y te dice: No temas, yo te ayudé.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "ISA",
+        "chapter": 41,
+        "verseStart": 13,
+        "verseEnd": 13
+      }
+    ],
+    "book": "ISA",
+    "chapter": 41,
+    "verse": 13,
+    "verseEnd": 13
+  },
+  {
+    "id": 403,
+    "day": 3,
+    "theme": "fortaleza",
+    "reference": "Salmo 28:7",
+    "text": "Jehová es mi fortaleza y mi escudo: en él esperó mi corazón, y fuí ayudado; por lo que se gozó mi corazón, y con mi canción le alabaré.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 28,
+        "verseStart": 7,
+        "verseEnd": 7
+      }
+    ],
+    "book": "PSA",
+    "chapter": 28,
+    "verse": 7,
+    "verseEnd": 7
+  },
+  {
+    "id": 404,
+    "day": 4,
+    "theme": "fe",
+    "reference": "Lucas 1:37",
+    "text": "Porque ninguna cosa es imposible para Dios.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "LUK",
+        "chapter": 1,
+        "verseStart": 37,
+        "verseEnd": 37
+      }
+    ],
+    "book": "LUK",
+    "chapter": 1,
+    "verse": 37,
+    "verseEnd": 37
+  },
+  {
+    "id": 405,
+    "day": 5,
+    "theme": "protección",
+    "reference": "Salmo 125:2",
+    "text": "Como Jerusalem tiene montes alrededor de ella, así Jehová alrededor de su pueblo desde ahora y para siempre.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 125,
+        "verseStart": 2,
+        "verseEnd": 2
+      }
+    ],
+    "book": "PSA",
+    "chapter": 125,
+    "verse": 2,
+    "verseEnd": 2
+  },
+  {
+    "id": 406,
+    "day": 6,
+    "theme": "amor de Dios",
+    "reference": "1 Juan 3:1",
+    "text": "MIRAD cuál amor nos ha dado el Padre, que seamos llamados hijos de Dios: por esto el mundo no nos conoce, porque no le conoce á él.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "1JN",
+        "chapter": 3,
+        "verseStart": 1,
+        "verseEnd": 1
+      }
+    ],
+    "book": "1JN",
+    "chapter": 3,
+    "verse": 1,
+    "verseEnd": 1
+  },
+  {
+    "id": 407,
+    "day": 7,
+    "theme": "ánimo",
+    "reference": "Salmo 27:13",
+    "text": "Hubiera yo desmayado, si no creyese que tengo de ver la bondad de Jehová en la tierra de los vivientes.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 27,
+        "verseStart": 13,
+        "verseEnd": 13
+      }
+    ],
+    "book": "PSA",
+    "chapter": 27,
+    "verse": 13,
+    "verseEnd": 13
+  },
+  {
+    "id": 408,
+    "day": 8,
+    "theme": "agradecimiento",
+    "reference": "Salmo 100:4",
+    "text": "Entrad por sus puertas con reconocimiento, por sus atrios con alabanza: alabadle, bendecid su nombre.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 100,
+        "verseStart": 4,
+        "verseEnd": 4
+      }
+    ],
+    "book": "PSA",
+    "chapter": 100,
+    "verse": 4,
+    "verseEnd": 4
+  },
+  {
+    "id": 409,
+    "day": 9,
+    "theme": "sabiduría",
+    "reference": "Proverbios 3:7",
+    "text": "No seas sabio en tu opinión: teme á Jehová, y apártate del mal;",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PRO",
+        "chapter": 3,
+        "verseStart": 7,
+        "verseEnd": 7
+      }
+    ],
+    "book": "PRO",
+    "chapter": 3,
+    "verse": 7,
+    "verseEnd": 7
+  },
+  {
+    "id": 410,
+    "day": 10,
+    "theme": "provisión",
+    "reference": "Salmo 145:16",
+    "text": "Abres tu mano, y colmas de bendición á todo viviente.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 145,
+        "verseStart": 16,
+        "verseEnd": 16
+      }
+    ],
+    "book": "PSA",
+    "chapter": 145,
+    "verse": 16,
+    "verseEnd": 16
+  },
+  {
+    "id": 411,
+    "day": 11,
+    "theme": "paz",
+    "reference": "Isaías 26:12",
+    "text": "Jehová, tú nos depararás paz; porque también obraste en nosotros todas nuestras obras.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "ISA",
+        "chapter": 26,
+        "verseStart": 12,
+        "verseEnd": 12
+      }
+    ],
+    "book": "ISA",
+    "chapter": 26,
+    "verse": 12,
+    "verseEnd": 12
+  },
+  {
+    "id": 412,
+    "day": 12,
+    "theme": "esperanza",
+    "reference": "Salmo 33:22",
+    "text": "Sea tu misericordia, oh Jehová, sobre nosotros, como esperamos en ti.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 33,
+        "verseStart": 22,
+        "verseEnd": 22
+      }
+    ],
+    "book": "PSA",
+    "chapter": 33,
+    "verse": 22,
+    "verseEnd": 22
+  },
+  {
+    "id": 413,
+    "day": 13,
+    "theme": "fortaleza",
+    "reference": "Salmo 18:32",
+    "text": "Dios es el que me ciñe de fuerza, é hizo perfecto mi camino;",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 18,
+        "verseStart": 32,
+        "verseEnd": 32
+      }
+    ],
+    "book": "PSA",
+    "chapter": 18,
+    "verse": 32,
+    "verseEnd": 32
+  },
+  {
+    "id": 414,
+    "day": 14,
+    "theme": "fe",
+    "reference": "Marcos 5:36",
+    "text": "Mas luego Jesús, oyendo esta razón que se decía, dijo al príncipe de la sinagoga: No temas, cree solamente.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "MRK",
+        "chapter": 5,
+        "verseStart": 36,
+        "verseEnd": 36
+      }
+    ],
+    "book": "MRK",
+    "chapter": 5,
+    "verse": 36,
+    "verseEnd": 36
+  },
+  {
+    "id": 415,
+    "day": 15,
+    "theme": "confianza",
+    "reference": "Salmo 62:8",
+    "text": "Esperad en él en todo tiempo, oh pueblos; derramad delante de él vuestro corazón: Dios es nuestro amparo. (Selah.)",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 62,
+        "verseStart": 8,
+        "verseEnd": 8
+      }
+    ],
+    "book": "PSA",
+    "chapter": 62,
+    "verse": 8,
+    "verseEnd": 8
+  },
+  {
+    "id": 416,
+    "day": 16,
+    "theme": "protección",
+    "reference": "Salmo 121:1-2",
+    "text": "Cántico gradual. ALZARÉ mis ojos á los montes, de donde vendrá mi socorro. Mi socorro viene de Jehová, que hizo los cielos y la tierra.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 121,
+        "verseStart": 1,
+        "verseEnd": 2
+      }
+    ],
+    "book": "PSA",
+    "chapter": 121,
+    "verse": 1,
+    "verseEnd": 2
+  },
+  {
+    "id": 417,
+    "day": 17,
+    "theme": "amor de Dios",
+    "reference": "Romanos 8:32",
+    "text": "El que aun á su propio Hijo no perdonó, antes le entregó por todos nosotros, ¿cómo no nos dará también con él todas las cosas?",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "ROM",
+        "chapter": 8,
+        "verseStart": 32,
+        "verseEnd": 32
+      }
+    ],
+    "book": "ROM",
+    "chapter": 8,
+    "verse": 32,
+    "verseEnd": 32
+  },
+  {
+    "id": 418,
+    "day": 18,
+    "theme": "ánimo",
+    "reference": "Salmo 138:3",
+    "text": "En el día que clamé, me respondiste; esforzásteme con fortaleza en mi alma.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 138,
+        "verseStart": 3,
+        "verseEnd": 3
+      }
+    ],
+    "book": "PSA",
+    "chapter": 138,
+    "verse": 3,
+    "verseEnd": 3
+  },
+  {
+    "id": 419,
+    "day": 19,
+    "theme": "agradecimiento",
+    "reference": "Salmo 9:1",
+    "text": "Al Músico principal: sobre Muth-labben: Salmo de David. TE alabaré, oh Jehová, con todo mi corazón; contaré todas tus maravillas.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 9,
+        "verseStart": 1,
+        "verseEnd": 1
+      }
+    ],
+    "book": "PSA",
+    "chapter": 9,
+    "verse": 1,
+    "verseEnd": 1
+  },
+  {
+    "id": 420,
+    "day": 20,
+    "theme": "sabiduría",
+    "reference": "Proverbios 2:10-11",
+    "text": "Cuando la sabiduría entrare en tu corazón, y la ciencia fuere dulce á tu alma, El consejo te guardará, te preservará la inteligencia:",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PRO",
+        "chapter": 2,
+        "verseStart": 10,
+        "verseEnd": 11
+      }
+    ],
+    "book": "PRO",
+    "chapter": 2,
+    "verse": 10,
+    "verseEnd": 11
+  },
+  {
+    "id": 421,
+    "day": 21,
+    "theme": "provisión",
+    "reference": "Salmo 37:4",
+    "text": "Pon asimismo tu delicia en Jehová, y él te dará las peticiones de tu corazón.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 37,
+        "verseStart": 4,
+        "verseEnd": 4
+      }
+    ],
+    "book": "PSA",
+    "chapter": 37,
+    "verse": 4,
+    "verseEnd": 4
+  },
+  {
+    "id": 422,
+    "day": 22,
+    "theme": "paz",
+    "reference": "Salmo 119:165",
+    "text": "Mucha paz tienen los que aman tu ley; y no hay para ellos tropiezo.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 119,
+        "verseStart": 165,
+        "verseEnd": 165
+      }
+    ],
+    "book": "PSA",
+    "chapter": 119,
+    "verse": 165,
+    "verseEnd": 165
+  },
+  {
+    "id": 423,
+    "day": 23,
+    "theme": "esperanza",
+    "reference": "Romanos 8:28",
+    "text": "Y sabemos que á los que á Dios aman, todas las cosas les ayudan á bien, es á saber, á los que conforme al propósito son llamados.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "ROM",
+        "chapter": 8,
+        "verseStart": 28,
+        "verseEnd": 28
+      }
+    ],
+    "book": "ROM",
+    "chapter": 8,
+    "verse": 28,
+    "verseEnd": 28
+  },
+  {
+    "id": 424,
+    "day": 24,
+    "theme": "fortaleza",
+    "reference": "Isaías 40:29",
+    "text": "El da esfuerzo al cansado, y multiplica las fuerzas al que no tiene ningunas.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "ISA",
+        "chapter": 40,
+        "verseStart": 29,
+        "verseEnd": 29
+      }
+    ],
+    "book": "ISA",
+    "chapter": 40,
+    "verse": 29,
+    "verseEnd": 29
+  },
+  {
+    "id": 425,
+    "day": 25,
+    "theme": "fe",
+    "reference": "Juan 20:29",
+    "text": "Dícele Jesús: Porque me has visto, Tomás, creiste: bienaventurados los que no vieron y creyeron.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "JHN",
+        "chapter": 20,
+        "verseStart": 29,
+        "verseEnd": 29
+      }
+    ],
+    "book": "JHN",
+    "chapter": 20,
+    "verse": 29,
+    "verseEnd": 29
+  },
+  {
+    "id": 426,
+    "day": 26,
+    "theme": "confianza",
+    "reference": "Salmo 91:2",
+    "text": "Diré yo á Jehová: Esperanza mía, y castillo mío; mi Dios, en él confiaré.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 91,
+        "verseStart": 2,
+        "verseEnd": 2
+      }
+    ],
+    "book": "PSA",
+    "chapter": 91,
+    "verse": 2,
+    "verseEnd": 2
+  },
+  {
+    "id": 427,
+    "day": 27,
+    "theme": "protección",
+    "reference": "Salmo 34:19",
+    "text": "Muchos son los males del justo; mas de todos ellos lo librará Jehová.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 34,
+        "verseStart": 19,
+        "verseEnd": 19
+      }
+    ],
+    "book": "PSA",
+    "chapter": 34,
+    "verse": 19,
+    "verseEnd": 19
+  },
+  {
+    "id": 428,
+    "day": 28,
+    "theme": "amor de Dios",
+    "reference": "Efesios 2:4-5",
+    "text": "Empero Dios, que es rico en misericordia, por su mucho amor con que nos amó, Aun estando nosotros muertos en pecados, nos dió vida juntamente con Cristo; por gracia sois salvos;",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "EPH",
+        "chapter": 2,
+        "verseStart": 4,
+        "verseEnd": 5
+      }
+    ],
+    "book": "EPH",
+    "chapter": 2,
+    "verse": 4,
+    "verseEnd": 5
+  },
+  {
+    "id": 429,
+    "day": 29,
+    "theme": "ánimo",
+    "reference": "Salmo 31:24",
+    "text": "Esforzaos todos vosotros los que esperáis en Jehová, y tome vuestro corazón aliento.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PSA",
+        "chapter": 31,
+        "verseStart": 24,
+        "verseEnd": 24
+      }
+    ],
+    "book": "PSA",
+    "chapter": 31,
+    "verse": 24,
+    "verseEnd": 24
+  },
+  {
+    "id": 430,
+    "day": 30,
+    "theme": "agradecimiento",
+    "reference": "Filipenses 4:6",
+    "text": "Por nada estéis afanosos; sino sean notorias vuestras peticiones delante de Dios en toda oración y ruego, con hacimiento de gracias.",
+    "translation": "Reina-Valera 1909",
+    "sourceUrl": "https://ebible.org/spaRV1909/copyright.htm",
+    "contentKind": "bible_passage",
+    "licenseStatus": "public_domain",
+    "reviewStatus": "matched_local_rv1909",
+    "editorialVersion": "2026-09-20",
+    "passages": [
+      {
+        "book": "PHP",
+        "chapter": 4,
+        "verseStart": 6,
+        "verseEnd": 6
+      }
+    ],
+    "book": "PHP",
+    "chapter": 4,
+    "verse": 6,
+    "verseEnd": 6
+  }
 ]

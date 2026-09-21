@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../faith/content_provenance.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../controllers/missions_controller.dart';
 import '../providers/app_provider.dart';
@@ -325,6 +326,11 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
         !_isNightPrayerAvailable() &&
         !(_completedMissions[_currentPageIndex] ?? false);
     return PrayerReadingExperience(
+      provenance: mission.id == 'verse'
+          ? ContentProvenance.bible
+          : const {'morning', 'night', 'family'}.contains(mission.id)
+          ? ContentProvenance.aiGenerated
+          : ContentProvenance.unverified,
       key: ValueKey('daily_${mission.id}'),
       loading: false,
       error: blocked

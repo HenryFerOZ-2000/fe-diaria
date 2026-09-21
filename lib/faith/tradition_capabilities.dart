@@ -6,11 +6,13 @@ class TraditionCapabilities {
     required this.showRosaryGuide,
     required this.showSaintsOfDay,
     required this.showNovena,
+    required this.showDailyLiturgy,
   });
 
   final bool showRosaryGuide;
   final bool showSaintsOfDay;
   final bool showNovena;
+  final bool showDailyLiturgy;
 
   factory TraditionCapabilities.forTradition(FaithTradition t) {
     if (t == FaithTradition.evangelical || t == FaithTradition.general) {
@@ -18,12 +20,22 @@ class TraditionCapabilities {
         showRosaryGuide: false,
         showSaintsOfDay: false,
         showNovena: false,
+        showDailyLiturgy: false,
+      );
+    }
+    if (t == FaithTradition.unset) {
+      return const TraditionCapabilities(
+        showRosaryGuide: false,
+        showSaintsOfDay: false,
+        showNovena: false,
+        showDailyLiturgy: false,
       );
     }
     return const TraditionCapabilities(
       showRosaryGuide: true,
       showSaintsOfDay: true,
       showNovena: true,
+      showDailyLiturgy: true,
     );
   }
 }

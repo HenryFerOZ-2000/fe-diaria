@@ -66,6 +66,7 @@ class _TraditionalPrayerScreenState extends State<TraditionalPrayerScreen> {
   @override
   Widget build(BuildContext context) => PrayerReadingExperience(
     loading: _loading,
+    provenance: _prayer?.provenance,
     error: _error,
     category: 'Oración tradicional',
     title: _prayer?.title,

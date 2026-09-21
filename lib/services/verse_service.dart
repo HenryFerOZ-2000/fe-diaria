@@ -2,6 +2,12 @@ import 'package:flutter/foundation.dart';
 import '../models/verse.dart';
 import 'cache_service.dart';
 import '../bible/services/daily_verse_service.dart' as offline_daily;
+import '../bible/domain/bible_book_info.dart';
+
+String formatBibleReference(String bookId, int chapter, int verse) {
+  final bookName = bibleBookById(bookId)?.name ?? bookId;
+  return '$bookName $chapter:$verse';
+}
 
 /// Servicio para gestionar versículos bíblicos
 /// Integra API externa con caché local y fallback
@@ -45,8 +51,11 @@ class VerseService {
     try {
       final offlineVerse = await offline_daily.DailyVerseService()
           .getDailyVerse(date: today);
-      final ref =
-          '${offlineVerse.book} ${offlineVerse.chapter}:${offlineVerse.verse}';
+      final ref = formatBibleReference(
+        offlineVerse.book,
+        offlineVerse.chapter,
+        offlineVerse.verse,
+      );
       final model = Verse(
         id: today.year * 10000 + today.month * 100 + today.day,
         text: offlineVerse.text,

@@ -19,7 +19,7 @@
     { "id": "ans-017", "book": "PSA", "chapter": 34, "verseStart": 4, "verseEnd": 4, "label": "Salmo 34:4" },
     { "id": "ans-018", "book": "PSA", "chapter": 139, "verseStart": 23, "verseEnd": 24, "label": "Salmo 139:23-24" },
     { "id": "ans-019", "book": "PSA", "chapter": 112, "verseStart": 7, "verseEnd": 7, "label": "Salmo 112:7" },
-    { "id": "ans-020", "book": "NAH", "chapter": 1, "verseStart": 7, "verseEnd": 7, "label": "Nahúm 1:7" },
+    { "id": "ans-020", "book": "NAM", "chapter": 1, "verseStart": 7, "verseEnd": 7, "label": "Nahúm 1:7" },
     { "id": "ans-021", "book": "ZEP", "chapter": 3, "verseStart": 17, "verseEnd": 17, "label": "Sofonías 3:17" },
     { "id": "ans-022", "book": "ISA", "chapter": 26, "verseStart": 3, "verseEnd": 4, "label": "Isaías 26:3-4" },
     { "id": "ans-023", "book": "PSA", "chapter": 118, "verseStart": 6, "verseEnd": 6, "label": "Salmo 118:6" },

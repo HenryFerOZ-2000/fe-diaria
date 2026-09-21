@@ -1,4 +1,7 @@
+import '../faith/content_provenance.dart';
+
 class TraditionalPrayer {
+  ContentProvenance get provenance => ContentProvenance.forBundledPrayer(title);
   final String id;
   final String title;
   final String type; // fixed_text | bible_passage

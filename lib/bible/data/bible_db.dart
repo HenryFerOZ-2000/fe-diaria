@@ -10,48 +10,44 @@ class BibleDb {
   static final BibleDb instance = BibleDb._();
 
   static const String _assetPath = 'assets/db/rv1909.sqlite';
-  static const String _dbName = 'rv1909.sqlite';
+  // Content revision only: bookmarks remain keyed by stable book/chapter/verse.
+  // Keep the earlier file intact; it contains no user reading preferences.
+  static const String _dbName = 'rv1909_20260920.sqlite';
 
   Database? _db;
-  Completer<void>? _copying;
+  Future<void>? _initializing;
 
   Future<void> verifyAndInit() async {
-    // Verificar que el asset exista
-    try {
-      await rootBundle.load(_assetPath);
-    } catch (_) {
-      throw Exception(
-        'No se encontró el asset $_assetPath. Asegúrate de que el archivo exista y esté declarado en pubspec.yaml.',
-      );
-    }
     await init();
   }
 
   Future<void> init() async {
     if (_db != null) return;
+    if (_initializing != null) return _initializing!;
+    final initialization = _openDatabase();
+    _initializing = initialization;
+    try {
+      await initialization;
+    } finally {
+      _initializing = null;
+    }
+  }
+
+  Future<void> _openDatabase() async {
     final dbDir = await getDatabasesPath();
     final dbPath = p.join(dbDir, _dbName);
 
     final file = File(dbPath);
     if (!await file.exists()) {
-      // Evitar copias concurrentes en arranque
-      _copying ??= Completer<void>();
-      if (!_copying!.isCompleted) {
-        try {
-          await file.parent.create(recursive: true);
-          final data = await rootBundle.load(_assetPath);
-          final bytes = data.buffer.asUint8List(
-            data.offsetInBytes,
-            data.lengthInBytes,
-          );
-          await file.writeAsBytes(bytes, flush: true);
-          _copying!.complete();
-        } catch (e) {
-          _copying!.completeError(e);
-          rethrow;
-        }
-      }
-      await _copying!.future;
+      await file.parent.create(recursive: true);
+      final data = await rootBundle.load(_assetPath);
+      final bytes = data.buffer.asUint8List(
+        data.offsetInBytes,
+        data.lengthInBytes,
+      );
+      final temporary = File('$dbPath.copying');
+      await temporary.writeAsBytes(bytes, flush: true);
+      await temporary.rename(dbPath);
     }
 
     _db = await openDatabase(dbPath, readOnly: true);

@@ -1,0 +1,138 @@
+import 'bible_book_info.dart';
+
+/// Bibliographic links only. No Vatican Bible text is redistributed.
+const catholicBibleSource = 'https://www.vatican.va/archive/ESL0506/';
+const catholicBookPages = <String, String>{
+  'GEN': '__P2.HTM',
+  'EXO': '__P1H.HTM',
+  'LEV': '__P2M.HTM',
+  'NUM': '__P3E.HTM',
+  'DEU': '__P4F.HTM',
+  'JOS': '__P5E.HTM',
+  'JDG': '__P63.HTM',
+  'RUT': '__PME.HTM',
+  '1SA': '__P6P.HTM',
+  '2SA': '__P7K.HTM',
+  '1KI': '__P89.HTM',
+  '2KI': '__P8V.HTM',
+  '1CH': '__PNT.HTM',
+  '2CH': '__POM.HTM',
+  'EZR': '__PPM.HTM',
+  'NEH': '__PPW.HTM',
+  'TOB': '__PQV.HTM',
+  'JDT': '__PQF.HTM',
+  'EST': '__PN7.HTM',
+  '1MA': '__PR9.HTM',
+  '2MA': '__PRP.HTM',
+  'JOB': '__PKC.HTM',
+  'PSA': '__PG6.HTM',
+  'PRO': '__PLJ.HTM',
+  'ECC': '__PMQ.HTM',
+  'SNG': '__PMI.HTM',
+  'WIS': '__PS4.HTM',
+  'SIR': '__PSN.HTM',
+  'ISA': '__P9L.HTM',
+  'JER': '__PBH.HTM',
+  'LAM': '__PN2.HTM',
+  'BAR': '__PU2.HTM',
+  'EZK': '__PCZ.HTM',
+  'DAN': '__PNH.HTM',
+  'HOS': '__PEB.HTM',
+  'JOL': '__PEP.HTM',
+  'AMO': '__PET.HTM',
+  'OBA': '__PF2.HTM',
+  'JON': '__PF3.HTM',
+  'MIC': '__PF7.HTM',
+  'NAM': '__PFE.HTM',
+  'HAB': '__PFH.HTM',
+  'ZEP': '__PFK.HTM',
+  'HAG': '__PFN.HTM',
+  'ZEC': '__PFP.HTM',
+  'MAL': '__PG3.HTM',
+  'MAT': '__PUB.HTM',
+  'MRK': '__PV3.HTM',
+  'LUK': '__PVJ.HTM',
+  'JHN': '__PW7.HTM',
+  'ACT': '__PWS.HTM',
+  'ROM': '__PXK.HTM',
+  '1CO': '__PY0.HTM',
+  '2CO': '__PYG.HTM',
+  'GAL': '__PYT.HTM',
+  'EPH': '__PYZ.HTM',
+  'PHP': '__PZ5.HTM',
+  'COL': '__PZ9.HTM',
+  '1TH': '__PZD.HTM',
+  '2TH': '__PZI.HTM',
+  '1TI': '__PZL.HTM',
+  '2TI': '__PZR.HTM',
+  'TIT': '__PZV.HTM',
+  'PHM': '__PZY.HTM',
+  'HEB': '__PZZ.HTM',
+  'JAS': '__P10C.HTM',
+  '1PE': '__P10H.HTM',
+  '2PE': '__P10M.HTM',
+  '1JN': '__P10P.HTM',
+  '2JN': '__P10U.HTM',
+  '3JN': '__P10V.HTM',
+  'JUD': '__P10W.HTM',
+  'REV': '__P10X.HTM',
+};
+
+const _additionalBooks = <BibleBookInfo>[
+  BibleBookInfo(
+    id: 'TOB',
+    name: 'Tobías',
+    section: 'Libros históricos',
+    testament: BibleTestament.old,
+  ),
+  BibleBookInfo(
+    id: 'JDT',
+    name: 'Judit',
+    section: 'Libros históricos',
+    testament: BibleTestament.old,
+  ),
+  BibleBookInfo(
+    id: '1MA',
+    name: '1 Macabeos',
+    section: 'Libros históricos',
+    testament: BibleTestament.old,
+  ),
+  BibleBookInfo(
+    id: '2MA',
+    name: '2 Macabeos',
+    section: 'Libros históricos',
+    testament: BibleTestament.old,
+  ),
+  BibleBookInfo(
+    id: 'WIS',
+    name: 'Sabiduría',
+    section: 'Libros sapienciales',
+    testament: BibleTestament.old,
+  ),
+  BibleBookInfo(
+    id: 'SIR',
+    name: 'Eclesiástico (Sirácida)',
+    section: 'Libros sapienciales',
+    testament: BibleTestament.old,
+  ),
+  BibleBookInfo(
+    id: 'BAR',
+    name: 'Baruc',
+    section: 'Profetas',
+    testament: BibleTestament.old,
+  ),
+];
+
+List<BibleBookInfo> get catholicBibleBooks {
+  final byId = {
+    for (final book in [...bibleBooks, ..._additionalBooks]) book.id: book,
+  };
+  return List.unmodifiable(catholicBookPages.keys.map((id) => byId[id]!));
+}
+
+/// This edition places the Greek additions and Jeremiah's letter separately.
+const catholicSupplementPages = <String, String>{
+  'Ester: suplementos griegos': '__PQ9.HTM',
+  'Daniel: suplementos griegos': '__PU8.HTM',
+  'Carta de Jeremías (Baruc 6)': '__PU7.HTM',
+};

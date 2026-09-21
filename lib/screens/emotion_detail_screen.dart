@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../faith/content_provenance.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../services/prayers_by_emotion_service.dart';
 import '../services/ads_service.dart';
@@ -123,6 +124,7 @@ class _EmotionDetailScreenState extends State<EmotionDetailScreen> {
                         const SizedBox(height: AppSpacing.xl),
                         // Oración
                         PrayerCard(
+                          provenance: ContentProvenance.aiGenerated,
                           title: _prayerData!['title'] as String,
                           text: _prayerData!['text'] as String,
                           icon: Icons.favorite_rounded,

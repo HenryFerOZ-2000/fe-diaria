@@ -12,6 +12,7 @@ import 'emotion_passage_read_screen.dart';
 import 'intention_prayer_read_screen.dart';
 import 'traditional_prayer_screen.dart';
 import 'traditional_prayers_list_screen.dart';
+import 'content_sources_screen.dart';
 
 class PrayersScreen extends StatefulWidget {
   const PrayersScreen({super.key});
@@ -52,6 +53,19 @@ class _PrayersScreenState extends State<PrayersScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _prayerHero(context, tradition),
+                const SizedBox(height: 12),
+                ListTile(
+                  leading: const Icon(Icons.library_books_outlined),
+                  title: const Text('Tradiciones y fuentes'),
+                  subtitle: const Text('Conoce el origen de lo que lees'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ContentSourcesScreen(),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 28),
                 _sectionTitle(
                   context,

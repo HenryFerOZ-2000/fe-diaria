@@ -15,7 +15,7 @@ class DailyContentService {
   List<String>? _familyPrayers;
   List<String>? _morningPrayersEvangelical;
   List<String>? _nightPrayersEvangelical;
-  bool _isLoading = false;
+  Future<void>? _loading;
 
   /// Obtiene el día del año (1-365) basado en la fecha actual
   int getDayOfYear() {
@@ -26,74 +26,70 @@ class DailyContentService {
   }
 
   /// Carga el contenido desde los archivos JSON unificados
-  Future<void> loadContent() async {
-    if (_isLoading) return;
+  Future<void> loadContent() {
+    if (_loading != null) return _loading!;
     if (_verses != null &&
         _morningPrayers != null &&
         _nightPrayers != null &&
+        _morningPrayersEvangelical != null &&
+        _nightPrayersEvangelical != null &&
         _familyPrayers != null) {
-      return;
+      return Future.value();
     }
+    return _loading = _loadContent().whenComplete(() => _loading = null);
+  }
 
-    _isLoading = true;
+  Future<void> _loadContent() async {
     try {
       // Cargar versículos (estructura: array de objetos con id, text, reference, etc.)
       final versesJson = await rootBundle.loadString('assets/data/verses.json');
       final List<dynamic> versesData = json.decode(versesJson);
-      _verses = versesData.map((e) => e as Map<String, dynamic>).toList();
+      final verses = versesData.map((e) => e as Map<String, dynamic>).toList();
 
       // Cargar oraciones de la mañana
       final morningJson = await rootBundle.loadString(
         'assets/data/morning_prayers.json',
       );
       final List<dynamic> morningData = json.decode(morningJson);
-      _morningPrayers = morningData.map((e) => e as String).toList();
+      final morningPrayers = morningData.map((e) => e as String).toList();
 
-      // Cargar oraciones evangélicas de la mañana (fallback a las generales)
-      try {
-        final morningEvangelicalJson = await rootBundle.loadString(
-          'assets/traditions/evangelical/morning_prayers.json',
-        );
-        final List<dynamic> morningEvangelicalData = json.decode(
-          morningEvangelicalJson,
-        );
-        _morningPrayersEvangelical = morningEvangelicalData
-            .map((e) => e as String)
-            .toList();
-      } catch (_) {
-        _morningPrayersEvangelical = _morningPrayers;
-      }
+      // No sustituir una tradición por otra si falla su catálogo.
+      final morningEvangelicalJson = await rootBundle.loadString(
+        'assets/traditions/evangelical/morning_prayers.json',
+      );
+      final List<dynamic> morningEvangelicalData = json.decode(
+        morningEvangelicalJson,
+      );
+      final morningPrayersEvangelical = morningEvangelicalData
+          .map((e) => e as String)
+          .toList();
 
       // Cargar oraciones de la noche (estructura: array de objetos con campo "text")
       final nightJson = await rootBundle.loadString(
         'assets/data/night_prayers.json',
       );
       final List<dynamic> nightData = json.decode(nightJson);
-      _nightPrayers = nightData
+      final nightPrayers = nightData
           .map((e) => (e as Map<String, dynamic>)['text'] as String)
           .toList();
 
-      // Cargar oraciones evangélicas de la noche (fallback a las generales)
-      try {
-        final nightEvangelicalJson = await rootBundle.loadString(
-          'assets/traditions/evangelical/night_prayers.json',
-        );
-        final List<dynamic> nightEvangelicalData = json.decode(
-          nightEvangelicalJson,
-        );
-        _nightPrayersEvangelical = nightEvangelicalData
-            .map((e) => (e as Map<String, dynamic>)['text'] as String)
-            .toList();
-      } catch (_) {
-        _nightPrayersEvangelical = _nightPrayers;
-      }
+      // Cada tradición tiene un recurso empaquetado explícito.
+      final nightEvangelicalJson = await rootBundle.loadString(
+        'assets/traditions/evangelical/night_prayers.json',
+      );
+      final List<dynamic> nightEvangelicalData = json.decode(
+        nightEvangelicalJson,
+      );
+      final nightPrayersEvangelical = nightEvangelicalData
+          .map((e) => (e as Map<String, dynamic>)['text'] as String)
+          .toList();
 
       // Cargar oraciones por intención y filtrar las de familia
       final intentionJson = await rootBundle.loadString(
         'assets/data/prayers_by_intention.json',
       );
       final List<dynamic> intentionData = json.decode(intentionJson);
-      _familyPrayers = intentionData
+      final familyPrayers = intentionData
           .where((e) {
             final intention = (e['intention'] as String?)?.toLowerCase() ?? '';
             final tags = (e['tags'] as List<dynamic>?)
@@ -107,17 +103,20 @@ class DailyContentService {
           .map((e) => e['text'] as String)
           .toList();
 
+      // Publish a complete snapshot only after every resource is loaded.
+      _verses = verses;
+      _morningPrayers = morningPrayers;
+      _nightPrayers = nightPrayers;
+      _morningPrayersEvangelical = morningPrayersEvangelical;
+      _nightPrayersEvangelical = nightPrayersEvangelical;
+      _familyPrayers = familyPrayers;
       debugPrint(
         '✓ Contenido cargado: ${_verses!.length} versículos, ${_morningPrayers!.length} oraciones mañana, ${_nightPrayers!.length} oraciones noche',
       );
     } catch (e) {
       debugPrint('Error cargando contenido: $e');
-      _verses = [];
-      _morningPrayers = [];
-      _nightPrayers = [];
-      _familyPrayers = [];
-    } finally {
-      _isLoading = false;
+      clearCache();
+      rethrow;
     }
   }
 
@@ -153,7 +152,7 @@ class DailyContentService {
   /// Obtiene la oración de la mañana del día usando día del año
   String getMorningPrayer({String tradition = 'catolica'}) {
     final source = tradition == 'cristiana' || tradition == 'general'
-        ? (_morningPrayersEvangelical ?? _morningPrayers)
+        ? _morningPrayersEvangelical
         : _morningPrayers;
     if (source == null || source.isEmpty) {
       throw Exception(
@@ -171,7 +170,7 @@ class DailyContentService {
   /// Obtiene la oración de la noche del día usando día del año
   String getNightPrayer({String tradition = 'catolica'}) {
     final source = tradition == 'cristiana' || tradition == 'general'
-        ? (_nightPrayersEvangelical ?? _nightPrayers)
+        ? _nightPrayersEvangelical
         : _nightPrayers;
     if (source == null || source.isEmpty) {
       throw Exception(
@@ -218,6 +217,5 @@ class DailyContentService {
     _familyPrayers = null;
     _morningPrayersEvangelical = null;
     _nightPrayersEvangelical = null;
-    _isLoading = false;
   }
 }

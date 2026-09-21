@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../faith/content_provenance.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../services/psalms_service.dart';
 import '../services/ads_service.dart';
@@ -132,6 +133,7 @@ class _PsalmsScreenState extends State<PsalmsScreen> {
                           title: psalm.title,
                           text: psalm.text,
                           reference: psalm.reference,
+                          provenance: ContentProvenance.bible,
                           icon: Icons.library_books_rounded,
                         ),
                       );

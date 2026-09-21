@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/traditional_prayers_service.dart';
 import '../services/share_service.dart';
 import '../widgets/prayer_reading_experience.dart';
+import '../faith/content_provenance.dart';
 
 /// Pantalla de detalle de una oración tradicional
 class TraditionalPrayerDetailScreen extends StatefulWidget {
@@ -36,15 +37,19 @@ class _TraditionalPrayerDetailScreenState
   }
 
   Future<void> _loadPrayer() async {
+    setState(() {
+      _isLoading = true;
+      _prayer = null;
+    });
     try {
-      await _service.loadPrayers();
+      final prayer = await _service.readPrayer(
+        widget.religion,
+        widget.category,
+        widget.prayerKey,
+      );
       if (!mounted) return;
       setState(() {
-        _prayer = _service.getPrayer(
-          widget.religion,
-          widget.category,
-          widget.prayerKey,
-        );
+        _prayer = prayer;
         _isLoading = false;
         _fadeIn = true;
       });
@@ -64,13 +69,19 @@ class _TraditionalPrayerDetailScreenState
     if (_prayer == null) return;
     final title = _prayer!['titulo'] as String? ?? widget.prayerKey;
     final text = _prayer!['texto'] as String? ?? '';
-    ShareService.shareAsText(text: text, reference: title, title: title);
+    final source = _prayer!['provenance'] as ContentProvenance?;
+    ShareService.shareAsText(
+      text: text,
+      reference: source?.translation ?? title,
+      title: title,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return PrayerReadingExperience(
       loading: _isLoading,
+      provenance: _prayer?['provenance'] as ContentProvenance?,
       error: !_isLoading && _prayer == null
           ? 'No se encontró esta oración.'
           : null,

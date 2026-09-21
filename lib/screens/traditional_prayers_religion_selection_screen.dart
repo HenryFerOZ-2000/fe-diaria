@@ -53,7 +53,7 @@ class _TraditionalPrayersReligionSelectionScreenState
     ),
     _TraditionOption(
       id: 'cristiana',
-      title: 'Tradición evangélica',
+      title: 'Evangélica / protestante',
       description:
           'Oraciones y reflexiones centradas en la Palabra y la vida en comunidad.',
       icon: Icons.menu_book_rounded,

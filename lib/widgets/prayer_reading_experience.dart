@@ -3,9 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/share_service.dart';
 import '../services/read_aloud_service.dart';
+import '../faith/content_provenance.dart';
 
 class PrayerReadingExperience extends StatefulWidget {
   final bool loading;
+  final ContentProvenance? provenance;
   final String? error;
   final String category;
   final String? title;
@@ -28,6 +30,7 @@ class PrayerReadingExperience extends StatefulWidget {
   const PrayerReadingExperience({
     super.key,
     required this.loading,
+    this.provenance = ContentProvenance.unverified,
     required this.category,
     required this.accent,
     required this.onBack,
@@ -192,46 +195,62 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
   }
 
   Widget _topBar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 6, 10, 8),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: widget.onBack,
-            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-          ),
-          Expanded(
-            child: Text(
-              widget.category.toUpperCase(),
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                color: Colors.white70,
-                fontSize: 9,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.7,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final textScale = MediaQuery.textScalerOf(context).scale(1);
+        final showCategory = constraints.maxWidth >= 360 || textScale <= 1.3;
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(10, 6, 10, 8),
+          child: Row(
+            children: [
+              IconButton(
+                onPressed: widget.onBack,
+                icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
               ),
-            ),
+              if (showCategory)
+                Expanded(
+                  child: Text(
+                    widget.category.toUpperCase(),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      color: Colors.white70,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.7,
+                    ),
+                  ),
+                )
+              else
+                const Spacer(),
+              IconButton(
+                onPressed: _toggleReadAloud,
+                tooltip: _speaking ? 'Detener audio' : 'Escuchar',
+                icon: Icon(
+                  _speaking
+                      ? Icons.stop_circle_outlined
+                      : Icons.headphones_rounded,
+                  color: Colors.white,
+                ),
+              ),
+              IconButton(
+                onPressed: _showReadingSettings,
+                tooltip: 'Ajustes de lectura',
+                icon: const Icon(
+                  Icons.text_fields_rounded,
+                  color: Colors.white,
+                ),
+              ),
+              IconButton(
+                onPressed: widget.onShare,
+                tooltip: 'Compartir',
+                icon: const Icon(Icons.ios_share_rounded, color: Colors.white),
+              ),
+            ],
           ),
-          IconButton(
-            onPressed: _toggleReadAloud,
-            tooltip: _speaking ? 'Detener audio' : 'Escuchar',
-            icon: Icon(
-              _speaking ? Icons.stop_circle_outlined : Icons.headphones_rounded,
-              color: Colors.white,
-            ),
-          ),
-          IconButton(
-            onPressed: _showReadingSettings,
-            tooltip: 'Ajustes de lectura',
-            icon: const Icon(Icons.text_fields_rounded, color: Colors.white),
-          ),
-          IconButton(
-            onPressed: widget.onShare,
-            tooltip: 'Compartir',
-            icon: const Icon(Icons.ios_share_rounded, color: Colors.white),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -333,13 +352,32 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
                       Icon(Icons.format_quote_rounded, color: widget.accent),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: Text(
-                          widget.verseReference!,
-                          style: GoogleFonts.playfairDisplay(
-                            color: ink,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.verseReference!,
+                              style: GoogleFonts.playfairDisplay(
+                                color: ink,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            if (widget.provenance?.translation != null) ...[
+                              const SizedBox(height: 3),
+                              Text(
+                                _shortTranslation(
+                                  widget.provenance!.translation!,
+                                ),
+                                style: GoogleFonts.inter(
+                                  color: ink.withValues(alpha: .56),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: .5,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                     ],
@@ -384,67 +422,92 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
       ),
       child: SafeArea(
         top: false,
-        child: Row(
-          children: [
-            if (widget.onSecondaryAction != null) ...[
-              SizedBox(
-                height: 54,
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: BorderSide(
-                      color: Colors.white.withValues(alpha: .24),
-                    ),
-                  ),
-                  onPressed: widget.onSecondaryAction,
-                  icon: Icon(
-                    widget.secondaryActionIcon ?? Icons.forum_outlined,
-                  ),
-                  label: Text(widget.secondaryActionLabel ?? 'Más'),
-                ),
-              ),
-              const SizedBox(width: 10),
-            ],
-            Expanded(
-              child: SizedBox(
-                height: 54,
-                child: FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: _completed
-                        ? const Color(0xFF5F8178)
-                        : widget.accent,
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-                    if (!_completed) {
-                      HapticFeedback.mediumImpact();
-                      setState(() => _completed = true);
-                      widget.onComplete?.call();
-                    } else if (widget.onNext != null) {
-                      widget.onNext!();
-                    } else {
-                      widget.onBack();
-                    }
-                  },
-                  icon: Icon(
-                    _completed
-                        ? Icons.arrow_forward_rounded
-                        : Icons.check_rounded,
-                  ),
-                  label: Text(
-                    _completed
-                        ? (widget.onNext != null
-                              ? widget.completedActionLabel
-                              : 'Terminar')
-                        : widget.primaryActionLabel,
-                  ),
-                ),
-              ),
-            ),
-          ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final textScale = MediaQuery.textScalerOf(context).scale(1);
+            final stackActions =
+                widget.onSecondaryAction != null &&
+                (constraints.maxWidth < 340 || textScale > 1.3);
+            final primary = _primaryButton();
+            final secondary = _secondaryButton();
+            if (stackActions) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (secondary != null) ...[
+                    secondary,
+                    const SizedBox(height: 10),
+                  ],
+                  primary,
+                ],
+              );
+            }
+            return Row(
+              children: [
+                if (secondary != null) ...[
+                  Flexible(child: secondary),
+                  const SizedBox(width: 10),
+                ],
+                Expanded(child: primary),
+              ],
+            );
+          },
         ),
       ),
     );
+  }
+
+  Widget? _secondaryButton() {
+    if (widget.onSecondaryAction == null) return null;
+    return OutlinedButton.icon(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: Colors.white,
+        side: BorderSide(color: Colors.white.withValues(alpha: .24)),
+        minimumSize: const Size(0, 54),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+      onPressed: widget.onSecondaryAction,
+      icon: Icon(widget.secondaryActionIcon ?? Icons.forum_outlined),
+      label: Text(
+        widget.secondaryActionLabel ?? 'Más',
+        maxLines: 2,
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _primaryButton() => FilledButton.icon(
+    style: FilledButton.styleFrom(
+      backgroundColor: _completed ? const Color(0xFF5F8178) : widget.accent,
+      foregroundColor: Colors.white,
+      minimumSize: const Size(0, 54),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    ),
+    onPressed: () {
+      if (!_completed) {
+        HapticFeedback.mediumImpact();
+        setState(() => _completed = true);
+        widget.onComplete?.call();
+      } else if (widget.onNext != null) {
+        widget.onNext!();
+      } else {
+        widget.onBack();
+      }
+    },
+    icon: Icon(_completed ? Icons.arrow_forward_rounded : Icons.check_rounded),
+    label: Text(
+      _completed
+          ? (widget.onNext != null ? widget.completedActionLabel : 'Terminar')
+          : widget.primaryActionLabel,
+      maxLines: 2,
+      textAlign: TextAlign.center,
+    ),
+  );
+
+  String _shortTranslation(String translation) {
+    if (translation == 'Reina-Valera 1909') return 'RV1909';
+    return translation;
   }
 
   Widget _errorState() => Center(
@@ -560,6 +623,7 @@ class _Glow extends StatelessWidget {
 }
 
 class PrayerTextReadingScreen extends StatelessWidget {
+  final ContentProvenance provenance;
   final String title;
   final String text;
   final String? reference;
@@ -573,11 +637,13 @@ class PrayerTextReadingScreen extends StatelessWidget {
     this.reference,
     required this.accent,
     this.category = 'Oración',
+    this.provenance = ContentProvenance.unverified,
   });
 
   @override
   Widget build(BuildContext context) => PrayerReadingExperience(
     loading: false,
+    provenance: provenance,
     category: category,
     title: title,
     text: text,
@@ -586,7 +652,10 @@ class PrayerTextReadingScreen extends StatelessWidget {
     onBack: () => Navigator.pop(context),
     onShare: () => ShareService.shareAsText(
       text: text,
-      reference: reference ?? title,
+      reference: [
+        reference ?? title,
+        if (provenance.translation != null) provenance.translation!,
+      ].join(' · '),
       title: title,
     ),
   );
