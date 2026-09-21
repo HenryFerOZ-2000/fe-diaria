@@ -85,7 +85,7 @@ class _TraditionalPrayerDetailScreenState
       error: !_isLoading && _prayer == null
           ? 'No se encontró esta oración.'
           : null,
-      category: widget.category,
+      category: _service.getCategoryDisplayName(widget.category),
       title: _prayer?['titulo'] as String? ?? widget.prayerKey,
       text: _prayer?['texto'] as String?,
       accent: const Color(0xFF8D7BC2),

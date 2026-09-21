@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import '../services/traditional_prayers_service.dart';
-import '../services/storage_service.dart';
+
 import '../services/ads_service.dart';
+import '../services/storage_service.dart';
+import '../services/traditional_prayers_service.dart';
+import '../widgets/app_scaffold.dart';
+import '../widgets/traditional_prayer_library.dart';
 import '../widgets/verbum_header_actions.dart';
 import 'traditional_prayers_list_screen.dart';
 import 'traditional_prayers_religion_selection_screen.dart';
 
-/// Pantalla que muestra las categorías de oraciones según la religión seleccionada
+/// Biblioteca de categorías según la tradición elegida por la persona.
 class TraditionalPrayersCategoriesScreen extends StatefulWidget {
   const TraditionalPrayersCategoriesScreen({super.key});
 
@@ -32,9 +35,7 @@ class _TraditionalPrayersCategoriesScreenState
     super.initState();
     _loadData();
     _adsRemoved = StorageService().getAdsRemoved();
-    if (!_adsRemoved) {
-      _loadBannerAd();
-    }
+    if (!_adsRemoved) _loadBannerAd();
   }
 
   Future<void> _loadData() async {
@@ -43,40 +44,34 @@ class _TraditionalPrayersCategoriesScreenState
       final religion = StorageService()
           .getValidatedTraditionalPrayersReligion();
       if (religion.isEmpty) {
-        // Si no hay religión seleccionada, volver a la pantalla de selección
         if (mounted) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) =>
-                  const TraditionalPrayersReligionSelectionScreen(),
+              builder: (_) => const TraditionalPrayersReligionSelectionScreen(),
             ),
           );
         }
         return;
       }
+      if (!mounted) return;
       setState(() {
         _religion = religion;
         _categories = _service.getCategories(religion);
         _isLoading = false;
       });
-    } catch (e) {
-      debugPrint('Error loading traditional prayers: $e');
-      setState(() {
-        _isLoading = false;
-      });
+    } catch (error) {
+      debugPrint('Error loading traditional prayers: $error');
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   void _loadBannerAd() {
     if (_adsRemoved) return;
-
     _adsService.loadBannerAd(
       adSize: AdSize.banner,
       onAdLoaded: (ad) {
         if (mounted && !_adsRemoved) {
-          setState(() {
-            _bannerAd = ad;
-          });
+          setState(() => _bannerAd = ad);
         } else {
           ad.dispose();
         }
@@ -95,9 +90,101 @@ class _TraditionalPrayersCategoriesScreenState
 
   @override
   Widget build(BuildContext context) {
-    // Actualizar estado de anuncios removidos
-    final storage = StorageService();
-    final adsRemovedNow = storage.getAdsRemoved();
+    _syncAdPreference();
+    final traditionName = _traditionName(_religion);
+
+    return AppScaffold(
+      showGuestNotice: false,
+      showBanner: !_adsRemoved,
+      bannerAd: _bannerAd,
+      centerTitle: false,
+      titleWidget: FittedBox(
+        alignment: Alignment.centerLeft,
+        fit: BoxFit.scaleDown,
+        child: Text(
+          'Oraciones tradicionales',
+          maxLines: 1,
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 23,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 12),
+          child: VerbumHeaderButton(
+            icon: Icons.tune_rounded,
+            tooltip: 'Cambiar tradición',
+            onPressed: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const TraditionalPrayersReligionSelectionScreen(),
+                ),
+              );
+              if (mounted) _loadData();
+            },
+          ),
+        ),
+      ],
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            )
+          : _categories.isEmpty
+          ? const PrayerLibraryEmptyState(
+              title: 'No encontramos categorías',
+              message:
+                  'Puedes cambiar tu tradición o intentarlo nuevamente más tarde.',
+            )
+          : ListView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
+              children: [
+                PrayerLibraryHero(
+                  kicker: 'TU BIBLIOTECA DE ORACIÓN',
+                  title: 'Elige cómo quieres orar',
+                  description:
+                      'Explora palabras recibidas por la tradición y encuentra una oración para este momento.',
+                  icon: Icons.auto_stories_rounded,
+                  accent: const Color(0xFFB58A45),
+                  badge: traditionName,
+                ),
+                const SizedBox(height: 24),
+                for (var index = 0; index < _categories.length; index++) ...[
+                  _categoryCard(context, _categories[index]),
+                  if (index < _categories.length - 1)
+                    const SizedBox(height: 12),
+                ],
+              ],
+            ),
+    );
+  }
+
+  Widget _categoryCard(BuildContext context, String category) {
+    final presentation = _categoryPresentation(category);
+    return PrayerLibraryCard(
+      title: _service.getCategoryDisplayName(category),
+      eyebrow: presentation.eyebrow,
+      subtitle: presentation.subtitle,
+      icon: presentation.icon,
+      accent: presentation.accent,
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => TraditionalPrayersListScreen(
+            religion: _religion,
+            category: category,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _syncAdPreference() {
+    final adsRemovedNow = StorageService().getAdsRemoved();
     if (adsRemovedNow && !_adsRemoved) {
       _bannerAd?.dispose();
       _bannerAd = null;
@@ -107,295 +194,89 @@ class _TraditionalPrayersCategoriesScreenState
       _loadBannerAd();
     } else if (!adsRemovedNow && _bannerAd == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && !_adsRemoved && _bannerAd == null) {
-          _loadBannerAd();
-        }
+        if (mounted && !_adsRemoved && _bannerAd == null) _loadBannerAd();
       });
     }
-
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Oraciones Tradicionales',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: VerbumHeaderButton(
-              icon: Icons.tune_rounded,
-              tooltip: 'Cambiar tradición',
-              onPressed: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const TraditionalPrayersReligionSelectionScreen(),
-                  ),
-                );
-                if (mounted) _loadData();
-              },
-            ),
-          ),
-        ],
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
-              Theme.of(context).scaffoldBackgroundColor,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: _isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(
-                          color: colorScheme.primary,
-                        ),
-                      )
-                    : _categories.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.error_outline,
-                              size: 64,
-                              color: colorScheme.onSurface.withValues(
-                                alpha: 0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No se encontraron categorías',
-                              style: GoogleFonts.inter(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      )
-                    : SingleChildScrollView(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Categorías',
-                              style: GoogleFonts.inter(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
-                                color: colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 20,
-                                    mainAxisSpacing: 20,
-                                    childAspectRatio: 0.95,
-                                  ),
-                              itemCount: _categories.length,
-                              itemBuilder: (context, index) {
-                                final category = _categories[index];
-                                return _buildCategoryButton(
-                                  context: context,
-                                  colorScheme: colorScheme,
-                                  category: category,
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            TraditionalPrayersListScreen(
-                                              religion: _religion,
-                                              category: category,
-                                            ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-              ),
-              // Banner Ad fijo en la parte inferior
-              if (!_adsRemoved)
-                Container(
-                  alignment: Alignment.center,
-                  width: double.infinity,
-                  height: _bannerAd != null
-                      ? _bannerAd!.size.height.toDouble()
-                      : 50,
-                  decoration: BoxDecoration(
-                    color: isDark ? colorScheme.surface : Colors.white,
-                    border: Border(
-                      top: BorderSide(
-                        color: colorScheme.outline.withValues(alpha: 0.1),
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                  child: _bannerAd != null
-                      ? AdWidget(ad: _bannerAd!)
-                      : const SizedBox(
-                          height: 50,
-                          child: Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        ),
-                ),
-              // Botón de regreso al inicio
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed('/home');
-                    },
-                    icon: const Icon(Icons.home, size: 24),
-                    label: Text(
-                      'Regresar al inicio',
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 2,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
+}
 
-  Widget _buildCategoryButton({
-    required BuildContext context,
-    required ColorScheme colorScheme,
-    required String category,
-    required VoidCallback onTap,
-  }) {
-    final displayName = _service.getCategoryDisplayName(category);
-    // Obtener icono según la categoría
-    IconData? categoryIcon = _getCategoryIcon(category);
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(28),
-        splashColor: colorScheme.primary.withValues(alpha: 0.1),
-        highlightColor: colorScheme.primary.withValues(alpha: 0.05),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(
-              color: colorScheme.primary.withValues(alpha: 0.15),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.primary.withValues(alpha: 0.08),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-                spreadRadius: 0,
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-                spreadRadius: 0,
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (categoryIcon != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    categoryIcon,
-                    size: 28,
-                    color: colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 12),
-              ],
-              Text(
-                displayName,
-                style: GoogleFonts.inter(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: colorScheme.onSurface,
-                  height: 1.4,
-                  letterSpacing: -0.2,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+String _traditionName(String religion) {
+  switch (religion) {
+    case 'catolica':
+      return 'Tradición católica';
+    case 'cristiana':
+      return 'Tradición evangélica';
+    case 'general':
+      return 'Cristiana general';
+    default:
+      return 'Tu tradición';
   }
+}
 
-  IconData? _getCategoryIcon(String category) {
-    switch (category) {
-      case 'basicas':
-        return Icons.favorite_rounded;
-      case 'arcangeles':
-        return Icons.auto_awesome_rounded;
-      case 'del_dia':
-        return Icons.calendar_today_rounded;
-      case 'biblicas':
-        return Icons.menu_book_rounded;
-      case 'promesas':
-        return Icons.verified_rounded;
-      case 'otras':
-        return Icons.library_books_rounded;
-      default:
-        return null;
-    }
+_CategoryCardPresentation _categoryPresentation(String category) {
+  switch (category) {
+    case 'biblicas':
+      return const _CategoryCardPresentation(
+        eyebrow: 'Ora con la Palabra',
+        subtitle: 'Padre Nuestro, salmos y oraciones inspiradas en la Biblia',
+        icon: Icons.menu_book_rounded,
+        accent: Color(0xFF77649A),
+      );
+    case 'promesas':
+      return const _CategoryCardPresentation(
+        eyebrow: 'Recuerda su fidelidad',
+        subtitle: 'Promesas bíblicas para fortalecer la esperanza',
+        icon: Icons.auto_awesome_rounded,
+        accent: Color(0xFFB58A45),
+      );
+    case 'otras':
+      return const _CategoryCardPresentation(
+        eyebrow: 'Para cada momento',
+        subtitle: 'Oraciones para entregar tu vida cotidiana a Dios',
+        icon: Icons.favorite_outline_rounded,
+        accent: Color(0xFF5F8178),
+      );
+    case 'basicas':
+      return const _CategoryCardPresentation(
+        eyebrow: 'Palabras esenciales',
+        subtitle: 'Oraciones fundamentales de la tradición cristiana',
+        icon: Icons.volunteer_activism_rounded,
+        accent: Color(0xFF77649A),
+      );
+    case 'arcangeles':
+      return const _CategoryCardPresentation(
+        eyebrow: 'Pide protección',
+        subtitle: 'Oraciones tradicionales a los arcángeles',
+        icon: Icons.shield_outlined,
+        accent: Color(0xFF536C91),
+      );
+    case 'del_dia':
+      return const _CategoryCardPresentation(
+        eyebrow: 'Acompaña tu jornada',
+        subtitle: 'Oraciones para comenzar y terminar el día',
+        icon: Icons.wb_sunny_outlined,
+        accent: Color(0xFFB58A45),
+      );
+    default:
+      return const _CategoryCardPresentation(
+        eyebrow: 'Tu momento de oración',
+        subtitle: 'Una colección para detenerte y encontrarte con Dios',
+        icon: Icons.auto_stories_rounded,
+        accent: Color(0xFF77649A),
+      );
   }
+}
+
+class _CategoryCardPresentation {
+  const _CategoryCardPresentation({
+    required this.eyebrow,
+    required this.subtitle,
+    required this.icon,
+    required this.accent,
+  });
+
+  final String eyebrow;
+  final String subtitle;
+  final IconData icon;
+  final Color accent;
 }

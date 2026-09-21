@@ -19,7 +19,9 @@ class AndroidWidgetResourcesTest(unittest.TestCase):
         }
         required_ids = {
             "@+id/widget_root",
-            "@+id/widget_seal",
+            "@+id/widget_brand_mark",
+            "@+id/widget_brand",
+            "@+id/widget_kicker",
             "@+id/widget_verse_text",
             "@+id/widget_reference",
             "@+id/widget_edition",
@@ -32,6 +34,33 @@ class AndroidWidgetResourcesTest(unittest.TestCase):
             self.assertTrue(tags <= supported, (name, tags - supported))
             ids = {node.attrib.get(ANDROID + "id") for node in root.iter()}
             self.assertTrue(required_ids <= ids, (name, required_ids - ids))
+
+            brand_mark = next(
+                node
+                for node in root.iter()
+                if node.attrib.get(ANDROID + "id") == "@+id/widget_brand_mark"
+            )
+            self.assertEqual(brand_mark.tag, "ImageView")
+            self.assertEqual(
+                brand_mark.attrib.get(ANDROID + "src"),
+                "@drawable/widget_brand_mark",
+            )
+
+            verse = next(
+                node
+                for node in root.iter()
+                if node.attrib.get(ANDROID + "id") == "@+id/widget_verse_text"
+            )
+            self.assertEqual(verse.attrib.get(ANDROID + "fontFamily"), "serif")
+
+    def test_roomier_layouts_keep_date_and_explicit_open_action(self):
+        for name in ("widget_medium.xml", "widget_large.xml"):
+            root = ET.parse(
+                ROOT / "android/app/src/main/res/layout" / name
+            ).getroot()
+            ids = {node.attrib.get(ANDROID + "id") for node in root.iter()}
+            self.assertIn("@+id/widget_date", ids)
+            self.assertIn("@+id/widget_open", ids)
 
     def test_provider_declares_home_keyguard_and_hourly_refresh(self):
         root = ET.parse(

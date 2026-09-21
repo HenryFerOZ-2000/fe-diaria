@@ -5,6 +5,7 @@ import 'package:verbum/l10n/app_localizations.dart';
 import 'package:verbum/models/verse.dart';
 import 'package:verbum/screens/daily_verse_widget_screen.dart';
 import 'package:verbum/services/widget_service.dart';
+import 'package:verbum/widgets/daily_verse_widget_preview.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -146,6 +147,40 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('la vista previa presenta la identidad editorial de Verbum', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 240);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 320,
+            child: DailyVerseWidgetPreview(
+              verse: Verse(
+                id: 20260921,
+                text: 'Jehov\u00e1 es mi pastor; nada me faltar\u00e1.',
+                reference: 'Salmos 23:1',
+                book: 'PSA',
+                chapter: 23,
+                verse: 1,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('VERBUM'), findsOneWidget);
+    expect(find.text('PALABRA DEL D\u00cdA'), findsOneWidget);
+    expect(find.text('Abrir'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

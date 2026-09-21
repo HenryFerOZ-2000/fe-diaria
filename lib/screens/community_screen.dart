@@ -14,6 +14,7 @@ import '../services/community_service.dart';
 import '../services/community_posts_social_service.dart';
 import '../services/post_social_service.dart';
 import '../widgets/community_post_interaction_row.dart';
+import '../widgets/community_members_sheet.dart';
 import '../services/storage_service.dart';
 import '../faith/faith_tradition.dart';
 import '../faith/tradition_capabilities.dart';
@@ -792,14 +793,6 @@ class _CommunityBasicView extends StatelessWidget {
                       .toSet(),
                   createdBy: ((data['createdBy'] as String?) ?? '').trim(),
                 ),
-                if (isCreator) ...[
-                  const SizedBox(height: 4),
-                  _ManageAdminsButton(
-                    communityId: communityId,
-                    currentUid: currentUid,
-                    communityService: communityService,
-                  ),
-                ],
                 if (city != null && city.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Row(
@@ -1623,14 +1616,14 @@ class _ManageAdminsButton extends StatelessWidget {
     return Align(
       alignment: Alignment.centerLeft,
       child: TextButton.icon(
-        onPressed: () => _openManageAdminsDialog(context),
+        onPressed: () => openDialog(context),
         icon: const Icon(Icons.manage_accounts_outlined, size: 18),
         label: const Text('Gestion manual por UID (fallback)'),
       ),
     );
   }
 
-  Future<void> _openManageAdminsDialog(BuildContext context) async {
+  Future<void> openDialog(BuildContext context) async {
     final addController = TextEditingController();
     bool isSubmitting = false;
 
@@ -1661,8 +1654,40 @@ class _ManageAdminsButton extends StatelessWidget {
               }
             }
 
+            final scheme = Theme.of(context).colorScheme;
             return AlertDialog(
-              title: const Text('Gestionar administradores'),
+              backgroundColor: scheme.surface,
+              surfaceTintColor: Colors.transparent,
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 24,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28),
+                side: BorderSide(color: scheme.outlineVariant),
+              ),
+              icon: Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF493878), Color(0xFF261E45)],
+                  ),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: const Icon(
+                  Icons.admin_panel_settings_outlined,
+                  color: Colors.white,
+                ),
+              ),
+              title: Text(
+                'Administración avanzada',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.playfairDisplay(
+                  fontSize: 23,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               content: SizedBox(
                 width: 460,
                 child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
@@ -1700,25 +1725,58 @@ class _ManageAdminsButton extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Responsable principal: $createdBy',
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w600,
+                          Container(
+                            padding: const EdgeInsets.all(13),
+                            decoration: BoxDecoration(
+                              color: scheme.secondary.withValues(alpha: .09),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: scheme.secondary.withValues(alpha: .2),
+                              ),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.info_outline_rounded,
+                                  size: 19,
+                                  color: scheme.secondary,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    'Utiliza esta opción solo si la persona no aparece todavía en la lista principal.',
+                                    style: GoogleFonts.inter(
+                                      color: scheme.onSurfaceVariant,
+                                      fontSize: 12.5,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 14),
                           TextField(
                             controller: addController,
                             enabled: !isSubmitting,
-                            decoration: const InputDecoration(
-                              labelText: 'UID para agregar administrador',
-                              hintText: 'Pega el UID de users/{uid}',
+                            decoration: InputDecoration(
+                              labelText: 'UID de la persona',
+                              hintText: 'Pega aquí su identificador',
+                              prefixIcon: const Icon(Icons.key_outlined),
+                              filled: true,
+                              fillColor: scheme.surfaceContainerHighest
+                                  .withValues(alpha: .5),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: ElevatedButton.icon(
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            width: double.infinity,
+                            child: FilledButton.icon(
                               onPressed: isSubmitting
                                   ? null
                                   : () => runAction(() async {
@@ -1733,27 +1791,78 @@ class _ManageAdminsButton extends StatelessWidget {
                                 Icons.person_add_alt_1_outlined,
                                 size: 18,
                               ),
-                              label: const Text('Agregar administrador'),
+                              label: const Text('Añadir como administrador'),
+                              style: FilledButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 13,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 20),
                           Text(
                             'Administradores actuales',
-                            style: GoogleFonts.inter(
+                            style: GoogleFonts.playfairDisplay(
+                              fontSize: 18,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 10),
                           ...adminIds.map((adminUid) {
                             final isOwner = adminUid == createdBy;
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 8),
-                              elevation: 0,
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 10),
+                              decoration: BoxDecoration(
+                                color: isOwner
+                                    ? scheme.secondary.withValues(alpha: .07)
+                                    : scheme.surfaceContainerHighest.withValues(
+                                        alpha: .42,
+                                      ),
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(
+                                  color: isOwner
+                                      ? scheme.secondary.withValues(alpha: .25)
+                                      : scheme.outlineVariant,
+                                ),
+                              ),
                               child: ListTile(
-                                dense: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 13,
+                                  vertical: 5,
+                                ),
+                                leading: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        (isOwner
+                                                ? scheme.secondary
+                                                : scheme.primary)
+                                            .withValues(alpha: .11),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    isOwner
+                                        ? Icons.workspace_premium_outlined
+                                        : Icons.shield_outlined,
+                                    size: 20,
+                                    color: isOwner
+                                        ? scheme.secondary
+                                        : scheme.primary,
+                                  ),
+                                ),
                                 title: Text(
-                                  adminUid,
-                                  style: GoogleFonts.inter(fontSize: 13),
+                                  isOwner
+                                      ? 'Responsable principal'
+                                      : 'Administrador',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                                 subtitle:
                                     FutureBuilder<
@@ -1769,95 +1878,138 @@ class _ManageAdminsButton extends StatelessWidget {
                                             (d?['displayName'] as String?)
                                                 ?.trim() ??
                                             '';
-                                        final email =
-                                            (d?['email'] as String?)?.trim() ??
+                                        final username =
+                                            (d?['username'] as String?)
+                                                ?.trim() ??
                                             '';
-                                        final label = [name, email]
-                                            .where((e) => e.isNotEmpty)
-                                            .join(' · ');
-                                        if (label.isEmpty) {
-                                          return const Text(
-                                            'Sin datos de perfil',
+                                        if (name.isNotEmpty) return Text(name);
+                                        if (username.isNotEmpty) {
+                                          return Text(
+                                            '@${username.replaceFirst(RegExp(r'^@'), '')}',
                                           );
                                         }
-                                        return Text(label);
+                                        return const Text(
+                                          'Perfil sin nombre visible',
+                                        );
                                       },
                                     ),
-                                trailing: Wrap(
-                                  spacing: 6,
-                                  children: [
-                                    if (isOwner)
-                                      const Chip(label: Text('Principal'))
-                                    else ...[
-                                      TextButton(
-                                        onPressed: isSubmitting
-                                            ? null
-                                            : () async {
-                                                final ok =
-                                                    await showDialog<bool>(
-                                                      context: context,
-                                                      builder: (confirmContext) => AlertDialog(
-                                                        title: const Text(
-                                                          'Transferir liderazgo',
-                                                        ),
-                                                        content: Text(
-                                                          'El nuevo responsable principal sera $adminUid. '
-                                                          'Desde ese momento, esa cuenta gestionara administradores.',
-                                                        ),
-                                                        actions: [
-                                                          TextButton(
-                                                            onPressed: () =>
-                                                                Navigator.of(
-                                                                  confirmContext,
-                                                                ).pop(false),
-                                                            child: const Text(
-                                                              'Cancelar',
-                                                            ),
-                                                          ),
-                                                          ElevatedButton(
-                                                            onPressed: () =>
-                                                                Navigator.of(
-                                                                  confirmContext,
-                                                                ).pop(true),
-                                                            child: const Text(
-                                                              'Transferir',
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ) ??
-                                                    false;
-                                                if (!ok) return;
-                                                await runAction(() async {
-                                                  await communityService
-                                                      .transferCommunityLeadership(
-                                                        communityId:
-                                                            communityId,
-                                                        actorUid: currentUid,
-                                                        newOwnerUid: adminUid,
-                                                      );
-                                                });
-                                              },
-                                        child: const Text(
-                                          'Transferir liderazgo',
+                                trailing: isOwner
+                                    ? Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 5,
                                         ),
+                                        decoration: BoxDecoration(
+                                          color: scheme.secondary.withValues(
+                                            alpha: .1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            999,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'Principal',
+                                          style: GoogleFonts.inter(
+                                            color: scheme.secondary,
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      )
+                                    : PopupMenuButton<String>(
+                                        enabled: !isSubmitting,
+                                        tooltip: 'Gestionar administrador',
+                                        icon: const Icon(
+                                          Icons.more_horiz_rounded,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            18,
+                                          ),
+                                        ),
+                                        onSelected: (value) async {
+                                          if (value == 'remove') {
+                                            await runAction(() async {
+                                              await communityService
+                                                  .removeCommunityAdmin(
+                                                    communityId: communityId,
+                                                    actorUid: currentUid,
+                                                    targetUid: adminUid,
+                                                  );
+                                            });
+                                            return;
+                                          }
+                                          final ok =
+                                              await showDialog<bool>(
+                                                context: context,
+                                                builder: (confirmContext) => AlertDialog(
+                                                  backgroundColor:
+                                                      scheme.surface,
+                                                  surfaceTintColor:
+                                                      Colors.transparent,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          24,
+                                                        ),
+                                                  ),
+                                                  title: Text(
+                                                    'Transferir liderazgo',
+                                                    style:
+                                                        GoogleFonts.playfairDisplay(
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                        ),
+                                                  ),
+                                                  content: const Text(
+                                                    'Esta persona pasará a gestionar la comunidad y sus administradores.',
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.of(
+                                                            confirmContext,
+                                                          ).pop(false),
+                                                      child: const Text(
+                                                        'Cancelar',
+                                                      ),
+                                                    ),
+                                                    FilledButton(
+                                                      onPressed: () =>
+                                                          Navigator.of(
+                                                            confirmContext,
+                                                          ).pop(true),
+                                                      child: const Text(
+                                                        'Transferir',
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ) ??
+                                              false;
+                                          if (!ok) return;
+                                          await runAction(() async {
+                                            await communityService
+                                                .transferCommunityLeadership(
+                                                  communityId: communityId,
+                                                  actorUid: currentUid,
+                                                  newOwnerUid: adminUid,
+                                                );
+                                          });
+                                        },
+                                        itemBuilder: (_) => const [
+                                          PopupMenuItem(
+                                            value: 'transfer',
+                                            child: Text('Transferir liderazgo'),
+                                          ),
+                                          PopupMenuItem(
+                                            value: 'remove',
+                                            child: Text(
+                                              'Quitar administración',
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      TextButton(
-                                        onPressed: isSubmitting
-                                            ? null
-                                            : () => runAction(() async {
-                                                await communityService
-                                                    .removeCommunityAdmin(
-                                                      communityId: communityId,
-                                                      actorUid: currentUid,
-                                                      targetUid: adminUid,
-                                                    );
-                                              }),
-                                        child: const Text('Quitar'),
-                                      ),
-                                    ],
-                                  ],
-                                ),
                               ),
                             );
                           }),
@@ -1880,6 +2032,7 @@ class _ManageAdminsButton extends StatelessWidget {
         );
       },
     );
+    addController.dispose();
   }
 }
 
@@ -1900,32 +2053,92 @@ class _CommunityMembersButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: OutlinedButton.icon(
-        onPressed: () => _openMembersDialog(context),
-        icon: const Icon(Icons.groups_outlined, size: 18),
-        label: const Text('Ver miembros'),
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.primary.withValues(alpha: .055),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: scheme.primary.withValues(alpha: .16)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => _openMembersSheet(context),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 11),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: scheme.primary.withValues(alpha: .11),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Icon(
+                  Icons.groups_2_outlined,
+                  color: scheme.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Personas de la comunidad',
+                      style: GoogleFonts.inter(
+                        color: scheme.onSurface,
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Conoce a quienes caminan contigo',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: scheme.onSurfaceVariant,
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 6),
+              Icon(Icons.chevron_right_rounded, color: scheme.primary),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Future<void> _openMembersDialog(BuildContext context) async {
+  Future<void> _openMembersSheet(BuildContext context) async {
     bool isSubmitting = false;
 
-    await showDialog<void>(
+    await showModalBottomSheet<void>(
       context: context,
-      builder: (dialogContext) {
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: const Color(0xFF171220).withValues(alpha: .52),
+      constraints: const BoxConstraints(maxWidth: 620),
+      builder: (sheetContext) {
         return StatefulBuilder(
-          builder: (context, setDialogState) {
-            Future<void> runAction(Future<void> Function() action) async {
-              setDialogState(() => isSubmitting = true);
+          builder: (context, setSheetState) {
+            Future<void> runAction(
+              Future<void> Function() action,
+              String successMessage,
+            ) async {
+              setSheetState(() => isSubmitting = true);
               try {
                 await action();
                 if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Operacion completada.')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(successMessage)));
               } catch (e) {
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -1935,257 +2148,236 @@ class _CommunityMembersButton extends StatelessWidget {
                 );
               } finally {
                 if (context.mounted) {
-                  setDialogState(() => isSubmitting = false);
+                  setSheetState(() => isSubmitting = false);
                 }
               }
             }
 
-            return AlertDialog(
-              title: const Text('Miembros'),
-              content: SizedBox(
-                width: 460,
-                child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                  stream: communityService.communityStream(communityId),
-                  builder: (context, communitySnapshot) {
-                    if (communitySnapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return const SizedBox(
-                        height: 140,
-                        child: Center(child: CircularProgressIndicator()),
+            Widget panel({
+              List<CommunityMemberViewData> members = const [],
+              bool loading = false,
+              String? error,
+              bool canManage = false,
+            }) {
+              return CommunityMembersPanel(
+                members: members,
+                canManage: canManage,
+                isLoading: loading,
+                isSubmitting: isSubmitting,
+                errorMessage: error,
+                onClose: () => Navigator.of(sheetContext).pop(),
+                onActionSelected: (selection) async {
+                  switch (selection.action) {
+                    case CommunityMemberAction.promote:
+                      await runAction(
+                        () => communityService.addCommunityAdmin(
+                          communityId: communityId,
+                          actorUid: currentUid,
+                          targetUid: selection.member.uid,
+                        ),
+                        '${selection.member.displayName} ahora ayuda a administrar la comunidad.',
                       );
-                    }
-                    final communityData =
-                        communitySnapshot.data?.data() ?? <String, dynamic>{};
-                    final liveCreatedBy =
-                        (communityData['createdBy'] as String?)?.trim() ??
-                        createdBy;
-                    final liveAdminIdsRaw =
-                        (communityData['adminIds'] as List?) ??
-                        adminIds.toList();
-                    final liveAdminIds = liveAdminIdsRaw
-                        .map((id) => id?.toString() ?? '')
-                        .where((id) => id.isNotEmpty)
-                        .toSet();
-                    final canManage = currentUid == liveCreatedBy;
+                    case CommunityMemberAction.demote:
+                      await runAction(
+                        () => communityService.removeCommunityAdmin(
+                          communityId: communityId,
+                          actorUid: currentUid,
+                          targetUid: selection.member.uid,
+                        ),
+                        'Se actualizaron los permisos de ${selection.member.displayName}.',
+                      );
+                    case CommunityMemberAction.transfer:
+                      final confirmed = await _confirmLeadershipTransfer(
+                        context,
+                        selection.member,
+                      );
+                      if (!confirmed) return;
+                      await runAction(
+                        () => communityService.transferCommunityLeadership(
+                          communityId: communityId,
+                          actorUid: currentUid,
+                          newOwnerUid: selection.member.uid,
+                        ),
+                        '${selection.member.displayName} es ahora la persona responsable principal.',
+                      );
+                  }
+                },
+                onOpenAdvancedManagement: canManage
+                    ? () async {
+                        Navigator.of(sheetContext).pop();
+                        await Future<void>.delayed(Duration.zero);
+                        if (!context.mounted) return;
+                        await _ManageAdminsButton(
+                          communityId: communityId,
+                          currentUid: currentUid,
+                          communityService: communityService,
+                        ).openDialog(context);
+                      }
+                    : null,
+              );
+            }
 
-                    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: communityService.communityMembersStream(
-                        communityId,
-                      ),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const SizedBox(
-                            height: 140,
-                            child: Center(child: CircularProgressIndicator()),
-                          );
-                        }
-                        if (snapshot.hasError) {
-                          return const Text(
-                            'No se pudieron cargar los miembros.',
-                          );
-                        }
-                        final docs = snapshot.data?.docs ?? [];
-                        if (docs.isEmpty) {
-                          return const Text(
-                            'Aun no hay miembros en esta comunidad.',
-                          );
-                        }
-                        return SizedBox(
-                          height: 420,
-                          child: ListView.separated(
-                            itemCount: docs.length,
-                            separatorBuilder: (_, __) =>
-                                const Divider(height: 1),
-                            itemBuilder: (context, index) {
-                              final userDoc = docs[index];
-                              final uid = userDoc.id;
-                              final d = userDoc.data();
-                              final displayName =
-                                  ((d['displayName'] as String?) ?? 'Miembro')
-                                      .trim();
-                              final email = ((d['email'] as String?) ?? '')
-                                  .trim();
-                              final photo = (d['photoURL'] as String?)?.trim();
-                              final isOwner = uid == liveCreatedBy;
-                              final isAdmin = liveAdminIds.contains(uid);
-
-                              Future<void> confirmTransfer() async {
-                                final ok =
-                                    await showDialog<bool>(
-                                      context: context,
-                                      builder: (confirmContext) => AlertDialog(
-                                        title: const Text(
-                                          'Transferir liderazgo',
-                                        ),
-                                        content: Text(
-                                          'El nuevo responsable principal sera $uid. '
-                                          'Desde ese momento, esa cuenta gestionara administradores.',
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.of(
-                                              confirmContext,
-                                            ).pop(false),
-                                            child: const Text('Cancelar'),
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () => Navigator.of(
-                                              confirmContext,
-                                            ).pop(true),
-                                            child: const Text('Transferir'),
-                                          ),
-                                        ],
-                                      ),
-                                    ) ??
-                                    false;
-                                if (!ok) return;
-                                await runAction(() async {
-                                  await communityService
-                                      .transferCommunityLeadership(
-                                        communityId: communityId,
-                                        actorUid: currentUid,
-                                        newOwnerUid: uid,
-                                      );
-                                });
-                              }
-
-                              return ListTile(
-                                leading: CircleAvatar(
-                                  radius: 18,
-                                  backgroundImage:
-                                      (photo != null && photo.isNotEmpty)
-                                      ? NetworkImage(photo)
-                                      : null,
-                                  child: (photo == null || photo.isEmpty)
-                                      ? Text(
-                                          displayName.isNotEmpty
-                                              ? displayName[0].toUpperCase()
-                                              : '?',
-                                        )
-                                      : null,
-                                ),
-                                title: Text(
-                                  displayName.isNotEmpty
-                                      ? displayName
-                                      : 'Miembro',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      email.isNotEmpty ? email : uid,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    if (isAdmin || isOwner) ...[
-                                      const SizedBox(height: 6),
-                                      Wrap(
-                                        spacing: 6,
-                                        runSpacing: 4,
-                                        children: [
-                                          if (isAdmin)
-                                            const Chip(
-                                              materialTapTargetSize:
-                                                  MaterialTapTargetSize
-                                                      .shrinkWrap,
-                                              visualDensity:
-                                                  VisualDensity.compact,
-                                              label: Text('Admin'),
-                                            ),
-                                          if (isOwner)
-                                            const Chip(
-                                              materialTapTargetSize:
-                                                  MaterialTapTargetSize
-                                                      .shrinkWrap,
-                                              visualDensity:
-                                                  VisualDensity.compact,
-                                              label: Text('Principal'),
-                                            ),
-                                        ],
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                                trailing: canManage && !isOwner
-                                    ? PopupMenuButton<String>(
-                                        enabled: !isSubmitting,
-                                        onSelected: (value) async {
-                                          if (value == 'make_admin') {
-                                            await runAction(() async {
-                                              await communityService
-                                                  .addCommunityAdmin(
-                                                    communityId: communityId,
-                                                    actorUid: currentUid,
-                                                    targetUid: uid,
-                                                  );
-                                            });
-                                            return;
-                                          }
-                                          if (value == 'remove_admin') {
-                                            await runAction(() async {
-                                              await communityService
-                                                  .removeCommunityAdmin(
-                                                    communityId: communityId,
-                                                    actorUid: currentUid,
-                                                    targetUid: uid,
-                                                  );
-                                            });
-                                            return;
-                                          }
-                                          if (value == 'transfer') {
-                                            await confirmTransfer();
-                                          }
-                                        },
-                                        itemBuilder: (context) {
-                                          if (!isAdmin) {
-                                            return const [
-                                              PopupMenuItem<String>(
-                                                value: 'make_admin',
-                                                child: Text('Hacer admin'),
-                                              ),
-                                            ];
-                                          }
-                                          return const [
-                                            PopupMenuItem<String>(
-                                              value: 'remove_admin',
-                                              child: Text('Quitar admin'),
-                                            ),
-                                            PopupMenuItem<String>(
-                                              value: 'transfer',
-                                              child: Text(
-                                                'Transferir liderazgo',
-                                              ),
-                                            ),
-                                          ];
-                                        },
-                                      )
-                                    : null,
-                              );
-                            },
-                          ),
-                        );
-                      },
+            return FractionallySizedBox(
+              heightFactor: .92,
+              child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                stream: communityService.communityStream(communityId),
+                builder: (context, communitySnapshot) {
+                  if (communitySnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return panel(loading: true);
+                  }
+                  if (communitySnapshot.hasError) {
+                    return panel(
+                      error:
+                          'No se pudo cargar la información de la comunidad.',
                     );
-                  },
-                ),
+                  }
+                  final communityData =
+                      communitySnapshot.data?.data() ?? <String, dynamic>{};
+                  final liveCreatedBy =
+                      (communityData['createdBy'] as String?)?.trim() ??
+                      createdBy;
+                  final liveAdminIdsRaw =
+                      (communityData['adminIds'] as List?) ?? adminIds.toList();
+                  final liveAdminIds = liveAdminIdsRaw
+                      .map((id) => id?.toString() ?? '')
+                      .where((id) => id.isNotEmpty)
+                      .toSet();
+                  final canManage = currentUid == liveCreatedBy;
+
+                  return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                    stream: communityService.communityMembersStream(
+                      communityId,
+                    ),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return panel(loading: true, canManage: canManage);
+                      }
+                      if (snapshot.hasError) {
+                        return panel(
+                          error: 'No se pudieron cargar los miembros.',
+                          canManage: canManage,
+                        );
+                      }
+                      final docs = snapshot.data?.docs ?? [];
+                      final members =
+                          docs.map((userDoc) {
+                            final uid = userDoc.id;
+                            final data = userDoc.data();
+                            return CommunityMemberViewData(
+                              uid: uid,
+                              displayName:
+                                  ((data['displayName'] as String?) ??
+                                          'Miembro')
+                                      .trim(),
+                              username: ((data['username'] as String?) ?? '')
+                                  .trim(),
+                              photoUrl: (data['photoURL'] as String?)?.trim(),
+                              isOwner: uid == liveCreatedBy,
+                              isAdmin: liveAdminIds.contains(uid),
+                              isCurrentUser: uid == currentUid,
+                            );
+                          }).toList()..sort((a, b) {
+                            final aRank = a.isOwner ? 0 : (a.isAdmin ? 1 : 2);
+                            final bRank = b.isOwner ? 0 : (b.isAdmin ? 1 : 2);
+                            final rank = aRank.compareTo(bRank);
+                            if (rank != 0) return rank;
+                            return a.displayName.toLowerCase().compareTo(
+                              b.displayName.toLowerCase(),
+                            );
+                          });
+                      return panel(members: members, canManage: canManage);
+                    },
+                  );
+                },
               ),
-              actions: [
-                TextButton(
-                  onPressed: isSubmitting
-                      ? null
-                      : () => Navigator.of(dialogContext).pop(),
-                  child: const Text('Cerrar'),
-                ),
-              ],
             );
           },
         );
       },
     );
+  }
+
+  Future<bool> _confirmLeadershipTransfer(
+    BuildContext context,
+    CommunityMemberViewData member,
+  ) async {
+    final scheme = Theme.of(context).colorScheme;
+    return await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.symmetric(horizontal: 20),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 430),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: VerbumAmbientBackground(
+                  child: Padding(
+                    padding: const EdgeInsets.all(22),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 54,
+                          height: 54,
+                          decoration: BoxDecoration(
+                            color: scheme.secondary.withValues(alpha: .12),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.change_circle_outlined,
+                            color: scheme.secondary,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          'Transferir liderazgo',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.playfairDisplay(
+                            fontSize: 23,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${member.displayName} será la persona responsable principal y podrá gestionar a los administradores.',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.inter(
+                            color: scheme.onSurfaceVariant,
+                            height: 1.45,
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () =>
+                                    Navigator.of(dialogContext).pop(false),
+                                child: const Text('Cancelar'),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: FilledButton(
+                                onPressed: () =>
+                                    Navigator.of(dialogContext).pop(true),
+                                child: const Text('Transferir'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ) ??
+        false;
   }
 }
 
