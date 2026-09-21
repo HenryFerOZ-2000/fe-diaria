@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Verbum</string>
-    <string name="widget_description">Muestra el versículo diario en tu pantalla de inicio</string>
+    <string name="widget_description">La Palabra de cada día en tu pantalla</string>
     <string name="widget_icon_description">Icono del widget de versículo</string>
-    <string name="widget_default_verse">Cargando versículo...</string>
+    <string name="widget_seal_description">Sello de Verbum</string>
+    <string name="widget_brand">VERBUM · PALABRA DEL DÍA</string>
+    <string name="widget_edition">RV1909</string>
+    <string name="widget_open">Abrir en Verbum ›</string>
+    <string name="widget_default_verse">Abre Verbum para recibir la Palabra de hoy</string>
     <string name="widget_default_reference">Juan 3:16</string>
 </resources>
-
