@@ -45,6 +45,31 @@ class AndroidWidgetResourcesTest(unittest.TestCase):
             "@layout/widget_compact",
         )
 
+    def test_provider_receives_day_timezone_boot_and_package_replacement(self):
+        manifest = ET.parse(
+            ROOT / "android/app/src/main/AndroidManifest.xml"
+        ).getroot()
+        receiver = next(
+            node
+            for node in manifest.iter("receiver")
+            if node.attrib.get(ANDROID + "name") == ".VerseWidgetProvider"
+        )
+        actions = {
+            node.attrib[ANDROID + "name"] for node in receiver.iter("action")
+        }
+        self.assertTrue(
+            {
+                "android.appwidget.action.APPWIDGET_UPDATE",
+                "android.intent.action.DATE_CHANGED",
+                "android.intent.action.TIME_SET",
+                "android.intent.action.TIMEZONE_CHANGED",
+                "android.intent.action.BOOT_COMPLETED",
+                "android.intent.action.MY_PACKAGE_REPLACED",
+                "com.ozcorp.verbum.UPDATE_WIDGET",
+            }
+            <= actions
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
