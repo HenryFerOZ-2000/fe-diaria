@@ -141,7 +141,7 @@ void main() async {
   }
 
   runApp(const MyApp());
-  DeepLinkService.instance.initialize(_navigatorKey);
+  await DeepLinkService.instance.initialize(_navigatorKey);
   NotificationService.payloadStream.listen(_handleNotificationPayload);
 }
 

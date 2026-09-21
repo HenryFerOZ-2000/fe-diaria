@@ -3,9 +3,14 @@ import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 
+import '../bible/data/bible_db.dart';
+import '../bible/domain/bible_book_info.dart';
+import '../bible/ui/bible_books_screen.dart';
+import '../bible/ui/bible_verses_screen.dart';
 import '../data/spiritual_paths_catalog.dart';
 import '../screens/spiritual_path_detail_screen.dart';
 import 'app_analytics_service.dart';
+import 'bible_deep_link.dart';
 
 class DeepLinkService {
   DeepLinkService._();
@@ -16,16 +21,52 @@ class DeepLinkService {
   GlobalKey<NavigatorState>? _navigatorKey;
   Uri? _pending;
 
-  void initialize(GlobalKey<NavigatorState> navigatorKey) {
+  Future<void> initialize(GlobalKey<NavigatorState> navigatorKey) async {
     if (_subscription != null) return;
     _navigatorKey = navigatorKey;
-    _subscription = _appLinks.uriLinkStream.listen(_handle, onError: (_) {});
+    final initial = await _appLinks.getInitialLink();
+    if (initial != null) await _handle(initial);
+    _subscription = _appLinks.uriLinkStream.listen(
+      (uri) => _handle(uri),
+      onError: (_) {},
+    );
   }
 
-  void _handle(Uri uri) {
+  Future<void> _handle(Uri uri) async {
+    final navigator = _navigatorKey?.currentState;
+    if (navigator == null) {
+      _pending = uri;
+      WidgetsBinding.instance.addPostFrameCallback((_) => flushPending());
+      return;
+    }
+
+    if (uri.scheme == 'verbum' && uri.host == 'biblia') {
+      final target = parseBibleDeepLink(uri);
+      if (target == null) {
+        _openBibleFallback(navigator);
+        return;
+      }
+      try {
+        final verse = await BibleDb.instance.getVerse(
+          target.bookId,
+          target.chapter,
+          target.verse,
+        );
+        if (verse == null) {
+          _openBibleFallback(navigator);
+          return;
+        }
+        _openBibleTarget(navigator, target);
+      } catch (_) {
+        _openBibleFallback(navigator);
+      }
+      return;
+    }
+
     final id = _pathId(uri);
     if (id == null) return;
-    openSpiritualPath(id);
+    final exists = SpiritualPathsCatalog.paths.any((path) => path.id == id);
+    if (exists) _open(navigator, id);
   }
 
   void openSpiritualPath(String id) {
@@ -45,8 +86,7 @@ class DeepLinkService {
     final navigator = _navigatorKey?.currentState;
     if (uri == null || navigator == null) return;
     _pending = null;
-    final id = _pathId(uri);
-    if (id != null) _open(navigator, id);
+    _handle(uri);
   }
 
   String? _pathId(Uri uri) {
@@ -74,5 +114,23 @@ class DeepLinkService {
             SpiritualPathDetailScreen(path: SpiritualPathsCatalog.byId(id)),
       ),
     );
+  }
+
+  void _openBibleTarget(NavigatorState navigator, BibleDeepLinkTarget target) {
+    final book = bibleBookById(target.bookId)!;
+    navigator.push(
+      MaterialPageRoute(
+        builder: (_) => BibleVersesScreen(
+          bookId: target.bookId,
+          bookName: book.name,
+          chapter: target.chapter,
+          initialVerse: target.verse,
+        ),
+      ),
+    );
+  }
+
+  void _openBibleFallback(NavigatorState navigator) {
+    navigator.push(MaterialPageRoute(builder: (_) => const BibleBooksScreen()));
   }
 }
