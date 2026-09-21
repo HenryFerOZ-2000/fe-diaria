@@ -33,12 +33,6 @@ class VerseWidgetProvider : AppWidgetProvider() {
             }
         }
 
-        @Suppress("UNUSED_PARAMETER")
-        fun saveVerseData(context: Context, text: String, reference: String) {
-            // Kept temporarily for the existing MethodChannel call site. The widget no
-            // longer persists Flutter text and always resolves today's native catalog.
-        }
-
         private fun updateAppWidget(
             context: Context,
             manager: AppWidgetManager,

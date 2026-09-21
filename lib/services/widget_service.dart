@@ -1,95 +1,99 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import '../models/verse.dart';
+
 import '../models/prayer.dart';
+import '../models/verse.dart';
 
-/// Servicio nativo para gestionar widgets de Android sin dependencias externas
-/// Usa MethodChannel para comunicación con código nativo
+enum WidgetPinRequestResult { requested, unsupported, failed }
+
+/// Puente con el widget nativo de Android.
+///
+/// El contenido se resuelve en Android para que el widget funcione aunque
+/// Flutter no se haya abierto. Los métodos estáticos conservan compatibilidad
+/// con los puntos de llamada existentes mientras la UI usa la instancia.
 class WidgetService {
-  static const MethodChannel _channel = MethodChannel(
-    'com.ozcorp.verbum/widget',
-  );
-  static bool _initialized = false;
+  WidgetService._(this._channel, this._isAndroid);
 
-  /// Inicializa el servicio de widgets
-  static Future<void> initialize() async {
+  static final WidgetService _instance = WidgetService._(
+    const MethodChannel('com.ozcorp.verbum/widget'),
+    defaultTargetPlatform == TargetPlatform.android,
+  );
+
+  factory WidgetService() => _instance;
+
+  @visibleForTesting
+  factory WidgetService.forTesting({
+    required MethodChannel channel,
+    required bool isAndroid,
+  }) => WidgetService._(channel, isAndroid);
+
+  final MethodChannel _channel;
+  final bool _isAndroid;
+
+  Future<bool> refreshWidget() => _invokeBool('refreshWidget');
+
+  Future<bool> hasWidgets() => _invokeBool('hasWidgets');
+
+  Future<bool> isPinningSupported() => _invokeBool('isPinWidgetSupported');
+
+  Future<WidgetPinRequestResult> requestPinWidget() async {
+    if (!await isPinningSupported()) {
+      return WidgetPinRequestResult.unsupported;
+    }
     try {
-      // Verificar si la plataforma soporta widgets (Android)
-      if (defaultTargetPlatform == TargetPlatform.android) {
-        _initialized = true;
-        debugPrint('Widget service initialized successfully');
-      } else {
-        debugPrint('Widget service only available on Android');
-      }
-    } catch (e) {
-      // Los widgets pueden no estar disponibles en todos los dispositivos
-      debugPrint('Error initializing widget service: $e');
-      _initialized = false;
+      final requested =
+          await _channel.invokeMethod<bool>('requestPinWidget') ?? false;
+      return requested
+          ? WidgetPinRequestResult.requested
+          : WidgetPinRequestResult.failed;
+    } on PlatformException {
+      return WidgetPinRequestResult.failed;
+    } on MissingPluginException {
+      return WidgetPinRequestResult.failed;
     }
   }
 
-  /// Actualiza el widget con el versículo actual
-  /// También puede incluir información de oraciones si está disponible
+  Future<bool> _invokeBool(String method) async {
+    if (!_isAndroid) return false;
+    try {
+      return await _channel.invokeMethod<bool>(method) ?? false;
+    } on PlatformException {
+      return false;
+    } on MissingPluginException {
+      return false;
+    }
+  }
+
+  static Future<void> initialize() async {
+    await _instance.refreshWidget();
+  }
+
+  /// Conserva la API usada por la app; Android ya no depende de este contenido.
   static Future<void> updateWidget({
     Verse? verse,
     Prayer? morningPrayer,
     Prayer? eveningPrayer,
   }) async {
-    if (!_initialized) {
-      debugPrint('Widget service not initialized');
-      return;
-    }
-
-    try {
-      // Priorizar el versículo para el widget principal
-      if (verse != null) {
-        final result = await _channel.invokeMethod<bool>('updateWidget', {
-          'verseText': verse.text,
-          'verseReference': verse.reference,
-        });
-
-        if (result == true) {
-          debugPrint('Widget updated successfully');
-        } else {
-          debugPrint('Widget update returned false');
-        }
-      } else {
-        debugPrint('No verse data to update widget');
-      }
-    } catch (e) {
-      // Los widgets pueden no estar disponibles en todos los dispositivos
-      // No es crítico si falla - la app sigue funcionando
-      debugPrint('Error updating widget: $e');
-    }
+    await _instance.refreshWidget();
   }
 
-  /// Actualiza el widget de la pantalla de inicio
-  /// Alias para updateWidget para mantener compatibilidad
   static Future<void> updateHomeScreenWidget({
     Verse? verse,
     Prayer? morningPrayer,
     Prayer? eveningPrayer,
-  }) async {
-    await updateWidget(
-      verse: verse,
-      morningPrayer: morningPrayer,
-      eveningPrayer: eveningPrayer,
-    );
-  }
+  }) => updateWidget(
+    verse: verse,
+    morningPrayer: morningPrayer,
+    eveningPrayer: eveningPrayer,
+  );
 
-  /// Actualiza el widget de la pantalla de bloqueo
-  /// Por ahora usa la misma implementación que el widget de inicio
   static Future<void> updateLockScreenWidget({
     Verse? verse,
     Prayer? morningPrayer,
     Prayer? eveningPrayer,
-  }) async {
-    // En Android, el widget de bloqueo requiere configuración adicional
-    // Por ahora, actualizamos el widget de inicio
-    await updateWidget(
-      verse: verse,
-      morningPrayer: morningPrayer,
-      eveningPrayer: eveningPrayer,
-    );
-  }
+  }) => updateWidget(
+    verse: verse,
+    morningPrayer: morningPrayer,
+    eveningPrayer: eveningPrayer,
+  );
 }
