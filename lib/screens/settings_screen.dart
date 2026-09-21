@@ -558,6 +558,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
                 const SizedBox(height: 32),
+                _buildSectionHeader(localizations.onYourScreen, context),
+                const SizedBox(height: 8),
+                _buildSettingsCard(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        localizations.widgetScreenTitle,
+                        style: GoogleFonts.inter(fontSize: 16),
+                      ),
+                      subtitle: Text(
+                        localizations.widgetSettingsSubtitle,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      leading: Icon(
+                        Icons.widgets_rounded,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () =>
+                          Navigator.pushNamed(context, '/daily-verse-widget'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 32),
                 // Sección de notificaciones
                 _buildSectionHeader(localizations.notifications, context),
                 const SizedBox(height: 8),

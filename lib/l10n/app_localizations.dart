@@ -516,4 +516,191 @@ class AppLocalizations {
         return 'Configuración';
     }
   }
+
+  String get onYourScreen {
+    switch (languageCode) {
+      case 'en':
+        return 'On your screen';
+      case 'pt':
+        return 'Na sua tela';
+      default:
+        return 'En tu pantalla';
+    }
+  }
+
+  String get widgetScreenTitle {
+    switch (languageCode) {
+      case 'en':
+        return 'Word widget';
+      case 'pt':
+        return 'Widget da Palavra';
+      default:
+        return 'Widget de la Palabra';
+    }
+  }
+
+  String get widgetScreenDescription {
+    switch (languageCode) {
+      case 'en':
+        return 'Keep today’s verse close, even without opening Verbum.';
+      case 'pt':
+        return 'Mantenha o versículo de hoje por perto, mesmo sem abrir o Verbum.';
+      default:
+        return 'Ten cerca el versículo de hoy, incluso sin abrir Verbum.';
+    }
+  }
+
+  String get widgetSettingsSubtitle {
+    switch (languageCode) {
+      case 'en':
+        return 'Today’s verse on your home or lock screen';
+      case 'pt':
+        return 'O versículo de hoje na tela inicial ou de bloqueio';
+      default:
+        return 'El versículo de hoy en inicio o pantalla de bloqueo';
+    }
+  }
+
+  String get widgetAddToHome {
+    switch (languageCode) {
+      case 'en':
+        return 'Add to Home';
+      case 'pt':
+        return 'Adicionar à tela inicial';
+      default:
+        return 'Añadir a inicio';
+    }
+  }
+
+  String get widgetAdded {
+    switch (languageCode) {
+      case 'en':
+        return 'Widget added';
+      case 'pt':
+        return 'Widget adicionado';
+      default:
+        return 'Widget añadido';
+    }
+  }
+
+  String get widgetRequestSent {
+    switch (languageCode) {
+      case 'en':
+        return 'Request sent. Confirm it on your home screen.';
+      case 'pt':
+        return 'Solicitação enviada. Confirme na tela inicial.';
+      default:
+        return 'Tu solicitud enviada está lista. Confírmala en tu pantalla de inicio.';
+    }
+  }
+
+  String get widgetManualTitle {
+    switch (languageCode) {
+      case 'en':
+        return 'Add it manually';
+      case 'pt':
+        return 'Adicione manualmente';
+      default:
+        return 'Añádelo manualmente';
+    }
+  }
+
+  String get widgetManualHome {
+    switch (languageCode) {
+      case 'en':
+        return 'Touch and hold your home screen, open Widgets, and choose Verbum.';
+      case 'pt':
+        return 'Mantenha pressionada a tela inicial, abra Widgets e escolha Verbum.';
+      default:
+        return 'Mantén pulsada la pantalla de inicio, abre Widgets y elige Verbum.';
+    }
+  }
+
+  String get widgetPinFailed {
+    switch (languageCode) {
+      case 'en':
+        return 'The selector could not be opened. You can add it manually.';
+      case 'pt':
+        return 'Não foi possível abrir o seletor. Você pode adicioná-lo manualmente.';
+      default:
+        return 'No se pudo abrir el selector. Puedes añadirlo manualmente.';
+    }
+  }
+
+  String get widgetLockScreenTitle {
+    switch (languageCode) {
+      case 'en':
+        return 'Lock screen';
+      case 'pt':
+        return 'Tela de bloqueio';
+      default:
+        return 'Pantalla de bloqueo';
+    }
+  }
+
+  String get widgetLockScreenCompatibility {
+    switch (languageCode) {
+      case 'en':
+        return 'Availability depends on your Android version and phone manufacturer.';
+      case 'pt':
+        return 'A disponibilidade depende da versão do Android e do fabricante.';
+      default:
+        return 'La disponibilidad depende de tu versión de Android y del fabricante.';
+    }
+  }
+
+  String get widgetLockScreenStep1 {
+    switch (languageCode) {
+      case 'en':
+        return 'Touch and hold the lock screen.';
+      case 'pt':
+        return 'Mantenha pressionada a tela de bloqueio.';
+      default:
+        return 'Mantén pulsada la pantalla de bloqueo.';
+    }
+  }
+
+  String get widgetLockScreenStep2 {
+    switch (languageCode) {
+      case 'en':
+        return 'Open customization or the widgets section.';
+      case 'pt':
+        return 'Abra a personalização ou a seção de widgets.';
+      default:
+        return 'Abre la personalización o la sección de widgets.';
+    }
+  }
+
+  String get widgetLockScreenStep3 {
+    switch (languageCode) {
+      case 'en':
+        return 'Find Verbum if your device supports widgets on this screen.';
+      case 'pt':
+        return 'Procure Verbum se o dispositivo aceitar widgets nessa tela.';
+      default:
+        return 'Busca Verbum si tu dispositivo admite widgets en esa pantalla.';
+    }
+  }
+
+  String get widgetPreviewUnavailable {
+    switch (languageCode) {
+      case 'en':
+        return 'Preview unavailable';
+      case 'pt':
+        return 'Prévia indisponível';
+      default:
+        return 'Vista previa no disponible';
+    }
+  }
+
+  String get widgetPreviewUnavailableDescription {
+    switch (languageCode) {
+      case 'en':
+        return 'The widget will still load today’s verse directly on Android.';
+      case 'pt':
+        return 'O widget ainda carregará o versículo de hoje diretamente no Android.';
+      default:
+        return 'El widget cargará igualmente el versículo de hoy directamente en Android.';
+    }
+  }
 }

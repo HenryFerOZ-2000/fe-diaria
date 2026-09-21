@@ -42,6 +42,7 @@ import 'screens/help_support_screen.dart';
 import 'screens/faq_screen.dart';
 import 'screens/report_problem_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/daily_verse_widget_screen.dart';
 import 'screens/personalization_screen.dart';
 import 'screens/spiritual_paths_screen.dart';
 import 'screens/comments_screen.dart';
@@ -205,6 +206,7 @@ class MyApp extends StatelessWidget {
             home: startScreen,
             routes: {
               '/home': (context) => _buildHomeEntry(),
+              '/daily-verse-widget': (context) => DailyVerseWidgetScreen(),
               '/emotion-selection': (context) => const EmotionSelectionScreen(),
               '/prayer-for-you': (context) => const PrayerForYouScreen(),
               '/category-prayers': (context) => const CategoryPrayersScreen(),

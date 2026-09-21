@@ -156,11 +156,7 @@ class AppProvider extends ChangeNotifier {
       await _updateDailyStreak();
 
       // Actualizar widgets
-      await WidgetService.updateWidget(
-        verse: _todayVerse,
-        morningPrayer: _todayMorningPrayer,
-        eveningPrayer: _todayEveningPrayer,
-      );
+      await WidgetService().refreshWidget();
     } catch (e) {
       debugPrint('Error loading today verse: $e');
       // Si falla, intentar obtener el último versículo guardado desde caché
@@ -195,11 +191,7 @@ class AppProvider extends ChangeNotifier {
       await _updateDailyStreak();
 
       // Actualizar widgets
-      await WidgetService.updateWidget(
-        verse: _todayVerse,
-        morningPrayer: _todayMorningPrayer,
-        eveningPrayer: _todayEveningPrayer,
-      );
+      await WidgetService().refreshWidget();
     } catch (e) {
       debugPrint('Error refreshing verse: $e');
     } finally {
@@ -216,11 +208,7 @@ class AppProvider extends ChangeNotifier {
       _todayEveningPrayer = await _prayerService.getTodayEveningPrayer();
 
       // Actualizar widgets
-      await WidgetService.updateWidget(
-        verse: _todayVerse,
-        morningPrayer: _todayMorningPrayer,
-        eveningPrayer: _todayEveningPrayer,
-      );
+      await WidgetService().refreshWidget();
 
       notifyListeners();
     } catch (e) {
