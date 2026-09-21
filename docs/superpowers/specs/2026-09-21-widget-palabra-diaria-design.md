@@ -2,7 +2,7 @@
 
 Fecha: 2026-09-21
 
-Estado: pendiente de revisión final del usuario
+Estado: aprobado por el usuario el 2026-09-21
 
 Producto: Verbum para Android
 
