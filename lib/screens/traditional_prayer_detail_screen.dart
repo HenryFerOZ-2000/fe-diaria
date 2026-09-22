@@ -4,6 +4,8 @@ import '../services/traditional_prayers_service.dart';
 import '../services/share_service.dart';
 import '../widgets/prayer_reading_experience.dart';
 import '../faith/content_provenance.dart';
+import '../faith/biblical_prayer_passages.dart';
+import '../features/sharing/domain/share_content.dart';
 
 /// Pantalla de detalle de una oración tradicional
 class TraditionalPrayerDetailScreen extends StatefulWidget {
@@ -70,10 +72,30 @@ class _TraditionalPrayerDetailScreenState
     final title = _prayer!['titulo'] as String? ?? widget.prayerKey;
     final text = _prayer!['texto'] as String? ?? '';
     final source = _prayer!['provenance'] as ContentProvenance?;
-    ShareService.shareAsText(
-      text: text,
-      reference: source?.translation ?? title,
-      title: title,
+    final passages = source == ContentProvenance.bible
+        ? biblicalPrayerPassages(widget.religion, widget.prayerKey)
+        : const <PrayerPassage>[];
+    ShareService.openComposer(
+      context,
+      ShareContent(
+        title: title,
+        body: text,
+        reference: passages.isEmpty
+            ? title
+            : passages.map((passage) => passage.reference).join('; '),
+        sourceLabel: source?.translation,
+        kind: passages.isEmpty
+            ? ShareContentKind.prayer
+            : passages.every((passage) => passage.book == 'PSA')
+            ? ShareContentKind.psalm
+            : ShareContentKind.verse,
+        tradition: switch (widget.religion) {
+          'catolica' => ShareTradition.catholic,
+          'cristiana' => ShareTradition.evangelical,
+          'general' => ShareTradition.ecumenical,
+          _ => null,
+        },
+      ),
     );
   }
 

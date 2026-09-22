@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/share_service.dart';
 import '../services/read_aloud_service.dart';
 import '../faith/content_provenance.dart';
+import '../features/sharing/domain/share_content.dart';
 
 class PrayerReadingExperience extends StatefulWidget {
   final bool loading;
@@ -650,13 +651,22 @@ class PrayerTextReadingScreen extends StatelessWidget {
     verseReference: reference,
     accent: accent,
     onBack: () => Navigator.pop(context),
-    onShare: () => ShareService.shareAsText(
-      text: text,
-      reference: [
-        reference ?? title,
-        if (provenance.translation != null) provenance.translation!,
-      ].join(' · '),
-      title: title,
+    onShare: () => ShareService.openComposer(
+      context,
+      ShareContent(
+        title: title,
+        body: text,
+        reference: reference ?? title,
+        sourceLabel: provenance.translation,
+        kind: provenance == ContentProvenance.bible
+            ? RegExp(
+                    r'^Salmos?\s+\d',
+                    caseSensitive: false,
+                  ).hasMatch(reference ?? title)
+                  ? ShareContentKind.psalm
+                  : ShareContentKind.verse
+            : ShareContentKind.prayer,
+      ),
     ),
   );
 }

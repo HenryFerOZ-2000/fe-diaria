@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../features/sharing/domain/share_content.dart';
 import '../faith/content_provenance.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/category_prayers_service.dart';
@@ -516,10 +517,14 @@ class _CategoryPrayerDetailScreenState
       text: prayerText,
       icon: Icons.menu_book_rounded,
       accentColor: Theme.of(context).colorScheme.primary,
-      onShare: () => ShareService.shareAsText(
-        text: prayerText,
-        reference: title,
-        title: title,
+      onShare: () => ShareService.openComposer(
+        context,
+        ShareContent(
+          title: title,
+          body: prayerText,
+          reference: title,
+          kind: ShareContentKind.prayer,
+        ),
       ),
     );
   }

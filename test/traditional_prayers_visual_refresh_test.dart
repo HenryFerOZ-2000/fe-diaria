@@ -7,6 +7,8 @@ import 'package:verbum/screens/traditional_prayer_detail_screen.dart';
 import 'package:verbum/screens/traditional_prayers_categories_screen.dart';
 import 'package:verbum/screens/traditional_prayers_list_screen.dart';
 import 'package:verbum/theme/app_theme.dart';
+import 'package:verbum/features/sharing/domain/share_content.dart';
+import 'package:verbum/features/sharing/presentation/share_composer_screen.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -118,5 +120,16 @@ void main() {
 
     expect(find.text('OTRAS ORACIONES'), findsOneWidget);
     expect(find.text('OTRAS'), findsNothing);
+
+    await tester.tap(find.byTooltip('Compartir'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ShareComposerScreen), findsOneWidget);
+    final content = tester
+        .widget<ShareComposerScreen>(find.byType(ShareComposerScreen))
+        .content;
+    expect(content.title, 'Oración de Entrega');
+    expect(content.kind, ShareContentKind.prayer);
+    expect(content.tradition, ShareTradition.evangelical);
+    expect(tester.takeException(), isNull);
   });
 }

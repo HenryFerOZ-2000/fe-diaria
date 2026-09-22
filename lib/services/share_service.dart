@@ -24,18 +24,4 @@ abstract final class ShareService {
       const SystemSharePlatformGateway().shareText(
         ShareMessageBuilder.build(content),
       );
-
-  @Deprecated('Migrate the caller to openComposer with typed ShareContent.')
-  static Future<NativeShareStatus> shareAsText({
-    required String text,
-    required String reference,
-    String? title,
-  }) => shareTextFallback(
-    ShareContent(
-      title: title ?? reference,
-      body: text,
-      reference: reference,
-      kind: ShareContentKind.reflection,
-    ),
-  );
 }

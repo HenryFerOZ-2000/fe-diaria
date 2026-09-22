@@ -8,6 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:verbum/bible/data/bible_db.dart';
 import 'package:verbum/bible/domain/verse.dart' as bible;
 import 'package:verbum/bible/ui/bible_verses_screen.dart';
 import 'package:verbum/controllers/missions_controller.dart';
@@ -20,6 +22,18 @@ import 'package:verbum/screens/daily_missions_flow_screen.dart';
 import 'package:verbum/screens/favorites_screen.dart';
 import 'package:verbum/screens/mission_read_screen.dart';
 import 'package:verbum/screens/spiritual_path_day_screen.dart';
+import 'package:verbum/screens/category_prayers_screen.dart';
+import 'package:verbum/screens/emotion_passage_read_screen.dart';
+import 'package:verbum/screens/intention_prayer_read_screen.dart';
+import 'package:verbum/screens/novena_screen.dart';
+import 'package:verbum/screens/prayer_read_screen.dart';
+import 'package:verbum/screens/psalms_screen.dart';
+import 'package:verbum/screens/reading_screen.dart';
+import 'package:verbum/screens/traditional_prayer_screen.dart';
+import 'package:verbum/screens/traditional_prayer_detail_screen.dart';
+import 'package:verbum/services/traditional_prayers_service.dart';
+import 'package:verbum/widgets/prayer_card.dart';
+import 'package:verbum/widgets/prayer_reading_experience.dart';
 import 'package:verbum/services/daily_progress_service.dart';
 import 'package:verbum/services/language_service.dart';
 import 'package:verbum/services/share_service.dart';
@@ -29,6 +43,8 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory hiveDirectory;
+  DatabaseFactory? previousDatabaseFactory;
+  final nativeShares = <MethodCall>[];
 
   setUpAll(() async {
     setupFirebaseCoreMocks();
@@ -52,19 +68,286 @@ void main() {
     await Hive.openBox('prayer_cache');
     await LanguageService.init();
     await LanguageService.setLanguage('es');
+    previousDatabaseFactory = databaseFactoryOrNull;
+    databaseFactory = databaseFactorySqflitePlugin;
+    // Replace only SQLite's native boundary; passage resolution, provenance,
+    // and the reader remain real.
+    messenger.setMockMethodCallHandler(
+      const MethodChannel('com.tekartik.sqflite'),
+      (call) async {
+        switch (call.method) {
+          case 'getDatabasesPath':
+            return hiveDirectory.path;
+          case 'openDatabase':
+            return {'id': 1};
+          case 'query':
+            final args = (call.arguments as Map)['arguments'] as List?;
+            if (args == null || args.length != 2) {
+              return <Map<String, Object?>>[];
+            }
+            return [
+              for (var verse = 1; verse <= 16; verse++)
+                {
+                  'book': args[0],
+                  'chapter': args[1],
+                  'verse': verse,
+                  'text': 'Texto bíblico $verse.',
+                },
+            ];
+          default:
+            throw UnsupportedError('Unexpected SQLite call: ${call.method}');
+        }
+      },
+    );
+    await BibleDb.instance.init();
   });
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await Hive.box('favorites').clear();
     await Hive.box('settings').clear();
+    await Hive.box('settings').put('adsRemoved', true);
+    nativeShares.clear();
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          const MethodChannel('dev.fluttercommunity.plus/share'),
+          (call) async {
+            nativeShares.add(call);
+            return 'dev.fluttercommunity.plus/share/success';
+          },
+        );
   });
 
   tearDownAll(() async {
+    databaseFactory = previousDatabaseFactory;
     await Hive.close();
     if (hiveDirectory.existsSync()) {
       hiveDirectory.deleteSync(recursive: true);
     }
+  });
+
+  for (final entry in [
+    ('Salmo 23', 'Salmo 23:1–6', ShareContentKind.psalm, 1, 6),
+    ('Padre Nuestro', 'Mateo 6:9–13', ShareContentKind.verse, 9, 13),
+  ]) {
+    testWidgets('biblical traditional detail preserves ${entry.$1} reference', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: TraditionalPrayerDetailScreen(
+            religion: 'cristiana',
+            category: 'biblicas',
+            prayerKey: entry.$1,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Compartir'));
+      await _pumpRoute(tester);
+
+      expect(find.byType(ShareComposerScreen), findsOneWidget);
+      final content = _composer(tester).content;
+      expect(content.title, entry.$1);
+      expect(content.reference, entry.$2);
+      expect(
+        content.body,
+        '${entry.$2}\n${[for (var verse = entry.$4; verse <= entry.$5; verse++) '$verse. Texto bíblico $verse.'].join('\n')}',
+      );
+      expect(content.sourceLabel, 'Reina-Valera 1909');
+      expect(content.kind, entry.$3);
+      expect(content.tradition, ShareTradition.evangelical);
+      expect(nativeShares, isEmpty);
+    });
+  }
+
+  for (final entry in <String, Widget>{
+    'generic': const PrayerReadScreen(category: 'ansiedad'),
+    'intention': const IntentionPrayerReadScreen(categoryKey: 'salud'),
+    'emotion': const EmotionPassageReadScreen(emotionKey: 'ansiedad'),
+    'traditional without religion metadata': const TraditionalPrayerScreen(
+      prayerId: 'ave_maria',
+    ),
+  }.entries) {
+    testWidgets('${entry.key} shares the displayed prayer and real reference', (
+      tester,
+    ) async {
+      await tester.pumpWidget(MaterialApp(home: entry.value));
+      await tester.pumpAndSettle();
+      final reader = tester.widget<PrayerReadingExperience>(
+        find.byType(PrayerReadingExperience),
+      );
+      expect(reader.text, isNotEmpty);
+
+      await tester.tap(find.byTooltip('Compartir'));
+      await _pumpRoute(tester);
+
+      expect(find.byType(ShareComposerScreen), findsOneWidget);
+      final content = _composer(tester).content;
+      expect(content.title, reader.title);
+      expect(content.body, reader.text);
+      expect(content.reference, reader.verseReference ?? reader.title);
+      expect(content.kind, ShareContentKind.prayer);
+      expect(content.tradition, isNull);
+      expect(content.sourceLabel, isNull);
+      expect(nativeShares, isEmpty);
+    });
+  }
+
+  for (final entry in {
+    'catolica': ShareTradition.catholic,
+    'cristiana': ShareTradition.evangelical,
+    'general': ShareTradition.ecumenical,
+  }.entries) {
+    testWidgets('traditional detail preserves ${entry.key} metadata', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: TraditionalPrayerDetailScreen(
+            religion: entry.key,
+            category: entry.key == 'catolica' ? 'basicas' : 'otras',
+            prayerKey: entry.key == 'catolica'
+                ? 'Padre Nuestro'
+                : 'Oración de Entrega',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final reader = tester.widget<PrayerReadingExperience>(
+        find.byType(PrayerReadingExperience),
+      );
+      expect(reader.text, isNotEmpty);
+      await tester.tap(find.byTooltip('Compartir'));
+      await _pumpRoute(tester);
+
+      expect(find.byType(ShareComposerScreen), findsOneWidget);
+      final content = _composer(tester).content;
+      expect(content.title, reader.title);
+      expect(content.body, reader.text);
+      expect(content.reference, reader.title);
+      expect(content.kind, ShareContentKind.prayer);
+      expect(content.tradition, entry.value);
+      expect(content.sourceLabel, isNull);
+      expect(nativeShares, isEmpty);
+    });
+  }
+
+  testWidgets('category prayer opens a composer with the displayed body', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: CategoryPrayerDetailScreen(categoryKey: 'familia'),
+      ),
+    );
+    final prayer = tester.widget<PrayerCard>(find.byType(PrayerCard));
+    await tester.tap(find.byIcon(Icons.share_outlined));
+    await _pumpRoute(tester);
+
+    expect(find.byType(ShareComposerScreen), findsOneWidget);
+    final content = _composer(tester).content;
+    expect(content.title, 'Mi familia');
+    expect(content.body, prayer.text);
+    expect(content.reference, 'Mi familia');
+    expect(content.kind, ShareContentKind.prayer);
+    expect(content.tradition, isNull);
+    expect(content.sourceLabel, isNull);
+    expect(nativeShares, isEmpty);
+  });
+
+  testWidgets('novena preserves its day title and section reference', (
+    tester,
+  ) async {
+    await tester.runAsync(() async {
+      await Hive.box('settings').put('traditionalPrayersReligion', 'catolica');
+      await TraditionalPrayersService().loadPrayers();
+    });
+    final step = TraditionalPrayersService().getNovenaStep(1, 1)!;
+    await tester.pumpWidget(const MaterialApp(home: NovenaDayScreen(day: 1)));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Compartir'), 300);
+    await tester.tap(find.text('Compartir'));
+    await _pumpRoute(tester);
+
+    expect(find.byType(ShareComposerScreen), findsOneWidget);
+    final content = _composer(tester).content;
+    expect(content.title, 'Novena de Navidad - Día 1');
+    expect(content.body, step['texto']);
+    expect(content.reference, step['titulo']);
+    expect(content.kind, ShareContentKind.prayer);
+    expect(content.tradition, ShareTradition.catholic);
+    expect(nativeShares, isEmpty);
+  });
+
+  testWidgets('a psalm card retains biblical provenance through its reader', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MaterialApp(home: PsalmsScreen()));
+    await tester.pumpAndSettle();
+    final psalm = tester.widget<PrayerCard>(find.byType(PrayerCard).first);
+    await tester.tap(find.text(psalm.title).first);
+    await _pumpRoute(tester);
+    await tester.tap(find.byTooltip('Compartir'));
+    await _pumpRoute(tester);
+
+    expect(find.byType(ShareComposerScreen), findsOneWidget);
+    final content = _composer(tester).content;
+    expect(content.title, psalm.title);
+    expect(content.body, psalm.text);
+    expect(content.reference, psalm.reference);
+    expect(content.sourceLabel, 'Reina-Valera 1909');
+    expect(content.kind, ShareContentKind.psalm);
+    expect(nativeShares, isEmpty);
+  });
+
+  testWidgets(
+    'the reading wrapper keeps a reference without inventing Scripture',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ReadingScreen(
+            title: 'Una pausa',
+            content: 'Recuerda el bien recibido hoy.',
+            reference: 'Reflexión del día',
+            onComplete: () {},
+          ),
+        ),
+      );
+      await tester.tap(find.byTooltip('Compartir'));
+      await _pumpRoute(tester);
+
+      expect(find.byType(ShareComposerScreen), findsOneWidget);
+      final content = _composer(tester).content;
+      expect(content.title, 'Una pausa');
+      expect(content.body, 'Recuerda el bien recibido hoy.');
+      expect(content.reference, 'Reflexión del día');
+      expect(content.kind, ShareContentKind.reflection);
+      expect(content.tradition, isNull);
+      expect(nativeShares, isEmpty);
+    },
+  );
+
+  testWidgets('the reading wrapper preserves an explicit share callback', (
+    tester,
+  ) async {
+    final shared = <(String, String?)>[];
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ReadingScreen(
+          title: 'Una pausa',
+          content: 'Recuerda el bien recibido hoy.',
+          reference: 'Reflexión del día',
+          onComplete: () {},
+          onShare: (body, reference) => shared.add((body, reference)),
+        ),
+      ),
+    );
+    await tester.tap(find.byTooltip('Compartir'));
+    await _pumpRoute(tester);
+    expect(shared, [('Recuerda el bien recibido hoy.', 'Reflexión del día')]);
+    expect(find.byType(ShareComposerScreen), findsNothing);
+    expect(nativeShares, isEmpty);
   });
 
   testWidgets('the facade opens one composer with the exact content', (
