@@ -36,7 +36,18 @@ class VerbumShareCard extends StatelessWidget {
         fit: BoxFit.contain,
         child: SizedBox.fromSize(
           size: layout.size,
-          child: MediaQuery.withNoTextScaling(
+          child: MediaQuery(
+            // The fixed export composition must retain the paginator's exact
+            // metrics even when the surrounding controls use accessibility
+            // typography. Preserve all unrelated inherited media settings.
+            data: (MediaQuery.maybeOf(context) ?? const MediaQueryData())
+                .copyWith(textScaler: TextScaler.noScaling, boldText: false)
+                .applyTextStyleOverrides(
+                  lineHeightScaleFactorOverride: null,
+                  letterSpacingOverride: null,
+                  wordSpacingOverride: null,
+                  paragraphSpacingOverride: null,
+                ),
             child: DefaultTextStyle(
               style: TextStyle(
                 fontFamily: 'VerbumInter',

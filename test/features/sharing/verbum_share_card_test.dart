@@ -30,6 +30,7 @@ Future<void> _pumpCard(
   SharePage page = _page,
   double width = 540,
   double textScale = 1,
+  bool typographyOverrides = false,
 }) async {
   final size = Size(width, width / format.pixelSize.aspectRatio);
   await tester.binding.setSurfaceSize(size);
@@ -37,7 +38,14 @@ Future<void> _pumpCard(
   await tester.pumpWidget(
     MaterialApp(
       home: MediaQuery(
-        data: MediaQueryData(textScaler: TextScaler.linear(textScale)),
+        data: MediaQueryData(
+          textScaler: TextScaler.linear(textScale),
+          boldText: typographyOverrides,
+          lineHeightScaleFactorOverride: typographyOverrides ? 2 : null,
+          letterSpacingOverride: typographyOverrides ? 4 : null,
+          wordSpacingOverride: typographyOverrides ? 12 : null,
+          paragraphSpacingOverride: typographyOverrides ? 24 : null,
+        ),
         child: Center(
           child: SizedBox.fromSize(
             size: size,
@@ -141,6 +149,7 @@ void main() {
           page: page,
           width: 280,
           textScale: 2.5,
+          typographyOverrides: true,
         );
         final paragraph = tester.renderObject<RenderParagraph>(
           find.byKey(const Key('share-card-body')),
@@ -151,6 +160,10 @@ void main() {
           textScaler: paragraph.textScaler,
         )..layout(maxWidth: paragraph.size.width);
         expect(painter.height, lessThanOrEqualTo(paragraph.size.height));
+        expect(paragraph.text.style?.fontWeight, FontWeight.w400);
+        expect(paragraph.text.style?.height, 1.35);
+        expect(paragraph.text.style?.letterSpacing, 0);
+        expect(paragraph.text.style?.wordSpacing ?? 0, 0);
         expect(paragraph.didExceedMaxLines, isFalse);
         expect(find.text(page.body.trim()), findsOneWidget);
         expect(tester.takeException(), isNull);
