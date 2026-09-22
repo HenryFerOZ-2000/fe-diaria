@@ -41,12 +41,15 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
   }
 
   void _share() {
-    Share.share(
-      'Quiero recorrer contigo “${widget.path.title}” en Verbum: '
-      '${widget.path.subtitle}.\n\nAbrir en Verbum: '
-      'verbum://camino/${widget.path.id}\n\nDescarga Verbum: '
-      'https://play.google.com/store/apps/details?id=com.ozcorp.verbum',
-      subject: 'Un camino para compartir',
+    SharePlus.instance.share(
+      ShareParams(
+        text:
+            'Quiero recorrer contigo “${widget.path.title}” en Verbum: '
+            '${widget.path.subtitle}.\n\nAbrir en Verbum: '
+            'verbum://camino/${widget.path.id}\n\nDescarga Verbum: '
+            'https://play.google.com/store/apps/details?id=com.ozcorp.verbum',
+        subject: 'Un camino para compartir',
+      ),
     );
   }
 

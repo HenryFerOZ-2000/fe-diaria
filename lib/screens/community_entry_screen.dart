@@ -456,7 +456,8 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
         ),
         const SizedBox(height: 18),
         FilledButton.icon(
-          onPressed: () => Share.share(invitation),
+          onPressed: () =>
+              SharePlus.instance.share(ShareParams(text: invitation)),
           icon: const Icon(Icons.ios_share_rounded),
           label: const Text('Compartir invitación'),
         ),
