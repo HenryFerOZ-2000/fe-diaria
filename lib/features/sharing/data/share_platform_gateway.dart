@@ -7,6 +7,21 @@ import 'package:share_plus/share_plus.dart';
 
 enum NativeShareStatus { success, dismissed, unavailable }
 
+enum GallerySaveFailureReason {
+  accessDenied,
+  insufficientSpace,
+  unsupportedFormat,
+  unknown,
+}
+
+/// Keeps plugin-specific diagnostics behind the platform boundary.
+final class GallerySaveFailure implements Exception {
+  const GallerySaveFailure(this.reason, this.cause);
+
+  final GallerySaveFailureReason reason;
+  final Object cause;
+}
+
 abstract interface class SharePlatformGateway {
   Future<Directory> temporaryDirectory();
 
@@ -32,7 +47,21 @@ final class SystemSharePlatformGateway implements SharePlatformGateway {
   Future<void> deleteFile(String path) => File(path).delete();
 
   @override
-  Future<void> saveImage(String path) => Gal.putImage(path);
+  Future<void> saveImage(String path) async {
+    try {
+      await Gal.putImage(path);
+    } on GalException catch (error, stackTrace) {
+      final reason = switch (error.type) {
+        GalExceptionType.accessDenied => GallerySaveFailureReason.accessDenied,
+        GalExceptionType.notEnoughSpace =>
+          GallerySaveFailureReason.insufficientSpace,
+        GalExceptionType.notSupportedFormat =>
+          GallerySaveFailureReason.unsupportedFormat,
+        GalExceptionType.unexpected => GallerySaveFailureReason.unknown,
+      };
+      Error.throwWithStackTrace(GallerySaveFailure(reason, error), stackTrace);
+    }
+  }
 
   @override
   Future<NativeShareStatus> shareFiles(List<String> paths, String text) async {

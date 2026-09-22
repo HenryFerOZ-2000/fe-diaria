@@ -292,22 +292,28 @@ void main() {
     );
   }
 
-  testWidgets('typed failure offers retry for the failed operation', (
-    tester,
-  ) async {
-    final coordinator = _Coordinator()
-      ..failure = const ShareExportFailure.render();
-    await _pump(tester, coordinator);
-    await tester.tap(find.byTooltip('Guardar'));
-    await tester.pumpAndSettle();
-    expect(find.text('No pudimos crear la tarjeta.'), findsOneWidget);
-    expect(find.text('Compartir como texto'), findsNothing);
-    coordinator.failure = null;
-    await tester.tap(find.text('Reintentar'));
-    await tester.pumpAndSettle();
-    expect(coordinator.saved, 2);
-    expect(coordinator.shared, 0);
-  });
+  for (final action in ['Guardar', 'Compartir']) {
+    testWidgets('render failure retries $action without text fallback', (
+      tester,
+    ) async {
+      final coordinator = _Coordinator()
+        ..failure = const ShareExportFailure.render();
+      await _pump(tester, coordinator);
+      await tester.tap(find.byTooltip(action));
+      await tester.pumpAndSettle();
+      expect(find.text('No pudimos crear la tarjeta.'), findsOneWidget);
+      expect(find.text('Compartir como texto'), findsNothing);
+      expect(coordinator.textShared, 0);
+      coordinator.failure = null;
+      await tester.tap(find.text('Reintentar'));
+      await tester.pumpAndSettle();
+      expect(coordinator.saved, action == 'Guardar' ? 2 : 0);
+      expect(coordinator.shared, action == 'Compartir' ? 2 : 0);
+      expect(coordinator.textShared, 0);
+      expect(find.text('Compartir como texto'), findsNothing);
+      expect(find.text('No pudimos crear la tarjeta.'), findsNothing);
+    });
+  }
 
   for (final result in [
     ShareExportResult.shared,

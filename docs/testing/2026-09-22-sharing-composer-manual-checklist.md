@@ -29,6 +29,14 @@ Resultados finales en el código de `fda5109` (incluye `6d2f82e`):
 
 APK local: `build/app/outputs/flutter-apk/app-debug.apk`. La compilación emite advertencias existentes de migración futura a Built-in Kotlin y avisa que no hay firma release configurada en este worktree; no son errores de esta compilación debug. La suite conserva mensajes diagnósticos esperados de las pruebas de liturgia y carga de datos, sin fallos.
 
+## Recuperación de errores de galería
+
+El gateway traduce los tipos reales de `gal 2.3.3` (`accessDenied`, `notEnoughSpace`, `notSupportedFormat`, `unexpected`) a causas propias. El coordinador muestra una explicación en español y mantiene el error nativo, sus detalles y su traza dentro de `ShareExportFailure.cause`; nunca los imprime en el mensaje visible. Las pruebas recorren el canal de Gal, el gateway y el coordinador, verificando permiso denegado durante la solicitud o el guardado, falta de espacio, formato no admitido y códigos desconocidos. También comprueban la limpieza de todas las páginas temporales y que después del fallo se puede iniciar otra exportación para compartir.
+
+La detección de almacenamiento insuficiente depende de la señal tipada del plugin. En su implementación Android, Gal clasifica algunos `IOException` por el texto nativo `No space left on device`; en Apple usa el código de PhotoKit `3305`. Por tanto, un sistema que devuelva otro error puede quedar clasificado como desconocido. Verbum no añade comparaciones frágiles de mensajes: si Gal no proporciona una causa reconocible, ofrece reintentar o compartir con un mensaje seguro. Esta clasificación está verificada con respuestas del canal simuladas y aún requiere comprobar los permisos reales en dispositivo.
+
+Después de esta corrección, `flutter test --reporter expanded` aprobó 174 pruebas y `flutter analyze` terminó sin incidencias. Las 41 pruebas focalizadas de coordinador/compositor también aprobaron. El reintento tras fallo de render se verifica tanto al guardar como al compartir, con cero llamadas a compartir texto. No se volvió a generar un APK en esta corrección.
+
 ## Comprobaciones en dispositivo
 
 Estado de todas las casillas siguientes: **REQUIERE VALIDACIÓN MANUAL EN DISPOSITIVO**. No se ejecutaron en una aplicación física durante esta verificación.

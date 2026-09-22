@@ -77,11 +77,22 @@ class ShareExportCoordinator {
       }
       return ShareExportResult.saved;
     } catch (error) {
-      throw ShareExportFailure(
-        ShareExportStage.save,
-        'No pudimos guardar la tarjeta en tu galería.',
-        error,
-      );
+      final reason = error is GallerySaveFailure
+          ? error.reason
+          : GallerySaveFailureReason.unknown;
+      throw ShareExportFailure(ShareExportStage.save, switch (reason) {
+        GallerySaveFailureReason.accessDenied =>
+          'Permite el acceso a la galería para guardar la tarjeta. '
+              'Puedes seguir compartiéndola.',
+        GallerySaveFailureReason.insufficientSpace =>
+          'No hay espacio suficiente para guardar la tarjeta. '
+              'Libera espacio e inténtalo de nuevo. Puedes seguir compartiéndola.',
+        GallerySaveFailureReason.unsupportedFormat =>
+          'La galería no admite esta imagen. Puedes compartir la tarjeta.',
+        GallerySaveFailureReason.unknown =>
+          'La galería no pudo guardar la tarjeta. '
+              'Inténtalo de nuevo o compártela.',
+      }, error is GallerySaveFailure ? error.cause : error);
     } finally {
       await _cleanup(paths);
     }

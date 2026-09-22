@@ -1,13 +1,15 @@
 import 'dart:io';
-import 'dart:typed_data';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gal/gal.dart';
 import 'package:verbum/features/sharing/application/share_export_coordinator.dart';
 import 'package:verbum/features/sharing/application/share_message_builder.dart';
 import 'package:verbum/features/sharing/data/share_platform_gateway.dart';
 import 'package:verbum/features/sharing/domain/share_content.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late Directory temporaryDirectory;
   late FakeSharePlatformGateway gateway;
   late ShareExportCoordinator coordinator;
@@ -145,6 +147,113 @@ void main() {
       expect(gateway.deletedPaths, unorderedEquals(gateway.savedPaths));
     },
   );
+
+  for (final scenario in [
+    (
+      code: 'ACCESS_DENIED',
+      method: 'requestAccess',
+      message:
+          'Permite el acceso a la galería para guardar la tarjeta. '
+          'Puedes seguir compartiéndola.',
+    ),
+    (
+      code: 'ACCESS_DENIED',
+      method: 'putImage',
+      message:
+          'Permite el acceso a la galería para guardar la tarjeta. '
+          'Puedes seguir compartiéndola.',
+    ),
+    (
+      code: 'NOT_ENOUGH_SPACE',
+      method: 'putImage',
+      message:
+          'No hay espacio suficiente para guardar la tarjeta. '
+          'Libera espacio e inténtalo de nuevo. Puedes seguir compartiéndola.',
+    ),
+    (
+      code: 'UNEXPECTED',
+      method: 'putImage',
+      message:
+          'La galería no pudo guardar la tarjeta. '
+          'Inténtalo de nuevo o compártela.',
+    ),
+    (
+      code: 'FUTURE_NATIVE_ERROR',
+      method: 'putImage',
+      message:
+          'La galería no pudo guardar la tarjeta. '
+          'Inténtalo de nuevo o compártela.',
+    ),
+    (
+      code: 'NOT_SUPPORTED_FORMAT',
+      method: 'putImage',
+      message: 'La galería no admite esta imagen. Puedes compartir la tarjeta.',
+    ),
+  ]) {
+    test('gallery ${scenario.code} from ${scenario.method} explains the cause, '
+        'cleans all pages and leaves image sharing usable', () async {
+      final messenger =
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+      const channel = MethodChannel('gal');
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        if (call.method == scenario.method) {
+          throw PlatformException(
+            code: scenario.code,
+            message: 'private native diagnostic',
+            details: 'private stack and file path',
+          );
+        }
+        if (call.method == 'requestAccess') return true;
+        fail('Unexpected gallery method: ${call.method}');
+      });
+      addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
+      final nativeGallery = _NativeGalleryGateway(temporaryDirectory);
+      final nativeCoordinator = ShareExportCoordinator(nativeGallery);
+      Future<List<Uint8List>> render() async => [
+        Uint8List.fromList(png1),
+        Uint8List.fromList(png2),
+      ];
+
+      await expectLater(
+        nativeCoordinator.save(content: content, renderPages: render),
+        throwsA(
+          isA<ShareExportFailure>()
+              .having((error) => error.stage, 'stage', ShareExportStage.save)
+              .having(
+                (error) => error.userMessage,
+                'actionable safe message',
+                scenario.message,
+              )
+              .having(
+                (error) => error.cause,
+                'original diagnostic preserved internally',
+                isA<GalException>()
+                    .having(
+                      (error) => error.platformException.code,
+                      'native code',
+                      scenario.code,
+                    )
+                    .having(
+                      (error) => error.platformException.details,
+                      'native details',
+                      'private stack and file path',
+                    ),
+              ),
+        ),
+      );
+      expect(nativeGallery.deletedPaths, hasLength(2));
+      expect(await temporaryDirectory.list().toList(), isEmpty);
+      expect(nativeGallery.shareFilesCalls, 0);
+      expect(nativeGallery.textShareCalls, 0);
+
+      expect(
+        await nativeCoordinator.share(content: content, renderPages: render),
+        ShareExportResult.shared,
+      );
+      expect(nativeGallery.sharedFileBytes, [png1, png2]);
+      expect(await temporaryDirectory.list().toList(), isEmpty);
+    });
+  }
 
   for (final status in [
     NativeShareStatus.success,
@@ -350,7 +459,15 @@ void main() {
   );
 }
 
-final class FakeSharePlatformGateway implements SharePlatformGateway {
+final class _NativeGalleryGateway extends FakeSharePlatformGateway {
+  _NativeGalleryGateway(super.directory);
+
+  @override
+  Future<void> saveImage(String path) =>
+      const SystemSharePlatformGateway().saveImage(path);
+}
+
+class FakeSharePlatformGateway implements SharePlatformGateway {
   FakeSharePlatformGateway(this.directory);
 
   final Directory directory;
