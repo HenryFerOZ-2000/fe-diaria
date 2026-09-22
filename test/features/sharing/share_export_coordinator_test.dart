@@ -120,6 +120,7 @@ void main() {
         ),
       );
       expect(renderedPages, 2);
+      expect(gateway.shareFilesCalls, 0);
       expect(gateway.sharedPaths, isEmpty);
       expect(gateway.savedPaths, isEmpty);
     },
@@ -144,6 +145,63 @@ void main() {
       expect(gateway.deletedPaths, unorderedEquals(gateway.savedPaths));
     },
   );
+
+  for (final status in [
+    NativeShareStatus.success,
+    NativeShareStatus.dismissed,
+  ]) {
+    test('text fallback sends the full caption and handles $status', () async {
+      gateway.shareStatus = status;
+
+      final result = await coordinator.shareText(content);
+
+      expect(
+        result,
+        status == NativeShareStatus.success
+            ? ShareExportResult.shared
+            : ShareExportResult.dismissed,
+      );
+      expect(gateway.textShareCalls, 1);
+      expect(
+        gateway.sharedText,
+        'Palabra del día\n\n'
+        'Filipenses 4:13\n\n'
+        'Todo lo puedo en Cristo que me fortalece.\n\n'
+        'Descubre Verbum y comparte la Palabra:\n\n'
+        'https://play.google.com/store/apps/details?id=com.ozcorp.verbum',
+      );
+      expect(gateway.shareFilesCalls, 0);
+      expect(await temporaryDirectory.list().toList(), isEmpty);
+    });
+  }
+
+  for (final unavailable in [false, true]) {
+    test(
+      'text fallback failure is recoverable (unavailable: $unavailable)',
+      () async {
+        if (unavailable) {
+          gateway.shareStatus = NativeShareStatus.unavailable;
+        } else {
+          gateway.shareError = StateError('native diagnostic not for users');
+        }
+
+        await expectLater(
+          coordinator.shareText(content),
+          throwsA(
+            isA<ShareExportFailure>()
+                .having((error) => error.stage, 'stage', ShareExportStage.share)
+                .having(
+                  (error) => error.userMessage,
+                  'userMessage',
+                  'No pudimos compartir el texto.',
+                ),
+          ),
+        );
+        expect(gateway.shareFilesCalls, 0);
+        expect(await temporaryDirectory.list().toList(), isEmpty);
+      },
+    );
+  }
 
   test(
     'copy puts title, reference, body, and Play Store link on clipboard',
@@ -307,6 +365,8 @@ final class FakeSharePlatformGateway implements SharePlatformGateway {
   Object? shareError;
   int? deleteErrorAtCall;
   int deleteAttempts = 0;
+  int shareFilesCalls = 0;
+  int textShareCalls = 0;
   String? sharedText;
   String? copiedText;
   bool sharedFilesExisted = false;
@@ -339,6 +399,7 @@ final class FakeSharePlatformGateway implements SharePlatformGateway {
 
   @override
   Future<NativeShareStatus> shareFiles(List<String> paths, String text) async {
+    shareFilesCalls++;
     sharedPaths.addAll(paths);
     sharedText = text;
     sharedFilesExisted = await Future.wait(
@@ -355,6 +416,7 @@ final class FakeSharePlatformGateway implements SharePlatformGateway {
 
   @override
   Future<NativeShareStatus> shareText(String text) async {
+    textShareCalls++;
     sharedText = text;
     if (shareError case final error?) {
       throw error;

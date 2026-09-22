@@ -537,6 +537,47 @@ void main() {
     },
   );
 
+  testWidgets('an unavailable daily verse cannot open the composer', (
+    tester,
+  ) async {
+    final mission = Mission(
+      id: 'verse',
+      title: 'Recibe la Palabra',
+      description: 'Lee la Palabra de hoy.',
+      icon: Icons.menu_book_rounded,
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: DailyMissionsFlowScreen(
+          missions: [mission],
+          initialMissionIndex: 0,
+          provider: _EntryPointAppProvider(
+            testFavorites: const [],
+            testTodayVerse: null,
+          ),
+          missionsController: MissionsController(missions: [mission]),
+          dailyProgressService: DailyProgressService(),
+          spiritualStatsService: SpiritualStatsService(),
+          onMissionComplete: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      find.text('Versículo del día no disponible por el momento.'),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widget<PrayerReadingExperience>(find.byType(PrayerReadingExperience))
+          .onShare,
+      isNull,
+    );
+    expect(find.byType(ShareComposerScreen), findsNothing);
+    expect(nativeShares, isEmpty);
+  });
+
   testWidgets('the mission reader opens mission content', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -628,7 +669,10 @@ Future<void> _pumpRoute(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 400));
 }
 
-final class _EntryPointAppProvider extends AppProvider {
+// Keep the provider contract without starting unrelated database, notification,
+// and widget-refresh work from AppProvider's constructor.
+final class _EntryPointAppProvider extends ChangeNotifier
+    implements AppProvider {
   _EntryPointAppProvider({
     required this.testFavorites,
     required this.testTodayVerse,
@@ -645,4 +689,7 @@ final class _EntryPointAppProvider extends AppProvider {
 
   @override
   Future<void> toggleFavorite(Verse verse) async {}
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

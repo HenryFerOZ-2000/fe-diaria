@@ -60,6 +60,10 @@ class _Coordinator extends ShareExportCoordinator {
   bool capture = false;
   int shared = 0;
   int saved = 0;
+  int textShared = 0;
+  ShareContent? textContent;
+  ShareExportResult textResult = ShareExportResult.shared;
+  ShareExportFailure? textFailure;
   ShareContent? copied;
   List<Uint8List>? images;
   SharePageRenderer? renderer;
@@ -91,6 +95,14 @@ class _Coordinator extends ShareExportCoordinator {
 
   @override
   Future<void> copy(ShareContent content) async => copied = content;
+
+  @override
+  Future<ShareExportResult> shareText(ShareContent content) async {
+    textShared++;
+    textContent = content;
+    if (textFailure case final error?) throw error;
+    return textResult;
+  }
 }
 
 Future<void> _pump(
@@ -200,6 +212,28 @@ void main() {
     expect(_card(tester).page.index, 1);
   });
 
+  testWidgets('a slow left drag advances the selected environment', (
+    tester,
+  ) async {
+    await _pump(tester, _Coordinator());
+    await tester.tap(find.byKey(const Key('share-style-sereneLight')));
+    await tester.pumpAndSettle();
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byKey(const Key('share-style-carousel'))),
+    );
+    for (var step = 0; step < 6; step++) {
+      await gesture.moveBy(const Offset(-20, 0));
+      await tester.pump(const Duration(milliseconds: 200));
+    }
+    await tester.pump(const Duration(milliseconds: 300));
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(_card(tester).style, ShareVisualStyle.contemplativeNight);
+    expect(_card(tester).page.body, _content.body);
+    expect(_card(tester).content.reference, _content.reference);
+  });
+
   for (final action in ['Compartir', 'Guardar']) {
     testWidgets(
       '$action blocks duplicate work and dismissal removes progress',
@@ -267,11 +301,87 @@ void main() {
     await tester.tap(find.byTooltip('Guardar'));
     await tester.pumpAndSettle();
     expect(find.text('No pudimos crear la tarjeta.'), findsOneWidget);
+    expect(find.text('Compartir como texto'), findsNothing);
     coordinator.failure = null;
     await tester.tap(find.text('Reintentar'));
     await tester.pumpAndSettle();
     expect(coordinator.saved, 2);
     expect(coordinator.shared, 0);
+  });
+
+  for (final result in [
+    ShareExportResult.shared,
+    ShareExportResult.dismissed,
+  ]) {
+    testWidgets(
+      'image-share failure offers a text fallback ending in $result',
+      (tester) async {
+        final coordinator = _Coordinator()
+          ..failure = const ShareExportFailure(
+            ShareExportStage.share,
+            'No pudimos compartir la tarjeta.',
+          )
+          ..textResult = result;
+        await _pump(
+          tester,
+          coordinator,
+          size: result == ShareExportResult.shared
+              ? const Size(320, 568)
+              : const Size(390, 844),
+          scale: result == ShareExportResult.shared ? 2 : 1,
+        );
+        await tester.tap(find.byTooltip('Compartir'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Reintentar'), findsOneWidget);
+        expect(find.text('Compartir como texto'), findsOneWidget);
+        await tester.tap(find.text('Compartir como texto'));
+        await tester.pumpAndSettle();
+
+        expect(coordinator.textShared, 1);
+        expect(coordinator.textContent, same(_content));
+        expect(coordinator.shared, 1);
+        expect(find.textContaining('No pudimos'), findsNothing);
+        expect(find.byType(ShareComposerScreen), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  testWidgets('a failed text fallback offers a safe text retry', (
+    tester,
+  ) async {
+    final coordinator = _Coordinator()
+      ..failure = const ShareExportFailure(
+        ShareExportStage.share,
+        'No pudimos compartir la tarjeta.',
+      )
+      ..textFailure = const ShareExportFailure(
+        ShareExportStage.share,
+        'No pudimos compartir el texto.',
+      );
+    await _pump(tester, coordinator);
+    await tester.tap(find.byTooltip('Compartir'));
+    await tester.pumpAndSettle();
+    expect(find.text('Compartir como texto'), findsOneWidget);
+    await tester.tap(find.text('Compartir como texto'));
+    await tester.pumpAndSettle();
+    expect(find.text('No pudimos compartir el texto.'), findsOneWidget);
+    expect(find.text('Reintentar'), findsOneWidget);
+    expect(
+      tester
+          .widget<FilledButton>(find.byKey(const Key('share-primary-action')))
+          .onPressed,
+      isNotNull,
+    );
+
+    coordinator.textFailure = null;
+    await tester.tap(find.text('Reintentar'));
+    await tester.pumpAndSettle();
+    expect(coordinator.textShared, 2);
+    expect(coordinator.shared, 1);
+    expect(find.textContaining('No pudimos'), findsNothing);
+    expect(find.byTooltip('Compartir').hitTestable(), findsOneWidget);
   });
 
   testWidgets('copy delegates the content and confirms success', (
@@ -442,31 +552,41 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('portrait export decodes to exactly 1080 by 1350', (
-    tester,
-  ) async {
-    final coordinator = _Coordinator()..capture = true;
-    await _pump(tester, coordinator);
-    await tester.tap(find.byTooltip('Compartir'));
-    await tester.runAsync(() async {
-      for (var frame = 0; frame < 100 && coordinator.images == null; frame++) {
-        await tester.pump();
-        await Future<void>.delayed(const Duration(milliseconds: 20));
-      }
-      expect(coordinator.images, hasLength(1));
-      final codec = await ui.instantiateImageCodec(coordinator.images!.single);
-      final frame = await codec.getNextFrame();
-      expect(frame.image.width, 1080);
-      expect(frame.image.height, 1350);
-      if (const bool.fromEnvironment('SHARE_DEBUG_CAPTURE')) {
-        await File(
-          'build/share_composer_portrait.png',
-        ).writeAsBytes(coordinator.images!.single);
-      }
-      frame.image.dispose();
-      codec.dispose();
+  for (final format in [('1:1', 1080, 'square'), ('4:5', 1350, 'portrait')]) {
+    testWidgets('${format.$3} export decodes to exactly 1080 by ${format.$2}', (
+      tester,
+    ) async {
+      final coordinator = _Coordinator()..capture = true;
+      await _pump(tester, coordinator);
+      await tester.tap(find.text(format.$1));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Compartir'));
+      await tester.runAsync(() async {
+        for (
+          var frame = 0;
+          frame < 100 && coordinator.images == null;
+          frame++
+        ) {
+          await tester.pump();
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+        }
+        expect(coordinator.images, hasLength(1));
+        final codec = await ui.instantiateImageCodec(
+          coordinator.images!.single,
+        );
+        final frame = await codec.getNextFrame();
+        expect(frame.image.width, 1080);
+        expect(frame.image.height, format.$2);
+        if (const bool.fromEnvironment('SHARE_DEBUG_CAPTURE')) {
+          await File(
+            'build/share_composer_${format.$3}.png',
+          ).writeAsBytes(coordinator.images!.single);
+        }
+        frame.image.dispose();
+        codec.dispose();
+      });
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
     });
-    await tester.pumpAndSettle();
-    expect(tester.takeException(), isNull);
-  });
+  }
 }

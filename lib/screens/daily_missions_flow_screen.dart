@@ -353,7 +353,11 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
       verseReference: blocked ? null : _getMissionReference(mission.id),
       accent: _missionAccent(mission.id),
       onBack: () => Navigator.of(context).pop(),
-      onShare: blocked ? null : _share,
+      onShare:
+          blocked ||
+              (mission.id == 'verse' && widget.provider.todayVerse == null)
+          ? null
+          : _share,
       onComplete: blocked ? null : _completeCurrentMission,
       onNext: blocked ? null : _handleNext,
       initiallyCompleted: mission.completed,

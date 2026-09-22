@@ -28,7 +28,7 @@ class ShareComposerScreen extends StatefulWidget {
   State<ShareComposerScreen> createState() => _ShareComposerScreenState();
 }
 
-enum _ExportAction { share, save, copy }
+enum _ExportAction { share, save, copy, shareText }
 
 class _ShareComposerScreenState extends State<ShareComposerScreen> {
   final _captureKey = GlobalKey();
@@ -38,6 +38,7 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
   int _page = 0;
   bool _busy = false;
   int _capturingPage = 0;
+  double _styleDragDistance = 0;
 
   @override
   void initState() {
@@ -157,6 +158,8 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
         case _ExportAction.copy:
           await widget.coordinator.copy(widget.content);
           message = 'Texto y enlace copiados';
+        case _ExportAction.shareText:
+          await widget.coordinator.shareText(widget.content);
       }
     } on ShareExportFailure catch (error) {
       failure = error;
@@ -173,7 +176,24 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
     if (failure != null || message != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(failure?.userMessage ?? message!),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(failure?.userMessage ?? message!),
+              if (action == _ExportAction.share &&
+                  failure?.stage == ShareExportStage.share)
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(
+                      context,
+                    ).colorScheme.inversePrimary,
+                  ),
+                  onPressed: () => _export(_ExportAction.shareText),
+                  child: const Text('Compartir como texto'),
+                ),
+            ],
+          ),
           action: failure == null
               ? null
               : SnackBarAction(
@@ -372,10 +392,15 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
 
   Widget _styles() => GestureDetector(
     key: const Key('share-style-carousel'),
+    onHorizontalDragStart: _busy ? null : (_) => _styleDragDistance = 0,
+    onHorizontalDragUpdate: _busy
+        ? null
+        : (details) => _styleDragDistance += details.delta.dx,
     onHorizontalDragEnd: _busy
         ? null
-        : (details) {
-            final delta = (details.primaryVelocity ?? 0) < 0 ? 1 : -1;
+        : (_) {
+            if (_styleDragDistance == 0) return;
+            final delta = _styleDragDistance < 0 ? 1 : -1;
             setState(
               () => _style =
                   ShareVisualStyle.values[(_style.index + delta).clamp(

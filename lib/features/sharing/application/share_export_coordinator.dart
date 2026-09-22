@@ -90,6 +90,30 @@ class ShareExportCoordinator {
   Future<void> copy(ShareContent content) =>
       gateway.copyText(ShareMessageBuilder.build(content));
 
+  Future<ShareExportResult> shareText(ShareContent content) async {
+    try {
+      final status = await gateway.shareText(
+        ShareMessageBuilder.build(content),
+      );
+      return switch (status) {
+        NativeShareStatus.success => ShareExportResult.shared,
+        NativeShareStatus.dismissed => ShareExportResult.dismissed,
+        NativeShareStatus.unavailable => throw const ShareExportFailure(
+          ShareExportStage.share,
+          'No pudimos compartir el texto.',
+        ),
+      };
+    } on ShareExportFailure {
+      rethrow;
+    } catch (error) {
+      throw ShareExportFailure(
+        ShareExportStage.share,
+        'No pudimos compartir el texto.',
+        error,
+      );
+    }
+  }
+
   Future<List<Uint8List>> _renderAll(SharePageRenderer renderPages) async {
     try {
       final pages = await renderPages();
