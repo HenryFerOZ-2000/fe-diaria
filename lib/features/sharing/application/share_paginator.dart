@@ -189,13 +189,12 @@ class _BodyLayout {
   final TextDirection textDirection;
 
   bool fits(String text) {
-    final paintedText = text.trim();
-    if (paintedText.isEmpty) {
+    if (text.isEmpty) {
       return true;
     }
 
     final painter = TextPainter(
-      text: TextSpan(text: paintedText, style: typography.bodyStyle),
+      text: TextSpan(text: text, style: typography.bodyStyle),
       textDirection: textDirection,
       textScaler: TextScaler.noScaling,
     )..layout(maxWidth: size.width);

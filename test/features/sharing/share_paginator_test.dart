@@ -95,6 +95,25 @@ void main() {
     expect(pages.where((page) => page.body.trim() == token), hasLength(1));
   });
 
+  test('includes a trailing paragraph separator in fit measurement', () {
+    final firstParagraph = List<String>.generate(
+      10,
+      (index) => 'Línea ${index + 1}.',
+    ).join('\n');
+    final prayer = ShareContent(
+      title: 'Oración al límite',
+      body: '$firstParagraph\n\nCierre.',
+      kind: ShareContentKind.prayer,
+    );
+
+    final pages = paginator.paginate(prayer, format: ShareCardFormat.square);
+
+    expect(pages, hasLength(2));
+    expect(pages.first.body, isNot('$firstParagraph\n\n'));
+    expect(pages.last.body, startsWith('Línea 10.\n\n'));
+    expect(pages.map((page) => page.body).join(), prayer.body);
+  });
+
   test('accepts right-to-left measurement without changing stored text', () {
     final reflection = ShareContent(
       title: 'Reflexión',
