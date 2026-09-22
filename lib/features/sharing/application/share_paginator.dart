@@ -1,39 +1,8 @@
-import 'dart:math' as math;
-
 import 'package:flutter/painting.dart';
+import 'package:verbum/features/sharing/application/share_card_layout.dart';
 import 'package:verbum/features/sharing/domain/share_card_format.dart';
 import 'package:verbum/features/sharing/domain/share_content.dart';
 import 'package:verbum/features/sharing/domain/share_page.dart';
-
-const Map<ShareCardFormat, _ShareTypography> _typographyByFormat = {
-  ShareCardFormat.square: _ShareTypography(
-    bodyFontSize: 42,
-    horizontalInset: 96,
-    verticalInset: 72,
-    logoRegionHeight: 112,
-    referenceRegionHeight: 88,
-    footerRegionHeight: 80,
-    pageMarkerRegionHeight: 64,
-  ),
-  ShareCardFormat.portrait: _ShareTypography(
-    bodyFontSize: 40,
-    horizontalInset: 96,
-    verticalInset: 80,
-    logoRegionHeight: 112,
-    referenceRegionHeight: 88,
-    footerRegionHeight: 80,
-    pageMarkerRegionHeight: 64,
-  ),
-  ShareCardFormat.story: _ShareTypography(
-    bodyFontSize: 38,
-    horizontalInset: 104,
-    verticalInset: 112,
-    logoRegionHeight: 128,
-    referenceRegionHeight: 96,
-    footerRegionHeight: 88,
-    pageMarkerRegionHeight: 72,
-  ),
-};
 
 class SharePaginator {
   const SharePaginator();
@@ -44,11 +13,10 @@ class SharePaginator {
     TextDirection textDirection = TextDirection.ltr,
   }) {
     final body = content.body.replaceAll('\r\n', '\n').trim();
-    final typography = _typographyByFormat[format]!;
+    final typography = ShareCardLayout(format);
 
     var chunks = _paginateBody(
       body,
-      format: format,
       typography: typography,
       textDirection: textDirection,
       knownPageCount: null,
@@ -59,7 +27,6 @@ class SharePaginator {
       while (true) {
         chunks = _paginateBody(
           body,
-          format: format,
           typography: typography,
           textDirection: textDirection,
           knownPageCount: knownPageCount,
@@ -86,14 +53,12 @@ class SharePaginator {
 
   List<String> _paginateBody(
     String body, {
-    required ShareCardFormat format,
-    required _ShareTypography typography,
+    required ShareCardLayout typography,
     required TextDirection textDirection,
     required int? knownPageCount,
   }) {
     final layout = _BodyLayout(
       size: typography.bodyBox(
-        format.pixelSize,
         reservePageMarker: knownPageCount != null && knownPageCount > 1,
       ),
       typography: typography,
@@ -185,7 +150,7 @@ class _BodyLayout {
   });
 
   final Size size;
-  final _ShareTypography typography;
+  final ShareCardLayout typography;
   final TextDirection textDirection;
 
   bool fits(String text) {
@@ -219,45 +184,6 @@ class _BodyLayout {
     }
     return false;
   }
-}
-
-class _ShareTypography {
-  const _ShareTypography({
-    required this.bodyFontSize,
-    required this.horizontalInset,
-    required this.verticalInset,
-    required this.logoRegionHeight,
-    required this.referenceRegionHeight,
-    required this.footerRegionHeight,
-    required this.pageMarkerRegionHeight,
-  });
-
-  final double bodyFontSize;
-  final double horizontalInset;
-  final double verticalInset;
-  final double logoRegionHeight;
-  final double referenceRegionHeight;
-  final double footerRegionHeight;
-  final double pageMarkerRegionHeight;
-
-  TextStyle get bodyStyle => TextStyle(
-    fontFamily: 'VerbumInter',
-    fontSize: bodyFontSize,
-    height: 1.35,
-  );
-
-  Size bodyBox(Size canvas, {required bool reservePageMarker}) => Size(
-    math.max(1, canvas.width - (horizontalInset * 2)),
-    math.max(
-      1,
-      canvas.height -
-          (verticalInset * 2) -
-          logoRegionHeight -
-          referenceRegionHeight -
-          footerRegionHeight -
-          (reservePageMarker ? pageMarkerRegionHeight : 0),
-    ),
-  );
 }
 
 List<String> _splitParagraphs(String text) =>
