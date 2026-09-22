@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../features/sharing/domain/share_content.dart';
 import '../models/spiritual_path.dart';
 import '../services/read_aloud_service.dart';
 import '../services/share_service.dart';
@@ -10,10 +11,13 @@ import 'reading_chat_screen.dart';
 class SpiritualPathDayScreen extends StatefulWidget {
   final SpiritualPath path;
   final int dayNumber;
+  final Future<void> Function(String pathId, int day, int totalDays)?
+  completeDay;
   const SpiritualPathDayScreen({
     super.key,
     required this.path,
     required this.dayNumber,
+    this.completeDay,
   });
 
   @override
@@ -71,11 +75,20 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
     }
     if (_completing) return;
     setState(() => _completing = true);
-    await _pathService.completeDay(
-      widget.path.id,
-      widget.dayNumber,
-      widget.path.days.length,
-    );
+    final completeDay = widget.completeDay;
+    if (completeDay == null) {
+      await _pathService.completeDay(
+        widget.path.id,
+        widget.dayNumber,
+        widget.path.days.length,
+      );
+    } else {
+      await completeDay(
+        widget.path.id,
+        widget.dayNumber,
+        widget.path.days.length,
+      );
+    }
     if (!mounted) return;
     await showDialog<void>(
       context: context,
@@ -449,10 +462,15 @@ class _CompletionDialog extends StatelessWidget {
       actionsAlignment: MainAxisAlignment.center,
       actions: [
         TextButton(
-          onPressed: () => ShareService.shareAsText(
-            text: day.scripture,
-            reference: day.scriptureReference,
-            title: path.title,
+          onPressed: () => ShareService.openComposer(
+            context,
+            ShareContent(
+              title: path.title,
+              body: day.scripture,
+              reference: '${day.scriptureReference} · RV1909',
+              sourceLabel: 'RV1909',
+              kind: ShareContentKind.verse,
+            ),
           ),
           child: const Text('Compartir'),
         ),

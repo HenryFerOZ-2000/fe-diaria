@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../features/sharing/domain/share_content.dart';
 import '../services/share_service.dart';
 import '../widgets/prayer_reading_experience.dart';
 
@@ -50,10 +51,13 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
       text: widget.content,
       accent: const Color(0xFF77649A),
       onBack: () => Navigator.pop(context),
-      onShare: () => ShareService.shareAsText(
-        text: widget.content,
-        reference: widget.title,
-        title: widget.title,
+      onShare: () => ShareService.openComposer(
+        context,
+        ShareContent(
+          title: widget.title,
+          body: widget.content,
+          kind: ShareContentKind.mission,
+        ),
       ),
       onNext: () {
         if (!_completed) {
@@ -152,10 +156,13 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
                   children: [
                     TextButton.icon(
                       onPressed: () {
-                        ShareService.shareAsText(
-                          text: widget.content,
-                          reference: widget.title,
-                          title: widget.title,
+                        ShareService.openComposer(
+                          context,
+                          ShareContent(
+                            title: widget.title,
+                            body: widget.content,
+                            kind: ShareContentKind.mission,
+                          ),
                         );
                       },
                       icon: const Icon(Icons.share_outlined),
