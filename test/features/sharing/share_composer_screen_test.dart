@@ -467,6 +467,85 @@ void main() {
     },
   );
 
+  testWidgets(
+    'successful sharing removes only the composer below a new route',
+    (tester) async {
+      final coordinator = _NavigationCoordinator()
+        ..pending = Completer<ShareExportResult>();
+      await _openComposer(tester, coordinator);
+      final navigator = Navigator.of(
+        tester.element(find.byType(ShareComposerScreen)),
+      );
+      await tester.tap(find.byKey(const Key('share-primary-action')));
+      await tester.pump();
+      navigator.push(
+        MaterialPageRoute<void>(
+          builder: (_) => const Scaffold(body: Text('Nueva pantalla')),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      coordinator.pending!.complete(ShareExportResult.shared);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Nueva pantalla'), findsOneWidget);
+      expect(
+        find.byType(ShareComposerScreen, skipOffstage: false),
+        findsNothing,
+      );
+      navigator.pop();
+      await tester.pumpAndSettle();
+      expect(find.text('Abrir').hitTestable(), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  for (final disposed in [false, true]) {
+    for (final success in [false, true]) {
+      testWidgets(
+        'completion success=$success after removing composer disposed=$disposed preserves the new route',
+        (tester) async {
+          final coordinator = _NavigationCoordinator()
+            ..pending = Completer<ShareExportResult>();
+          await _openComposer(tester, coordinator);
+          final context = tester.element(find.byType(ShareComposerScreen));
+          final route = ModalRoute.of(context)!;
+          final navigator = Navigator.of(context);
+          await tester.tap(find.byKey(const Key('share-primary-action')));
+          await tester.pump();
+          navigator.push(
+            MaterialPageRoute<void>(
+              builder: (_) => const Scaffold(body: Text('Nueva pantalla')),
+            ),
+          );
+          await tester.pumpAndSettle();
+          navigator.removeRoute(route);
+          if (disposed) await tester.pumpAndSettle();
+
+          if (success) {
+            coordinator.pending!.complete(ShareExportResult.shared);
+          } else {
+            coordinator.pending!.completeError(
+              const ShareExportFailure.render(),
+            );
+          }
+          await tester.pumpAndSettle();
+
+          expect(find.text('Nueva pantalla'), findsOneWidget);
+          expect(
+            find.byType(ShareComposerScreen, skipOffstage: false),
+            findsNothing,
+          );
+          expect(find.byType(SnackBar), findsNothing);
+          expect(tester.takeException(), isNull);
+          navigator.pop();
+          await tester.pumpAndSettle();
+          expect(find.text('Abrir').hitTestable(), findsOneWidget);
+        },
+      );
+    }
+  }
+
   testWidgets('dismissed image sharing keeps the composer without a message', (
     tester,
   ) async {

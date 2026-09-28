@@ -136,6 +136,7 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
     bool closeOnShared = false,
   }) async {
     if (_busy) return;
+    final composerRoute = ModalRoute.of(context);
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     setState(() {
       _busy = true;
@@ -177,9 +178,14 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
-    if (!mounted) return;
+    if (!mounted || composerRoute?.isActive != true) return;
     if (shouldClose) {
-      Navigator.of(context).pop();
+      final navigator = composerRoute!.navigator!;
+      if (composerRoute.isCurrent) {
+        navigator.pop();
+      } else {
+        navigator.removeRoute(composerRoute);
+      }
       return;
     }
     if (failure != null || message != null) {
