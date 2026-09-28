@@ -105,6 +105,51 @@ class _Coordinator extends ShareExportCoordinator {
   }
 }
 
+class _NavigationCoordinator extends _Coordinator {
+  ShareExportResult imageResult = ShareExportResult.shared;
+  Object? imageFailure;
+
+  @override
+  Future<ShareExportResult> share({
+    required ShareContent content,
+    required SharePageRenderer renderPages,
+  }) async {
+    if (imageFailure case final error?) throw error;
+    return pending?.future ?? imageResult;
+  }
+
+  @override
+  Future<ShareExportResult> save({
+    required ShareContent content,
+    required SharePageRenderer renderPages,
+  }) async => ShareExportResult.saved;
+}
+
+Future<void> _openComposer(
+  WidgetTester tester,
+  ShareExportCoordinator coordinator,
+) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Builder(
+        builder: (context) => TextButton(
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => ShareComposerScreen(
+                content: _content,
+                coordinator: coordinator,
+              ),
+            ),
+          ),
+          child: const Text('Abrir'),
+        ),
+      ),
+    ),
+  );
+  await tester.tap(find.text('Abrir'));
+  await tester.pumpAndSettle();
+}
+
 Future<void> _pump(
   WidgetTester tester,
   _Coordinator coordinator, {
@@ -403,27 +448,126 @@ void main() {
     expect(find.text('Texto y enlace copiados'), findsOneWidget);
   });
 
+  testWidgets(
+    'successful primary image sharing returns to the previous route',
+    (tester) async {
+      final coordinator = _NavigationCoordinator()
+        ..pending = Completer<ShareExportResult>();
+      await _openComposer(tester, coordinator);
+      await tester.tap(find.byKey(const Key('share-primary-action')));
+      await tester.pump();
+      expect(find.byType(ShareComposerScreen), findsOneWidget);
+      expect(tester.widget<PopScope>(find.byType(PopScope)).canPop, isFalse);
+      coordinator.pending!.complete(ShareExportResult.shared);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ShareComposerScreen), findsNothing);
+      expect(find.text('Abrir').hitTestable(), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('dismissed image sharing keeps the composer without a message', (
+    tester,
+  ) async {
+    await _openComposer(
+      tester,
+      _NavigationCoordinator()..imageResult = ShareExportResult.dismissed,
+    );
+    await tester.tap(find.byKey(const Key('share-primary-action')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ShareComposerScreen), findsOneWidget);
+    expect(find.text('Abrir'), findsNothing);
+    expect(find.byType(SnackBar), findsNothing);
+    expect(
+      find.byKey(const Key('share-primary-action')).hitTestable(),
+      findsOneWidget,
+    );
+  });
+
+  for (final failure in <String, Object>{
+    'render': const ShareExportFailure.render(),
+    'write': const ShareExportFailure(
+      ShareExportStage.write,
+      'No pudimos preparar la tarjeta.',
+    ),
+    'share': const ShareExportFailure(
+      ShareExportStage.share,
+      'No pudimos compartir la tarjeta.',
+    ),
+    'unexpected': StateError('Unexpected export failure'),
+  }.entries) {
+    testWidgets(
+      '${failure.key} failure and successful retry keep the composer',
+      (tester) async {
+        final coordinator = _NavigationCoordinator()
+          ..imageFailure = failure.value;
+        await _openComposer(tester, coordinator);
+        await tester.tap(find.byKey(const Key('share-primary-action')));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ShareComposerScreen), findsOneWidget);
+        expect(find.text('Abrir'), findsNothing);
+        expect(find.text('Reintentar').hitTestable(), findsOneWidget);
+        coordinator.imageFailure = null;
+        await tester.tap(find.text('Reintentar'));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ShareComposerScreen), findsOneWidget);
+        expect(find.text('Abrir'), findsNothing);
+        expect(find.byType(SnackBar), findsNothing);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  testWidgets('saving successfully keeps the composer open', (tester) async {
+    await _openComposer(tester, _NavigationCoordinator());
+    await tester.tap(find.byTooltip('Guardar'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ShareComposerScreen), findsOneWidget);
+    expect(find.text('Abrir'), findsNothing);
+    expect(find.text('Tarjeta guardada en tu galería'), findsOneWidget);
+  });
+
+  testWidgets('successful text fallback keeps the composer open', (
+    tester,
+  ) async {
+    await _openComposer(
+      tester,
+      _NavigationCoordinator()
+        ..imageFailure = const ShareExportFailure(
+          ShareExportStage.share,
+          'No pudimos compartir la tarjeta.',
+        ),
+    );
+    await tester.tap(find.byKey(const Key('share-primary-action')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Compartir como texto'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ShareComposerScreen), findsOneWidget);
+    expect(find.text('Abrir'), findsNothing);
+    expect(find.byType(SnackBar), findsNothing);
+  });
+
+  testWidgets('copying successfully keeps the composer open', (tester) async {
+    await _openComposer(tester, _NavigationCoordinator());
+    await tester.tap(find.byKey(const Key('share-more-actions')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Copiar texto y enlace'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ShareComposerScreen), findsOneWidget);
+    expect(find.text('Abrir'), findsNothing);
+    expect(find.text('Texto y enlace copiados'), findsOneWidget);
+  });
+
   testWidgets('closing pops without exporting or copying', (tester) async {
     final coordinator = _Coordinator();
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Builder(
-          builder: (context) => TextButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => ShareComposerScreen(
-                  content: _content,
-                  coordinator: coordinator,
-                ),
-              ),
-            ),
-            child: const Text('Abrir'),
-          ),
-        ),
-      ),
-    );
-    await tester.tap(find.text('Abrir'));
-    await tester.pumpAndSettle();
+    await _openComposer(tester, coordinator);
     await tester.tap(find.byTooltip('Cerrar'));
     await tester.pumpAndSettle();
     expect(find.text('Abrir'), findsOneWidget);

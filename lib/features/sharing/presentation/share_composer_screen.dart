@@ -131,7 +131,10 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
     }
   }
 
-  Future<void> _export(_ExportAction action) async {
+  Future<void> _export(
+    _ExportAction action, {
+    bool closeOnShared = false,
+  }) async {
     if (_busy) return;
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     setState(() {
@@ -140,13 +143,15 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
     });
     String? message;
     ShareExportFailure? failure;
+    var shouldClose = false;
     try {
       switch (action) {
         case _ExportAction.share:
-          await widget.coordinator.share(
+          final result = await widget.coordinator.share(
             content: widget.content,
             renderPages: _renderPages,
           );
+          shouldClose = closeOnShared && result == ShareExportResult.shared;
         case _ExportAction.save:
           final result = await widget.coordinator.save(
             content: widget.content,
@@ -173,6 +178,10 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
       if (mounted) setState(() => _busy = false);
     }
     if (!mounted) return;
+    if (shouldClose) {
+      Navigator.of(context).pop();
+      return;
+    }
     if (failure != null || message != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -544,7 +553,9 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
                 message: 'Compartir',
                 child: FilledButton.icon(
                   key: const Key('share-primary-action'),
-                  onPressed: _busy ? null : () => _export(_ExportAction.share),
+                  onPressed: _busy
+                      ? null
+                      : () => _export(_ExportAction.share, closeOnShared: true),
                   icon: const Icon(Icons.ios_share_rounded, size: 18),
                   label: const Text(
                     'Compartir',
