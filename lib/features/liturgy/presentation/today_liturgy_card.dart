@@ -24,6 +24,8 @@ class TodayLiturgyCard extends StatelessWidget {
     return Semantics(
       button: true,
       label: 'Hoy en la Iglesia. ${day.primary.name}. $colorLabel',
+      excludeSemantics: true,
+      onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOutCubic,
@@ -34,13 +36,13 @@ class TodayLiturgyCard extends StatelessWidget {
             ),
             colorScheme.surface,
           ),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(color: accent.withValues(alpha: 0.34)),
           boxShadow: [
             BoxShadow(
               color: colorScheme.shadow.withValues(alpha: 0.07),
-              blurRadius: 22,
-              offset: const Offset(0, 9),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -48,16 +50,16 @@ class TodayLiturgyCard extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(18),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 17, 14, 15),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               child: IntrinsicHeight(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Container(
                       key: const Key('liturgical_color_marker'),
-                      width: 5,
+                      width: 4,
                       decoration: BoxDecoration(
                         color: accent,
                         borderRadius: BorderRadius.circular(99),
@@ -66,7 +68,7 @@ class TodayLiturgyCard extends StatelessWidget {
                             : null,
                       ),
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -77,48 +79,30 @@ class TodayLiturgyCard extends StatelessWidget {
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: accent,
                               fontWeight: FontWeight.w800,
-                              letterSpacing: 1.15,
+                              letterSpacing: 0.8,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 5),
                           Text(
                             day.primary.name,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.titleLarge?.copyWith(
+                            style: theme.textTheme.titleMedium?.copyWith(
                               color: colorScheme.onSurface,
                               fontWeight: FontWeight.w700,
-                              height: 1.15,
+                              height: 1.25,
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          const SizedBox(height: 5),
+                          Row(
                             children: [
-                              _MetadataPill(
-                                icon: Icons.circle,
-                                iconColor: accent,
-                                label: colorLabel,
-                              ),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton.icon(
-                                  onPressed: onTap,
-                                  iconAlignment: IconAlignment.end,
-                                  icon: const Icon(
-                                    Icons.arrow_forward_rounded,
-                                    size: 17,
-                                  ),
-                                  label: const Text('Ver el día'),
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: colorScheme.onSurface,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 8,
-                                    ),
-                                    minimumSize: const Size(0, 44),
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
+                              Icon(Icons.circle, size: 7, color: accent),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  colorLabel,
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
                                   ),
                                 ),
                               ),
@@ -127,55 +111,20 @@ class TodayLiturgyCard extends StatelessWidget {
                         ],
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    Center(
+                      child: Icon(
+                        Icons.chevron_right_rounded,
+                        color: colorScheme.onSurfaceVariant,
+                        size: 20,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _MetadataPill extends StatelessWidget {
-  const _MetadataPill({
-    required this.icon,
-    required this.iconColor,
-    required this.label,
-  });
-
-  final IconData icon;
-  final Color iconColor;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withValues(alpha: 0.76),
-        borderRadius: BorderRadius.circular(99),
-        border: Border.all(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.7),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 10, color: iconColor),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(
-              label,
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

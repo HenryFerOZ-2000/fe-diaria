@@ -130,7 +130,7 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.tap(find.text('Ver el día'));
+    await tester.tap(find.text('HOY EN LA IGLESIA'));
     await tester.pumpAndSettle();
     final screen = tester.widget<LiturgyDayScreen>(
       find.byType(LiturgyDayScreen),
