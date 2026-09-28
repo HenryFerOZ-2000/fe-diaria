@@ -15,6 +15,7 @@ import '../services/daily_progress_service.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/verbum_header_actions.dart';
 import '../widgets/spiritual_path_today_card.dart';
+import '../widgets/home_today_sections.dart';
 import '../features/liturgy/presentation/today_liturgy_section.dart';
 
 Mission _buildDailyPracticeMission(DateTime date) {
@@ -485,10 +486,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const TodayLiturgySection(),
-                  const SpiritualPathTodayCard(),
-                  const SizedBox(height: 22),
-                  _buildMissionsSection(context, provider),
+                  HomeTodaySections(
+                    missions: _buildMissionsSection(context, provider),
+                    spiritualPath: const SpiritualPathTodayCard(),
+                    liturgy: const TodayLiturgySection(),
+                  ),
                   const SizedBox(height: 12),
                 ],
               ),

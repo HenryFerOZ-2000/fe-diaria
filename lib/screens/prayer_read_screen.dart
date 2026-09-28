@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../faith/content_provenance.dart';
-import 'package:share_plus/share_plus.dart';
+import '../features/sharing/domain/share_content.dart';
+import '../services/share_service.dart';
 import '../models/prayer_model.dart';
 import '../services/prayer_rotation_service.dart';
 import '../widgets/prayer_reading_experience.dart';
@@ -56,8 +57,15 @@ class _PrayerReadScreenState extends State<PrayerReadScreen> {
   void _sharePrayer() {
     if (_current == null) return;
     final prayer = _current!;
-    final verse = prayer.verseRef != null ? '\n\nRef: ${prayer.verseRef}' : '';
-    Share.share('${prayer.title}\n\n${prayer.text}$verse');
+    ShareService.openComposer(
+      context,
+      ShareContent(
+        title: prayer.title,
+        body: prayer.text,
+        reference: prayer.verseRef ?? prayer.title,
+        kind: ShareContentKind.prayer,
+      ),
+    );
   }
 
   @override

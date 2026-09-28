@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:share_plus/share_plus.dart';
+import '../../features/sharing/domain/share_content.dart';
 import '../../screens/reading_chat_screen.dart';
+import '../../services/share_service.dart';
 import '../../widgets/app_scaffold.dart';
 import '../data/bible_db.dart';
 import '../domain/verse.dart';
@@ -16,6 +17,8 @@ class BibleVersesScreen extends StatefulWidget {
   final String bookName;
   final int chapter;
   final int initialVerse;
+  final Future<List<Verse>> Function(String bookId, int chapter)? chapterLoader;
+  final Future<List<int>> Function(String bookId)? chaptersLoader;
 
   const BibleVersesScreen({
     super.key,
@@ -23,6 +26,8 @@ class BibleVersesScreen extends StatefulWidget {
     required this.bookName,
     required this.chapter,
     this.initialVerse = 1,
+    this.chapterLoader,
+    this.chaptersLoader,
   });
 
   @override
@@ -94,8 +99,10 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
 
   Future<List<Verse>> _loadChapter() async {
     final results = await Future.wait([
-      BibleDb.instance.getChapter(widget.bookId, widget.chapter),
-      BibleDb.instance.getChapters(widget.bookId),
+      widget.chapterLoader?.call(widget.bookId, widget.chapter) ??
+          BibleDb.instance.getChapter(widget.bookId, widget.chapter),
+      widget.chaptersLoader?.call(widget.bookId) ??
+          BibleDb.instance.getChapters(widget.bookId),
     ]);
     final verses = results[0] as List<Verse>;
     final chapters = results[1] as List<int>;
@@ -220,9 +227,15 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
   }
 
   void _shareSelection() {
-    Share.share(
-      '${_selectionReference()} · Reina-Valera 1909\n${_selectionText()}\n\nCompartido desde Verbum',
-      subject: _selectionReference(),
+    ShareService.openComposer(
+      context,
+      ShareContent(
+        title: '${widget.bookName} ${widget.chapter}',
+        body: _selectionText(),
+        reference: '${_selectionReference()} · RV1909',
+        sourceLabel: 'RV1909',
+        kind: ShareContentKind.verse,
+      ),
     );
   }
 

@@ -4,6 +4,7 @@ import '../controllers/missions_controller.dart';
 import 'reading_chat_screen.dart';
 import '../services/share_service.dart';
 import '../widgets/prayer_reading_experience.dart';
+import '../features/sharing/domain/share_content.dart';
 
 class ReadingScreen extends StatefulWidget {
   final String title;
@@ -42,6 +43,22 @@ class _ReadingScreenState extends State<ReadingScreen>
     with SingleTickerProviderStateMixin {
   bool _fadeIn = false;
 
+  void _share() {
+    if (widget.onShare != null) {
+      widget.onShare!(widget.content, widget.reference);
+      return;
+    }
+    ShareService.openComposer(
+      context,
+      ShareContent(
+        title: widget.title,
+        body: widget.content,
+        reference: widget.reference,
+        kind: ShareContentKind.reflection,
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -62,17 +79,7 @@ class _ReadingScreenState extends State<ReadingScreen>
       verseReference: widget.reference,
       accent: const Color(0xFF77649A),
       onBack: () => Navigator.pop(context),
-      onShare: () {
-        if (widget.onShare != null) {
-          widget.onShare!(widget.content, widget.reference);
-        } else {
-          ShareService.shareAsText(
-            text: widget.content,
-            reference: widget.reference ?? widget.title,
-            title: widget.title,
-          );
-        }
-      },
+      onShare: _share,
       secondaryActionLabel: 'Chat',
       secondaryActionIcon: Icons.forum_outlined,
       onSecondaryAction: () {
@@ -154,17 +161,7 @@ class _ReadingScreenState extends State<ReadingScreen>
                           Icons.share_outlined,
                           color: Colors.white,
                         ),
-                        onPressed: () {
-                          if (widget.onShare != null) {
-                            widget.onShare!(widget.content, widget.reference);
-                          } else {
-                            ShareService.shareAsText(
-                              text: widget.content,
-                              reference: widget.reference ?? widget.title,
-                              title: widget.title,
-                            );
-                          }
-                        },
+                        onPressed: _share,
                       ),
                     ],
                   ),

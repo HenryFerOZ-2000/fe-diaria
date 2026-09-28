@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../features/sharing/domain/share_content.dart';
 import '../providers/app_provider.dart';
 import '../services/share_service.dart';
 import '../l10n/app_localizations.dart';
@@ -113,10 +114,15 @@ class FavoritesScreen extends StatelessWidget {
                     },
                     child: _FavoriteCard(
                       verse: verse,
-                      onShare: () => ShareService.shareAsText(
-                        text: verse.text,
-                        reference: verse.reference,
-                        title: AppLocalizations.of(context).favorite,
+                      onShare: () => ShareService.openComposer(
+                        context,
+                        ShareContent(
+                          title: AppLocalizations.of(context).favorite,
+                          body: verse.text,
+                          reference: '${verse.reference} · RV1909',
+                          sourceLabel: 'RV1909',
+                          kind: ShareContentKind.verse,
+                        ),
                       ),
                       onRemove: () => provider.toggleFavorite(verse),
                     ),

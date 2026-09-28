@@ -134,6 +134,7 @@ lib/generated_plugin_registrant.dart
 *.temp
 *~
 .worktrees/
+.superpowers/
 
 # Secrets
 **/api/src/secrets/*

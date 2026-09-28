@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../faith/content_provenance.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../controllers/missions_controller.dart';
+import '../features/sharing/domain/share_content.dart';
 import '../providers/app_provider.dart';
 import '../services/share_service.dart';
 import '../services/daily_progress_service.dart';
@@ -311,10 +312,18 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
     final content = _getMissionContent(currentMission.id);
     final reference = _getMissionReference(currentMission.id);
 
-    ShareService.shareAsText(
-      text: content,
-      reference: reference ?? currentMission.title,
-      title: currentMission.title,
+    final isScripture = currentMission.id == 'verse';
+    ShareService.openComposer(
+      context,
+      ShareContent(
+        title: currentMission.title,
+        body: content,
+        reference: isScripture && reference != null
+            ? '$reference · RV1909'
+            : null,
+        sourceLabel: isScripture ? 'RV1909' : null,
+        kind: isScripture ? ShareContentKind.verse : ShareContentKind.mission,
+      ),
     );
   }
 
@@ -344,7 +353,11 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
       verseReference: blocked ? null : _getMissionReference(mission.id),
       accent: _missionAccent(mission.id),
       onBack: () => Navigator.of(context).pop(),
-      onShare: blocked ? null : _share,
+      onShare:
+          blocked ||
+              (mission.id == 'verse' && widget.provider.todayVerse == null)
+          ? null
+          : _share,
       onComplete: blocked ? null : _completeCurrentMission,
       onNext: blocked ? null : _handleNext,
       initiallyCompleted: mission.completed,

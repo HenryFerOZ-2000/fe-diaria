@@ -163,9 +163,11 @@ class _LiveScreenState extends State<LiveScreen> {
   }
 
   void _sharePost(LivePost post) {
-    Share.share(
-      '${post.text}\n\n- ${post.userName}',
-      subject: 'Oración en vivo',
+    SharePlus.instance.share(
+      ShareParams(
+        text: '${post.text}\n\n- ${post.userName}',
+        subject: 'Oración en vivo',
+      ),
     );
   }
 

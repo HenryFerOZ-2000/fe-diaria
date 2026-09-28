@@ -916,8 +916,11 @@ class _CommunityBasicView extends StatelessWidget {
                         ),
                         IconButton(
                           tooltip: 'Compartir invitación',
-                          onPressed: () => Share.share(
-                            'Te invito a unirte a ${name?.isNotEmpty == true ? name : 'mi comunidad'} en Verbum. Usa el código $inviteCode.',
+                          onPressed: () => SharePlus.instance.share(
+                            ShareParams(
+                              text:
+                                  'Te invito a unirte a ${name?.isNotEmpty == true ? name : 'mi comunidad'} en Verbum. Usa el código $inviteCode.',
+                            ),
                           ),
                           icon: const Icon(Icons.ios_share_rounded),
                         ),
@@ -1399,8 +1402,11 @@ class _CommunityWelcomeHero extends StatelessWidget {
                         _HeroAction(
                           icon: Icons.ios_share_rounded,
                           label: 'Invitar',
-                          onTap: () => Share.share(
-                            'Te invito a unirte a $name en Verbum. Usa el código $inviteCode.',
+                          onTap: () => SharePlus.instance.share(
+                            ShareParams(
+                              text:
+                                  'Te invito a unirte a $name en Verbum. Usa el código $inviteCode.',
+                            ),
                           ),
                         ),
                       ],

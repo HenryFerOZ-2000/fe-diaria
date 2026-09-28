@@ -134,7 +134,7 @@ class _TodayLiturgyContentState extends State<_TodayLiturgyContent> {
     }
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(top: 16),
       child: TodayLiturgyCard(
         day: day,
         onTap: () => Navigator.of(context).push(

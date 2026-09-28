@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../features/sharing/domain/share_content.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../services/traditional_prayers_service.dart';
@@ -700,10 +701,15 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  ShareService.shareAsText(
-                    text: text,
-                    reference: title,
-                    title: 'Novena de Navidad - Día ${widget.day}',
+                  ShareService.openComposer(
+                    context,
+                    ShareContent(
+                      title: 'Novena de Navidad - Día ${widget.day}',
+                      body: text,
+                      reference: title,
+                      kind: ShareContentKind.prayer,
+                      tradition: ShareTradition.catholic,
+                    ),
                   );
                 },
                 icon: const Icon(Icons.share),

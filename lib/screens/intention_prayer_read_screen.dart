@@ -5,6 +5,7 @@ import '../repositories/intention_prayer_repository.dart';
 import '../services/rotation_service.dart';
 import '../services/share_service.dart';
 import '../widgets/prayer_reading_experience.dart';
+import '../features/sharing/domain/share_content.dart';
 
 class IntentionPrayerReadScreen extends StatefulWidget {
   final String categoryKey;
@@ -59,10 +60,14 @@ class _IntentionPrayerReadScreenState extends State<IntentionPrayerReadScreen> {
 
   void _share() {
     if (_current == null) return;
-    ShareService.shareAsText(
-      text: _current!.text,
-      reference: _current!.verseRef ?? _current!.title,
-      title: _current!.title,
+    ShareService.openComposer(
+      context,
+      ShareContent(
+        title: _current!.title,
+        body: _current!.text,
+        reference: _current!.verseRef ?? _current!.title,
+        kind: ShareContentKind.prayer,
+      ),
     );
   }
 

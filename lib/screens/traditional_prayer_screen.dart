@@ -3,6 +3,7 @@ import '../models/traditional_prayer.dart';
 import '../repositories/traditional_prayer_repository.dart';
 import '../services/share_service.dart';
 import '../widgets/prayer_reading_experience.dart';
+import '../features/sharing/domain/share_content.dart';
 
 class TraditionalPrayerScreen extends StatefulWidget {
   final String prayerId;
@@ -56,10 +57,14 @@ class _TraditionalPrayerScreenState extends State<TraditionalPrayerScreen> {
 
   void _share() {
     if (_prayer == null || _text == null) return;
-    ShareService.shareAsText(
-      text: _text!,
-      reference: _prayer!.title,
-      title: _prayer!.title,
+    ShareService.openComposer(
+      context,
+      ShareContent(
+        title: _prayer!.title,
+        body: _text!,
+        reference: _prayer!.title,
+        kind: ShareContentKind.prayer,
+      ),
     );
   }
 

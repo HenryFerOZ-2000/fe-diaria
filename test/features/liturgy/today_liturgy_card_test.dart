@@ -39,7 +39,7 @@ LiturgicalDay cardDay(String name, List<String> colors) {
 
 void main() {
   testWidgets('la tarjeta resiste 320 px y texto al 200 %', (tester) async {
-    tester.view.physicalSize = const Size(320, 640);
+    tester.view.physicalSize = const Size(320, 568);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -50,12 +50,15 @@ void main() {
           data: const MediaQueryData(textScaler: TextScaler.linear(2)),
           child: Scaffold(
             body: SingleChildScrollView(
-              child: TodayLiturgyCard(
-                day: cardDay(
-                  'Domingo de nombre deliberadamente extenso para probar el diseño',
-                  ['green'],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: TodayLiturgyCard(
+                  day: cardDay(
+                    'Domingo de nombre deliberadamente extenso para probar el diseño',
+                    ['green'],
+                  ),
+                  onTap: () {},
                 ),
-                onTap: () {},
               ),
             ),
           ),
@@ -65,7 +68,63 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.text('HOY EN LA IGLESIA'), findsOneWidget);
-    expect(find.text('Ver el día'), findsOneWidget);
+    expect(
+      tester.getSize(find.byType(TodayLiturgyCard)).height,
+      lessThanOrEqualTo(240),
+    );
+    expect(find.byType(TextButton), findsNothing);
+  });
+
+  testWidgets('la tarjeta deja espacio para el contenido principal de Hoy', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 280,
+            child: TodayLiturgyCard(
+              day: cardDay('XXV Domingo del Tiempo Ordinario', ['green']),
+              onTap: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(
+      tester.getSize(find.byType(TodayLiturgyCard)).height,
+      lessThanOrEqualTo(140),
+    );
+  });
+
+  testWidgets('toda la tarjeta abre el día y conserva su nombre accesible', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    var taps = 0;
+    const name = 'XXV Domingo del Tiempo Ordinario';
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: TodayLiturgyCard(
+            day: cardDay(name, ['green']),
+            onTap: () => taps++,
+          ),
+        ),
+      ),
+    );
+    final rect = tester.getRect(find.byType(TodayLiturgyCard));
+    await tester.tapAt(Offset(rect.right - 8, rect.center.dy));
+    expect(taps, 1);
+    expect(
+      tester.getSemantics(find.byType(TodayLiturgyCard)),
+      matchesSemantics(
+        label: 'Hoy en la Iglesia. $name. Color Verde',
+        isButton: true,
+        hasTapAction: true,
+      ),
+    );
+    semantics.dispose();
   });
 
   testWidgets('el blanco litúrgico conserva borde y etiqueta textual', (

@@ -5,6 +5,7 @@ import '../repositories/emotion_prayer_repository.dart';
 import '../services/rotation_service.dart';
 import '../services/share_service.dart';
 import '../widgets/prayer_reading_experience.dart';
+import '../features/sharing/domain/share_content.dart';
 
 class EmotionPassageReadScreen extends StatefulWidget {
   final String emotionKey;
@@ -59,10 +60,14 @@ class _EmotionPassageReadScreenState extends State<EmotionPassageReadScreen> {
 
   void _share() {
     if (_prayer == null) return;
-    ShareService.shareAsText(
-      text: _prayer!.text,
-      reference: _prayer!.verseRef ?? _prayer!.title,
-      title: _prayer!.title,
+    ShareService.openComposer(
+      context,
+      ShareContent(
+        title: _prayer!.title,
+        body: _prayer!.text,
+        reference: _prayer!.verseRef ?? _prayer!.title,
+        kind: ShareContentKind.prayer,
+      ),
     );
   }
 
