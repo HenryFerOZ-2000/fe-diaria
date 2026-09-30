@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
+import '../design_system/design_system.dart';
 import 'verbum_ambient_background.dart';
 
 /// Scaffold personalizado con diseño consistente y gradientes
@@ -54,25 +54,6 @@ class AppScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
-
-    final bgGradient =
-        gradient ??
-        LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  AppColors.backgroundDark,
-                  AppColors.surfaceDark,
-                  AppColors.backgroundDark,
-                ]
-              : [
-                  AppColors.background,
-                  colorScheme.tertiary.withValues(alpha: 0.05),
-                  AppColors.background,
-                ],
-        );
 
     // Guest notice (only when not signed in)
     Widget? guestNotice;
@@ -80,26 +61,24 @@ class AppScaffold extends StatelessWidget {
       final auth = Provider.of<AuthProvider?>(context, listen: true);
       final isGuest = auth == null || !auth.isSignedIn;
       if (isGuest) {
+        final p = context.palette;
         guestNotice = Container(
           width: double.infinity,
           margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: colorScheme.primary.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: colorScheme.primary.withValues(alpha: 0.12),
-            ),
+            color: p.surfaceMuted,
+            borderRadius: BorderRadius.circular(VerbumRadius.control),
           ),
           child: Row(
             children: [
-              Icon(Icons.info_outline, size: 18, color: colorScheme.primary),
+              VIcon(VerbumIcons.info, size: 18, color: p.inkMuted),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'Modo invitado: inicia sesión para sincronizar rachas, favoritos y progreso.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.primary,
+                  style: context.type.caption.copyWith(
+                    color: p.inkMuted,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -148,8 +127,8 @@ class AppScaffold extends StatelessWidget {
                 ),
                 child: Text(
                   'Iniciar sesión',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.primary,
+                  style: context.type.caption.copyWith(
+                    color: context.palette.rubric,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -183,7 +162,7 @@ class AppScaffold extends StatelessWidget {
       floatingActionButtonLocation: floatingActionButtonLocation,
       bottomNavigationBar: bottomNavigationBar,
       body: VerbumAmbientBackground(
-        gradient: gradient == null ? null : bgGradient,
+        gradient: gradient,
         color: backgroundColor,
         child: SafeArea(
           child: Column(
@@ -197,7 +176,7 @@ class AppScaffold extends StatelessWidget {
                   width: double.infinity,
                   height: bannerAd!.size.height.toDouble(),
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    color: context.palette.surface,
                     border: Border(
                       top: BorderSide(
                         color: colorScheme.outline.withValues(alpha: 0.1),
@@ -213,7 +192,7 @@ class AppScaffold extends StatelessWidget {
                   width: double.infinity,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    color: context.palette.surface,
                     border: Border(
                       top: BorderSide(
                         color: colorScheme.outline.withValues(alpha: 0.1),
