@@ -61,6 +61,10 @@
 		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Verbum necesita permiso para guardar en Fotos las tarjetas de versículos y oraciones que creas.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Verbum necesita acceso a Fotos para guardar las tarjetas que creas.</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>Esta aplicación necesita permiso para enviar notificaciones diarias con versículos bíblicos.</string>
 	<key>GADApplicationIdentifier</key>
