@@ -46,7 +46,6 @@ class PrayerCard extends StatelessWidget {
                   text: text,
                   reference: reference,
                   provenance: provenance,
-                  accent: accent,
                 ),
               ),
             )

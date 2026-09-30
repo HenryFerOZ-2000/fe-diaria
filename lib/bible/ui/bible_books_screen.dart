@@ -216,8 +216,6 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
             padding: EdgeInsets.fromLTRB(2, 24, 2, 10),
           ),
           VTileGrid(
-            minTileWidth: 76,
-            spacing: 8,
             children: [
               for (final (id, icon) in const [
                 ('PSA', VerbumIcons.feather),

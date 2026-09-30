@@ -79,7 +79,6 @@ class _PrayerReadScreenState extends State<PrayerReadScreen> {
       text: _current?.text,
       verseReference: _current?.verseRef,
       tags: _current?.tags ?? const [],
-      accent: const Color(0xFF77649A),
       onBack: () => Navigator.pop(context),
       onShare: _sharePrayer,
       onNext: _loadNext,

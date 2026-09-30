@@ -50,8 +50,8 @@ ThemeData buildVerbumTheme({
     outlineVariant: palette.lineSoft,
     shadow: Colors.black,
     scrim: Colors.black,
-    inverseSurface: palette.ink,
-    onInverseSurface: palette.onInk,
+    inverseSurface: palette.inverse,
+    onInverseSurface: palette.onInverse,
     inversePrimary: palette.gold,
   );
 
@@ -117,8 +117,8 @@ ThemeData buildVerbumTheme({
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: palette.ink,
-        foregroundColor: palette.onInk,
+        backgroundColor: palette.emphasis,
+        foregroundColor: palette.onEmphasis,
         disabledBackgroundColor: palette.surfaceMuted,
         disabledForegroundColor: palette.inkSubtle,
         elevation: 0,
@@ -130,8 +130,8 @@ ThemeData buildVerbumTheme({
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: palette.ink,
-        foregroundColor: palette.onInk,
+        backgroundColor: palette.emphasis,
+        foregroundColor: palette.onEmphasis,
         minimumSize: const Size(64, 50),
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
         shape: shape,
@@ -179,7 +179,7 @@ ThemeData buildVerbumTheme({
     ),
     chipTheme: ChipThemeData(
       backgroundColor: palette.surface,
-      selectedColor: palette.ink,
+      selectedColor: palette.emphasis,
       side: hairline,
       labelStyle: type.bodyStrong.copyWith(fontSize: 13),
       shape: const StadiumBorder(),
@@ -187,12 +187,12 @@ ThemeData buildVerbumTheme({
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith(
         (s) => s.contains(WidgetState.selected)
-            ? palette.onInk
+            ? palette.onEmphasis
             : palette.inkSubtle,
       ),
       trackColor: WidgetStateProperty.resolveWith(
         (s) => s.contains(WidgetState.selected)
-            ? palette.ink
+            ? palette.emphasis
             : palette.surfaceMuted,
       ),
       trackOutlineColor: WidgetStatePropertyAll(palette.line),
@@ -202,8 +202,8 @@ ThemeData buildVerbumTheme({
       linearTrackColor: palette.lineSoft,
     ),
     snackBarTheme: SnackBarThemeData(
-      backgroundColor: palette.ink,
-      contentTextStyle: type.bodyStrong.copyWith(color: palette.onInk),
+      backgroundColor: palette.inverse,
+      contentTextStyle: type.bodyStrong.copyWith(color: palette.onInverse),
       behavior: SnackBarBehavior.floating,
       shape: shape,
     ),

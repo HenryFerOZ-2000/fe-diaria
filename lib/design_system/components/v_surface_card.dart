@@ -49,7 +49,7 @@ class VSurfaceCard extends StatelessWidget {
     final (Color bg, Color? border) = switch (tone) {
       VSurfaceTone.paper => (p.surface, p.line),
       VSurfaceTone.muted => (p.surfaceMuted, null),
-      VSurfaceTone.ink => (p.ink, null),
+      VSurfaceTone.ink => (p.inverse, null),
       VSurfaceTone.accent => (p.accentSoft, null),
     };
     final shape = RoundedRectangleBorder(
@@ -92,9 +92,9 @@ class VSurfaceCard extends StatelessWidget {
     // Dentro de una superficie en tinta, el texto e iconos pasan a claro.
     final themed = tone == VSurfaceTone.ink
         ? IconTheme.merge(
-            data: IconThemeData(color: p.onInk),
+            data: IconThemeData(color: p.onInverse),
             child: DefaultTextStyle.merge(
-              style: TextStyle(color: p.onInk),
+              style: TextStyle(color: p.onInverse),
               child: card,
             ),
           )

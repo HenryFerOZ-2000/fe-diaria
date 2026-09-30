@@ -35,8 +35,10 @@ class VActionTile extends StatelessWidget {
     final p = context.palette;
     final type = context.type;
     final onInk = tone == VSurfaceTone.ink;
-    final titleColor = onInk ? p.onInk : p.ink;
-    final detailColor = onInk ? p.onInk.withValues(alpha: 0.72) : p.inkMuted;
+    final titleColor = onInk ? p.onInverse : p.ink;
+    final detailColor = onInk
+        ? p.onInverse.withValues(alpha: 0.72)
+        : p.inkMuted;
     final accent = iconColor ?? (onInk ? p.gold : p.rubric);
 
     return VSurfaceCard(
@@ -82,7 +84,7 @@ class VActionTile extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: onInk ? p.onInk.withValues(alpha: 0.1) : p.surface,
+                color: onInk ? p.onInverse.withValues(alpha: 0.1) : p.surface,
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,

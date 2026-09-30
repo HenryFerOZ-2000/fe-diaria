@@ -211,7 +211,6 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
                 ? 'Oración para $userName'
                 : 'Tu oración personalizada',
             text: prayerText,
-            accent: const Color(0xFFA65F69),
             category: 'Oración para ti',
           ),
         ),

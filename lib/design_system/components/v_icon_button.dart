@@ -48,7 +48,7 @@ class VIconButton extends StatelessWidget {
         BorderSide(color: p.line),
       ),
       VIconButtonVariant.ghost => (Colors.transparent, p.ink, BorderSide.none),
-      VIconButtonVariant.solid => (p.ink, p.onInk, BorderSide.none),
+      VIconButtonVariant.solid => (p.emphasis, p.onEmphasis, BorderSide.none),
     };
 
     return Semantics(

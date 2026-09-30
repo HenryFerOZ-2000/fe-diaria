@@ -20,6 +20,10 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
     required this.accent,
     required this.accentSoft,
     required this.onInk,
+    required this.emphasis,
+    required this.onEmphasis,
+    required this.inverse,
+    required this.onInverse,
   });
 
   /// Fondo de página (vitela).
@@ -54,6 +58,16 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
   /// Texto sobre [ink].
   final Color onInk;
 
+  /// Controles de énfasis pequeños (botón principal, paso hecho, día
+  /// cumplido). Tinta de día, luz de vela de noche.
+  final Color emphasis;
+  final Color onEmphasis;
+
+  /// Superficies grandes invertidas (tarjeta destacada, barra de acciones).
+  /// Tinta de día; de noche una superficie elevada para no deslumbrar.
+  final Color inverse;
+  final Color onInverse;
+
   static const light = VerbumPalette(
     background: Color(0xFFF5EEE1),
     surface: Color(0xFFFBF7EF),
@@ -69,6 +83,10 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
     accent: Color(0xFFB0823A),
     accentSoft: Color(0xFFF1E6CF),
     onInk: Color(0xFFF5EEE1),
+    emphasis: Color(0xFF1E1915),
+    onEmphasis: Color(0xFFF5EEE1),
+    inverse: Color(0xFF1E1915),
+    onInverse: Color(0xFFF5EEE1),
   );
 
   /// Modo noche ("Completas"): azul noche y luz de vela.
@@ -87,6 +105,10 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
     accent: Color(0xFFE3B866),
     accentSoft: Color(0xFF2E2A22),
     onInk: Color(0xFF101219),
+    emphasis: Color(0xFFE3B866),
+    onEmphasis: Color(0xFF101219),
+    inverse: Color(0xFF252A38),
+    onInverse: Color(0xFFEDE6D8),
   );
 
   static VerbumPalette of(BuildContext context) =>
@@ -123,6 +145,10 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
     Color? accent,
     Color? accentSoft,
     Color? onInk,
+    Color? emphasis,
+    Color? onEmphasis,
+    Color? inverse,
+    Color? onInverse,
   }) {
     return VerbumPalette(
       background: background ?? this.background,
@@ -139,6 +165,10 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
       accent: accent ?? this.accent,
       accentSoft: accentSoft ?? this.accentSoft,
       onInk: onInk ?? this.onInk,
+      emphasis: emphasis ?? this.emphasis,
+      onEmphasis: onEmphasis ?? this.onEmphasis,
+      inverse: inverse ?? this.inverse,
+      onInverse: onInverse ?? this.onInverse,
     );
   }
 
@@ -161,6 +191,10 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
       accent: l(accent, other.accent),
       accentSoft: l(accentSoft, other.accentSoft),
       onInk: l(onInk, other.onInk),
+      emphasis: l(emphasis, other.emphasis),
+      onEmphasis: l(onEmphasis, other.onEmphasis),
+      inverse: l(inverse, other.inverse),
+      onInverse: l(onInverse, other.onInverse),
     );
   }
 }

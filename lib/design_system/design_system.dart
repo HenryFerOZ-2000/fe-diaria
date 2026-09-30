@@ -10,6 +10,7 @@ library;
 export 'components/v_action_bar.dart';
 export 'components/v_action_tile.dart';
 export 'components/v_button.dart';
+export 'components/v_candle.dart';
 export 'components/v_category_tile.dart';
 export 'components/v_drop_cap_text.dart';
 export 'components/v_empty_state.dart';

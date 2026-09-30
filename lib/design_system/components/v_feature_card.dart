@@ -30,11 +30,8 @@ class VFeatureCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = context.palette;
     final type = context.type;
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    // En modo noche la tinta es clara; la tarjeta usa la superficie elevada
-    // para no deslumbrar.
-    final bg = dark ? p.surfaceMuted : p.ink;
-    final fg = dark ? p.ink : p.onInk;
+    final bg = p.inverse;
+    final fg = p.onInverse;
 
     return Material(
       color: bg,

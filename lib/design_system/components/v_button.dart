@@ -50,14 +50,14 @@ class VButton extends StatelessWidget {
     final p = context.palette;
     final type = context.type;
     final (Color bg, Color fg, BorderSide side) = switch (variant) {
-      VButtonVariant.solid => (p.ink, p.onInk, BorderSide.none),
+      VButtonVariant.solid => (p.emphasis, p.onEmphasis, BorderSide.none),
       VButtonVariant.outlined => (
         Colors.transparent,
         p.ink,
         BorderSide(color: p.line, width: 1.2),
       ),
       VButtonVariant.text => (Colors.transparent, p.rubric, BorderSide.none),
-      VButtonVariant.inverse => (p.onInk, p.ink, BorderSide.none),
+      VButtonVariant.inverse => (p.onInverse, p.inverse, BorderSide.none),
     };
     final enabled = onPressed != null;
     final color = enabled ? fg : p.inkSubtle;

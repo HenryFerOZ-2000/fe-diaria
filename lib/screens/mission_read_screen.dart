@@ -49,7 +49,6 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
       category: 'Misión de hoy',
       title: widget.title,
       text: widget.content,
-      accent: const Color(0xFF77649A),
       onBack: () => Navigator.pop(context),
       onShare: () => ShareService.openComposer(
         context,

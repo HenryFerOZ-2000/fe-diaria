@@ -110,7 +110,6 @@ class _TraditionalPrayerDetailScreenState
       category: _service.getCategoryDisplayName(widget.category),
       title: _prayer?['titulo'] as String? ?? widget.prayerKey,
       text: _prayer?['texto'] as String?,
-      accent: const Color(0xFF8D7BC2),
       onBack: () => Navigator.pop(context),
       onRetry: _loadPrayer,
       onShare: _share,

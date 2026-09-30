@@ -5,6 +5,7 @@ import '../services/share_service.dart';
 import '../widgets/prayer_reading_experience.dart';
 import '../features/sharing/domain/share_content.dart';
 import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import '../design_system/icons/verbum_icons.dart';
 
 class ReadingScreen extends StatefulWidget {
   final String title;
@@ -77,11 +78,10 @@ class _ReadingScreenState extends State<ReadingScreen>
       title: widget.title,
       text: widget.content,
       verseReference: widget.reference,
-      accent: const Color(0xFF77649A),
       onBack: () => Navigator.pop(context),
       onShare: _share,
       secondaryActionLabel: 'Chat',
-      secondaryActionIcon: Icons.forum_outlined,
+      secondaryActionIcon: VerbumIcons.chatsCircle,
       onSecondaryAction: () {
         if (widget.onOpenChat != null) {
           widget.onOpenChat!(widget.content, widget.reference);
