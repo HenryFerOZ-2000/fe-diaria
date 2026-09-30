@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class PostCard extends StatelessWidget {
   final String userName;
@@ -95,7 +95,7 @@ class PostCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                icon: const Icon(Icons.favorite, size: 16),
+                icon: const VIcon(VerbumIcons.heart, weight: VIconWeight.fill, size: 16),
                 label: Text(
                   'Unirse ($joinCount)',
                   style: VerbumFonts.sans(
@@ -120,7 +120,7 @@ class PostCard extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: onLike,
-                icon: const Icon(Icons.favorite_border),
+                icon: const VIcon(VerbumIcons.heart),
                 color: colorScheme.primary,
               ),
               Text(
@@ -133,7 +133,7 @@ class PostCard extends StatelessWidget {
               const SizedBox(width: 16),
               IconButton(
                 onPressed: onComment,
-                icon: const Icon(Icons.mode_comment_outlined),
+                icon: const VIcon(VerbumIcons.chatCircle),
                 color: colorScheme.primary,
               ),
               Text(

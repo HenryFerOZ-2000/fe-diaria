@@ -6,7 +6,7 @@ import '../services/ads_service.dart';
 import '../services/storage_service.dart';
 import '../services/share_service.dart';
 import '../faith/tradition_guard.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla principal de la Novena - Selección de día
 class NovenaScreen extends StatefulWidget {
@@ -219,14 +219,12 @@ class _NovenaScreenState extends State<NovenaScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (isCompleted)
-                  Icon(
-                    Icons.check_circle,
+                  VIcon(VerbumIcons.checkCircle, weight: VIconWeight.fill,
                     color: colorScheme.secondary,
                     size: 20,
                   )
                 else if (isInProgress)
-                  Icon(
-                    Icons.play_circle_outline,
+                  VIcon(VerbumIcons.playCircle,
                     color: colorScheme.primary,
                     size: 20,
                   )
@@ -436,8 +434,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.error_outline,
+                            VIcon(VerbumIcons.warningCircle,
                               size: 64,
                               color: colorScheme.onSurface.withValues(
                                 alpha: 0.5,
@@ -501,7 +498,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                                   Expanded(
                                     child: ElevatedButton.icon(
                                       onPressed: _previousStep,
-                                      icon: const Icon(Icons.arrow_back),
+                                      icon: const VIcon(VerbumIcons.arrowLeft),
                                       label: const Text('Anterior'),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: colorScheme.surface,
@@ -524,7 +521,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                                     onPressed: _currentStep < _totalSteps
                                         ? _nextStep
                                         : null,
-                                    icon: const Icon(Icons.arrow_forward),
+                                    icon: const VIcon(VerbumIcons.arrowRight),
                                     label: Text(
                                       _currentStep < _totalSteps
                                           ? 'Siguiente'
@@ -553,7 +550,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                                 onPressed: () {
                                   Navigator.of(context).pushNamed('/home');
                                 },
-                                icon: const Icon(Icons.home, size: 24),
+                                icon: const VIcon(VerbumIcons.house, weight: VIconWeight.fill, size: 24),
                                 label: Text(
                                   'Regresar al inicio',
                                   style: VerbumFonts.sans(
@@ -645,8 +642,8 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                       : colorScheme.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  isVillancico ? Icons.music_note : Icons.book,
+                child: VIcon(
+                  isVillancico ? VerbumIcons.musicNote : VerbumIcons.book,
                   color: isVillancico
                       ? colorScheme.secondary
                       : colorScheme.primary,
@@ -683,7 +680,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _nextStep,
-                icon: const Icon(Icons.play_arrow),
+                icon: const VIcon(VerbumIcons.play, weight: VIconWeight.fill),
                 label: const Text('Continuar'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.secondary,
@@ -712,7 +709,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                     ),
                   );
                 },
-                icon: const Icon(Icons.share),
+                icon: const VIcon(VerbumIcons.shareNetwork),
                 label: const Text('Compartir'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,

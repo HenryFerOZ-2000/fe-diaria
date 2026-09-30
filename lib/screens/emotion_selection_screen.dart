@@ -10,6 +10,7 @@ import '../widgets/custom_button.dart';
 import '../widgets/main_card.dart';
 import 'emotion_detail_screen.dart';
 import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla simple para seleccionar emoción - Diseñada para adultos mayores
 class EmotionSelectionScreen extends StatefulWidget {
@@ -66,49 +67,49 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
     {
       'id': 'ansioso',
       'name': 'Ansioso',
-      'icon': Icons.psychology,
+      'icon': VerbumIcons.brain,
       'color': Color(0xFFFF9800),
     },
     {
       'id': 'triste',
       'name': 'Triste',
-      'icon': Icons.sentiment_very_dissatisfied,
+      'icon': VerbumIcons.smileySad,
       'color': Color(0xFF2196F3),
     },
     {
       'id': 'cansado',
       'name': 'Cansado',
-      'icon': Icons.bedtime,
+      'icon': VerbumIcons.moonStars,
       'color': Color(0xFF9E9E9E),
     },
     {
       'id': 'preocupado',
       'name': 'Preocupado',
-      'icon': Icons.warning,
+      'icon': VerbumIcons.warning,
       'color': Color(0xFFFFC107),
     },
     {
       'id': 'agradecido',
       'name': 'Agradecido',
-      'icon': Icons.favorite,
+      'icon': VerbumIcons.heart,
       'color': Color(0xFF4CAF50),
     },
     {
       'id': 'feliz',
       'name': 'Feliz',
-      'icon': Icons.sentiment_very_satisfied,
+      'icon': VerbumIcons.smiley,
       'color': Color(0xFFFFEB3B),
     },
     {
       'id': 'confundido',
       'name': 'Confundido',
-      'icon': Icons.help,
+      'icon': VerbumIcons.question,
       'color': Color(0xFF9C27B0),
     },
     {
       'id': 'miedo',
       'name': 'Con miedo',
-      'icon': Icons.visibility_off,
+      'icon': VerbumIcons.eyeSlash,
       'color': Color(0xFFF44336),
     },
   ];
@@ -265,7 +266,7 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
             padding: const EdgeInsets.all(AppSpacing.md),
             child: CustomButton(
               text: 'Regresar al inicio',
-              icon: Icons.home,
+              icon: VerbumIcons.house,
               onPressed: () {
                 Navigator.of(context).pushNamed('/home');
               },
@@ -343,8 +344,8 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
               color: emotionColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(AppRadius.md),
             ),
-            child: Icon(
-              emotion['icon'] as IconData,
+            child: VIcon(
+              emotion['icon'] as VerbumIcons,
               size: 40,
               color: emotionColor,
             ),

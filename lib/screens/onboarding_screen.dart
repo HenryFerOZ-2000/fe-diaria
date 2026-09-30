@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/storage_service.dart';
 import '../services/notification_service.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de onboarding simple para nuevos usuarios
 class OnboardingScreen extends StatefulWidget {
@@ -108,7 +108,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               color: colorScheme.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.favorite, size: 64, color: colorScheme.primary),
+            child: VIcon(VerbumIcons.heart, weight: VIconWeight.fill, size: 64, color: colorScheme.primary),
           ),
           const SizedBox(height: 48),
 

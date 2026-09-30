@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 OverlayEntry? _activeTopNotice;
 Timer? _activeTopNoticeTimer;
@@ -77,10 +77,10 @@ void showTopNotice(
                     ),
                     child: Row(
                       children: [
-                        Icon(
+                        VIcon(
                           isError
-                              ? Icons.error_outline_rounded
-                              : Icons.check_circle_outline_rounded,
+                              ? VerbumIcons.warningCircle
+                              : VerbumIcons.checkCircle,
                           color: foregroundColor,
                           size: 20,
                         ),

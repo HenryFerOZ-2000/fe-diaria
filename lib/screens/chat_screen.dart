@@ -5,7 +5,7 @@ import '../widgets/chat_bubble.dart';
 import '../widgets/verbum_header_actions.dart';
 import '../services/groq_chat_service.dart' as groq;
 import '../providers/auth_provider.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import '../design_system/design_system.dart';
 
 class ChatMessage {
   final String text;
@@ -123,6 +123,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
     return AppScaffold(
       centerTitle: false,
       titleWidget: Row(
@@ -131,38 +132,33 @@ class _ChatScreenState extends State<ChatScreen> {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF493878), Color(0xFFB58A45)],
-              ),
-              borderRadius: BorderRadius.circular(13),
+              color: p.goldSoft,
+              shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.auto_awesome,
-              color: Colors.white,
-              size: 19,
+            alignment: Alignment.center,
+            child: VIcon(
+              VerbumIcons.chatsCircle,
+              weight: VIconWeight.duotone,
+              size: 21,
+              color: p.gold,
             ),
           ),
           const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Acompañamiento',
-                style: VerbumFonts.serif(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Acompañamiento', style: context.type.heading),
+                Text(
+                  'UN ESPACIO SEGURO PARA HABLAR',
+                  style: context.type.rubric.copyWith(
+                    color: p.gold,
+                    fontSize: 8.5,
+                    letterSpacing: 1.2,
+                  ),
                 ),
-              ),
-              Text(
-                'UN ESPACIO SEGURO PARA HABLAR',
-                style: VerbumFonts.sans(
-                  fontSize: 8,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.1,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -173,12 +169,11 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              reverse: false,
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
               itemCount: _messages.length + (_isLoading ? 1 : 0),
               itemBuilder: (context, index) {
                 if (_isLoading && index == _messages.length) {
-                  return _buildTypingIndicator(context);
+                  return const _TypingIndicator();
                 }
                 final msg = _messages[index];
                 return TweenAnimationBuilder<double>(
@@ -186,15 +181,13 @@ class _ChatScreenState extends State<ChatScreen> {
                   tween: Tween(begin: 0.0, end: 1.0),
                   duration: const Duration(milliseconds: 260),
                   curve: Curves.easeOutCubic,
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Transform.translate(
-                        offset: Offset(0, (1 - value) * 12),
-                        child: child,
-                      ),
-                    );
-                  },
+                  builder: (context, value, child) => Opacity(
+                    opacity: value,
+                    child: Transform.translate(
+                      offset: Offset(0, (1 - value) * 12),
+                      child: child,
+                    ),
+                  ),
                   child: ChatBubble(text: msg.text, isUser: msg.isUser),
                 );
               },
@@ -206,154 +199,106 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _buildTypingIndicator(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.only(right: 40, bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: colorScheme.surface.withValues(alpha: 0.95),
-          borderRadius: BorderRadius.circular(
-            16,
-          ).copyWith(bottomLeft: const Radius.circular(0)),
-          border: Border.all(
-            color: colorScheme.primary.withValues(alpha: 0.08),
-          ),
-        ),
+  Widget _buildInput(BuildContext context) {
+    final p = context.palette;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: p.surface,
+        border: Border(top: BorderSide(color: p.line)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: colorScheme.primary,
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                minLines: 1,
+                maxLines: 4,
+                textInputAction: TextInputAction.send,
+                decoration: const InputDecoration(
+                  hintText: 'Escribe tu mensaje',
+                ),
+                onSubmitted: _sendMessage,
               ),
             ),
-            const SizedBox(width: 10),
-            Text(
-              'Pensando...',
-              style: VerbumFonts.sans(
-                fontSize: 14,
-                color: colorScheme.onSurface.withValues(alpha: 0.7),
-              ),
+            const SizedBox(width: 8),
+            VIconButton(
+              icon: VerbumIcons.paperPlaneRight,
+              semanticLabel: 'Enviar mensaje',
+              variant: VIconButtonVariant.solid,
+              size: 46,
+              onPressed: _isLoading
+                  ? null
+                  : () => _sendMessage(_controller.text),
             ),
           ],
         ),
       ),
     );
   }
-
-  Widget _buildInput(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.primary.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, -4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _controller,
-              decoration: InputDecoration(
-                hintText: 'Escribe tu mensaje',
-                hintStyle: VerbumFonts.sans(
-                  color: colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-                filled: true,
-                fillColor: colorScheme.surface.withValues(alpha: 0.9),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(
-                    color: colorScheme.outline.withValues(alpha: 0.3),
-                  ),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-              ),
-              onSubmitted: _sendMessage,
-            ),
-          ),
-          const SizedBox(width: 8),
-          _SendButton(
-            onPressed: () => _sendMessage(_controller.text),
-            color: colorScheme.primary,
-          ),
-        ],
-      ),
-    );
-  }
 }
 
-/// Botón de envío circular con gradiente y animación de presión.
-class _SendButton extends StatefulWidget {
-  final VoidCallback onPressed;
-  final Color color;
-
-  const _SendButton({required this.onPressed, required this.color});
+/// Indicador de respuesta en curso: tres puntos que respiran.
+class _TypingIndicator extends StatefulWidget {
+  const _TypingIndicator();
 
   @override
-  State<_SendButton> createState() => _SendButtonState();
+  State<_TypingIndicator> createState() => _TypingIndicatorState();
 }
 
-class _SendButtonState extends State<_SendButton>
+class _TypingIndicatorState extends State<_TypingIndicator>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    duration: const Duration(milliseconds: 120),
+  late final AnimationController _c = AnimationController(
     vsync: this,
-  );
-  late final Animation<double> _scale = Tween<double>(
-    begin: 1.0,
-    end: 0.88,
-  ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    duration: const Duration(milliseconds: 1100),
+  )..repeat();
 
   @override
   void dispose() {
-    _controller.dispose();
+    _c.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => _controller.forward(),
-      onTapUp: (_) => _controller.reverse(),
-      onTapCancel: () => _controller.reverse(),
-      onTap: widget.onPressed,
-      child: ScaleTransition(
-        scale: _scale,
+    final p = context.palette;
+    return Semantics(
+      label: 'El acompañante está escribiendo',
+      child: Align(
+        alignment: Alignment.centerLeft,
         child: Container(
-          width: 44,
-          height: 44,
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [widget.color, widget.color.withValues(alpha: 0.75)],
-            ),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: widget.color.withValues(alpha: 0.35),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            color: p.surface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: p.line),
           ),
-          child: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+          child: AnimatedBuilder(
+            animation: _c,
+            builder: (context, _) => Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i = 0; i < 3; i++) ...[
+                  if (i > 0) const SizedBox(width: 5),
+                  Opacity(
+                    opacity:
+                        0.3 +
+                        0.7 * (1 - ((_c.value * 3 - i) % 3).clamp(0.0, 1.0)),
+                    child: Container(
+                      width: 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        color: p.gold,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
         ),
       ),
     );

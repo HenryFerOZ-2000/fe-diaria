@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+import '../design_system/icons/verbum_icons.dart';
 
 /// Modelo para categorías de contenido
 class Category {
   final String id;
   final String title;
   final String description;
-  final IconData icon;
+  final VerbumIcons icon;
   final String route;
   final String? subtitle;
   final List<String>? tags;
@@ -44,32 +44,32 @@ class Category {
     };
   }
 
-  static IconData _iconFromString(String iconName) {
+  static VerbumIcons _iconFromString(String iconName) {
     switch (iconName) {
       case 'menu_book':
-        return Icons.menu_book_rounded;
+        return VerbumIcons.bookOpenText;
       case 'favorite':
-        return Icons.favorite_rounded;
+        return VerbumIcons.heart;
       case 'emoji_emotions':
-        return Icons.emoji_emotions_rounded;
+        return VerbumIcons.smiley;
       case 'calendar_view_day':
-        return Icons.calendar_view_day_rounded;
+        return VerbumIcons.calendarCheck;
       case 'book':
-        return Icons.book_rounded;
+        return VerbumIcons.book;
       case 'auto_stories':
-        return Icons.auto_stories_rounded;
+        return VerbumIcons.bookOpen;
       case 'library_books':
-        return Icons.library_books_rounded;
+        return VerbumIcons.books;
       case 'bedtime':
-        return Icons.bedtime_rounded;
+        return VerbumIcons.moonStars;
       case 'healing':
-        return Icons.healing_rounded;
+        return VerbumIcons.firstAid;
       case 'edit_note':
-        return Icons.edit_note_rounded;
+        return VerbumIcons.notePencil;
       case 'church':
-        return Icons.church_rounded;
+        return VerbumIcons.church;
       default:
-        return Icons.category_rounded;
+        return VerbumIcons.squaresFour;
     }
   }
 }

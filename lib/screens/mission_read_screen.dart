@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../features/sharing/domain/share_content.dart';
 import '../services/share_service.dart';
 import '../widgets/prayer_reading_experience.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class MissionReadScreen extends StatefulWidget {
   final String title;
@@ -124,7 +124,7 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.menu_book_rounded, color: colorScheme.primary),
+                      VIcon(VerbumIcons.bookOpenText, weight: VIconWeight.fill, color: colorScheme.primary),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -164,7 +164,7 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
                           ),
                         );
                       },
-                      icon: const Icon(Icons.share_outlined),
+                      icon: const VIcon(VerbumIcons.shareNetwork),
                       label: const Text('Compartir'),
                     ),
                     const SizedBox(width: 8),
@@ -176,7 +176,7 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
                         }
                         Navigator.of(context).pop();
                       },
-                      icon: const Icon(Icons.check_circle_outline),
+                      icon: const VIcon(VerbumIcons.checkCircle),
                       label: const Text('Cerrar'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: colorScheme.primary,

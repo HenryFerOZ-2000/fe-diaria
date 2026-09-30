@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/language_service.dart';
 import '../main.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de selección de idioma inicial
 /// Se muestra solo la primera vez que se abre la app
@@ -104,8 +104,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
                           color: Colors.white.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(
-                          Icons.menu_book_rounded,
+                        child: VIcon(VerbumIcons.bookOpenText, weight: VIconWeight.fill,
                           size: 64,
                           color: Colors.white,
                         ),
@@ -211,8 +210,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
                 ),
               ),
               if (isSelected)
-                Icon(
-                  Icons.check_circle,
+                VIcon(VerbumIcons.checkCircle, weight: VIconWeight.fill,
                   color: Theme.of(context).colorScheme.primary,
                 ),
             ],

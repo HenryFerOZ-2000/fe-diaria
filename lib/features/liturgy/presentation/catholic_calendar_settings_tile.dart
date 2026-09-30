@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../faith/faith_tradition.dart';
 import '../domain/calendar_selection.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class CatholicCalendarSettingsTile extends StatelessWidget {
   const CatholicCalendarSettingsTile({
@@ -35,8 +36,7 @@ class CatholicCalendarSettingsTile extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 2),
-                child: Icon(
-                  Icons.public_rounded,
+                child: VIcon(VerbumIcons.globe,
                   color: theme.colorScheme.primary,
                 ),
               ),
@@ -75,7 +75,7 @@ class CatholicCalendarSettingsTile extends StatelessWidget {
               const SizedBox(width: 8),
               const Padding(
                 padding: EdgeInsets.only(top: 2),
-                child: Icon(Icons.chevron_right_rounded),
+                child: VIcon(VerbumIcons.caretRight),
               ),
             ],
           ),
@@ -153,8 +153,8 @@ class _CalendarOption extends StatelessWidget {
         minVerticalPadding: 12,
         title: Text(title),
         subtitle: Text(subtitle),
-        leading: Icon(
-          selected ? Icons.radio_button_checked : Icons.radio_button_off,
+        leading: VIcon(
+          selected ? VerbumIcons.radioButton : VerbumIcons.circle,
           color: selected ? Theme.of(context).colorScheme.primary : null,
         ),
         onTap: onTap,

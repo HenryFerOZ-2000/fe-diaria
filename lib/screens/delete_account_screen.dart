@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/privacy_security_service.dart';
 import '../providers/auth_provider.dart' as app_auth;
 import 'package:provider/provider.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class DeleteAccountScreen extends StatefulWidget {
   const DeleteAccountScreen({super.key});
@@ -101,7 +101,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.warning_amber_rounded, color: Colors.red[700]),
+                  VIcon(VerbumIcons.warning, color: Colors.red[700]),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -194,7 +194,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.remove, size: 16, color: Colors.grey[600]),
+          VIcon(VerbumIcons.minus, size: 16, color: Colors.grey[600]),
           const SizedBox(width: 8),
           Expanded(
             child: Text(

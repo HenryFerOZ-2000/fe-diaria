@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'main_card.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Tarjeta reutilizable para mostrar categorías con diseño moderno
 class CategoryCard extends StatelessWidget {
   final String title;
   final String description;
-  final IconData icon;
+  final VerbumIcons icon;
   final VoidCallback onTap;
   final Color? iconColor;
   final Color? backgroundColor;
@@ -48,7 +49,7 @@ class CategoryCard extends StatelessWidget {
               color: iconBgColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
-            child: Icon(icon, size: 28, color: iconBgColor),
+            child: VIcon(icon, size: 28, color: iconBgColor),
           ),
           const SizedBox(height: AppSpacing.sm),
           // Título
@@ -84,8 +85,7 @@ class CategoryCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.xs),
-              Icon(
-                Icons.arrow_forward_ios,
+              VIcon(VerbumIcons.caretRight,
                 size: 12,
                 color: colorScheme.primary,
               ),

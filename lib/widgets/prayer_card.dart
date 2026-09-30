@@ -3,13 +3,14 @@ import '../faith/content_provenance.dart';
 import '../theme/app_theme.dart';
 import 'main_card.dart';
 import 'prayer_reading_experience.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Tarjeta reutilizable para mostrar oraciones con diseño elegante
 class PrayerCard extends StatelessWidget {
   final String title;
   final String text;
   final String? reference;
-  final IconData? icon;
+  final VerbumIcons? icon;
   final VoidCallback? onShare;
   final VoidCallback? onFavorite;
   final bool isFavorite;
@@ -64,7 +65,7 @@ class PrayerCard extends StatelessWidget {
                     color: accent.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
-                  child: Icon(icon, color: accent, size: 28),
+                  child: VIcon(icon!, color: accent, size: 28),
                 ),
                 const SizedBox(width: AppSpacing.md),
               ],
@@ -79,14 +80,14 @@ class PrayerCard extends StatelessWidget {
               ),
               if (onShare != null)
                 IconButton(
-                  icon: const Icon(Icons.share_outlined),
+                  icon: const VIcon(VerbumIcons.shareNetwork),
                   onPressed: onShare,
                   color: colorScheme.primary,
                 ),
               if (onFavorite != null)
                 IconButton(
-                  icon: Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                  icon: VIcon(
+                    isFavorite ? VerbumIcons.heart : VerbumIcons.heart,
                     color: isFavorite ? Colors.red : colorScheme.primary,
                   ),
                   onPressed: onFavorite,
@@ -118,7 +119,7 @@ class PrayerCard extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                Icon(Icons.arrow_outward_rounded, size: 18, color: accent),
+                VIcon(VerbumIcons.arrowUpRight, size: 18, color: accent),
               ],
             ),
           ],
@@ -137,7 +138,7 @@ class PrayerCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.format_quote, size: 16, color: accent),
+                  VIcon(VerbumIcons.quotes, weight: VIconWeight.fill, size: 16, color: accent),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
                     reference!,

@@ -7,7 +7,7 @@ import '../services/spiritual_stats_service.dart';
 import '../services/storage_service.dart';
 import '../services/streak_service.dart';
 import '../widgets/verbum_ambient_background.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class StreakScreen extends StatefulWidget {
   const StreakScreen({super.key});
@@ -223,8 +223,7 @@ class _StreakScreenState extends State<StreakScreen> {
           Positioned(
             right: -12,
             top: -20,
-            child: Icon(
-              Icons.local_fire_department_rounded,
+            child: VIcon(VerbumIcons.flame, weight: VIconWeight.fill,
               size: 126,
               color: Colors.white.withValues(alpha: .045),
             ),
@@ -271,13 +270,13 @@ class _StreakScreenState extends State<StreakScreen> {
               Row(
                 children: [
                   _heroMetric(
-                    Icons.workspace_premium_outlined,
+                    VerbumIcons.medal,
                     'Mejor recorrido',
                     '$_best días',
                   ),
                   const SizedBox(width: 10),
                   _heroMetric(
-                    Icons.history_rounded,
+                    VerbumIcons.clockCounterClockwise,
                     'Actividad reciente',
                     _lastActiveLabel,
                   ),
@@ -290,7 +289,7 @@ class _StreakScreenState extends State<StreakScreen> {
     );
   }
 
-  Widget _heroMetric(IconData icon, String label, String value) {
+  Widget _heroMetric(VerbumIcons icon, String label, String value) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(11),
@@ -301,7 +300,7 @@ class _StreakScreenState extends State<StreakScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFFEBCB91), size: 18),
+            VIcon(icon, color: const Color(0xFFEBCB91), size: 18),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
@@ -351,8 +350,8 @@ class _StreakScreenState extends State<StreakScreen> {
                   .withValues(alpha: .12),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(
-              _todayComplete ? Icons.verified_rounded : Icons.wb_sunny_outlined,
+            child: VIcon(
+              _todayComplete ? VerbumIcons.sealCheck : VerbumIcons.sun,
               color: _todayComplete ? const Color(0xFF5F8178) : scheme.primary,
             ),
           ),
@@ -389,7 +388,7 @@ class _StreakScreenState extends State<StreakScreen> {
               onPressed: () => Navigator.of(
                 context,
               ).pushNamedAndRemoveUntil('/home', (route) => false),
-              icon: const Icon(Icons.arrow_forward_rounded, size: 19),
+              icon: const VIcon(VerbumIcons.arrowRight, size: 19),
             ),
         ],
       ),
@@ -456,7 +455,7 @@ class _StreakScreenState extends State<StreakScreen> {
                     _visibleMonth.month - 1,
                   );
                 }),
-                icon: const Icon(Icons.chevron_left_rounded),
+                icon: const VIcon(VerbumIcons.caretLeft),
               ),
               Expanded(
                 child: Text(
@@ -479,7 +478,7 @@ class _StreakScreenState extends State<StreakScreen> {
                           _visibleMonth.month + 1,
                         );
                       }),
-                icon: const Icon(Icons.chevron_right_rounded),
+                icon: const VIcon(VerbumIcons.caretRight),
               ),
             ],
           ),
@@ -544,8 +543,7 @@ class _StreakScreenState extends State<StreakScreen> {
                     ),
                   ),
                   child: done
-                      ? const Icon(
-                          Icons.check_rounded,
+                      ? const VIcon(VerbumIcons.check,
                           color: Color(0xFF2A2030),
                           size: 17,
                         )
@@ -641,8 +639,7 @@ class _StreakScreenState extends State<StreakScreen> {
                   color: const Color(0xFFE1B467).withValues(alpha: .14),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.auto_awesome_rounded,
+                child: const VIcon(VerbumIcons.sparkle, weight: VIconWeight.fill,
                   color: Color(0xFFB27A34),
                 ),
               ),
@@ -703,7 +700,7 @@ class _StreakScreenState extends State<StreakScreen> {
         Expanded(
           child: _summaryTile(
             context,
-            icon: Icons.calendar_month_outlined,
+            icon: VerbumIcons.calendarDots,
             value: '$_activeThisMonth',
             label: 'días este mes',
           ),
@@ -712,7 +709,7 @@ class _StreakScreenState extends State<StreakScreen> {
         Expanded(
           child: _summaryTile(
             context,
-            icon: Icons.all_inclusive_rounded,
+            icon: VerbumIcons.infinity,
             value: '$_recordedDays',
             label: 'días registrados',
           ),
@@ -723,7 +720,7 @@ class _StreakScreenState extends State<StreakScreen> {
 
   Widget _summaryTile(
     BuildContext context, {
-    required IconData icon,
+    required VerbumIcons icon,
     required String value,
     required String label,
   }) {
@@ -734,7 +731,7 @@ class _StreakScreenState extends State<StreakScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: scheme.primary, size: 21),
+          VIcon(icon, color: scheme.primary, size: 21),
           const SizedBox(height: 11),
           Text(
             value,
@@ -771,7 +768,7 @@ class _StreakScreenState extends State<StreakScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.spa_outlined, color: scheme.primary, size: 22),
+          VIcon(VerbumIcons.flowerLotus, color: scheme.primary, size: 22),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

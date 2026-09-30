@@ -4,7 +4,7 @@ import '../features/sharing/domain/share_content.dart';
 import '../providers/app_provider.dart';
 import '../services/share_service.dart';
 import '../l10n/app_localizations.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de favoritos con animaciones suaves
 class FavoritesScreen extends StatelessWidget {
@@ -51,8 +51,7 @@ class FavoritesScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.favorite_border,
+                        VIcon(VerbumIcons.heart,
                           size: 80,
                           color: Theme.of(
                             context,
@@ -304,8 +303,7 @@ class _FavoriteCardState extends State<_FavoriteCard>
                             borderRadius: BorderRadius.circular(20),
                             child: Padding(
                               padding: const EdgeInsets.all(8),
-                              child: Icon(
-                                Icons.favorite,
+                              child: VIcon(VerbumIcons.heart, weight: VIconWeight.fill,
                                 size: 20,
                                 color: Colors.red,
                               ),

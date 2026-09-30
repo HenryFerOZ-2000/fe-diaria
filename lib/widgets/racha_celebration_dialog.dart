@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class RachaCelebrationDialog extends StatefulWidget {
   final int totalDays;
@@ -150,8 +150,7 @@ class _RachaCelebrationDialogState extends State<RachaCelebrationDialog>
                                 ),
                               ],
                             ),
-                            child: const Icon(
-                              Icons.local_fire_department_rounded,
+                            child: const VIcon(VerbumIcons.flame, weight: VIconWeight.fill,
                               color: Color(0xFF2A2030),
                               size: 34,
                             ),
@@ -159,8 +158,7 @@ class _RachaCelebrationDialogState extends State<RachaCelebrationDialog>
                           Positioned(
                             top: 3,
                             right: 3,
-                            child: Icon(
-                              Icons.auto_awesome_rounded,
+                            child: VIcon(VerbumIcons.sparkle, weight: VIconWeight.fill,
                               color: const Color(0xFFD29A45),
                               size: 19,
                             ),

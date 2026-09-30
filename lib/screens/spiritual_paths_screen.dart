@@ -5,7 +5,7 @@ import '../models/spiritual_path.dart';
 import '../services/spiritual_path_service.dart';
 import '../widgets/verbum_ambient_background.dart';
 import 'spiritual_path_detail_screen.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class SpiritualPathsScreen extends StatefulWidget {
   const SpiritualPathsScreen({super.key});
@@ -165,8 +165,7 @@ class _PathsHero extends StatelessWidget {
                   color: Colors.white.withValues(alpha: .12),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: const Icon(
-                  Icons.route_rounded,
+                child: const VIcon(VerbumIcons.path,
                   color: Color(0xFFF0D9A1),
                 ),
               ),
@@ -217,10 +216,10 @@ class _PathsHero extends StatelessWidget {
               backgroundColor: Colors.white,
               foregroundColor: const Color(0xFF34284F),
             ),
-            icon: Icon(
+            icon: VIcon(
               activePath == null
-                  ? Icons.arrow_forward_rounded
-                  : Icons.play_arrow_rounded,
+                  ? VerbumIcons.arrowRight
+                  : VerbumIcons.play,
             ),
             label: Text(activePath == null ? 'Conocer el camino' : 'Continuar'),
           ),
@@ -273,7 +272,7 @@ class _PathCard extends StatelessWidget {
                   color: path.accent.withValues(alpha: .12),
                   borderRadius: BorderRadius.circular(17),
                 ),
-                child: Icon(path.icon, color: path.accent),
+                child: VIcon(path.icon, color: path.accent),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -292,10 +291,10 @@ class _PathCard extends StatelessWidget {
                           ),
                         ),
                         if (active || complete)
-                          Icon(
+                          VIcon(
                             complete
-                                ? Icons.check_circle_rounded
-                                : Icons.bolt_rounded,
+                                ? VerbumIcons.checkCircle
+                                : VerbumIcons.lightning,
                             size: 17,
                             color: complete ? scheme.tertiary : path.accent,
                           ),
@@ -325,7 +324,7 @@ class _PathCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Icon(Icons.chevron_right_rounded, color: scheme.outline),
+              VIcon(VerbumIcons.caretRight, color: scheme.outline),
             ],
           ),
         ),

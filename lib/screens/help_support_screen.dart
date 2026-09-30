@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/app_constants.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class HelpSupportScreen extends StatelessWidget {
   const HelpSupportScreen({super.key});
@@ -86,7 +86,7 @@ class HelpSupportScreen extends StatelessWidget {
           const SizedBox(height: 8),
           _buildListTile(
             context: context,
-            icon: Icons.help_outline,
+            icon: VerbumIcons.question,
             title: 'Preguntas frecuentes (FAQ)',
             subtitle: 'Encuentra respuestas a las preguntas más comunes',
             onTap: () => Navigator.of(context).pushNamed('/faq'),
@@ -97,7 +97,7 @@ class HelpSupportScreen extends StatelessWidget {
           const SizedBox(height: 8),
           _buildListTile(
             context: context,
-            icon: Icons.mail_outline,
+            icon: VerbumIcons.envelope,
             title: 'Enviar email',
             subtitle: AppConstants.supportEmail,
             onTap: () => _openEmail(context),
@@ -106,7 +106,7 @@ class HelpSupportScreen extends StatelessWidget {
             const SizedBox(height: 8),
             _buildListTile(
               context: context,
-              icon: Icons.chat_outlined,
+              icon: VerbumIcons.chatCircle,
               title: 'WhatsApp',
               subtitle: 'Chatea con nosotros',
               onTap: () => _openWhatsApp(context),
@@ -118,7 +118,7 @@ class HelpSupportScreen extends StatelessWidget {
           const SizedBox(height: 8),
           _buildListTile(
             context: context,
-            icon: Icons.bug_report_outlined,
+            icon: VerbumIcons.bug,
             title: 'Reportar un problema',
             subtitle: 'Reporta bugs, sugerencias o problemas',
             onTap: () => Navigator.of(context).pushNamed('/report-problem'),
@@ -129,7 +129,7 @@ class HelpSupportScreen extends StatelessWidget {
           const SizedBox(height: 8),
           _buildListTile(
             context: context,
-            icon: Icons.description_outlined,
+            icon: VerbumIcons.fileText,
             title: 'Términos y Privacidad',
             subtitle: 'Lee nuestros términos y política de privacidad',
             onTap: () {
@@ -183,7 +183,7 @@ class HelpSupportScreen extends StatelessWidget {
 
   Widget _buildListTile({
     required BuildContext context,
-    required IconData icon,
+    required VerbumIcons icon,
     required String title,
     required String subtitle,
     required VoidCallback onTap,
@@ -196,7 +196,7 @@ class HelpSupportScreen extends StatelessWidget {
         border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
       ),
       child: ListTile(
-        leading: Icon(icon),
+        leading: VIcon(icon),
         title: Text(
           title,
           style: VerbumFonts.sans(fontWeight: FontWeight.w600),
@@ -205,7 +205,7 @@ class HelpSupportScreen extends StatelessWidget {
           subtitle,
           style: VerbumFonts.sans(fontSize: 12, color: Colors.grey[600]),
         ),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: const VIcon(VerbumIcons.caretRight),
         onTap: onTap,
       ),
     );

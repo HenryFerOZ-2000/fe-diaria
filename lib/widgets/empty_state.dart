@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Widget para mostrar estado vacío cuando no hay contenido
 class EmptyState extends StatelessWidget {
   final String title;
   final String? message;
-  final IconData icon;
+  final VerbumIcons icon;
   final VoidCallback? onAction;
   final String? actionLabel;
 
@@ -13,7 +14,7 @@ class EmptyState extends StatelessWidget {
     super.key,
     required this.title,
     this.message,
-    this.icon = Icons.inbox_outlined,
+    this.icon = VerbumIcons.tray,
     this.onAction,
     this.actionLabel,
   });
@@ -35,7 +36,7 @@ class EmptyState extends StatelessWidget {
                 color: colorScheme.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: VIcon(
                 icon,
                 size: 64,
                 color: colorScheme.primary.withValues(alpha: 0.6),
@@ -63,7 +64,7 @@ class EmptyState extends StatelessWidget {
               const SizedBox(height: AppSpacing.lg),
               ElevatedButton.icon(
                 onPressed: onAction,
-                icon: const Icon(Icons.refresh),
+                icon: const VIcon(VerbumIcons.arrowClockwise),
                 label: Text(actionLabel!),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(

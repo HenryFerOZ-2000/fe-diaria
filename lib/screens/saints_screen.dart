@@ -9,6 +9,7 @@ import '../widgets/prayer_card.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/main_card.dart';
 import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de santos del día
 class SaintsScreen extends StatefulWidget {
@@ -100,7 +101,7 @@ class _SaintsScreenState extends State<SaintsScreen> {
                 ? EmptyState(
                     title: 'No hay santos disponibles',
                     message: 'Intenta recargar más tarde',
-                    icon: Icons.auto_stories_outlined,
+                    icon: VerbumIcons.bookOpen,
                     onAction: _loadData,
                     actionLabel: 'Recargar',
                   )
@@ -130,8 +131,7 @@ class _SaintsScreenState extends State<SaintsScreen> {
                                         AppRadius.md,
                                       ),
                                     ),
-                                    child: Icon(
-                                      Icons.auto_stories_rounded,
+                                    child: VIcon(VerbumIcons.bookOpen,
                                       color: colorScheme.secondary,
                                       size: 28,
                                     ),
@@ -171,7 +171,7 @@ class _SaintsScreenState extends State<SaintsScreen> {
                               PrayerCard(
                                 title: 'Oración',
                                 text: saint['prayer'] as String,
-                                icon: Icons.favorite_rounded,
+                                icon: VerbumIcons.heart,
                                 accentColor: colorScheme.secondary,
                               ),
                             ],

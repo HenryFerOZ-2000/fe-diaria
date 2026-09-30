@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -68,7 +68,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   ),
                 );
               },
-              icon: const Icon(Icons.open_in_new),
+              icon: const VIcon(VerbumIcons.arrowSquareOut),
               label: const Text('Ver política completa'),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(

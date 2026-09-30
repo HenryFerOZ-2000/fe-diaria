@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class SessionsDevicesScreen extends StatelessWidget {
   const SessionsDevicesScreen({super.key});
@@ -23,7 +23,7 @@ class SessionsDevicesScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.devices, size: 64, color: Colors.grey[400]),
+            VIcon(VerbumIcons.devices, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               'Próximamente',

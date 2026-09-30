@@ -8,6 +8,7 @@ import '../widgets/app_scaffold.dart';
 import '../widgets/prayer_card.dart';
 import '../widgets/empty_state.dart';
 import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de salmos por categoría
 class PsalmsScreen extends StatefulWidget {
@@ -118,7 +119,7 @@ class _PsalmsScreenState extends State<PsalmsScreen> {
                 ? EmptyState(
                     title: 'No hay salmos disponibles',
                     message: 'Intenta recargar más tarde',
-                    icon: Icons.library_books_outlined,
+                    icon: VerbumIcons.books,
                     onAction: _loadData,
                     actionLabel: 'Recargar',
                   )
@@ -134,7 +135,7 @@ class _PsalmsScreenState extends State<PsalmsScreen> {
                           text: psalm.text,
                           reference: psalm.reference,
                           provenance: ContentProvenance.bible,
-                          icon: Icons.library_books_rounded,
+                          icon: VerbumIcons.books,
                         ),
                       );
                     },

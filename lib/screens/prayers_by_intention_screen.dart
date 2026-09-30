@@ -8,6 +8,7 @@ import '../widgets/app_scaffold.dart';
 import '../widgets/prayer_card.dart';
 import '../widgets/empty_state.dart';
 import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de peticiones especiales
 class PrayersByIntentionScreen extends StatefulWidget {
@@ -116,7 +117,7 @@ class _PrayersByIntentionScreenState extends State<PrayersByIntentionScreen> {
                 ? EmptyState(
                     title: 'No hay oraciones disponibles',
                     message: 'Intenta recargar más tarde',
-                    icon: Icons.healing_outlined,
+                    icon: VerbumIcons.firstAid,
                     onAction: _loadData,
                     actionLabel: 'Recargar',
                   )
@@ -131,7 +132,7 @@ class _PrayersByIntentionScreenState extends State<PrayersByIntentionScreen> {
                           provenance: ContentProvenance.aiGenerated,
                           title: prayer['title'] as String,
                           text: prayer['text'] as String,
-                          icon: Icons.healing_rounded,
+                          icon: VerbumIcons.firstAid,
                         ),
                       );
                     },

@@ -7,7 +7,7 @@ import '../services/prayer_service.dart';
 import '../services/storage_service.dart';
 import '../widgets/verbum_ambient_background.dart';
 import 'traditional_prayers_categories_screen.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 Future<void> _syncAfterTraditionChange(BuildContext context) async {
   PrayerService().resetInMemoryDailyPrayers();
@@ -48,7 +48,7 @@ class _TraditionalPrayersReligionSelectionScreenState
       title: 'Tradición católica',
       description:
           'Oraciones tradicionales, rosario, santos y reflexiones católicas.',
-      icon: Icons.church_outlined,
+      icon: VerbumIcons.church,
       accent: Color(0xFF77649A),
     ),
     _TraditionOption(
@@ -56,7 +56,7 @@ class _TraditionalPrayersReligionSelectionScreenState
       title: 'Evangélica / protestante',
       description:
           'Oraciones y reflexiones centradas en la Palabra y la vida en comunidad.',
-      icon: Icons.menu_book_rounded,
+      icon: VerbumIcons.bookOpenText,
       accent: Color(0xFFB58A45),
     ),
     _TraditionOption(
@@ -64,7 +64,7 @@ class _TraditionalPrayersReligionSelectionScreenState
       title: 'Cristiana general',
       description:
           'Contenido cristiano común para explorar sin elegir una denominación.',
-      icon: Icons.auto_awesome_outlined,
+      icon: VerbumIcons.sparkle,
       accent: Color(0xFF5F8178),
     ),
   ];
@@ -124,7 +124,7 @@ class _TraditionalPrayersReligionSelectionScreenState
                     if (!firstRun)
                       IconButton(
                         onPressed: () => Navigator.of(context).maybePop(),
-                        icon: const Icon(Icons.arrow_back_rounded),
+                        icon: const VIcon(VerbumIcons.arrowLeft),
                       )
                     else
                       Container(
@@ -137,8 +137,7 @@ class _TraditionalPrayersReligionSelectionScreenState
                             color: scheme.primary.withValues(alpha: .18),
                           ),
                         ),
-                        child: Icon(
-                          Icons.menu_book_rounded,
+                        child: VIcon(VerbumIcons.bookOpenText, weight: VIconWeight.fill,
                           color: scheme.primary,
                           size: 21,
                         ),
@@ -215,8 +214,7 @@ class _TraditionalPrayersReligionSelectionScreenState
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            Icons.tune_rounded,
+                          VIcon(VerbumIcons.slidersHorizontal,
                             color: scheme.onSurfaceVariant,
                             size: 16,
                           ),
@@ -263,7 +261,7 @@ class _TraditionalPrayersReligionSelectionScreenState
                               color: Colors.white,
                             ),
                           )
-                        : const Icon(Icons.arrow_forward_rounded),
+                        : const VIcon(VerbumIcons.arrowRight),
                     label: Text(_saving ? 'Guardando...' : 'Continuar'),
                   ),
                 ),
@@ -280,7 +278,7 @@ class _TraditionOption {
   final String id;
   final String title;
   final String description;
-  final IconData icon;
+  final VerbumIcons icon;
   final Color accent;
 
   const _TraditionOption({
@@ -354,7 +352,7 @@ class _TraditionCard extends StatelessWidget {
                     ),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Icon(option.icon, color: option.accent, size: 24),
+                  child: VIcon(option.icon, color: option.accent, size: 24),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -397,8 +395,7 @@ class _TraditionCard extends StatelessWidget {
                     ),
                   ),
                   child: selected
-                      ? const Icon(
-                          Icons.check_rounded,
+                      ? const VIcon(VerbumIcons.check,
                           size: 16,
                           color: Colors.white,
                         )

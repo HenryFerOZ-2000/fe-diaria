@@ -8,6 +8,7 @@ import '../widgets/app_scaffold.dart';
 import '../widgets/main_card.dart';
 import '../widgets/custom_button.dart';
 import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de guía del rosario
 class RosaryGuideScreen extends StatefulWidget {
@@ -218,7 +219,7 @@ class _RosaryGuideScreenState extends State<RosaryGuideScreen> {
                                       Expanded(
                                         child: CustomButton(
                                           text: 'Anterior',
-                                          icon: Icons.arrow_back,
+                                          icon: VerbumIcons.arrowLeft,
                                           onPressed: () {
                                             setState(() => _currentStep--);
                                           },
@@ -231,7 +232,7 @@ class _RosaryGuideScreenState extends State<RosaryGuideScreen> {
                                         text: _currentStep < steps.length - 1
                                             ? 'Siguiente'
                                             : 'Finalizar',
-                                        icon: Icons.arrow_forward,
+                                        icon: VerbumIcons.arrowRight,
                                         onPressed:
                                             _currentStep < steps.length - 1
                                             ? () {

@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/social_service.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class SetupUsernameScreen extends StatefulWidget {
   const SetupUsernameScreen({super.key});
@@ -132,7 +132,7 @@ class _SetupUsernameScreenState extends State<SetupUsernameScreen> {
                 decoration: InputDecoration(
                   labelText: 'Username',
                   hintText: 'ejemplo: usuario123',
-                  prefixIcon: const Icon(Icons.alternate_email),
+                  prefixIcon: const VIcon(VerbumIcons.at),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -149,8 +149,7 @@ class _SetupUsernameScreenState extends State<SetupUsernameScreen> {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Icon(
-                    Icons.info_outline,
+                  VIcon(VerbumIcons.info,
                     size: 16,
                     color: colorScheme.primary.withValues(alpha: 0.7),
                   ),

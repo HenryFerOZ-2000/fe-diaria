@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/achievement.dart';
 import '../models/spiritual_stats.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class AchievementDetailScreen extends StatelessWidget {
   final Achievement achievement;
@@ -92,7 +92,7 @@ class AchievementDetailScreen extends StatelessWidget {
                         ]
                       : null,
                 ),
-                child: Icon(
+                child: VIcon(
                   achievement.icon,
                   size: 64,
                   color: isUnlocked ? Colors.amber[700] : Colors.grey[400],
@@ -144,8 +144,8 @@ class AchievementDetailScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        isUnlocked ? Icons.check_circle : Icons.lock,
+                      VIcon(
+                        isUnlocked ? VerbumIcons.checkCircle : VerbumIcons.lockSimple,
                         color: isUnlocked
                             ? Colors.amber[700]
                             : Colors.grey[600],
@@ -220,8 +220,7 @@ class AchievementDetailScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.info_outline,
+                      VIcon(VerbumIcons.info,
                         color: Colors.blue[600],
                         size: 20,
                       ),
@@ -268,7 +267,7 @@ class AchievementDetailScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.stars, color: Colors.amber[700], size: 20),
+                      VIcon(VerbumIcons.star, weight: VIconWeight.fill, color: Colors.amber[700], size: 20),
                       const SizedBox(width: 8),
                       Text(
                         'Recompensa',
@@ -313,8 +312,7 @@ class AchievementDetailScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.calendar_today,
+                      VIcon(VerbumIcons.calendarBlank, weight: VIconWeight.fill,
                         color: Colors.grey[600],
                         size: 20,
                       ),

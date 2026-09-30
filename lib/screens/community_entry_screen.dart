@@ -4,7 +4,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../services/community_service.dart';
 import '../widgets/verbum_ambient_background.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 enum CommunityEntryMode { landing, join, create, success }
 
@@ -61,7 +61,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
               });
             }
           },
-          icon: const Icon(Icons.arrow_back_rounded),
+          icon: const VIcon(VerbumIcons.arrowLeft),
         ),
       ),
       body: VerbumAmbientBackground(
@@ -91,10 +91,16 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
           height: 210,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(32),
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF261E45), Color(0xFF5C487C), Color(0xFF8A6942)],
+              colors: [
+                context.palette.inverse,
+                Color.alphaBlend(
+                  context.palette.gold.withValues(alpha: .28),
+                  context.palette.inverse,
+                ),
+              ],
             ),
           ),
           child: Stack(
@@ -102,8 +108,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
               Positioned(
                 right: -18,
                 top: -20,
-                child: Icon(
-                  Icons.groups_rounded,
+                child: VIcon(VerbumIcons.usersThree, weight: VIconWeight.fill,
                   size: 190,
                   color: Colors.white.withValues(alpha: .07),
                 ),
@@ -117,7 +122,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
                     Text(
                       'CRECER JUNTOS',
                       style: VerbumFonts.sans(
-                        color: const Color(0xFFD8B875),
+                        color: context.palette.gold,
                         fontWeight: FontWeight.w800,
                         fontSize: 10,
                         letterSpacing: 1.8,
@@ -151,18 +156,18 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
         const SizedBox(height: 26),
         FilledButton.icon(
           onPressed: () => setState(() => _mode = CommunityEntryMode.join),
-          icon: const Icon(Icons.link_rounded),
+          icon: const VIcon(VerbumIcons.link),
           label: const Text('Unirme a una comunidad'),
         ),
         const SizedBox(height: 12),
         OutlinedButton.icon(
           onPressed: () => setState(() => _mode = CommunityEntryMode.create),
-          icon: const Icon(Icons.add_rounded),
+          icon: const VIcon(VerbumIcons.plus),
           label: const Text('Crear una comunidad'),
         ),
         const SizedBox(height: 22),
         _note(
-          Icons.shield_outlined,
+          VerbumIcons.shield,
           'Siempre verás la información de la comunidad antes de entrar.',
         ),
       ],
@@ -226,7 +231,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
           const SizedBox(height: 16),
           FilledButton.icon(
             onPressed: _busy ? null : _joinCommunity,
-            icon: const Icon(Icons.login_rounded),
+            icon: const VIcon(VerbumIcons.signIn),
             label: _loadingLabel('Unirme ahora'),
           ),
           TextButton(
@@ -255,7 +260,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: scheme.primaryContainer,
-                child: Icon(Icons.church_rounded, color: scheme.primary),
+                child: VIcon(VerbumIcons.church, weight: VIconWeight.fill, color: scheme.primary),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -285,7 +290,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
           ),
           const SizedBox(height: 14),
           _note(
-            Icons.verified_user_outlined,
+            VerbumIcons.shieldCheck,
             'Podrás salir de la comunidad cuando quieras.',
           ),
         ],
@@ -323,7 +328,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
             textCapitalization: TextCapitalization.words,
             decoration: const InputDecoration(
               labelText: 'Nombre de la comunidad',
-              prefixIcon: Icon(Icons.groups_rounded),
+              prefixIcon: VIcon(VerbumIcons.usersThree, weight: VIconWeight.fill),
             ),
           ),
           const SizedBox(height: 14),
@@ -332,7 +337,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
             textCapitalization: TextCapitalization.words,
             decoration: const InputDecoration(
               labelText: 'Ciudad',
-              prefixIcon: Icon(Icons.location_on_outlined),
+              prefixIcon: VIcon(VerbumIcons.mapPin),
             ),
           ),
         ] else if (_createStep == 1) ...[
@@ -350,21 +355,21 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
             textCapitalization: TextCapitalization.words,
             decoration: const InputDecoration(
               labelText: 'Responsable (opcional)',
-              prefixIcon: Icon(Icons.person_outline),
+              prefixIcon: VIcon(VerbumIcons.user),
             ),
           ),
           const SizedBox(height: 10),
           _note(
-            Icons.auto_awesome_outlined,
+            VerbumIcons.sparkle,
             'Podrás añadir imagen, administradores y permisos después.',
           ),
         ] else ...[
-          _summaryRow(Icons.groups_rounded, _name.text),
-          _summaryRow(Icons.location_on_outlined, _city.text),
-          _summaryRow(Icons.lock_open_rounded, 'Ingreso mediante invitación'),
+          _summaryRow(VerbumIcons.usersThree, _name.text),
+          _summaryRow(VerbumIcons.mapPin, _city.text),
+          _summaryRow(VerbumIcons.lockSimpleOpen, 'Ingreso mediante invitación'),
           const SizedBox(height: 12),
           _note(
-            Icons.info_outline,
+            VerbumIcons.info,
             'Serás el administrador principal de esta comunidad.',
           ),
         ],
@@ -410,8 +415,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
       padding: const EdgeInsets.all(28),
       children: [
         const SizedBox(height: 30),
-        Icon(
-          Icons.check_circle_rounded,
+        VIcon(VerbumIcons.checkCircle, weight: VIconWeight.fill,
           size: 78,
           color: Theme.of(context).colorScheme.tertiary,
         ),
@@ -458,7 +462,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
         FilledButton.icon(
           onPressed: () =>
               SharePlus.instance.share(ShareParams(text: invitation)),
-          icon: const Icon(Icons.ios_share_rounded),
+          icon: const VIcon(VerbumIcons.shareNetwork),
           label: const Text('Compartir invitación'),
         ),
         const SizedBox(height: 10),
@@ -469,7 +473,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
               context,
             ).showSnackBar(const SnackBar(content: Text('Código copiado')));
           },
-          icon: const Icon(Icons.copy_rounded),
+          icon: const VIcon(VerbumIcons.copy),
           label: const Text('Copiar código'),
         ),
         TextButton(
@@ -567,9 +571,9 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
       ),
     ),
   );
-  Widget _note(IconData icon, String text) => Row(
+  Widget _note(VerbumIcons icon, String text) => Row(
     children: [
-      Icon(icon, size: 17, color: Theme.of(context).colorScheme.tertiary),
+      VIcon(icon, size: 17, color: Theme.of(context).colorScheme.tertiary),
       const SizedBox(width: 9),
       Expanded(
         child: Text(
@@ -583,11 +587,11 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
       ),
     ],
   );
-  Widget _summaryRow(IconData icon, String text) => Padding(
+  Widget _summaryRow(VerbumIcons icon, String text) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
     child: Row(
       children: [
-        Icon(icon, color: Theme.of(context).colorScheme.primary),
+        VIcon(icon, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 12),
         Expanded(
           child: Text(

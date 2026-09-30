@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/privacy_security_service.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class BlockedUsersScreen extends StatefulWidget {
   const BlockedUsersScreen({super.key});
@@ -112,7 +112,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.block_outlined, size: 64, color: Colors.grey[400]),
+                  VIcon(VerbumIcons.prohibit, size: 64, color: Colors.grey[400]),
                   const SizedBox(height: 16),
                   Text(
                     'No hay usuarios bloqueados',

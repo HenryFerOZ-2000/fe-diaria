@@ -5,7 +5,7 @@ import '../models/spiritual_path.dart';
 import '../services/spiritual_path_service.dart';
 import '../widgets/verbum_ambient_background.dart';
 import 'spiritual_path_day_screen.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class SpiritualPathDetailScreen extends StatefulWidget {
   final SpiritualPath path;
@@ -78,7 +78,7 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
                       IconButton(
                         tooltip: 'Invitar a alguien',
                         onPressed: _share,
-                        icon: const Icon(Icons.ios_share_rounded),
+                        icon: const VIcon(VerbumIcons.shareNetwork),
                       ),
                       const SizedBox(width: 6),
                     ],
@@ -152,12 +152,12 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
                       width: double.infinity,
                       child: FilledButton.icon(
                         onPressed: () => _openDay(complete ? 1 : next),
-                        icon: Icon(
+                        icon: VIcon(
                           complete
-                              ? Icons.replay_rounded
+                              ? VerbumIcons.arrowCounterClockwise
                               : started
-                              ? Icons.play_arrow_rounded
-                              : Icons.route_rounded,
+                              ? VerbumIcons.play
+                              : VerbumIcons.path,
                         ),
                         label: Text(
                           complete
@@ -207,7 +207,7 @@ class _PathHero extends StatelessWidget {
               color: Colors.white.withValues(alpha: .13),
               borderRadius: BorderRadius.circular(17),
             ),
-            child: Icon(path.icon, color: Colors.white),
+            child: VIcon(path.icon, color: Colors.white),
           ),
           const SizedBox(height: 22),
           Text(
@@ -240,8 +240,7 @@ class _PathHero extends StatelessWidget {
           const SizedBox(height: 18),
           Row(
             children: [
-              const Icon(
-                Icons.calendar_today_outlined,
+              const VIcon(VerbumIcons.calendarBlank,
                 color: Colors.white70,
                 size: 16,
               ),
@@ -255,8 +254,7 @@ class _PathHero extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 17),
-              const Icon(
-                Icons.schedule_rounded,
+              const VIcon(VerbumIcons.clock,
                 color: Colors.white70,
                 size: 16,
               ),
@@ -342,8 +340,7 @@ class _DayTile extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: done
-                      ? const Icon(
-                          Icons.check_rounded,
+                      ? const VIcon(VerbumIcons.check,
                           color: Colors.white,
                           size: 19,
                         )
@@ -380,10 +377,10 @@ class _DayTile extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(
+                VIcon(
                   available
-                      ? Icons.chevron_right_rounded
-                      : Icons.lock_outline_rounded,
+                      ? VerbumIcons.caretRight
+                      : VerbumIcons.lockSimple,
                   size: 19,
                   color: scheme.outline,
                 ),

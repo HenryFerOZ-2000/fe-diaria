@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/source_link.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class ContentSourcesScreen extends StatelessWidget {
   const ContentSourcesScreen({super.key});
@@ -109,7 +110,7 @@ class ContentSourcesScreen extends StatelessWidget {
     padding: const EdgeInsets.only(bottom: 20),
     child: OutlinedButton.icon(
       onPressed: () => openSource(context, url),
-      icon: const Icon(Icons.open_in_new),
+      icon: const VIcon(VerbumIcons.arrowSquareOut),
       label: Text(label),
     ),
   );

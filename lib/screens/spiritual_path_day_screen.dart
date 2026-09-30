@@ -6,7 +6,7 @@ import '../services/read_aloud_service.dart';
 import '../services/share_service.dart';
 import '../services/spiritual_path_service.dart';
 import 'reading_chat_screen.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class SpiritualPathDayScreen extends StatefulWidget {
   final SpiritualPath path;
@@ -120,8 +120,7 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                   IconButton(
                     tooltip: 'Volver',
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(
-                      Icons.arrow_back_rounded,
+                    icon: const VIcon(VerbumIcons.arrowLeft,
                       color: Colors.white,
                     ),
                   ),
@@ -153,10 +152,10 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                   IconButton(
                     tooltip: _speaking ? 'Detener audio' : 'Escuchar el día',
                     onPressed: _toggleNarration,
-                    icon: Icon(
+                    icon: VIcon(
                       _speaking
-                          ? Icons.stop_circle_outlined
-                          : Icons.headphones_rounded,
+                          ? VerbumIcons.stopCircle
+                          : VerbumIcons.headphones,
                       color: Colors.white,
                     ),
                   ),
@@ -171,8 +170,7 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                         ),
                       ),
                     ),
-                    icon: const Icon(
-                      Icons.auto_awesome_outlined,
+                    icon: const VIcon(VerbumIcons.sparkle,
                       color: Colors.white,
                     ),
                   ),
@@ -212,7 +210,7 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                     subtitle: _day.subtitle,
                     body: _day.scripture,
                     footer: _day.scriptureReference,
-                    icon: Icons.menu_book_rounded,
+                    icon: VerbumIcons.bookOpenText,
                     accent: path.accent,
                     serifBody: true,
                   ),
@@ -221,7 +219,7 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                     title: 'Deja que la Palabra repose',
                     subtitle: 'Lee sin prisa. No tienes que resolver nada.',
                     body: _day.reflection,
-                    icon: Icons.auto_awesome_outlined,
+                    icon: VerbumIcons.sparkle,
                     accent: path.accent,
                   ),
                   _ReadingPage(
@@ -229,7 +227,7 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                     title: 'Tu oración de hoy',
                     subtitle: 'Puedes leerla o hacerla tuya en silencio.',
                     body: _day.prayer,
-                    icon: Icons.favorite_outline_rounded,
+                    icon: VerbumIcons.heart,
                     accent: path.accent,
                     serifBody: true,
                   ),
@@ -238,7 +236,7 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                     title: 'Un paso pequeño y concreto',
                     subtitle: 'La fe también crece en lo cotidiano.',
                     body: _day.practice,
-                    icon: Icons.directions_walk_rounded,
+                    icon: VerbumIcons.personSimpleWalk,
                     accent: path.accent,
                   ),
                 ],
@@ -263,7 +261,7 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                         backgroundColor: Colors.white.withValues(alpha: .12),
                         foregroundColor: Colors.white,
                       ),
-                      icon: const Icon(Icons.arrow_back_rounded),
+                      icon: const VIcon(VerbumIcons.arrowLeft),
                     ),
                     const SizedBox(width: 10),
                   ],
@@ -280,10 +278,10 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                               height: 17,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : Icon(
+                          : VIcon(
                               _page == 3
-                                  ? Icons.check_rounded
-                                  : Icons.arrow_forward_rounded,
+                                  ? VerbumIcons.check
+                                  : VerbumIcons.arrowRight,
                             ),
                       label: Text(
                         _page == 3 ? 'Completar este día' : 'Continuar',
@@ -306,7 +304,7 @@ class _ReadingPage extends StatelessWidget {
   final String subtitle;
   final String body;
   final String? footer;
-  final IconData icon;
+  final VerbumIcons icon;
   final Color accent;
   final bool serifBody;
 
@@ -347,7 +345,7 @@ class _ReadingPage extends StatelessWidget {
                 color: accent.withValues(alpha: .12),
                 borderRadius: BorderRadius.circular(15),
               ),
-              child: Icon(icon, color: accent),
+              child: VIcon(icon, color: accent),
             ),
             const SizedBox(height: 24),
             Text(
@@ -438,8 +436,8 @@ class _CompletionDialog extends StatelessWidget {
           color: path.accent.withValues(alpha: .12),
           shape: BoxShape.circle,
         ),
-        child: Icon(
-          finished ? Icons.celebration_rounded : Icons.auto_awesome_rounded,
+        child: VIcon(
+          finished ? VerbumIcons.confetti : VerbumIcons.sparkle,
           color: path.accent,
           size: 31,
         ),

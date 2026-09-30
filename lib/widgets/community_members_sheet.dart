@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'verbum_ambient_background.dart';
 import 'verbum_header_actions.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
-import 'package:verbum/design_system/icons/verbum_icons.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 enum CommunityMemberAction { promote, demote, transfer }
 
@@ -93,24 +92,17 @@ class CommunityMembersPanel extends StatelessWidget {
                         width: 46,
                         height: 46,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFF493878), Color(0xFF261E45)],
-                          ),
+                          color: context.palette.emphasis,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(
-                                0xFF261E45,
-                              ).withValues(alpha: .2),
+                              color: Colors.black.withValues(alpha: .12),
                               blurRadius: 14,
                               offset: const Offset(0, 7),
                             ),
                           ],
                         ),
-                        child: const Icon(
-                          Icons.groups_2_rounded,
+                        child: const VIcon(VerbumIcons.usersThree, weight: VIconWeight.fill,
                           color: Colors.white,
                           size: 23,
                         ),
@@ -178,8 +170,7 @@ class CommunityMembersPanel extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              Icon(
-                                Icons.admin_panel_settings_outlined,
+                              VIcon(VerbumIcons.userGear,
                                 color: scheme.primary,
                               ),
                               const SizedBox(width: 10),
@@ -192,8 +183,7 @@ class CommunityMembersPanel extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              Icon(
-                                Icons.chevron_right_rounded,
+                              VIcon(VerbumIcons.caretRight,
                                 color: scheme.primary,
                               ),
                             ],
@@ -219,14 +209,14 @@ class CommunityMembersPanel extends StatelessWidget {
     }
     if (errorMessage != null) {
       return _MembersMessageState(
-        icon: Icons.cloud_off_rounded,
+        icon: VerbumIcons.cloudSlash,
         title: 'No pudimos reunir a la comunidad',
         message: errorMessage!,
       );
     }
     if (members.isEmpty) {
       return const _MembersMessageState(
-        icon: Icons.people_outline_rounded,
+        icon: VerbumIcons.users,
         title: 'Aún no hay miembros',
         message:
             'Cuando otras personas se unan, aparecerán aquí para caminar juntas.',
@@ -315,7 +305,7 @@ class _CommunityMemberCard extends StatelessWidget {
             ? null
             : [
                 BoxShadow(
-                  color: const Color(0xFF261E45).withValues(alpha: .045),
+                  color: context.palette.ink.withValues(alpha: .045),
                   blurRadius: 16,
                   offset: const Offset(0, 7),
                 ),
@@ -366,8 +356,7 @@ class _CommunityMemberCard extends StatelessWidget {
                   key: ValueKey('member-actions-${member.uid}'),
                   enabled: !isSubmitting,
                   tooltip: 'Gestionar a $name',
-                  icon: Icon(
-                    Icons.more_horiz_rounded,
+                  icon: VIcon(VerbumIcons.dotsThree,
                     color: scheme.onSurfaceVariant,
                   ),
                   color: scheme.surface,
@@ -386,14 +375,14 @@ class _CommunityMemberCard extends StatelessWidget {
                           PopupMenuItem(
                             value: CommunityMemberAction.demote,
                             child: _MemberMenuItem(
-                              icon: Icons.remove_moderator_outlined,
+                              icon: VerbumIcons.shieldSlash,
                               label: 'Quitar administración',
                             ),
                           ),
                           PopupMenuItem(
                             value: CommunityMemberAction.transfer,
                             child: _MemberMenuItem(
-                              icon: Icons.change_circle_outlined,
+                              icon: VerbumIcons.arrowsClockwise,
                               label: 'Transferir liderazgo',
                             ),
                           ),
@@ -402,7 +391,7 @@ class _CommunityMemberCard extends StatelessWidget {
                           PopupMenuItem(
                             value: CommunityMemberAction.promote,
                             child: _MemberMenuItem(
-                              icon: Icons.add_moderator_outlined,
+                              icon: VerbumIcons.shieldPlus,
                               label: 'Hacer administrador',
                             ),
                           ),
@@ -420,19 +409,19 @@ class _CommunityMemberCard extends StatelessWidget {
                 if (member.isOwner)
                   const _MemberRolePill(
                     label: 'Principal',
-                    icon: Icons.workspace_premium_outlined,
+                    icon: VerbumIcons.medal,
                     tone: _MemberRoleTone.gold,
                   )
                 else if (member.isAdmin)
                   const _MemberRolePill(
                     label: 'Administrador',
-                    icon: Icons.shield_outlined,
+                    icon: VerbumIcons.shield,
                     tone: _MemberRoleTone.plum,
                   ),
                 if (member.isCurrentUser)
                   const _MemberRolePill(
                     label: 'Tú',
-                    icon: Icons.person_outline_rounded,
+                    icon: VerbumIcons.user,
                     tone: _MemberRoleTone.neutral,
                   ),
               ],
@@ -507,7 +496,7 @@ enum _MemberRoleTone { gold, plum, neutral }
 
 class _MemberRolePill extends StatelessWidget {
   final String label;
-  final IconData icon;
+  final VerbumIcons icon;
   final _MemberRoleTone tone;
 
   const _MemberRolePill({
@@ -534,7 +523,7 @@ class _MemberRolePill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 11, color: color),
+          VIcon(icon, size: 11, color: color),
           const SizedBox(width: 4),
           Text(
             label,
@@ -551,7 +540,7 @@ class _MemberRolePill extends StatelessWidget {
 }
 
 class _MemberMenuItem extends StatelessWidget {
-  final IconData icon;
+  final VerbumIcons icon;
   final String label;
 
   const _MemberMenuItem({required this.icon, required this.label});
@@ -560,7 +549,7 @@ class _MemberMenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 19),
+        VIcon(icon, size: 19),
         const SizedBox(width: 10),
         Flexible(child: Text(label)),
       ],
@@ -569,7 +558,7 @@ class _MemberMenuItem extends StatelessWidget {
 }
 
 class _MembersMessageState extends StatelessWidget {
-  final IconData icon;
+  final VerbumIcons icon;
   final String title;
   final String message;
 
@@ -603,7 +592,7 @@ class _MembersMessageState extends StatelessWidget {
                   color: scheme.primary.withValues(alpha: .1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: scheme.primary, size: 27),
+                child: VIcon(icon, color: scheme.primary, size: 27),
               ),
               const SizedBox(height: 14),
               Text(

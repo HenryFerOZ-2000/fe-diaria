@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Título de sección con diseño moderno
 class SectionTitle extends StatelessWidget {
   final String title;
   final String? subtitle;
-  final IconData? icon;
+  final VerbumIcons? icon;
   final EdgeInsetsGeometry? padding;
   final TextAlign textAlign;
   final Color? color;
@@ -40,7 +41,7 @@ class SectionTitle extends StatelessWidget {
                 color: titleColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
-              child: Icon(icon, color: titleColor, size: 24),
+              child: VIcon(icon!, color: titleColor, size: 24),
             ),
             const SizedBox(height: AppSpacing.sm),
           ],

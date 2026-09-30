@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Botón personalizado con diseño moderno y animaciones suaves
 class CustomButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
-  final IconData? icon;
+  final VerbumIcons? icon;
   final Color? backgroundColor;
   final Color? foregroundColor;
   final double? width;
@@ -45,7 +46,7 @@ class CustomButton extends StatefulWidget {
     Key? key,
     required String text,
     required VoidCallback? onPressed,
-    IconData? icon,
+    VerbumIcons? icon,
     double? width,
     double? height,
     bool isLoading = false,
@@ -139,8 +140,8 @@ class _CustomButtonState extends State<CustomButton>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.icon != null) ...[
-                Icon(
-                  widget.icon,
+                VIcon(
+                  widget.icon!,
                   size: widget.fontSize != null ? widget.fontSize! + 4 : 20,
                 ),
                 const SizedBox(width: AppSpacing.sm),

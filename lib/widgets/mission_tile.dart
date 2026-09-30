@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Tile de misión diaria con check animado.
 class MissionTile extends StatelessWidget {
-  final IconData icon;
+  final VerbumIcons icon;
   final String title;
   final bool completed;
   final VoidCallback onToggle;
@@ -57,7 +57,7 @@ class MissionTile extends StatelessWidget {
                     : colorScheme.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: colorScheme.primary, size: 20),
+              child: VIcon(icon, color: colorScheme.primary, size: 20),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -75,13 +75,11 @@ class MissionTile extends StatelessWidget {
               transitionBuilder: (child, anim) =>
                   ScaleTransition(scale: anim, child: child),
               child: completed
-                  ? Icon(
-                      Icons.check_circle,
+                  ? VIcon(VerbumIcons.checkCircle, weight: VIconWeight.fill,
                       color: colorScheme.primary,
                       key: const ValueKey('done'),
                     )
-                  : Icon(
-                      Icons.circle_outlined,
+                  : VIcon(VerbumIcons.circle,
                       color: colorScheme.outline,
                       key: const ValueKey('todo'),
                     ),

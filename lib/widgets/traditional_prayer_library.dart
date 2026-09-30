@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class PrayerLibraryHero extends StatelessWidget {
   const PrayerLibraryHero({
@@ -16,7 +16,7 @@ class PrayerLibraryHero extends StatelessWidget {
   final String kicker;
   final String title;
   final String description;
-  final IconData icon;
+  final VerbumIcons icon;
   final Color accent;
   final String? badge;
 
@@ -53,7 +53,7 @@ class PrayerLibraryHero extends StatelessWidget {
           Positioned(
             right: -22,
             top: -28,
-            child: Icon(
+            child: VIcon(
               icon,
               size: 132,
               color: Colors.white.withValues(alpha: .055),
@@ -75,7 +75,7 @@ class PrayerLibraryHero extends StatelessWidget {
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: accent.withValues(alpha: .34)),
                     ),
-                    child: Icon(icon, color: const Color(0xFFF1D79C), size: 21),
+                    child: VIcon(icon, color: const Color(0xFFF1D79C), size: 21),
                   ),
                   if (badge != null)
                     Container(
@@ -152,7 +152,7 @@ class PrayerLibraryCard extends StatefulWidget {
   final String title;
   final String eyebrow;
   final String subtitle;
-  final IconData icon;
+  final VerbumIcons icon;
   final Color accent;
   final VoidCallback onTap;
 
@@ -218,7 +218,7 @@ class _PrayerLibraryCardState extends State<PrayerLibraryCard> {
                   Positioned(
                     right: -11,
                     top: -25,
-                    child: Icon(
+                    child: VIcon(
                       widget.icon,
                       size: 92,
                       color: widget.accent.withValues(alpha: .045),
@@ -252,7 +252,7 @@ class _PrayerLibraryCardState extends State<PrayerLibraryCard> {
                             ),
                           ],
                         ),
-                        child: Icon(widget.icon, color: Colors.white, size: 21),
+                        child: VIcon(widget.icon, color: Colors.white, size: 21),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -305,8 +305,7 @@ class _PrayerLibraryCardState extends State<PrayerLibraryCard> {
                             color: widget.accent.withValues(alpha: .10),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
-                            Icons.arrow_forward_rounded,
+                          child: VIcon(VerbumIcons.arrowRight,
                             color: widget.accent,
                             size: 17,
                           ),
@@ -350,8 +349,7 @@ class PrayerLibraryEmptyState extends StatelessWidget {
                 color: scheme.primary.withValues(alpha: .10),
                 borderRadius: BorderRadius.circular(22),
               ),
-              child: Icon(
-                Icons.auto_stories_outlined,
+              child: VIcon(VerbumIcons.bookOpen,
                 color: scheme.primary,
                 size: 28,
               ),

@@ -12,6 +12,7 @@ import '../widgets/custom_button.dart';
 import '../widgets/main_card.dart';
 import '../theme/app_theme.dart';
 import '../widgets/prayer_reading_experience.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla dedicada "Oración para ti" - Mostrando oración y versículo personalizados
 class PrayerForYouScreen extends StatefulWidget {
@@ -100,7 +101,7 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
           title: 'Oración para ti',
           actions: [
             IconButton(
-              icon: const Icon(Icons.refresh),
+              icon: const VIcon(VerbumIcons.arrowClockwise),
               onPressed: () async {
                 await provider.loadTodayVerse();
                 await provider.loadTodayPrayers();
@@ -119,7 +120,7 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
                       // Botón grande para cambiar emoción
                       CustomButton(
                         text: '¿Cómo te sientes ahora?',
-                        icon: Icons.emoji_emotions_outlined,
+                        icon: VerbumIcons.smiley,
                         onPressed: () {
                           Navigator.of(
                             context,
@@ -180,7 +181,7 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: CustomButton(
                   text: 'Regresar al inicio',
-                  icon: Icons.home,
+                  icon: VerbumIcons.house,
                   onPressed: () {
                     Navigator.of(context).pushNamed('/home');
                   },
@@ -246,8 +247,7 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
                       color: colorScheme.secondary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(AppRadius.md),
                     ),
-                    child: Icon(
-                      Icons.favorite,
+                    child: VIcon(VerbumIcons.heart, weight: VIconWeight.fill,
                       color: colorScheme.secondary,
                       size: 28,
                     ),
@@ -303,7 +303,7 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
             right: -30,
             child: Opacity(
               opacity: 0.06,
-              child: Icon(Icons.book, size: 140, color: colorScheme.tertiary),
+              child: VIcon(VerbumIcons.book, weight: VIconWeight.fill, size: 140, color: colorScheme.tertiary),
             ),
           ),
           Column(
@@ -317,8 +317,7 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
                       color: colorScheme.tertiary.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(AppRadius.md),
                     ),
-                    child: Icon(
-                      Icons.book,
+                    child: VIcon(VerbumIcons.book, weight: VIconWeight.fill,
                       color: colorScheme.tertiary,
                       size: 28,
                     ),

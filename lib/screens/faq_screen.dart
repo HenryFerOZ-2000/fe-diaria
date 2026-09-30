@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/help_support_service.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class FaqScreen extends StatefulWidget {
   const FaqScreen({super.key});
@@ -153,10 +153,10 @@ class _FaqScreenState extends State<FaqScreen> {
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Buscar en FAQ...',
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: const VIcon(VerbumIcons.magnifyingGlass),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear),
+                        icon: const VIcon(VerbumIcons.close),
                         onPressed: () {
                           _searchController.clear();
                         },
@@ -179,8 +179,7 @@ class _FaqScreenState extends State<FaqScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.search_off,
+                        VIcon(VerbumIcons.magnifyingGlassMinus,
                           size: 64,
                           color: Colors.grey[400],
                         ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/groq_chat_service.dart' as groq;
 import '../services/app_analytics_service.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class ReadingChatMessage {
   final String text;
@@ -118,16 +118,14 @@ class _ReadingChatScreenState extends State<ReadingChatScreen> {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back_ios_new_rounded,
+                        icon: const VIcon(VerbumIcons.caretLeft,
                           color: Colors.white,
                         ),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const Spacer(),
                       IconButton(
-                        icon: const Icon(
-                          Icons.close_rounded,
+                        icon: const VIcon(VerbumIcons.close,
                           color: Colors.white,
                         ),
                         onPressed: () => Navigator.of(context).pop(),
@@ -306,8 +304,7 @@ class _ReadingChatScreenState extends State<ReadingChatScreen> {
                               ),
                             ],
                           ),
-                          child: const Icon(
-                            Icons.send_rounded,
+                          child: const VIcon(VerbumIcons.paperPlaneRight, weight: VIconWeight.fill,
                             color: Colors.white,
                             size: 20,
                           ),

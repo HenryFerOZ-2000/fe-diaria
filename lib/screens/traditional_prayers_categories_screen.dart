@@ -9,8 +9,7 @@ import '../widgets/traditional_prayer_library.dart';
 import '../widgets/verbum_header_actions.dart';
 import 'traditional_prayers_list_screen.dart';
 import 'traditional_prayers_religion_selection_screen.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
-import 'package:verbum/design_system/icons/verbum_icons.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Biblioteca de categorías según la tradición elegida por la persona.
 class TraditionalPrayersCategoriesScreen extends StatefulWidget {
@@ -150,7 +149,7 @@ class _TraditionalPrayersCategoriesScreenState
                   title: 'Elige cómo quieres orar',
                   description:
                       'Explora palabras recibidas por la tradición y encuentra una oración para este momento.',
-                  icon: Icons.auto_stories_rounded,
+                  icon: VerbumIcons.bookOpen,
                   accent: const Color(0xFFB58A45),
                   badge: traditionName,
                 ),
@@ -220,49 +219,49 @@ _CategoryCardPresentation _categoryPresentation(String category) {
       return const _CategoryCardPresentation(
         eyebrow: 'Ora con la Palabra',
         subtitle: 'Padre Nuestro, salmos y oraciones inspiradas en la Biblia',
-        icon: Icons.menu_book_rounded,
+        icon: VerbumIcons.bookOpenText,
         accent: Color(0xFF77649A),
       );
     case 'promesas':
       return const _CategoryCardPresentation(
         eyebrow: 'Recuerda su fidelidad',
         subtitle: 'Promesas bíblicas para fortalecer la esperanza',
-        icon: Icons.auto_awesome_rounded,
+        icon: VerbumIcons.sparkle,
         accent: Color(0xFFB58A45),
       );
     case 'otras':
       return const _CategoryCardPresentation(
         eyebrow: 'Para cada momento',
         subtitle: 'Oraciones para entregar tu vida cotidiana a Dios',
-        icon: Icons.favorite_outline_rounded,
+        icon: VerbumIcons.heart,
         accent: Color(0xFF5F8178),
       );
     case 'basicas':
       return const _CategoryCardPresentation(
         eyebrow: 'Palabras esenciales',
         subtitle: 'Oraciones fundamentales de la tradición cristiana',
-        icon: Icons.volunteer_activism_rounded,
+        icon: VerbumIcons.handHeart,
         accent: Color(0xFF77649A),
       );
     case 'arcangeles':
       return const _CategoryCardPresentation(
         eyebrow: 'Pide protección',
         subtitle: 'Oraciones tradicionales a los arcángeles',
-        icon: Icons.shield_outlined,
+        icon: VerbumIcons.shield,
         accent: Color(0xFF536C91),
       );
     case 'del_dia':
       return const _CategoryCardPresentation(
         eyebrow: 'Acompaña tu jornada',
         subtitle: 'Oraciones para comenzar y terminar el día',
-        icon: Icons.wb_sunny_outlined,
+        icon: VerbumIcons.sun,
         accent: Color(0xFFB58A45),
       );
     default:
       return const _CategoryCardPresentation(
         eyebrow: 'Tu momento de oración',
         subtitle: 'Una colección para detenerte y encontrarte con Dios',
-        icon: Icons.auto_stories_rounded,
+        icon: VerbumIcons.bookOpen,
         accent: Color(0xFF77649A),
       );
   }
@@ -278,6 +277,6 @@ class _CategoryCardPresentation {
 
   final String eyebrow;
   final String subtitle;
-  final IconData icon;
+  final VerbumIcons icon;
   final Color accent;
 }

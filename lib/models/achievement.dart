@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'spiritual_stats.dart';
+import '../design_system/icons/verbum_icons.dart';
 
 enum AchievementType { streak, verses, prayers, posts }
 
@@ -9,7 +9,7 @@ class Achievement {
   final String description;
   final AchievementType type;
   final int target;
-  final IconData icon;
+  final VerbumIcons icon;
 
   const Achievement({
     required this.id,

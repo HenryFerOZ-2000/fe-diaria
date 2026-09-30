@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class SpiritualPathDay {
   final int number;
@@ -33,7 +34,7 @@ class SpiritualPath {
   final String description;
   final String category;
   final int minutesPerDay;
-  final IconData icon;
+  final VerbumIcons icon;
   final Color accent;
   final List<SpiritualPathDay> days;
 

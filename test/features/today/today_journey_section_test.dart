@@ -10,26 +10,26 @@ void main() {
       id: 'verse',
       title: 'Recibe la Palabra',
       description: 'Lee',
-      icon: Icons.book,
+      icon: VerbumIcons.book,
     ),
     Mission(
       id: 'morning',
       title: 'Hazla oración',
       description: 'Ora',
-      icon: Icons.sunny,
+      icon: VerbumIcons.sun,
     ),
     Mission(
       id: 'practice',
       title: 'Ora por alguien',
       description: 'Pide',
-      icon: Icons.favorite,
+      icon: VerbumIcons.heart,
     ),
   ];
   final night = Mission(
     id: 'night',
     title: 'Cierra tu día con Dios',
     description: 'Descansa en su paz',
-    icon: Icons.nightlight,
+    icon: VerbumIcons.moon,
     isOptional: true,
   );
 

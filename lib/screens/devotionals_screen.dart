@@ -8,6 +8,7 @@ import '../widgets/app_scaffold.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/main_card.dart';
 import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de devocionales diarios
 class DevotionalsScreen extends StatefulWidget {
@@ -86,7 +87,7 @@ class _DevotionalsScreenState extends State<DevotionalsScreen> {
       title: 'Devocionales Diarios',
       actions: [
         IconButton(
-          icon: Icon(_showTodayOnly ? Icons.list : Icons.today),
+          icon: VIcon(_showTodayOnly ? VerbumIcons.listBullets : VerbumIcons.calendarBlank),
           onPressed: () => setState(() => _showTodayOnly = !_showTodayOnly),
           tooltip: _showTodayOnly ? 'Ver todos' : 'Ver solo hoy',
         ),
@@ -104,7 +105,7 @@ class _DevotionalsScreenState extends State<DevotionalsScreen> {
                 ? EmptyState(
                     title: 'No hay devocionales disponibles',
                     message: 'Intenta recargar más tarde',
-                    icon: Icons.book_outlined,
+                    icon: VerbumIcons.book,
                     onAction: _loadData,
                     actionLabel: 'Recargar',
                   )

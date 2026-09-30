@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/spiritual_stats.dart';
 import '../models/achievement.dart';
 import '../services/spiritual_stats_service.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class SpiritualStatsScreen extends StatefulWidget {
   const SpiritualStatsScreen({super.key});
@@ -26,7 +26,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
       description: 'Mantén tu racha por 7 días consecutivos',
       type: AchievementType.streak,
       target: 7,
-      icon: Icons.local_fire_department,
+      icon: VerbumIcons.flame,
     ),
     Achievement(
       id: 'streak_30',
@@ -34,7 +34,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
       description: 'Mantén tu racha por 30 días consecutivos',
       type: AchievementType.streak,
       target: 30,
-      icon: Icons.local_fire_department,
+      icon: VerbumIcons.flame,
     ),
     Achievement(
       id: 'streak_100',
@@ -42,7 +42,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
       description: 'Mantén tu racha por 100 días consecutivos',
       type: AchievementType.streak,
       target: 100,
-      icon: Icons.local_fire_department,
+      icon: VerbumIcons.flame,
     ),
     Achievement(
       id: 'verses_10',
@@ -50,7 +50,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
       description: 'Lee 10 versículos',
       type: AchievementType.verses,
       target: 10,
-      icon: Icons.book,
+      icon: VerbumIcons.book,
     ),
     Achievement(
       id: 'verses_100',
@@ -58,7 +58,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
       description: 'Lee 100 versículos',
       type: AchievementType.verses,
       target: 100,
-      icon: Icons.book,
+      icon: VerbumIcons.book,
     ),
     Achievement(
       id: 'verses_500',
@@ -66,7 +66,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
       description: 'Lee 500 versículos',
       type: AchievementType.verses,
       target: 500,
-      icon: Icons.book,
+      icon: VerbumIcons.book,
     ),
     Achievement(
       id: 'prayers_10',
@@ -74,7 +74,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
       description: 'Completa 10 oraciones',
       type: AchievementType.prayers,
       target: 10,
-      icon: Icons.favorite,
+      icon: VerbumIcons.heart,
     ),
     Achievement(
       id: 'prayers_100',
@@ -82,7 +82,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
       description: 'Completa 100 oraciones',
       type: AchievementType.prayers,
       target: 100,
-      icon: Icons.favorite,
+      icon: VerbumIcons.heart,
     ),
     Achievement(
       id: 'posts_10',
@@ -90,7 +90,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
       description: 'Crea 10 publicaciones',
       type: AchievementType.posts,
       target: 10,
-      icon: Icons.chat_bubble,
+      icon: VerbumIcons.chatCircle,
     ),
     Achievement(
       id: 'posts_50',
@@ -98,7 +98,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
       description: 'Crea 50 publicaciones',
       type: AchievementType.posts,
       target: 50,
-      icon: Icons.chat_bubble,
+      icon: VerbumIcons.chatCircle,
     ),
   ];
 
@@ -236,42 +236,42 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
           title: 'Días activos',
           subtitle: 'Últimos 30 días',
           value: '${_stats.activeDaysLast30}',
-          icon: Icons.calendar_today,
+          icon: VerbumIcons.calendarBlank,
           color: Colors.blue,
         ),
         _StatsCard(
           title: 'Oraciones',
           subtitle: 'Completadas',
           value: '${_stats.prayersCompleted}',
-          icon: Icons.favorite,
+          icon: VerbumIcons.heart,
           color: Colors.red,
         ),
         _StatsCard(
           title: 'Versículos',
           subtitle: 'Leídos',
           value: '${_stats.versesRead}',
-          icon: Icons.book,
+          icon: VerbumIcons.book,
           color: Colors.purple,
         ),
         _StatsCard(
           title: 'Publicaciones',
           subtitle: 'Creadas',
           value: '${_stats.postsCreated}',
-          icon: Icons.chat_bubble,
+          icon: VerbumIcons.chatCircle,
           color: Colors.orange,
         ),
         _StatsCard(
           title: 'Racha actual',
           subtitle: 'Días consecutivos',
           value: '${_stats.currentStreak}',
-          icon: Icons.local_fire_department,
+          icon: VerbumIcons.flame,
           color: Colors.deepOrange,
         ),
         _StatsCard(
           title: 'Mejor racha',
           subtitle: 'Récord personal',
           value: '${_stats.bestStreak}',
-          icon: Icons.emoji_events,
+          icon: VerbumIcons.trophy,
           color: Colors.amber,
         ),
       ],
@@ -310,7 +310,7 @@ class _StatsCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final String value;
-  final IconData icon;
+  final VerbumIcons icon;
   final Color color;
 
   const _StatsCard({
@@ -350,7 +350,7 @@ class _StatsCard extends StatelessWidget {
               color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: color, size: 20),
+            child: VIcon(icon, color: color, size: 20),
           ),
           Flexible(
             child: Column(
@@ -440,7 +440,7 @@ class _AchievementCard extends StatelessWidget {
         children: [
           Hero(
             tag: 'achievement_icon_${achievement.id}',
-            child: Icon(
+            child: VIcon(
               achievement.icon,
               size: 28,
               color: isUnlocked ? Colors.amber[700] : Colors.grey[400],
@@ -477,7 +477,7 @@ class _AchievementCard extends StatelessWidget {
             ),
           ] else ...[
             const SizedBox(height: 2),
-            Icon(Icons.check_circle, size: 14, color: Colors.amber[700]),
+            VIcon(VerbumIcons.checkCircle, weight: VIconWeight.fill, size: 14, color: Colors.amber[700]),
           ],
         ],
       ),

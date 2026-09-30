@@ -38,6 +38,7 @@ import 'package:verbum/services/daily_progress_service.dart';
 import 'package:verbum/services/language_service.dart';
 import 'package:verbum/services/share_service.dart';
 import 'package:verbum/services/spiritual_stats_service.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -242,7 +243,11 @@ void main() {
       ),
     );
     final prayer = tester.widget<PrayerCard>(find.byType(PrayerCard));
-    await tester.tap(find.byIcon(Icons.share_outlined));
+    await tester.tap(
+      find.byWidgetPredicate(
+        (w) => w is VIcon && w.icon == VerbumIcons.shareNetwork,
+      ),
+    );
     await _pumpRoute(tester);
 
     expect(find.byType(ShareComposerScreen), findsOneWidget);
@@ -466,7 +471,7 @@ void main() {
       id: 'verse',
       title: 'Recibe la Palabra',
       description: 'Lee la Palabra de hoy.',
-      icon: Icons.menu_book_rounded,
+      icon: VerbumIcons.bookOpenText,
     );
 
     await tester.pumpWidget(
@@ -505,7 +510,7 @@ void main() {
         title: 'Un gesto de bondad',
         description: 'Lleva la fe a lo cotidiano.',
         content: 'Ayuda hoy a una persona sin esperar nada a cambio.',
-        icon: Icons.volunteer_activism_outlined,
+        icon: VerbumIcons.handHeart,
       );
 
       await tester.pumpWidget(
@@ -544,7 +549,7 @@ void main() {
       id: 'verse',
       title: 'Recibe la Palabra',
       description: 'Lee la Palabra de hoy.',
-      icon: Icons.menu_book_rounded,
+      icon: VerbumIcons.bookOpenText,
     );
     await tester.pumpWidget(
       MaterialApp(
@@ -629,7 +634,7 @@ void main() {
         description: 'Dos días de prueba.',
         category: 'Esperanza',
         minutesPerDay: 5,
-        icon: Icons.spa_outlined,
+        icon: VerbumIcons.flowerLotus,
         accent: Color(0xFF6B7398),
         days: [day, secondDay],
       );

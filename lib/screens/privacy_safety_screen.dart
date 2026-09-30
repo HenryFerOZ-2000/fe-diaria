@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/privacy_security_service.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class PrivacySafetyScreen extends StatefulWidget {
   const PrivacySafetyScreen({super.key});
@@ -63,7 +63,7 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
                 _buildSectionHeader('Seguridad'),
                 const SizedBox(height: 8),
                 _buildListTile(
-                  icon: Icons.lock_outline,
+                  icon: VerbumIcons.lockSimple,
                   title: 'Cambiar contraseña',
                   subtitle: _service.isEmailPasswordUser()
                       ? 'Enviar email de restablecimiento'
@@ -73,14 +73,14 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
                       : null,
                 ),
                 _buildListTile(
-                  icon: Icons.devices,
+                  icon: VerbumIcons.devices,
                   title: 'Sesiones y dispositivos',
                   subtitle: 'Ver y gestionar sesiones activas',
                   onTap: () =>
                       Navigator.of(context).pushNamed('/sessions-devices'),
                 ),
                 _buildListTile(
-                  icon: Icons.security,
+                  icon: VerbumIcons.shieldCheck,
                   title: 'Autenticación en dos pasos',
                   subtitle: 'Añade una capa extra de seguridad',
                   onTap: () => _showPlaceholder(
@@ -92,14 +92,14 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
                 _buildSectionHeader('Bloqueos y reportes'),
                 const SizedBox(height: 8),
                 _buildListTile(
-                  icon: Icons.block_outlined,
+                  icon: VerbumIcons.prohibit,
                   title: 'Usuarios bloqueados',
                   subtitle: 'Gestiona usuarios que has bloqueado',
                   onTap: () =>
                       Navigator.of(context).pushNamed('/blocked-users'),
                 ),
                 _buildListTile(
-                  icon: Icons.flag_outlined,
+                  icon: VerbumIcons.flag,
                   title: 'Reportar contenido',
                   subtitle: 'Reporta contenido inapropiado',
                   onTap: () =>
@@ -110,20 +110,20 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
                 _buildSectionHeader('Información legal y control'),
                 const SizedBox(height: 8),
                 _buildListTile(
-                  icon: Icons.privacy_tip_outlined,
+                  icon: VerbumIcons.shieldCheck,
                   title: 'Política de privacidad',
                   subtitle: 'Lee nuestra política de privacidad',
                   onTap: () =>
                       Navigator.of(context).pushNamed('/privacy-policy'),
                 ),
                 _buildListTile(
-                  icon: Icons.description_outlined,
+                  icon: VerbumIcons.fileText,
                   title: 'Términos de uso',
                   subtitle: 'Lee nuestros términos de uso',
                   onTap: () => Navigator.of(context).pushNamed('/terms'),
                 ),
                 _buildListTile(
-                  icon: Icons.delete_outline,
+                  icon: VerbumIcons.trash,
                   title: 'Eliminar cuenta',
                   subtitle: 'Elimina permanentemente tu cuenta',
                   titleColor: Colors.red,
@@ -149,7 +149,7 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
   }
 
   Widget _buildListTile({
-    required IconData icon,
+    required VerbumIcons icon,
     required String title,
     required String subtitle,
     Color? titleColor,
@@ -163,7 +163,7 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
         border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
       ),
       child: ListTile(
-        leading: Icon(icon, color: titleColor),
+        leading: VIcon(icon, color: titleColor),
         title: Text(
           title,
           style: VerbumFonts.sans(
@@ -175,7 +175,7 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
           subtitle,
           style: VerbumFonts.sans(fontSize: 12, color: Colors.grey[600]),
         ),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: const VIcon(VerbumIcons.caretRight),
         onTap: onTap,
       ),
     );

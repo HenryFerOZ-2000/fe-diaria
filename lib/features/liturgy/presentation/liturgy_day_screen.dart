@@ -4,6 +4,7 @@ import '../domain/calendar_selection.dart';
 import '../domain/liturgical_day.dart';
 import 'liturgical_palette.dart';
 import 'liturgy_source_sheet.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class LiturgyDayScreen extends StatelessWidget {
   const LiturgyDayScreen({
@@ -32,7 +33,7 @@ class LiturgyDayScreen extends StatelessWidget {
             tooltip: 'Fuente y alcance',
             onPressed: () =>
                 showLiturgySourceSheet(context, day: day, selection: selection),
-            icon: const Icon(Icons.info_outline_rounded),
+            icon: const VIcon(VerbumIcons.info),
           ),
         ],
       ),
@@ -100,7 +101,7 @@ class LiturgyDayScreen extends StatelessWidget {
                 ...day.optional.map(
                   (celebration) => ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Icon(Icons.auto_awesome, color: accent, size: 20),
+                    leading: VIcon(VerbumIcons.sparkle, color: accent, size: 20),
                     title: Text(celebration.name),
                     subtitle: Text(_rankLabel(celebration.rank)),
                   ),
@@ -117,7 +118,7 @@ class LiturgyDayScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.wb_sunny_outlined, color: accent),
+                    VIcon(VerbumIcons.sun, color: accent),
                     const SizedBox(height: 10),
                     Text(
                       'Oración devocional sugerida para hoy',
@@ -143,7 +144,7 @@ class LiturgyDayScreen extends StatelessWidget {
                   day: day,
                   selection: selection,
                 ),
-                icon: const Icon(Icons.info_outline_rounded),
+                icon: const VIcon(VerbumIcons.info),
                 label: const Text('Fuente y alcance del calendario'),
               ),
             ],

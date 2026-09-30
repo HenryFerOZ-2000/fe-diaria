@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
+import '../design_system/design_system.dart';
+
+/// Burbuja de conversación: el acompañante en papel con filete, la persona
+/// en el tono de apoyo, alineada a la derecha.
 class ChatBubble extends StatelessWidget {
   final String text;
   final bool isUser;
@@ -9,49 +12,36 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final bubbleColor = isUser
-        ? colorScheme.primary.withValues(alpha: 0.15)
-        : colorScheme.surface.withValues(alpha: 0.95);
-    final align = isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
-
-    return Column(
-      crossAxisAlignment: align,
-      children: [
-        Container(
-          margin: EdgeInsets.only(
-            left: isUser ? 40 : 0,
-            right: isUser ? 0 : 40,
-            bottom: 10,
+    final p = context.palette;
+    const r = Radius.circular(18);
+    return Align(
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: EdgeInsets.only(
+          left: isUser ? 48 : 0,
+          right: isUser ? 0 : 48,
+          bottom: 10,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        decoration: BoxDecoration(
+          color: isUser ? p.surfaceMuted : p.surface,
+          borderRadius: BorderRadius.only(
+            topLeft: r,
+            topRight: r,
+            bottomLeft: isUser ? r : const Radius.circular(4),
+            bottomRight: isUser ? const Radius.circular(4) : r,
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            color: bubbleColor,
-            borderRadius: BorderRadius.circular(16).copyWith(
-              bottomRight: Radius.circular(isUser ? 0 : 16),
-              bottomLeft: Radius.circular(isUser ? 16 : 0),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.primary.withValues(alpha: 0.08),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
-            border: Border.all(
-              color: colorScheme.primary.withValues(alpha: 0.08),
-            ),
-          ),
-          child: Text(
-            text,
-            style: VerbumFonts.sans(
-              fontSize: 14,
-              height: 1.5,
-              color: colorScheme.onSurface,
-            ),
+          border: isUser ? null : Border.all(color: p.line),
+        ),
+        child: SelectableText(
+          text,
+          style: context.type.body.copyWith(
+            color: p.ink,
+            fontSize: 14.5,
+            height: 1.5,
           ),
         ),
-      ],
+      ),
     );
   }
 }

@@ -8,7 +8,7 @@ import '../widgets/app_scaffold.dart';
 import '../widgets/traditional_prayer_library.dart';
 import '../widgets/verbum_header_actions.dart';
 import 'traditional_prayer_detail_screen.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Biblioteca de oraciones pertenecientes a una categoría concreta.
 class TraditionalPrayersListScreen extends StatefulWidget {
@@ -225,7 +225,7 @@ _CategoryPresentation _presentationFor(String category) {
         kicker: 'ORA CON LA PALABRA',
         description:
             'Pasajes y oraciones para leer despacio, guardar en el corazón y llevar al día.',
-        icon: Icons.menu_book_rounded,
+        icon: VerbumIcons.bookOpenText,
         accent: Color(0xFF77649A),
       );
     case 'promesas':
@@ -233,7 +233,7 @@ _CategoryPresentation _presentationFor(String category) {
         kicker: 'PROMESAS PARA EL CAMINO',
         description:
             'Palabras de esperanza para recordar la fidelidad de Dios en cada momento.',
-        icon: Icons.auto_awesome_rounded,
+        icon: VerbumIcons.sparkle,
         accent: Color(0xFFB58A45),
       );
     case 'otras':
@@ -241,7 +241,7 @@ _CategoryPresentation _presentationFor(String category) {
         kicker: 'ORACIONES PARA CADA MOMENTO',
         description:
             'Una colección sencilla para entregar a Dios lo que hoy llevas dentro.',
-        icon: Icons.favorite_outline_rounded,
+        icon: VerbumIcons.heart,
         accent: Color(0xFF5F8178),
       );
     case 'basicas':
@@ -249,7 +249,7 @@ _CategoryPresentation _presentationFor(String category) {
         kicker: 'PALABRAS QUE NOS UNEN',
         description:
             'Oraciones esenciales de la tradición para volver a ellas cuando lo necesites.',
-        icon: Icons.volunteer_activism_rounded,
+        icon: VerbumIcons.handHeart,
         accent: Color(0xFF77649A),
       );
     case 'arcangeles':
@@ -257,7 +257,7 @@ _CategoryPresentation _presentationFor(String category) {
         kicker: 'ORACIONES DE PROTECCIÓN',
         description:
             'Plegarias tradicionales para pedir compañía, cuidado y fortaleza.',
-        icon: Icons.shield_outlined,
+        icon: VerbumIcons.shield,
         accent: Color(0xFF536C91),
       );
     default:
@@ -265,7 +265,7 @@ _CategoryPresentation _presentationFor(String category) {
         kicker: 'TU MOMENTO DE ORACIÓN',
         description:
             'Elige una oración, respira con calma y abre este momento a Dios.',
-        icon: Icons.auto_stories_rounded,
+        icon: VerbumIcons.bookOpen,
         accent: Color(0xFF77649A),
       );
   }
@@ -277,7 +277,7 @@ _PrayerItemPresentation _itemPresentation(String title, String category) {
     return const _PrayerItemPresentation(
       eyebrow: 'Salmo bíblico',
       subtitle: 'Lee y medita este pasaje de la Escritura',
-      icon: Icons.menu_book_rounded,
+      icon: VerbumIcons.bookOpenText,
       accent: Color(0xFF536C91),
     );
   }
@@ -285,7 +285,7 @@ _PrayerItemPresentation _itemPresentation(String title, String category) {
     return const _PrayerItemPresentation(
       eyebrow: 'Oración bíblica',
       subtitle: 'La oración que Jesús enseñó a sus discípulos',
-      icon: Icons.self_improvement_rounded,
+      icon: VerbumIcons.personSimpleTaiChi,
       accent: Color(0xFF77649A),
     );
   }
@@ -293,7 +293,7 @@ _PrayerItemPresentation _itemPresentation(String title, String category) {
     return const _PrayerItemPresentation(
       eyebrow: 'Para agradecer',
       subtitle: 'Reconoce con calma el bien recibido',
-      icon: Icons.wb_sunny_outlined,
+      icon: VerbumIcons.sun,
       accent: Color(0xFFB58A45),
     );
   }
@@ -301,7 +301,7 @@ _PrayerItemPresentation _itemPresentation(String title, String category) {
     return const _PrayerItemPresentation(
       eyebrow: 'Para descansar',
       subtitle: 'Entrega el día y descansa en su cuidado',
-      icon: Icons.nightlight_round,
+      icon: VerbumIcons.moon,
       accent: Color(0xFF6B7398),
     );
   }
@@ -309,7 +309,7 @@ _PrayerItemPresentation _itemPresentation(String title, String category) {
     return const _PrayerItemPresentation(
       eyebrow: 'Para confiar',
       subtitle: 'Encuentra ánimo y refugio para el camino',
-      icon: Icons.shield_outlined,
+      icon: VerbumIcons.shield,
       accent: Color(0xFF536C91),
     );
   }
@@ -317,14 +317,14 @@ _PrayerItemPresentation _itemPresentation(String title, String category) {
     return const _PrayerItemPresentation(
       eyebrow: 'Promesa bíblica',
       subtitle: 'Una palabra de esperanza para conservar',
-      icon: Icons.auto_awesome_rounded,
+      icon: VerbumIcons.sparkle,
       accent: Color(0xFFB58A45),
     );
   }
   return const _PrayerItemPresentation(
     eyebrow: 'Oración cristiana',
     subtitle: 'Haz una pausa y presenta este momento a Dios',
-    icon: Icons.favorite_outline_rounded,
+    icon: VerbumIcons.heart,
     accent: Color(0xFF5F8178),
   );
 }
@@ -339,7 +339,7 @@ class _CategoryPresentation {
 
   final String kicker;
   final String description;
-  final IconData icon;
+  final VerbumIcons icon;
   final Color accent;
 }
 
@@ -353,6 +353,6 @@ class _PrayerItemPresentation {
 
   final String eyebrow;
   final String subtitle;
-  final IconData icon;
+  final VerbumIcons icon;
   final Color accent;
 }

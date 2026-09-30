@@ -22,7 +22,7 @@ import '../widgets/verbum_header_actions.dart';
 import '../data/spiritual_paths_catalog.dart';
 import '../models/spiritual_path.dart';
 import 'spiritual_path_detail_screen.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class CommunityScreen extends StatelessWidget {
   const CommunityScreen({super.key});
@@ -31,48 +31,25 @@ class CommunityScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         extendBodyBehindAppBar: false,
         appBar: AppBar(
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isDark
-                    ? [
-                        colorScheme.surface,
-                        colorScheme.primary.withValues(alpha: 0.12),
-                      ]
-                    : [
-                        colorScheme.primary.withValues(alpha: 0.06),
-                        colorScheme.tertiary.withValues(alpha: 0.05),
-                      ],
-              ),
-            ),
-          ),
+          backgroundColor: context.palette.background,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Comunidad',
-                style: VerbumFonts.serif(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onSurface,
-                ),
+                style: context.type.display.copyWith(fontSize: 30),
               ),
               Text(
                 'FE QUE SE COMPARTE',
-                style: VerbumFonts.sans(
-                  fontSize: 8,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.6,
-                  color: colorScheme.secondary,
+                style: context.type.rubric.copyWith(
+                  color: context.palette.gold,
+                  fontSize: 8.5,
                 ),
               ),
             ],
@@ -86,28 +63,19 @@ class CommunityScreen extends StatelessWidget {
               child: Container(
                 height: 44,
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withValues(
-                    alpha: 0.5,
-                  ),
+                  color: context.palette.surfaceMuted,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 padding: const EdgeInsets.all(4),
                 child: TabBar(
                   indicator: BoxDecoration(
-                    color: colorScheme.primary,
+                    color: context.palette.emphasis,
                     borderRadius: BorderRadius.circular(11),
-                    boxShadow: [
-                      BoxShadow(
-                        color: colorScheme.primary.withValues(alpha: 0.35),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
                   ),
                   indicatorSize: TabBarIndicatorSize.tab,
                   dividerColor: Colors.transparent,
                   splashBorderRadius: BorderRadius.circular(11),
-                  labelColor: Colors.white,
+                  labelColor: context.palette.onEmphasis,
                   unselectedLabelColor: colorScheme.onSurfaceVariant,
                   labelStyle: VerbumFonts.sans(
                     fontSize: 14,
@@ -122,7 +90,11 @@ class CommunityScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.circle, size: 7),
+                          VIcon(
+                            VerbumIcons.circle,
+                            weight: VIconWeight.fill,
+                            size: 7,
+                          ),
                           SizedBox(width: 7),
                           Text('En vivo'),
                         ],
@@ -132,7 +104,7 @@ class CommunityScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.groups_2_outlined, size: 17),
+                          VIcon(VerbumIcons.usersThree, size: 17),
                           SizedBox(width: 7),
                           Text('Mi comunidad'),
                         ],
@@ -175,7 +147,7 @@ class _MyCommunityTabState extends State<_MyCommunityTab> {
         title: 'Inicia sesion para ver tu comunidad',
         subtitle: 'Cuando inicies sesion, podras unirte con un codigo.',
         buttonLabel: 'Iniciar sesion',
-        buttonIcon: Icons.login,
+        buttonIcon: VerbumIcons.signIn,
         onJoin: () => Navigator.of(context).pushNamed('/welcome'),
       );
     }
@@ -239,7 +211,7 @@ class _MyCommunityTabState extends State<_MyCommunityTab> {
                 subtitle:
                     'No pudimos encontrar la comunidad asociada a tu perfil.',
                 buttonLabel: 'Entendido',
-                buttonIcon: Icons.info_outline,
+                buttonIcon: VerbumIcons.info,
               );
             }
 
@@ -531,7 +503,7 @@ class _MyCommunityEmptyView extends StatelessWidget {
   final String title;
   final String subtitle;
   final String buttonLabel;
-  final IconData buttonIcon;
+  final VerbumIcons buttonIcon;
   final VoidCallback? onJoin;
   final VoidCallback? onCreate;
 
@@ -540,7 +512,7 @@ class _MyCommunityEmptyView extends StatelessWidget {
     this.subtitle =
         'Unete con un codigo o crea una comunidad nueva para tu parroquia o grupo.',
     this.buttonLabel = 'Unirme a una comunidad',
-    this.buttonIcon = Icons.vpn_key_outlined,
+    this.buttonIcon = VerbumIcons.key,
     this.onJoin,
     this.onCreate,
   });
@@ -557,8 +529,9 @@ class _MyCommunityEmptyView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.groups_rounded,
+            VIcon(
+              VerbumIcons.usersThree,
+              weight: VIconWeight.fill,
               size: 64,
               color: colorScheme.primary.withValues(alpha: 0.8),
             ),
@@ -588,7 +561,7 @@ class _MyCommunityEmptyView extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: onJoin,
-                  icon: Icon(buttonIcon),
+                  icon: VIcon(buttonIcon),
                   label: Text(buttonLabel),
                 ),
               ),
@@ -597,14 +570,14 @@ class _MyCommunityEmptyView extends StatelessWidget {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: onCreate,
-                  icon: const Icon(Icons.add_circle_outline),
+                  icon: const VIcon(VerbumIcons.plusCircle),
                   label: const Text('Crear comunidad'),
                 ),
               ),
             ] else
               ElevatedButton.icon(
                 onPressed: onJoin,
-                icon: Icon(buttonIcon),
+                icon: VIcon(buttonIcon),
                 label: Text(buttonLabel),
               ),
           ],
@@ -723,7 +696,7 @@ class _CommunityBasicView extends StatelessWidget {
                         errorBuilder: (_, __, ___) => Container(
                           color: colorScheme.surfaceContainerHighest,
                           alignment: Alignment.center,
-                          child: const Icon(Icons.broken_image_outlined),
+                          child: const VIcon(VerbumIcons.imageBroken),
                         ),
                       ),
                     ),
@@ -754,8 +727,9 @@ class _CommunityBasicView extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              Icons.verified_rounded,
+                            VIcon(
+                              VerbumIcons.sealCheck,
+                              weight: VIconWeight.fill,
                               size: 14,
                               color: colorScheme.primary,
                             ),
@@ -797,8 +771,8 @@ class _CommunityBasicView extends StatelessWidget {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      Icon(
-                        Icons.location_on_outlined,
+                      VIcon(
+                        VerbumIcons.mapPin,
                         size: 16,
                         color: colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
@@ -836,7 +810,7 @@ class _CommunityBasicView extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.person_outline, size: 18),
+                        const VIcon(VerbumIcons.user, size: 18),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -867,8 +841,8 @@ class _CommunityBasicView extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.vpn_key_outlined,
+                        VIcon(
+                          VerbumIcons.key,
                           size: 20,
                           color: colorScheme.primary,
                         ),
@@ -912,7 +886,7 @@ class _CommunityBasicView extends StatelessWidget {
                               ),
                             );
                           },
-                          icon: const Icon(Icons.copy_outlined),
+                          icon: const VIcon(VerbumIcons.copy),
                         ),
                         IconButton(
                           tooltip: 'Compartir invitación',
@@ -922,7 +896,7 @@ class _CommunityBasicView extends StatelessWidget {
                                   'Te invito a unirte a ${name?.isNotEmpty == true ? name : 'mi comunidad'} en Verbum. Usa el código $inviteCode.',
                             ),
                           ),
-                          icon: const Icon(Icons.ios_share_rounded),
+                          icon: const VIcon(VerbumIcons.shareNetwork),
                         ),
                       ],
                     ),
@@ -955,8 +929,8 @@ class _CommunityBasicView extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.info_outline,
+                  VIcon(
+                    VerbumIcons.info,
                     size: 18,
                     color: colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
@@ -994,7 +968,7 @@ class _CommunityBasicView extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            Icon(Icons.auto_awesome, size: 17, color: colorScheme.secondary),
+            VIcon(VerbumIcons.sparkle, size: 17, color: colorScheme.secondary),
           ],
         ),
         const SizedBox(height: 8),
@@ -1036,8 +1010,8 @@ class _CommunityBasicView extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.forum_outlined,
+                      VIcon(
+                        VerbumIcons.chatsCircle,
                         color: colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                       const SizedBox(width: 10),
@@ -1129,11 +1103,11 @@ class _CommunityPathCard extends StatelessWidget {
                   contentPadding: EdgeInsets.zero,
                   leading: CircleAvatar(
                     backgroundColor: path.accent.withValues(alpha: .12),
-                    child: Icon(path.icon, color: path.accent),
+                    child: VIcon(path.icon, color: path.accent),
                   ),
                   title: Text(path.title),
                   subtitle: Text(path.subtitle),
-                  trailing: const Icon(Icons.chevron_right_rounded),
+                  trailing: const VIcon(VerbumIcons.caretRight),
                   onTap: () => Navigator.pop(sheetContext, path),
                 ),
               ),
@@ -1146,7 +1120,7 @@ class _CommunityPathCard extends StatelessWidget {
                       editorUid: currentUid,
                     );
                   },
-                  icon: const Icon(Icons.stop_circle_outlined),
+                  icon: const VIcon(VerbumIcons.stopCircle),
                   label: const Text('Finalizar el camino actual'),
                 ),
             ],
@@ -1200,8 +1174,8 @@ class _CommunityPathCard extends StatelessWidget {
                   color: accent.withValues(alpha: .12),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(
-                  path?.icon ?? Icons.group_work_outlined,
+                child: VIcon(
+                  path?.icon ?? VerbumIcons.usersFour,
                   color: accent,
                 ),
               ),
@@ -1242,10 +1216,10 @@ class _CommunityPathCard extends StatelessWidget {
                 IconButton(
                   tooltip: 'Cambiar camino',
                   onPressed: () => _choose(context),
-                  icon: const Icon(Icons.tune_rounded),
+                  icon: const VIcon(VerbumIcons.slidersHorizontal),
                 )
               else
-                const Icon(Icons.chevron_right_rounded),
+                const VIcon(VerbumIcons.caretRight),
             ],
           ),
         ),
@@ -1279,7 +1253,7 @@ class _CommunityWelcomeHero extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF261E45).withValues(alpha: .24),
+            color: Colors.black.withValues(alpha: .12),
             blurRadius: 30,
             offset: const Offset(0, 14),
           ),
@@ -1296,15 +1270,18 @@ class _CommunityWelcomeHero extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => const SizedBox.shrink(),
               ),
-            const DecoratedBox(
+            DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFF261E45),
-                    Color(0xDD493878),
-                    Color(0xB37B5928),
+                    context.palette.inverse,
+                    context.palette.inverse.withValues(alpha: .86),
+                    Color.alphaBlend(
+                      context.palette.gold.withValues(alpha: .35),
+                      context.palette.inverse,
+                    ).withValues(alpha: .78),
                   ],
                 ),
               ),
@@ -1312,8 +1289,9 @@ class _CommunityWelcomeHero extends StatelessWidget {
             Positioned(
               right: -24,
               top: -22,
-              child: Icon(
-                Icons.groups_rounded,
+              child: VIcon(
+                VerbumIcons.usersThree,
+                weight: VIconWeight.fill,
                 size: 190,
                 color: Colors.white.withValues(alpha: .06),
               ),
@@ -1348,9 +1326,10 @@ class _CommunityWelcomeHero extends StatelessWidget {
                       ),
                       if (isVerified) ...[
                         const SizedBox(width: 8),
-                        const Icon(
-                          Icons.verified_rounded,
-                          color: Color(0xFFD8B875),
+                        VIcon(
+                          VerbumIcons.sealCheck,
+                          weight: VIconWeight.fill,
+                          color: context.palette.gold,
                           size: 20,
                         ),
                       ],
@@ -1372,8 +1351,8 @@ class _CommunityWelcomeHero extends StatelessWidget {
                     const SizedBox(height: 7),
                     Row(
                       children: [
-                        const Icon(
-                          Icons.location_on_outlined,
+                        const VIcon(
+                          VerbumIcons.mapPin,
                           color: Colors.white70,
                           size: 16,
                         ),
@@ -1392,7 +1371,7 @@ class _CommunityWelcomeHero extends StatelessWidget {
                   Row(
                     children: [
                       _HeroAction(
-                        icon: Icons.tune_rounded,
+                        icon: VerbumIcons.slidersHorizontal,
                         label: 'Preferencias',
                         onTap: () =>
                             Navigator.of(context).pushNamed('/settings'),
@@ -1400,7 +1379,7 @@ class _CommunityWelcomeHero extends StatelessWidget {
                       if (isAdmin && inviteCode.isNotEmpty) ...[
                         const SizedBox(width: 9),
                         _HeroAction(
-                          icon: Icons.ios_share_rounded,
+                          icon: VerbumIcons.shareNetwork,
                           label: 'Invitar',
                           onTap: () => SharePlus.instance.share(
                             ShareParams(
@@ -1423,7 +1402,7 @@ class _CommunityWelcomeHero extends StatelessWidget {
 }
 
 class _HeroAction extends StatelessWidget {
-  final IconData icon;
+  final VerbumIcons icon;
   final String label;
   final VoidCallback? onTap;
   const _HeroAction({required this.icon, required this.label, this.onTap});
@@ -1442,7 +1421,7 @@ class _HeroAction extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: Colors.white, size: 16),
+                VIcon(icon, color: Colors.white, size: 16),
                 const SizedBox(width: 6),
                 Text(
                   label,
@@ -1480,7 +1459,7 @@ class _EditCommunityButton extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: OutlinedButton.icon(
         onPressed: () => _openEditDialog(context),
-        icon: const Icon(Icons.edit_outlined, size: 18),
+        icon: const VIcon(VerbumIcons.pencilSimple, size: 18),
         label: const Text('Editar comunidad'),
       ),
     );
@@ -1623,7 +1602,7 @@ class _ManageAdminsButton extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: TextButton.icon(
         onPressed: () => openDialog(context),
-        icon: const Icon(Icons.manage_accounts_outlined, size: 18),
+        icon: const VIcon(VerbumIcons.userGear, size: 18),
         label: const Text('Gestion manual por UID (fallback)'),
       ),
     );
@@ -1676,14 +1655,12 @@ class _ManageAdminsButton extends StatelessWidget {
                 width: 54,
                 height: 54,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF493878), Color(0xFF261E45)],
-                  ),
+                  color: context.palette.emphasis,
                   borderRadius: BorderRadius.circular(18),
                 ),
-                child: const Icon(
-                  Icons.admin_panel_settings_outlined,
-                  color: Colors.white,
+                child: VIcon(
+                  VerbumIcons.userGear,
+                  color: context.palette.onEmphasis,
                 ),
               ),
               title: Text(
@@ -1743,8 +1720,8 @@ class _ManageAdminsButton extends StatelessWidget {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(
-                                  Icons.info_outline_rounded,
+                                VIcon(
+                                  VerbumIcons.info,
                                   size: 19,
                                   color: scheme.secondary,
                                 ),
@@ -1769,7 +1746,7 @@ class _ManageAdminsButton extends StatelessWidget {
                             decoration: InputDecoration(
                               labelText: 'UID de la persona',
                               hintText: 'Pega aquí su identificador',
-                              prefixIcon: const Icon(Icons.key_outlined),
+                              prefixIcon: const VIcon(VerbumIcons.key),
                               filled: true,
                               fillColor: scheme.surfaceContainerHighest
                                   .withValues(alpha: .5),
@@ -1793,10 +1770,7 @@ class _ManageAdminsButton extends StatelessWidget {
                                       );
                                       addController.clear();
                                     }),
-                              icon: const Icon(
-                                Icons.person_add_alt_1_outlined,
-                                size: 18,
-                              ),
+                              icon: const VIcon(VerbumIcons.userPlus, size: 18),
                               label: const Text('Añadir como administrador'),
                               style: FilledButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
@@ -1851,10 +1825,10 @@ class _ManageAdminsButton extends StatelessWidget {
                                             .withValues(alpha: .11),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: Icon(
+                                  child: VIcon(
                                     isOwner
-                                        ? Icons.workspace_premium_outlined
-                                        : Icons.shield_outlined,
+                                        ? VerbumIcons.medal
+                                        : VerbumIcons.shield,
                                     size: 20,
                                     color: isOwner
                                         ? scheme.secondary
@@ -1925,8 +1899,8 @@ class _ManageAdminsButton extends StatelessWidget {
                                     : PopupMenuButton<String>(
                                         enabled: !isSubmitting,
                                         tooltip: 'Gestionar administrador',
-                                        icon: const Icon(
-                                          Icons.more_horiz_rounded,
+                                        icon: const VIcon(
+                                          VerbumIcons.dotsThree,
                                         ),
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(
@@ -1961,11 +1935,10 @@ class _ManageAdminsButton extends StatelessWidget {
                                                   ),
                                                   title: Text(
                                                     'Transferir liderazgo',
-                                                    style:
-                                                        VerbumFonts.serif(
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                        ),
+                                                    style: VerbumFonts.serif(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
                                                   ),
                                                   content: const Text(
                                                     'Esta persona pasará a gestionar la comunidad y sus administradores.',
@@ -2080,8 +2053,8 @@ class _CommunityMembersButton extends StatelessWidget {
                   color: scheme.primary.withValues(alpha: .11),
                   borderRadius: BorderRadius.circular(13),
                 ),
-                child: Icon(
-                  Icons.groups_2_outlined,
+                child: VIcon(
+                  VerbumIcons.usersThree,
                   color: scheme.primary,
                   size: 20,
                 ),
@@ -2113,7 +2086,7 @@ class _CommunityMembersButton extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 6),
-              Icon(Icons.chevron_right_rounded, color: scheme.primary),
+              VIcon(VerbumIcons.caretRight, color: scheme.primary),
             ],
           ),
         ),
@@ -2331,8 +2304,8 @@ class _CommunityMembersButton extends StatelessWidget {
                             color: scheme.secondary.withValues(alpha: .12),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
-                            Icons.change_circle_outlined,
+                          child: VIcon(
+                            VerbumIcons.arrowsClockwise,
                             color: scheme.secondary,
                             size: 28,
                           ),
@@ -2414,8 +2387,8 @@ class _CommunityComposerCard extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: CircleAvatar(
           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          child: Icon(
-            Icons.edit_note_rounded,
+          child: VIcon(
+            VerbumIcons.notePencil,
             color: Theme.of(context).colorScheme.primary,
           ),
         ),
@@ -2424,7 +2397,7 @@ class _CommunityComposerCard extends StatelessWidget {
           style: VerbumFonts.sans(fontWeight: FontWeight.w700),
         ),
         subtitle: const Text('Una reflexión, intención o mensaje'),
-        trailing: const Icon(Icons.arrow_outward_rounded),
+        trailing: const VIcon(VerbumIcons.arrowUpRight),
         onTap: () => _openCreatePostDialog(context),
       ),
     );
@@ -2552,7 +2525,7 @@ class _LeaveCommunityButton extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: TextButton.icon(
         onPressed: () => _confirmLeave(context),
-        icon: const Icon(Icons.logout_rounded, size: 18),
+        icon: const VIcon(VerbumIcons.signOut, size: 18),
         label: const Text('Salir de la comunidad'),
       ),
     );
@@ -2635,7 +2608,6 @@ class _CommunityPostTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
     final authorName = ((post['authorName'] as String?) ?? 'Miembro').trim();
     final authorPhotoUrl = (post['authorPhotoUrl'] as String?)?.trim();
     final text = ((post['text'] as String?) ?? '').trim();
@@ -2650,7 +2622,7 @@ class _CommunityPostTile extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
-      color: isDark ? const Color(0xFF292431) : const Color(0xFFFFFCF7),
+      color: context.palette.surface,
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(23),

@@ -13,7 +13,7 @@ import '../domain/share_content.dart';
 import '../domain/share_page.dart';
 import '../domain/share_visual_style.dart';
 import 'verbum_share_card.dart';
-import 'package:verbum/design_system/icons/verbum_icons.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class ShareComposerScreen extends StatefulWidget {
   const ShareComposerScreen({
@@ -388,7 +388,7 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
       IconButton(
         tooltip: 'Página anterior',
         onPressed: _busy || _page == 0 ? null : () => setState(() => _page--),
-        icon: const Icon(Icons.chevron_left),
+        icon: const VIcon(VerbumIcons.caretLeft),
       ),
       Flexible(
         child: Text(
@@ -401,7 +401,7 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
         onPressed: _busy || _page == _pages.length - 1
             ? null
             : () => setState(() => _page++),
-        icon: const Icon(Icons.chevron_right),
+        icon: const VIcon(VerbumIcons.caretRight),
       ),
     ],
   );
@@ -469,10 +469,10 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
                             },
                           ),
                         ),
-                        child: Icon(
+                        child: VIcon(
                           _style == style
-                              ? Icons.check_rounded
-                              : Icons.auto_awesome_outlined,
+                              ? VerbumIcons.check
+                              : VerbumIcons.sparkle,
                           size: 20,
                           color: style == ShareVisualStyle.sereneLight
                               ? const Color(0xFF392544)
@@ -552,7 +552,7 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
             IconButton(
               tooltip: 'Guardar',
               onPressed: _busy ? null : () => _export(_ExportAction.save),
-              icon: const Icon(Icons.download_outlined),
+              icon: const VIcon(VerbumIcons.downloadSimple),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -563,7 +563,7 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
                   onPressed: _busy
                       ? null
                       : () => _export(_ExportAction.share, closeOnShared: true),
-                  icon: const Icon(Icons.ios_share_rounded, size: 18),
+                  icon: const VIcon(VerbumIcons.shareNetwork, size: 18),
                   label: const Text(
                     'Compartir',
                     style: TextStyle(fontFamily: 'VerbumInter'),
@@ -586,7 +586,7 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
                   child: Text('Copiar texto y enlace'),
                 ),
               ],
-              icon: const Icon(Icons.more_horiz_rounded),
+              icon: const VIcon(VerbumIcons.dotsThree),
             ),
           ],
         ),

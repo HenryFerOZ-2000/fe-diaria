@@ -4,8 +4,7 @@ import 'reading_chat_screen.dart';
 import '../services/share_service.dart';
 import '../widgets/prayer_reading_experience.dart';
 import '../features/sharing/domain/share_content.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
-import '../design_system/icons/verbum_icons.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class ReadingScreen extends StatefulWidget {
   final String title;
@@ -142,23 +141,20 @@ class _ReadingScreenState extends State<ReadingScreen>
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back_ios_new_rounded,
+                        icon: const VIcon(VerbumIcons.caretLeft,
                           color: Colors.white,
                         ),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const Spacer(),
                       IconButton(
-                        icon: const Icon(
-                          Icons.close_rounded,
+                        icon: const VIcon(VerbumIcons.close,
                           color: Colors.white,
                         ),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       IconButton(
-                        icon: const Icon(
-                          Icons.share_outlined,
+                        icon: const VIcon(VerbumIcons.shareNetwork,
                           color: Colors.white,
                         ),
                         onPressed: _share,
@@ -263,7 +259,7 @@ class _ReadingScreenState extends State<ReadingScreen>
                     children: [
                       Expanded(
                         child: _glassButton(
-                          icon: Icons.forum_outlined,
+                          icon: VerbumIcons.chatsCircle,
                           label: 'Chat',
                           onTap: () {
                             if (widget.onOpenChat != null) {
@@ -301,7 +297,7 @@ class _ReadingScreenState extends State<ReadingScreen>
   }
 
   Widget _glassButton({
-    required IconData icon,
+    required VerbumIcons icon,
     String? label,
     required VoidCallback onTap,
   }) {
@@ -319,7 +315,7 @@ class _ReadingScreenState extends State<ReadingScreen>
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white, size: 22),
+            VIcon(icon, color: Colors.white, size: 22),
             if (label != null) ...[
               const SizedBox(width: 8),
               Text(
@@ -358,7 +354,7 @@ class _ReadingScreenState extends State<ReadingScreen>
               style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
             ),
             SizedBox(width: 8),
-            Icon(Icons.arrow_forward_rounded, size: 22),
+            VIcon(VerbumIcons.arrowRight, size: 22),
           ],
         ),
       ),

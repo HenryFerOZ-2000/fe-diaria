@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../services/live_posts_service.dart';
 import '../services/post_social_service.dart';
 import '../widgets/top_notice.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class CommentsScreen extends StatefulWidget {
   final String postId;
@@ -188,8 +188,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.comment_outlined,
+                      VIcon(VerbumIcons.chatCircle,
                         size: 64,
                         color: Colors.grey[400],
                       ),
@@ -269,7 +268,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.close, size: 18),
+                            icon: const VIcon(VerbumIcons.close, size: 18),
                             onPressed: _cancelReply,
                             color: Colors.blue[900],
                           ),
@@ -313,7 +312,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Icon(Icons.send_rounded),
+                            : const VIcon(VerbumIcons.paperPlaneRight, weight: VIconWeight.fill),
                         style: IconButton.styleFrom(
                           backgroundColor: Theme.of(
                             context,
@@ -654,10 +653,10 @@ class _CommentItemState extends State<_CommentItem> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
+                                VIcon(
                                   isLiked
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
+                                      ? VerbumIcons.heart
+                                      : VerbumIcons.heart,
                                   size: 16,
                                   color: isLiked
                                       ? Colors.red
@@ -922,10 +921,10 @@ class _ReplyItemState extends State<_ReplyItem> {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(
+                                      VIcon(
                                         isLiked
-                                            ? Icons.favorite
-                                            : Icons.favorite_border,
+                                            ? VerbumIcons.heart
+                                            : VerbumIcons.heart,
                                         size: 14,
                                         color: isLiked
                                             ? Colors.red

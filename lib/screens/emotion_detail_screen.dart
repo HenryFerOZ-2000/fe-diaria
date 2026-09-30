@@ -9,6 +9,7 @@ import '../widgets/prayer_card.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/main_card.dart';
 import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla que muestra oración y versículo para una emoción específica
 class EmotionDetailScreen extends StatefulWidget {
@@ -90,7 +91,7 @@ class _EmotionDetailScreenState extends State<EmotionDetailScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 64, color: colorScheme.error),
+                  VIcon(VerbumIcons.warningCircle, size: 64, color: colorScheme.error),
                   const SizedBox(height: AppSpacing.md),
                   Text(
                     'No se pudo cargar la oración',
@@ -99,7 +100,7 @@ class _EmotionDetailScreenState extends State<EmotionDetailScreen> {
                   const SizedBox(height: AppSpacing.md),
                   CustomButton(
                     text: 'Reintentar',
-                    icon: Icons.refresh,
+                    icon: VerbumIcons.arrowClockwise,
                     onPressed: _loadData,
                   ),
                 ],
@@ -127,7 +128,7 @@ class _EmotionDetailScreenState extends State<EmotionDetailScreen> {
                           provenance: ContentProvenance.aiGenerated,
                           title: _prayerData!['title'] as String,
                           text: _prayerData!['text'] as String,
-                          icon: Icons.favorite_rounded,
+                          icon: VerbumIcons.heart,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         // Versículo motivador
@@ -148,8 +149,7 @@ class _EmotionDetailScreenState extends State<EmotionDetailScreen> {
                               children: [
                                 Row(
                                   children: [
-                                    Icon(
-                                      Icons.book_rounded,
+                                    VIcon(VerbumIcons.book, weight: VIconWeight.fill,
                                       color: colorScheme.tertiary,
                                     ),
                                     const SizedBox(width: AppSpacing.sm),
@@ -194,7 +194,7 @@ class _EmotionDetailScreenState extends State<EmotionDetailScreen> {
                   padding: const EdgeInsets.all(AppSpacing.md),
                   child: CustomButton(
                     text: 'Regresar',
-                    icon: Icons.arrow_back,
+                    icon: VerbumIcons.arrowLeft,
                     onPressed: () => Navigator.of(context).pop(),
                     width: double.infinity,
                   ),

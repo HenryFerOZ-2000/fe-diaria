@@ -7,7 +7,7 @@ import '../services/ads_service.dart';
 import '../services/storage_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../widgets/prayer_card.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class CategoryPrayersScreen extends StatefulWidget {
   const CategoryPrayersScreen({super.key});
@@ -188,7 +188,7 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
                     onPressed: () {
                       Navigator.of(context).pushNamed('/home');
                     },
-                    icon: const Icon(Icons.home, size: 24),
+                    icon: const VIcon(VerbumIcons.house, weight: VIconWeight.fill, size: 24),
                     label: Text(
                       'Regresar al inicio',
                       style: VerbumFonts.sans(
@@ -233,7 +233,7 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
     required VoidCallback onTap,
   }) {
     // Obtener icono según la categoría
-    IconData? categoryIcon = _getCategoryIcon(title);
+    VerbumIcons? categoryIcon = _getCategoryIcon(title);
 
     return Material(
       color: Colors.transparent,
@@ -277,7 +277,7 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
                     color: colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
+                  child: VIcon(
                     categoryIcon,
                     size: 28,
                     color: colorScheme.primary,
@@ -305,29 +305,29 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
     );
   }
 
-  IconData? _getCategoryIcon(String title) {
+  VerbumIcons? _getCategoryIcon(String title) {
     final titleLower = title.toLowerCase();
     if (titleLower.contains('familia')) {
-      return Icons.family_restroom_rounded;
+      return VerbumIcons.usersThree;
     }
-    if (titleLower.contains('salud')) return Icons.favorite_rounded;
-    if (titleLower.contains('trabajo')) return Icons.work_rounded;
+    if (titleLower.contains('salud')) return VerbumIcons.heart;
+    if (titleLower.contains('trabajo')) return VerbumIcons.briefcase;
     if (titleLower.contains('finanzas')) {
-      return Icons.account_balance_wallet_rounded;
+      return VerbumIcons.wallet;
     }
-    if (titleLower.contains('hogar')) return Icons.home_rounded;
+    if (titleLower.contains('hogar')) return VerbumIcons.house;
     if (titleLower.contains('protección') ||
         titleLower.contains('proteccion')) {
-      return Icons.shield_rounded;
+      return VerbumIcons.shield;
     }
-    if (titleLower.contains('descanso')) return Icons.bedtime_rounded;
+    if (titleLower.contains('descanso')) return VerbumIcons.moonStars;
     if (titleLower.contains('mente') || titleLower.contains('paz')) {
-      return Icons.self_improvement_rounded;
+      return VerbumIcons.personSimpleTaiChi;
     }
     if (titleLower.contains('ánimo') || titleLower.contains('animo')) {
-      return Icons.emoji_emotions_rounded;
+      return VerbumIcons.smiley;
     }
-    if (titleLower.contains('agradecimiento')) return Icons.celebration_rounded;
+    if (titleLower.contains('agradecimiento')) return VerbumIcons.confetti;
     return null;
   }
 }
@@ -481,7 +481,7 @@ class _CategoryPrayerDetailScreenState
                 onPressed: () {
                   Navigator.of(context).pushNamed('/home');
                 },
-                icon: const Icon(Icons.home, size: 24),
+                icon: const VIcon(VerbumIcons.house, weight: VIconWeight.fill, size: 24),
                 label: Text(
                   'Regresar al inicio',
                   style: VerbumFonts.sans(
@@ -515,7 +515,7 @@ class _CategoryPrayerDetailScreenState
       provenance: ContentProvenance.aiGenerated,
       title: title,
       text: prayerText,
-      icon: Icons.menu_book_rounded,
+      icon: VerbumIcons.bookOpenText,
       accentColor: Theme.of(context).colorScheme.primary,
       onShare: () => ShareService.openComposer(
         context,

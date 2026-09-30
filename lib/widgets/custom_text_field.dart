@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Campo de texto personalizado con diseño moderno
 class CustomTextField extends StatefulWidget {
@@ -12,8 +13,8 @@ class CustomTextField extends StatefulWidget {
   final TextInputType? keyboardType;
   final int? maxLines;
   final int? maxLength;
-  final IconData? prefixIcon;
-  final IconData? suffixIcon;
+  final VerbumIcons? prefixIcon;
+  final VerbumIcons? suffixIcon;
   final VoidCallback? onSuffixTap;
   final bool enabled;
   final bool readOnly;
@@ -117,12 +118,12 @@ class _CustomTextFieldState extends State<CustomTextField>
             labelText: widget.label,
             hintText: widget.hint,
             prefixIcon: widget.prefixIcon != null
-                ? Icon(widget.prefixIcon, color: colorScheme.primary)
+                ? VIcon(widget.prefixIcon!, color: colorScheme.primary)
                 : null,
             suffixIcon: widget.suffixIcon != null
                 ? GestureDetector(
                     onTap: widget.onSuffixTap,
-                    child: Icon(widget.suffixIcon, color: colorScheme.primary),
+                    child: VIcon(widget.suffixIcon!, color: colorScheme.primary),
                   )
                 : null,
             contentPadding:

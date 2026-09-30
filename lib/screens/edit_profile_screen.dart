@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import '../services/profile_service.dart';
 import '../services/social_service.dart';
 import '../widgets/verbum_ambient_background.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -210,8 +210,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     backgroundColor: scheme.primaryContainer,
                                     backgroundImage: image,
                                     child: image == null
-                                        ? Icon(
-                                            Icons.person_outline_rounded,
+                                        ? VIcon(VerbumIcons.user,
                                             size: 42,
                                             color: scheme.primary,
                                           )
@@ -243,8 +242,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                               color: Colors.white,
                                             ),
                                           )
-                                        : const Icon(
-                                            Icons.photo_camera_outlined,
+                                        : const VIcon(VerbumIcons.camera,
                                             size: 19,
                                           ),
                                   ),
@@ -297,7 +295,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               decoration: const InputDecoration(
                                 labelText: 'Nombre visible',
                                 hintText: '¿Cómo quieres que te llamemos?',
-                                prefixIcon: Icon(Icons.badge_outlined),
+                                prefixIcon: VIcon(VerbumIcons.identificationBadge),
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -309,8 +307,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 labelText: 'Nombre de usuario',
                                 hintText: 'tu.usuario',
                                 prefixText: '@',
-                                prefixIcon: const Icon(
-                                  Icons.alternate_email_rounded,
+                                prefixIcon: const VIcon(VerbumIcons.at,
                                 ),
                                 errorText: usernameValid
                                     ? null
@@ -322,8 +319,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(
-                                  Icons.info_outline_rounded,
+                                VIcon(VerbumIcons.info,
                                   size: 15,
                                   color: scheme.onSurfaceVariant,
                                 ),
@@ -357,7 +353,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Icon(Icons.check_rounded),
+                              : const VIcon(VerbumIcons.check),
                           label: Text(
                             _saving ? 'Guardando…' : 'Guardar cambios',
                           ),

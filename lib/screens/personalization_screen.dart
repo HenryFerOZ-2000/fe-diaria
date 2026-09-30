@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
 import '../services/personalization_service.dart';
 import '../services/storage_service.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de personalización del usuario
 class PersonalizationScreen extends StatefulWidget {
@@ -25,55 +25,55 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
     {
       'id': 'ansioso',
       'name': 'Ansioso',
-      'icon': Icons.psychology,
+      'icon': VerbumIcons.brain,
       'color': Color(0xFFFF9800),
     },
     {
       'id': 'triste',
       'name': 'Triste',
-      'icon': Icons.sentiment_very_dissatisfied,
+      'icon': VerbumIcons.smileySad,
       'color': Color(0xFF2196F3),
     },
     {
       'id': 'agradecido',
       'name': 'Agradecido',
-      'icon': Icons.favorite,
+      'icon': VerbumIcons.heart,
       'color': Color(0xFF4CAF50),
     },
     {
       'id': 'motivado',
       'name': 'Motivado',
-      'icon': Icons.trending_up,
+      'icon': VerbumIcons.trendUp,
       'color': Color(0xFFFF5722),
     },
     {
       'id': 'preocupado',
       'name': 'Preocupado',
-      'icon': Icons.warning,
+      'icon': VerbumIcons.warning,
       'color': Color(0xFFFFC107),
     },
     {
       'id': 'feliz',
       'name': 'Feliz',
-      'icon': Icons.sentiment_very_satisfied,
+      'icon': VerbumIcons.smiley,
       'color': Color(0xFFFFEB3B),
     },
     {
       'id': 'desanimado',
       'name': 'Desanimado',
-      'icon': Icons.sentiment_dissatisfied,
+      'icon': VerbumIcons.smileySad,
       'color': Color(0xFF9E9E9E),
     },
     {
       'id': 'enojado',
       'name': 'Enojado',
-      'icon': Icons.mood_bad,
+      'icon': VerbumIcons.smileySad,
       'color': Color(0xFFF44336),
     },
     {
       'id': 'tranquilo',
       'name': 'Tranquilo',
-      'icon': Icons.wb_sunny,
+      'icon': VerbumIcons.sun,
       'color': Color(0xFF87CEEB),
     },
   ];
@@ -208,7 +208,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
                 // Sección nombre de usuario
                 _buildSectionHeader(
                   'Nombre de usuario',
-                  Icons.alternate_email,
+                  VerbumIcons.at,
                   colorScheme,
                 ),
                 const SizedBox(height: 16),
@@ -218,7 +218,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
                 // Sección de emociones
                 _buildSectionHeader(
                   '¿Cómo te sientes hoy?',
-                  Icons.emoji_emotions_outlined,
+                  VerbumIcons.smiley,
                   colorScheme,
                 ),
                 const SizedBox(height: 16),
@@ -227,7 +227,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
 
                 _buildSectionHeader(
                   'Tu ritmo diario',
-                  Icons.schedule_rounded,
+                  VerbumIcons.clock,
                   colorScheme,
                 ),
                 const SizedBox(height: 14),
@@ -250,7 +250,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
 
   Widget _buildSectionHeader(
     String title,
-    IconData icon,
+    VerbumIcons icon,
     ColorScheme colorScheme,
   ) {
     return Row(
@@ -261,7 +261,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
             color: colorScheme.primary.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: colorScheme.primary, size: 20),
+          child: VIcon(icon, color: colorScheme.primary, size: 20),
         ),
         const SizedBox(width: 12),
         Text(
@@ -299,7 +299,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
         decoration: InputDecoration(
           hintText: 'Ej: usuario123 o tu nombre para saludos',
           hintStyle: VerbumFonts.sans(color: colorScheme.onSurfaceVariant),
-          prefixIcon: Icon(Icons.alternate_email, color: colorScheme.primary),
+          prefixIcon: VIcon(VerbumIcons.at, color: colorScheme.primary),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(20),
         ),
@@ -375,8 +375,8 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                emotion['icon'] as IconData,
+              VIcon(
+                emotion['icon'] as VerbumIcons,
                 size: 32,
                 color: isSelected ? emotionColor : colorScheme.onSurfaceVariant,
               ),
@@ -427,7 +427,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.save_outlined, size: 20),
+                  const VIcon(VerbumIcons.floppyDisk, size: 20),
                   const SizedBox(width: 8),
                   Text(
                     'Guardar Personalización',
@@ -516,7 +516,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.info_outline, color: colorScheme.tertiary, size: 24),
+          VIcon(VerbumIcons.info, color: colorScheme.tertiary, size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

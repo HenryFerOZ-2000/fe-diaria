@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/spiritual_path.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class SpiritualPathsCatalog {
   static const paths = <SpiritualPath>[
@@ -12,7 +13,7 @@ class SpiritualPathsCatalog {
           'Un camino sereno para entregar el control, reconocer la presencia de Dios y recuperar la esperanza paso a paso.',
       category: 'Paz y confianza',
       minutesPerDay: 5,
-      icon: Icons.spa_outlined,
+      icon: VerbumIcons.flowerLotus,
       accent: Color(0xFF6B7398),
       days: [
         SpiritualPathDay(
@@ -120,7 +121,7 @@ class SpiritualPathsCatalog {
           'Prácticas breves de oración, respiración y Escritura para atravesar los días de inquietud con compañía.',
       category: 'Bienestar espiritual',
       minutesPerDay: 4,
-      icon: Icons.air_rounded,
+      icon: VerbumIcons.wind,
       accent: Color(0xFF5F8178),
       days: [
         SpiritualPathDay(
@@ -228,7 +229,7 @@ class SpiritualPathsCatalog {
           'Entrena una mirada agradecida sin negar las dificultades y descubre la presencia de Dios en lo sencillo.',
       category: 'Vida diaria',
       minutesPerDay: 3,
-      icon: Icons.wb_sunny_outlined,
+      icon: VerbumIcons.sun,
       accent: Color(0xFFB58A45),
       days: [
         SpiritualPathDay(
@@ -334,7 +335,7 @@ class SpiritualPathsCatalog {
           'Una rutina nocturna de Escritura, examen sereno y oración para cerrar el día sin llevarlo entero a la cama.',
       category: 'Descanso',
       minutesPerDay: 6,
-      icon: Icons.nightlight_round,
+      icon: VerbumIcons.moon,
       accent: Color(0xFF77649A),
       days: [
         SpiritualPathDay(

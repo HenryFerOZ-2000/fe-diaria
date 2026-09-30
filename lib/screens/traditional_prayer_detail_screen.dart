@@ -5,7 +5,7 @@ import '../widgets/prayer_reading_experience.dart';
 import '../faith/content_provenance.dart';
 import '../faith/biblical_prayer_passages.dart';
 import '../features/sharing/domain/share_content.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de detalle de una oración tradicional
 class TraditionalPrayerDetailScreen extends StatefulWidget {
@@ -161,23 +161,20 @@ class _TraditionalPrayerDetailScreenState
                         child: Row(
                           children: [
                             IconButton(
-                              icon: const Icon(
-                                Icons.arrow_back_ios_new_rounded,
+                              icon: const VIcon(VerbumIcons.caretLeft,
                                 color: Colors.white,
                               ),
                               onPressed: () => Navigator.of(context).pop(),
                             ),
                             const Spacer(),
                             IconButton(
-                              icon: const Icon(
-                                Icons.close_rounded,
+                              icon: const VIcon(VerbumIcons.close,
                                 color: Colors.white,
                               ),
                               onPressed: () => Navigator.of(context).pop(),
                             ),
                             IconButton(
-                              icon: const Icon(
-                                Icons.share_outlined,
+                              icon: const VIcon(VerbumIcons.shareNetwork,
                                 color: Colors.white,
                               ),
                               onPressed: _share,
@@ -245,7 +242,7 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, color: Colors.white70, size: 44),
+            const VIcon(VerbumIcons.warningCircle, color: Colors.white70, size: 44),
             const SizedBox(height: 12),
             Text(
               message,

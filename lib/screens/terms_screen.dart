@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class TermsScreen extends StatelessWidget {
   const TermsScreen({super.key});
@@ -68,7 +68,7 @@ class TermsScreen extends StatelessWidget {
                   ),
                 );
               },
-              icon: const Icon(Icons.open_in_new),
+              icon: const VIcon(VerbumIcons.arrowSquareOut),
               label: const Text('Ver términos completos'),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(

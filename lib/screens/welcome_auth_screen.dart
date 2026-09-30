@@ -4,7 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/storage_service.dart';
 import '../services/social_service.dart';
 import '../widgets/verbum_ambient_background.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class WelcomeAuthScreen extends StatefulWidget {
   const WelcomeAuthScreen({super.key});
@@ -237,8 +237,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                           color: colorScheme.primary.withValues(alpha: .18),
                         ),
                       ),
-                      child: Icon(
-                        Icons.menu_book_rounded,
+                      child: VIcon(VerbumIcons.bookOpenText, weight: VIconWeight.fill,
                         color: colorScheme.primary,
                         size: 20,
                       ),
@@ -395,8 +394,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                               _selectedTab = 1;
                               _error = null;
                             }),
-                            icon: Icon(
-                              Icons.email_outlined,
+                            icon: VIcon(VerbumIcons.envelope,
                               size: 17,
                               color: colorScheme.primary,
                             ),
@@ -544,7 +542,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                       color: Colors.white,
                     ),
                   )
-                : const Icon(Icons.g_mobiledata_rounded, size: 27),
+                : const VIcon(VerbumIcons.googleLogo, size: 27),
             label: Text(
               _isLoading ? 'Conectando...' : 'Continuar con Google',
               style: VerbumFonts.sans(
@@ -581,8 +579,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                 _selectedTab = 0;
                 _error = null;
               }),
-              icon: Icon(
-                Icons.arrow_back_ios_new_rounded,
+              icon: VIcon(VerbumIcons.caretLeft,
                 size: 14,
                 color: colorScheme.onSurface.withValues(alpha: 0.72),
               ),
@@ -626,7 +623,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
             autofillHints: const [AutofillHints.email],
             decoration: InputDecoration(
               labelText: 'Correo electrónico',
-              prefixIcon: const Icon(Icons.email_outlined),
+              prefixIcon: const VIcon(VerbumIcons.envelope),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -664,12 +661,12 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                 : (_) => _handleEmailPasswordAuth(),
             decoration: InputDecoration(
               labelText: 'Contraseña',
-              prefixIcon: const Icon(Icons.lock_outline),
+              prefixIcon: const VIcon(VerbumIcons.lockSimple),
               suffixIcon: IconButton(
-                icon: Icon(
+                icon: VIcon(
                   _obscurePassword
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
+                      ? VerbumIcons.eye
+                      : VerbumIcons.eyeSlash,
                 ),
                 onPressed: () =>
                     setState(() => _obscurePassword = !_obscurePassword),
@@ -706,12 +703,12 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
               onFieldSubmitted: (_) => _handleEmailPasswordAuth(),
               decoration: InputDecoration(
                 labelText: 'Confirmar contraseña',
-                prefixIcon: const Icon(Icons.lock_outline),
+                prefixIcon: const VIcon(VerbumIcons.lockSimple),
                 suffixIcon: IconButton(
-                  icon: Icon(
+                  icon: VIcon(
                     _obscureConfirmPassword
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
+                        ? VerbumIcons.eye
+                        : VerbumIcons.eyeSlash,
                   ),
                   onPressed: () => setState(
                     () => _obscureConfirmPassword = !_obscureConfirmPassword,

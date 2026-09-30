@@ -5,6 +5,7 @@ import '../models/verse.dart';
 import '../services/verse_service.dart';
 import '../services/widget_service.dart';
 import '../widgets/daily_verse_widget_preview.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class DailyVerseWidgetScreen extends StatefulWidget {
   DailyVerseWidgetScreen({
@@ -119,7 +120,7 @@ class _DailyVerseWidgetScreenState extends State<DailyVerseWidgetScreen>
                 }
                 if (snapshot.hasError) {
                   return _InfoCard(
-                    icon: Icons.menu_book_rounded,
+                    icon: VerbumIcons.bookOpenText,
                     title: strings.widgetPreviewUnavailable,
                     body: strings.widgetPreviewUnavailableDescription,
                   );
@@ -143,10 +144,10 @@ class _DailyVerseWidgetScreenState extends State<DailyVerseWidgetScreen>
                         dimension: 18,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : Icon(
+                    : VIcon(
                         _hasWidget
-                            ? Icons.check_circle_rounded
-                            : Icons.add_to_home_screen_rounded,
+                            ? VerbumIcons.checkCircle
+                            : VerbumIcons.deviceMobile,
                       ),
                 label: Text(
                   _hasWidget ? strings.widgetAdded : strings.widgetAddToHome,
@@ -162,14 +163,14 @@ class _DailyVerseWidgetScreenState extends State<DailyVerseWidgetScreen>
             if (_showManualInstructions) ...[
               const SizedBox(height: 14),
               _InfoCard(
-                icon: Icons.touch_app_rounded,
+                icon: VerbumIcons.handTap,
                 title: strings.widgetManualTitle,
                 body: strings.widgetManualHome,
               ),
             ],
             const SizedBox(height: 28),
             _InfoCard(
-              icon: Icons.lock_outline_rounded,
+              icon: VerbumIcons.lockSimple,
               title: strings.widgetLockScreenTitle,
               body: strings.widgetLockScreenCompatibility,
               steps: [
@@ -193,7 +194,7 @@ class _InfoCard extends StatelessWidget {
     this.steps = const [],
   });
 
-  final IconData icon;
+  final VerbumIcons icon;
   final String title;
   final String body;
   final List<String> steps;
@@ -215,7 +216,7 @@ class _InfoCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, color: colors.primary),
+              VIcon(icon, color: colors.primary),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(

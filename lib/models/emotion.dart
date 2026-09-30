@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Modelo para emociones con contenido asociado
 class Emotion {
   final String id;
   final String name;
-  final IconData icon;
+  final VerbumIcons icon;
   final Color color;
   final String? description;
   final List<String>? tags;
@@ -40,26 +41,26 @@ class Emotion {
     };
   }
 
-  static IconData _iconFromString(String iconName) {
+  static VerbumIcons _iconFromString(String iconName) {
     switch (iconName) {
       case 'psychology':
-        return Icons.psychology;
+        return VerbumIcons.brain;
       case 'sentiment_very_dissatisfied':
-        return Icons.sentiment_very_dissatisfied;
+        return VerbumIcons.smileySad;
       case 'bedtime':
-        return Icons.bedtime;
+        return VerbumIcons.moonStars;
       case 'warning':
-        return Icons.warning;
+        return VerbumIcons.warning;
       case 'favorite':
-        return Icons.favorite;
+        return VerbumIcons.heart;
       case 'sentiment_very_satisfied':
-        return Icons.sentiment_very_satisfied;
+        return VerbumIcons.smiley;
       case 'help':
-        return Icons.help;
+        return VerbumIcons.question;
       case 'visibility_off':
-        return Icons.visibility_off;
+        return VerbumIcons.eyeSlash;
       default:
-        return Icons.sentiment_neutral;
+        return VerbumIcons.smileyMeh;
     }
   }
 

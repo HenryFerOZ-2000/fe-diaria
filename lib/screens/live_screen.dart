@@ -14,7 +14,7 @@ import '../services/live_posts_service.dart';
 import '../services/profile_service.dart';
 import '../services/spiritual_stats_service.dart';
 import 'comments_screen.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class LivePost {
   final String id;
@@ -499,9 +499,7 @@ class _LiveFeedHeader extends StatelessWidget {
               child: Ink(
                 padding: const EdgeInsets.fromLTRB(13, 12, 12, 12),
                 decoration: BoxDecoration(
-                  color: dark
-                      ? const Color(0xFF292431)
-                      : const Color(0xFFFFFCF7),
+                  color: context.palette.surface,
                   borderRadius: BorderRadius.circular(22),
                   border: Border.all(
                     color: scheme.primary.withValues(alpha: .15),
@@ -523,8 +521,7 @@ class _LiveFeedHeader extends StatelessWidget {
                         color: scheme.primary.withValues(alpha: .10),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        Icons.volunteer_activism_outlined,
+                      child: VIcon(VerbumIcons.handHeart,
                         color: scheme.primary,
                         size: 20,
                       ),
@@ -554,8 +551,7 @@ class _LiveFeedHeader extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Icon(
-                      Icons.arrow_forward_rounded,
+                    VIcon(VerbumIcons.arrowRight,
                       color: scheme.primary,
                       size: 19,
                     ),
@@ -586,9 +582,7 @@ class _LiveFeedHeader extends StatelessWidget {
                         ? scheme.primary.withValues(alpha: .28)
                         : scheme.outline.withValues(alpha: .16),
                   ),
-                  backgroundColor: dark
-                      ? const Color(0xFF292431)
-                      : const Color(0xFFFFFCF7),
+                  backgroundColor: context.palette.surface,
                   selectedColor: scheme.primary.withValues(alpha: .12),
                   labelStyle: VerbumFonts.sans(
                     color: selected ? scheme.primary : scheme.onSurfaceVariant,
@@ -623,7 +617,7 @@ class _LiveEmptyState extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(Icons.forum_outlined, color: scheme.primary, size: 32),
+          VIcon(VerbumIcons.chatsCircle, color: scheme.primary, size: 32),
           const SizedBox(height: 10),
           Text(
             filtered ? 'Aún no hay intenciones aquí' : 'Sé la primera voz',
@@ -646,7 +640,7 @@ class _LiveEmptyState extends StatelessWidget {
           const SizedBox(height: 12),
           TextButton.icon(
             onPressed: onCompose,
-            icon: const Icon(Icons.add_rounded),
+            icon: const VIcon(VerbumIcons.plus),
             label: const Text('Compartir una intención'),
           ),
         ],
@@ -786,14 +780,14 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
     }
   }
 
-  IconData get _statusIcon {
+  VerbumIcons get _statusIcon {
     switch (widget.post.status) {
       case 'answered':
-        return Icons.check_circle_outline_rounded;
+        return VerbumIcons.checkCircle;
       case 'gratitude':
-        return Icons.auto_awesome_rounded;
+        return VerbumIcons.sparkle;
       default:
-        return Icons.favorite_outline_rounded;
+        return VerbumIcons.heart;
     }
   }
 
@@ -810,16 +804,16 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
     }
   }
 
-  IconData _categoryIcon(String category) {
+  VerbumIcons _categoryIcon(String category) {
     switch (category) {
       case 'Salud':
-        return Icons.healing_outlined;
+        return VerbumIcons.firstAid;
       case 'Familia':
-        return Icons.family_restroom_rounded;
+        return VerbumIcons.usersThree;
       case 'Gratitud':
-        return Icons.auto_awesome_outlined;
+        return VerbumIcons.sparkle;
       default:
-        return Icons.shield_outlined;
+        return VerbumIcons.shield;
     }
   }
 
@@ -861,7 +855,7 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
         return AnimatedContainer(
           duration: const Duration(milliseconds: 220),
           decoration: BoxDecoration(
-            color: dark ? const Color(0xFF292431) : const Color(0xFFFFFCF7),
+            color: context.palette.surface,
             borderRadius: BorderRadius.circular(23),
             border: Border.all(
               color: _joined
@@ -951,7 +945,7 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
                               const SizedBox(height: 3),
                               Row(
                                 children: [
-                                  Icon(
+                                  VIcon(
                                     _categoryIcon(widget.post.category),
                                     color: accent,
                                     size: 12,
@@ -975,8 +969,7 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
                           PopupMenuButton<String>(
                             tooltip: 'Opciones',
                             padding: EdgeInsets.zero,
-                            icon: Icon(
-                              Icons.more_horiz_rounded,
+                            icon: VIcon(VerbumIcons.dotsThree,
                               color: scheme.onSurfaceVariant,
                             ),
                             onSelected: (value) {
@@ -1021,7 +1014,7 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(_statusIcon, size: 12, color: accent),
+                          VIcon(_statusIcon, size: 12, color: accent),
                           const SizedBox(width: 5),
                           Text(
                             _statusLabel,
@@ -1057,8 +1050,7 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
                             cacheWidth: 900,
                             errorBuilder: (_, __, ___) => ColoredBox(
                               color: scheme.surfaceContainerHighest,
-                              child: Icon(
-                                Icons.image_not_supported_outlined,
+                              child: VIcon(VerbumIcons.imageBroken,
                                 color: scheme.onSurfaceVariant,
                               ),
                             ),
@@ -1084,12 +1076,12 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
                         ),
                         const SizedBox(width: 4),
                         _ModernPostAction(
-                          icon: Icons.mode_comment_outlined,
+                          icon: VerbumIcons.chatCircle,
                           label: '${widget.post.comments}',
                           onTap: widget.onComment,
                         ),
                         _ModernPostAction(
-                          icon: Icons.ios_share_outlined,
+                          icon: VerbumIcons.shareNetwork,
                           tooltip: 'Compartir',
                           onTap: widget.onShare,
                         ),
@@ -1135,10 +1127,10 @@ class _PrayerJoinButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            VIcon(
               joined
-                  ? Icons.volunteer_activism
-                  : Icons.volunteer_activism_outlined,
+                  ? VerbumIcons.handHeart
+                  : VerbumIcons.handHeart,
               color: color,
               size: 18,
             ),
@@ -1163,7 +1155,7 @@ class _PrayerJoinButton extends StatelessWidget {
 }
 
 class _ModernPostAction extends StatelessWidget {
-  final IconData icon;
+  final VerbumIcons icon;
   final String? label;
   final String? tooltip;
   final VoidCallback onTap;
@@ -1189,7 +1181,7 @@ class _ModernPostAction extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 9),
             child: Row(
               children: [
-                Icon(icon, color: color, size: 18),
+                VIcon(icon, color: color, size: 18),
                 if (label != null) ...[
                   const SizedBox(width: 4),
                   Text(
@@ -1212,382 +1204,6 @@ class _ModernPostAction extends StatelessWidget {
 
 // TODO: retirar tras verificar la migración visual en todos los dispositivos.
 // ignore: unused_element
-class _LegacyFeedPostTileState extends State<_FeedPostTile> {
-  bool _optimisticLiked = false;
-  int _optimisticLikeCount = 0;
-  bool _isUpdating = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _optimisticLiked = widget.post.isLiked;
-    _optimisticLikeCount = widget.post.likes;
-  }
-
-  @override
-  void didUpdateWidget(_FeedPostTile oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Solo actualizar si el post cambió y no estamos en medio de una actualización
-    if (!_isUpdating && oldWidget.postId != widget.postId) {
-      _optimisticLiked = widget.post.isLiked;
-      _optimisticLikeCount = widget.post.likes;
-    }
-  }
-
-  Future<void> _handleLike() async {
-    if (_isUpdating || widget.currentUid.isEmpty) return;
-
-    final wasLiked = _optimisticLiked;
-    final oldCount = _optimisticLikeCount;
-
-    setState(() {
-      _isUpdating = true;
-      _optimisticLiked = !_optimisticLiked;
-      // Si estaba liked, ahora no lo está, entonces restamos 1
-      // Si no estaba liked, ahora lo está, entonces sumamos 1
-      _optimisticLikeCount = _optimisticLiked ? oldCount + 1 : oldCount - 1;
-    });
-
-    try {
-      await widget.service.togglePostLike(widget.postId, widget.currentUid);
-    } catch (e) {
-      // Revertir en caso de error
-      if (mounted) {
-        setState(() {
-          _optimisticLiked = wasLiked;
-          _optimisticLikeCount = oldCount;
-        });
-      }
-      debugPrint('Error toggling like: $e');
-    } finally {
-      if (mounted) {
-        setState(() => _isUpdating = false);
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 14,
-            offset: const Offset(0, 8),
-          ),
-        ],
-        border: Border.all(color: Colors.black12.withValues(alpha: 0.05)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                    stream: widget.post.authorUid.isNotEmpty
-                        ? FirebaseFirestore.instance
-                              .collection('users')
-                              .doc(widget.post.authorUid)
-                              .snapshots()
-                        : null,
-                    builder: (context, profileSnapshot) {
-                      final profileData = profileSnapshot.data?.data();
-                      final displayName =
-                          ((profileData?['displayName'] as String?) ??
-                                  widget.post.userName)
-                              .trim();
-                      final username =
-                          ((profileData?['username'] as String?) ?? '').trim();
-                      final authorPhoto =
-                          (profileData?['photoURL'] as String?) ??
-                          widget.post.authorPhoto;
-                      final isMine =
-                          widget.currentUid.isNotEmpty &&
-                          widget.post.authorUid == widget.currentUid;
-
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            radius: 20,
-                            backgroundColor: Colors.deepPurple.withValues(
-                              alpha: 0.12,
-                            ),
-                            backgroundImage: authorPhoto != null
-                                ? NetworkImage(authorPhoto)
-                                : null,
-                            child: authorPhoto == null
-                                ? Text(
-                                    displayName.isNotEmpty
-                                        ? displayName[0].toUpperCase()
-                                        : '?',
-                                    style: VerbumFonts.sans(
-                                      color: Colors.deepPurple,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  )
-                                : null,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        displayName.isNotEmpty
-                                            ? displayName
-                                            : 'Anónimo',
-                                        style: VerbumFonts.sans(
-                                          fontSize: 14.5,
-                                          fontWeight: FontWeight.w800,
-                                          color: const Color(0xFF1F1F1F),
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    if (isMine) ...[
-                                      const SizedBox(width: 6),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary
-                                              .withValues(alpha: 0.12),
-                                          borderRadius: BorderRadius.circular(
-                                            999,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          'Tú',
-                                          style: VerbumFonts.sans(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w700,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      '· ${widget.post.timeAgo}',
-                                      style: VerbumFonts.sans(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '@${username.isNotEmpty ? username : 'sin-username'}',
-                                  style: VerbumFonts.sans(
-                                    fontSize: 12,
-                                    color: Colors.grey[600],
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  widget.post.text,
-                                  style: VerbumFonts.sans(
-                                    fontSize: 14.5,
-                                    height: 1.45,
-                                    color: const Color(0xFF1F1F1F),
-                                  ),
-                                ),
-                                if (widget.post.mediaUrl != null) ...[
-                                  const SizedBox(height: 10),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(14),
-                                    child: AspectRatio(
-                                      aspectRatio: 16 / 9,
-                                      child: Image.network(
-                                        widget.post.mediaUrl!,
-                                        fit: BoxFit.cover,
-                                        loadingBuilder: (context, child, loadingProgress) {
-                                          if (loadingProgress == null) {
-                                            return child;
-                                          }
-                                          return Container(
-                                            color: Colors.grey.shade200,
-                                            child: Center(
-                                              child: CircularProgressIndicator(
-                                                value:
-                                                    loadingProgress
-                                                            .expectedTotalBytes !=
-                                                        null
-                                                    ? loadingProgress
-                                                              .cumulativeBytesLoaded /
-                                                          loadingProgress
-                                                              .expectedTotalBytes!
-                                                    : null,
-                                                strokeWidth: 2,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        errorBuilder: (_, __, ___) => Container(
-                                          color: Colors.grey.shade200,
-                                          child: const Center(
-                                            child: Icon(
-                                              Icons
-                                                  .image_not_supported_outlined,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ),
-                                        cacheWidth: 800,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                                const SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    StreamBuilder<int>(
-                                      stream: widget.service
-                                          .getPostLikeCountStream(
-                                            widget.postId,
-                                          ),
-                                      builder: (context, countSnapshot) {
-                                        if (!_isUpdating &&
-                                            countSnapshot.hasData) {
-                                          final realCount = countSnapshot.data!;
-                                          if (_optimisticLikeCount !=
-                                              realCount) {
-                                            WidgetsBinding.instance
-                                                .addPostFrameCallback((_) {
-                                                  if (mounted && !_isUpdating) {
-                                                    setState(() {
-                                                      _optimisticLikeCount =
-                                                          realCount;
-                                                    });
-                                                  }
-                                                });
-                                          }
-                                        }
-
-                                        final displayCount = _isUpdating
-                                            ? _optimisticLikeCount
-                                            : (countSnapshot.data ??
-                                                  _optimisticLikeCount);
-
-                                        return StreamBuilder<bool>(
-                                          stream: widget.currentUid.isNotEmpty
-                                              ? widget.service
-                                                    .isPostLikedStream(
-                                                      widget.postId,
-                                                      widget.currentUid,
-                                                    )
-                                              : Stream.value(false),
-                                          builder: (context, likedSnapshot) {
-                                            if (!_isUpdating &&
-                                                likedSnapshot.hasData) {
-                                              final streamLiked =
-                                                  likedSnapshot.data!;
-                                              if (_optimisticLiked !=
-                                                  streamLiked) {
-                                                WidgetsBinding.instance
-                                                    .addPostFrameCallback((_) {
-                                                      if (mounted &&
-                                                          !_isUpdating) {
-                                                        setState(() {
-                                                          _optimisticLiked =
-                                                              streamLiked;
-                                                        });
-                                                      }
-                                                    });
-                                              }
-                                            }
-
-                                            final isLiked = _isUpdating
-                                                ? _optimisticLiked
-                                                : (likedSnapshot.data ??
-                                                      _optimisticLiked);
-
-                                            return _ActionButton(
-                                              icon: isLiked
-                                                  ? Icons.favorite
-                                                  : Icons.favorite_border,
-                                              label: '$displayCount',
-                                              color: isLiked
-                                                  ? Colors.redAccent
-                                                  : Colors.grey[700]!,
-                                              onTap: _handleLike,
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                    const SizedBox(width: 8),
-                                    _ActionButton(
-                                      icon: Icons.mode_comment_outlined,
-                                      label: '${widget.post.comments}',
-                                      color: Colors.grey[700]!,
-                                      onTap: widget.onComment,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    _ActionButton(
-                                      icon: Icons.share_outlined,
-                                      label: 'Compartir',
-                                      color: Colors.grey[700]!,
-                                      onTap: widget.onShare,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (isMine && widget.onDelete != null)
-                            PopupMenuButton<String>(
-                              tooltip: 'Opciones',
-                              onSelected: (value) {
-                                if (value == 'delete') {
-                                  widget.onDelete?.call();
-                                }
-                              },
-                              itemBuilder: (context) => const [
-                                PopupMenuItem<String>(
-                                  value: 'delete',
-                                  child: Text('Eliminar publicación'),
-                                ),
-                              ],
-                              icon: Icon(
-                                Icons.more_vert,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _CreatePostModal extends StatefulWidget {
   final Future<bool> Function(String text, String category) onPost;
 
@@ -1683,8 +1299,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                         color: colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(
-                        Icons.edit_note_rounded,
+                      child: VIcon(VerbumIcons.notePencil,
                         color: colorScheme.primary,
                         size: 24,
                       ),
@@ -1812,8 +1427,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.w500,
                         ),
-                        icon: Icon(
-                          Icons.keyboard_arrow_down_rounded,
+                        icon: VIcon(VerbumIcons.caretDown,
                           color: colorScheme.primary,
                         ),
                         items: const [
@@ -1943,8 +1557,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                                 ),
                               )
                             else ...[
-                              Icon(
-                                Icons.send_rounded,
+                              VIcon(VerbumIcons.paperPlaneRight, weight: VIconWeight.fill,
                                 size: 20,
                                 color: canPost
                                     ? colorScheme.onPrimary
@@ -1970,46 +1583,6 @@ class _CreatePostModalState extends State<_CreatePostModal> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _ActionButton({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: VerbumFonts.sans(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                color: color,
-              ),
-            ),
-          ],
         ),
       ),
     );

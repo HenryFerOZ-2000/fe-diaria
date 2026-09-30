@@ -13,7 +13,7 @@ import '../widgets/verbum_header_actions.dart';
 import 'favorites_screen.dart';
 import 'traditional_prayers_religion_selection_screen.dart';
 import 'welcome_auth_screen.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class ProfileHubScreen extends StatefulWidget {
   const ProfileHubScreen({super.key});
@@ -185,7 +185,7 @@ class _ProfileContent extends StatelessWidget {
                     child: _MetricCard(
                       value: '${stats.prayersCompleted}',
                       label: 'Oraciones',
-                      icon: Icons.favorite_outline_rounded,
+                      icon: VerbumIcons.heart,
                       tint: const Color(0xFF9B5C62),
                     ),
                   ),
@@ -194,7 +194,7 @@ class _ProfileContent extends StatelessWidget {
                     child: _MetricCard(
                       value: '${stats.versesRead}',
                       label: 'Lecturas',
-                      icon: Icons.menu_book_rounded,
+                      icon: VerbumIcons.bookOpenText,
                       tint: const Color(0xFF6B7398),
                     ),
                   ),
@@ -203,7 +203,7 @@ class _ProfileContent extends StatelessWidget {
                     child: _MetricCard(
                       value: '${stats.activeDaysLast30}',
                       label: 'Días activos',
-                      icon: Icons.wb_sunny_outlined,
+                      icon: VerbumIcons.sun,
                       tint: const Color(0xFF9A783D),
                     ),
                   ),
@@ -218,20 +218,20 @@ class _ProfileContent extends StatelessWidget {
               _ActionGroup(
                 children: [
                   _ProfileAction(
-                    icon: Icons.route_outlined,
+                    icon: VerbumIcons.path,
                     title: 'Caminos espirituales',
                     subtitle: 'Procesos guiados para lo que hoy necesitas',
                     onTap: () =>
                         Navigator.pushNamed(context, '/spiritual-paths'),
                   ),
                   _ProfileAction(
-                    icon: Icons.forum_outlined,
+                    icon: VerbumIcons.chatsCircle,
                     title: 'Mis publicaciones',
                     subtitle: '${stats.postsCreated} compartidas en comunidad',
                     onTap: () => Navigator.pushNamed(context, '/my-profile'),
                   ),
                   _ProfileAction(
-                    icon: Icons.bookmark_border_rounded,
+                    icon: VerbumIcons.bookmarkSimple,
                     title: 'Contenido guardado',
                     subtitle: 'Vuelve a los versículos que te hablaron',
                     onTap: () => Navigator.of(context).push(
@@ -241,7 +241,7 @@ class _ProfileContent extends StatelessWidget {
                     ),
                   ),
                   _ProfileAction(
-                    icon: Icons.insights_outlined,
+                    icon: VerbumIcons.chartLineUp,
                     title: 'Datos espirituales',
                     subtitle: 'Métricas, hitos y logros de tu camino',
                     onTap: () =>
@@ -258,20 +258,20 @@ class _ProfileContent extends StatelessWidget {
               _ActionGroup(
                 children: [
                   _ProfileAction(
-                    icon: Icons.auto_awesome_outlined,
+                    icon: VerbumIcons.sparkle,
                     title: 'Tradición cristiana',
                     subtitle: tradition,
                     onTap: onTraditionTap,
                   ),
                   _ProfileAction(
-                    icon: Icons.tune_rounded,
+                    icon: VerbumIcons.slidersHorizontal,
                     title: 'Mi ritmo espiritual',
                     subtitle: 'Tiempo, emoción y momento preferido',
                     onTap: () =>
                         Navigator.pushNamed(context, '/personalization'),
                   ),
                   _ProfileAction(
-                    icon: Icons.notifications_none_rounded,
+                    icon: VerbumIcons.bell,
                     title: 'Recordatorios y preferencias',
                     subtitle: 'Horarios, contenido, idioma y apariencia',
                     onTap: () => Navigator.pushNamed(context, '/settings'),
@@ -287,20 +287,20 @@ class _ProfileContent extends StatelessWidget {
               _ActionGroup(
                 children: [
                   _ProfileAction(
-                    icon: Icons.manage_accounts_outlined,
+                    icon: VerbumIcons.userGear,
                     title: 'Cuenta y seguridad',
                     subtitle: 'Sesiones, privacidad y datos de la cuenta',
                     onTap: () =>
                         Navigator.pushNamed(context, '/account-settings'),
                   ),
                   _ProfileAction(
-                    icon: Icons.workspace_premium_outlined,
+                    icon: VerbumIcons.medal,
                     title: 'Plan de Verbum',
                     subtitle: 'Consulta los beneficios de tu plan',
                     onTap: () => Navigator.pushNamed(context, '/plan'),
                   ),
                   _ProfileAction(
-                    icon: Icons.help_outline_rounded,
+                    icon: VerbumIcons.question,
                     title: 'Ayuda y soporte',
                     subtitle: 'Preguntas frecuentes y contacto',
                     onTap: () => Navigator.pushNamed(context, '/help-support'),
@@ -311,7 +311,7 @@ class _ProfileContent extends StatelessWidget {
               Center(
                 child: TextButton.icon(
                   onPressed: onLogout,
-                  icon: const Icon(Icons.logout_rounded, size: 18),
+                  icon: const VIcon(VerbumIcons.signOut, size: 18),
                   label: const Text('Cerrar sesión'),
                   style: TextButton.styleFrom(
                     foregroundColor: Theme.of(
@@ -467,7 +467,7 @@ class _IdentityCard extends StatelessWidget {
                   backgroundColor: Colors.white.withValues(alpha: .12),
                   foregroundColor: Colors.white,
                 ),
-                icon: const Icon(Icons.edit_outlined, size: 19),
+                icon: const VIcon(VerbumIcons.pencilSimple, size: 19),
               ),
             ],
           ),
@@ -525,8 +525,7 @@ class _WeeklyJourneyCard extends StatelessWidget {
                       color: scheme.secondaryContainer,
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    child: Icon(
-                      Icons.local_fire_department_rounded,
+                    child: VIcon(VerbumIcons.flame, weight: VIconWeight.fill,
                       color: scheme.secondary,
                     ),
                   ),
@@ -605,8 +604,8 @@ class _WeeklyJourneyCard extends StatelessWidget {
                               ? Border.all(color: scheme.secondary, width: 2)
                               : null,
                         ),
-                        child: Icon(
-                          active ? Icons.check_rounded : Icons.circle,
+                        child: VIcon(
+                          active ? VerbumIcons.check : VerbumIcons.circle,
                           size: active ? 16 : 5,
                           color: active ? Colors.white : scheme.outline,
                         ),
@@ -637,8 +636,7 @@ class _WeeklyJourneyCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 2),
-                  Icon(
-                    Icons.arrow_forward_rounded,
+                  VIcon(VerbumIcons.arrowRight,
                     size: 16,
                     color: scheme.primary,
                   ),
@@ -655,7 +653,7 @@ class _WeeklyJourneyCard extends StatelessWidget {
 class _MetricCard extends StatelessWidget {
   final String value;
   final String label;
-  final IconData icon;
+  final VerbumIcons icon;
   final Color tint;
   const _MetricCard({
     required this.value,
@@ -677,7 +675,7 @@ class _MetricCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 19, color: tint),
+          VIcon(icon, size: 19, color: tint),
           const SizedBox(height: 8),
           Text(
             value,
@@ -765,7 +763,7 @@ class _ActionGroup extends StatelessWidget {
 }
 
 class _ProfileAction extends StatelessWidget {
-  final IconData icon;
+  final VerbumIcons icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
@@ -788,7 +786,7 @@ class _ProfileAction extends StatelessWidget {
           color: scheme.primaryContainer.withValues(alpha: .7),
           borderRadius: BorderRadius.circular(13),
         ),
-        child: Icon(icon, size: 20, color: scheme.primary),
+        child: VIcon(icon, size: 20, color: scheme.primary),
       ),
       title: Text(
         title,
@@ -800,8 +798,7 @@ class _ProfileAction extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: VerbumFonts.sans(fontSize: 11, color: scheme.onSurfaceVariant),
       ),
-      trailing: Icon(
-        Icons.chevron_right_rounded,
+      trailing: VIcon(VerbumIcons.caretRight,
         size: 20,
         color: scheme.outline,
       ),
@@ -828,8 +825,7 @@ class _CompletionCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
-              Icons.person_add_alt_1_outlined,
+            VIcon(VerbumIcons.userPlus,
               color: Theme.of(context).colorScheme.secondary,
             ),
             const SizedBox(width: 11),
@@ -842,7 +838,7 @@ class _CompletionCard extends StatelessWidget {
                 ),
               ),
             ),
-            const Icon(Icons.arrow_forward_rounded, size: 18),
+            const VIcon(VerbumIcons.arrowRight, size: 18),
           ],
         ),
       ),

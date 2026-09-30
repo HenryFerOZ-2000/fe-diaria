@@ -7,6 +7,7 @@ import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/main_card.dart';
 import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla para guardar y ver intenciones del día
 class DailyIntentionsScreen extends StatefulWidget {
@@ -115,7 +116,7 @@ class _DailyIntentionsScreenState extends State<DailyIntentionsScreen> {
                         const SizedBox(height: AppSpacing.md),
                         CustomButton(
                           text: 'Guardar Intención',
-                          icon: Icons.save,
+                          icon: VerbumIcons.floppyDisk,
                           onPressed: _saveIntention,
                           width: double.infinity,
                         ),
@@ -142,7 +143,7 @@ class _DailyIntentionsScreenState extends State<DailyIntentionsScreen> {
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete_outline),
+                                icon: const VIcon(VerbumIcons.trash),
                                 onPressed: () => _deleteIntention(index),
                                 color: Colors.red,
                               ),

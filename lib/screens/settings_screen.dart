@@ -12,7 +12,7 @@ import '../faith/faith_tradition.dart';
 import '../features/liturgy/application/calendar_region_resolver.dart';
 import '../features/liturgy/presentation/catholic_calendar_settings_tile.dart';
 import 'traditional_prayers_religion_selection_screen.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de configuración con todas las opciones de la aplicación
 class SettingsScreen extends StatefulWidget {
@@ -242,8 +242,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               if (isSelected)
-                Icon(
-                  Icons.check_circle,
+                VIcon(VerbumIcons.checkCircle, weight: VIconWeight.fill,
                   color: Theme.of(context).colorScheme.primary,
                 ),
             ],
@@ -316,11 +315,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      leading: Icon(
-                        Icons.language,
+                      leading: VIcon(VerbumIcons.globe,
                         color: Theme.of(context).colorScheme.primary,
                       ),
-                      trailing: const Icon(Icons.chevron_right),
+                      trailing: const VIcon(VerbumIcons.caretRight),
                       onTap: () => _showLanguageSelector(context, provider),
                     ),
                   ],
@@ -349,11 +347,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      leading: Icon(
-                        Icons.person_rounded,
+                      leading: VIcon(VerbumIcons.user, weight: VIconWeight.fill,
                         color: Theme.of(context).colorScheme.primary,
                       ),
-                      trailing: const Icon(Icons.chevron_right),
+                      trailing: const VIcon(VerbumIcons.caretRight),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -391,11 +388,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      leading: Icon(
-                        Icons.church,
+                      leading: VIcon(VerbumIcons.church, weight: VIconWeight.fill,
                         color: Theme.of(context).colorScheme.primary,
                       ),
-                      trailing: const Icon(Icons.chevron_right),
+                      trailing: const VIcon(VerbumIcons.caretRight),
                       onTap: () async {
                         final result = await Navigator.of(context).push(
                           MaterialPageRoute(
@@ -467,8 +463,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       value: provider.darkMode,
                       onChanged: (value) => provider.setDarkMode(value),
-                      secondary: Icon(
-                        provider.darkMode ? Icons.dark_mode : Icons.light_mode,
+                      secondary: VIcon(
+                        provider.darkMode ? VerbumIcons.moon : VerbumIcons.sun,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
@@ -487,15 +483,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      leading: Icon(
-                        Icons.text_fields,
+                      leading: VIcon(VerbumIcons.textAa,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.remove_circle_outline),
+                            icon: const VIcon(VerbumIcons.minusCircle),
                             onPressed: provider.fontSize > 0.8
                                 ? () => provider.setFontSize(
                                     provider.fontSize - 0.1,
@@ -503,7 +498,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 : null,
                           ),
                           IconButton(
-                            icon: const Icon(Icons.add_circle_outline),
+                            icon: const VIcon(VerbumIcons.plusCircle),
                             onPressed: provider.fontSize < 1.4
                                 ? () => provider.setFontSize(
                                     provider.fontSize + 0.1,
@@ -529,8 +524,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       value: provider.readingMode,
                       onChanged: (value) => provider.setReadingMode(value),
-                      secondary: Icon(
-                        Icons.book,
+                      secondary: VIcon(VerbumIcons.book, weight: VIconWeight.fill,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
@@ -550,8 +544,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       value: provider.soundEnabled,
                       onChanged: (value) => provider.setSoundEnabled(value),
-                      secondary: Icon(
-                        Icons.volume_up,
+                      secondary: VIcon(VerbumIcons.speakerHigh, weight: VIconWeight.fill,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
@@ -574,11 +567,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      leading: Icon(
-                        Icons.widgets_rounded,
+                      leading: VIcon(VerbumIcons.squaresFour,
                         color: Theme.of(context).colorScheme.primary,
                       ),
-                      trailing: const Icon(Icons.chevron_right),
+                      trailing: const VIcon(VerbumIcons.caretRight),
                       onTap: () =>
                           Navigator.pushNamed(context, '/daily-verse-widget'),
                     ),
@@ -629,8 +621,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           provider.setNotificationEnabled(false);
                         }
                       },
-                      secondary: Icon(
-                        Icons.notifications,
+                      secondary: VIcon(VerbumIcons.bell, weight: VIconWeight.fill,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
@@ -654,8 +645,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         value: provider.morningNotificationEnabled,
                         onChanged: (value) =>
                             provider.setMorningNotificationEnabled(value),
-                        secondary: const Icon(
-                          Icons.wb_sunny,
+                        secondary: const VIcon(VerbumIcons.sun, weight: VIconWeight.fill,
                           color: Colors.orange,
                         ),
                       ),
@@ -674,11 +664,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          leading: const Icon(
-                            Icons.access_time,
+                          leading: const VIcon(VerbumIcons.clock,
                             color: Colors.orange,
                           ),
-                          trailing: const Icon(Icons.chevron_right),
+                          trailing: const VIcon(VerbumIcons.caretRight),
                           onTap: () => _selectTime(
                             context,
                             provider.morningVerseNotificationTime,
@@ -706,8 +695,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         value: provider.eveningNotificationEnabled,
                         onChanged: (value) =>
                             provider.setEveningNotificationEnabled(value),
-                        secondary: const Icon(
-                          Icons.nightlight_round,
+                        secondary: const VIcon(VerbumIcons.moon, weight: VIconWeight.fill,
                           color: Colors.indigo,
                         ),
                       ),
@@ -726,11 +714,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          leading: const Icon(
-                            Icons.access_time,
+                          leading: const VIcon(VerbumIcons.clock,
                             color: Colors.indigo,
                           ),
-                          trailing: const Icon(Icons.chevron_right),
+                          trailing: const VIcon(VerbumIcons.caretRight),
                           onTap: () => _selectTime(
                             context,
                             provider.eveningPrayerNotificationTime,
@@ -758,8 +745,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         value: provider.hourlyRemindersEnabled,
                         onChanged: (value) =>
                             provider.setHourlyRemindersEnabled(value),
-                        secondary: Icon(
-                          Icons.schedule,
+                        secondary: VIcon(VerbumIcons.clock,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
@@ -778,7 +764,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ).colorScheme.onSurfaceVariant,
                           ),
                         ),
-                        trailing: const Icon(Icons.send),
+                        trailing: const VIcon(VerbumIcons.paperPlaneRight, weight: VIconWeight.fill),
                         onTap: _testNotification,
                       ),
                       if (kDebugMode) ...[
@@ -797,7 +783,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ).colorScheme.onSurfaceVariant,
                             ),
                           ),
-                          trailing: const Icon(Icons.bug_report_outlined),
+                          trailing: const VIcon(VerbumIcons.bug),
                           onTap: () async {
                             await NotificationService()
                                 .printDiagnosticsToConsole();
@@ -841,8 +827,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      leading: Icon(
-                        Icons.info_outline,
+                      leading: VIcon(VerbumIcons.info,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
@@ -859,8 +844,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      leading: Icon(
-                        Icons.menu_book_outlined,
+                      leading: VIcon(VerbumIcons.bookOpenText,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),

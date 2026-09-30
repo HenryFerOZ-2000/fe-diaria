@@ -8,6 +8,7 @@ import '../widgets/app_scaffold.dart';
 import '../widgets/prayer_card.dart';
 import '../widgets/empty_state.dart';
 import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de oraciones para dormir
 class NightPrayersScreen extends StatefulWidget {
@@ -85,7 +86,7 @@ class _NightPrayersScreenState extends State<NightPrayersScreen> {
                 ? EmptyState(
                     title: 'No hay oraciones disponibles',
                     message: 'Intenta recargar más tarde',
-                    icon: Icons.bedtime_outlined,
+                    icon: VerbumIcons.moonStars,
                     onAction: _loadData,
                     actionLabel: 'Recargar',
                   )
@@ -100,7 +101,7 @@ class _NightPrayersScreenState extends State<NightPrayersScreen> {
                           provenance: ContentProvenance.aiGenerated,
                           title: prayer['title'] as String,
                           text: prayer['text'] as String,
-                          icon: Icons.bedtime_rounded,
+                          icon: VerbumIcons.moonStars,
                           accentColor: colorScheme.tertiary,
                         ),
                       );

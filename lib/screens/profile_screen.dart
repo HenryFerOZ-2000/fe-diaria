@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../services/profile_service.dart';
 import '../widgets/verbum_ambient_background.dart';
 import 'welcome_auth_screen.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class MySocialProfileScreen extends StatefulWidget {
   final int? initialTabIndex;
@@ -57,7 +57,7 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen> {
                     tooltip: 'Editar perfil',
                     onPressed: () =>
                         Navigator.pushNamed(context, '/edit-profile'),
-                    icon: const Icon(Icons.edit_outlined),
+                    icon: const VIcon(VerbumIcons.pencilSimple),
                   ),
                   const SizedBox(width: 5),
                 ],
@@ -112,7 +112,7 @@ class _PostsListState extends State<_PostsList> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        icon: Icon(Icons.delete_outline_rounded, color: scheme.error),
+        icon: VIcon(VerbumIcons.trash, color: scheme.error),
         title: Text(
           'Eliminar publicación',
           style: VerbumFonts.serif(fontWeight: FontWeight.w700),
@@ -197,7 +197,7 @@ class _PostsListState extends State<_PostsList> {
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _MessageState(
-            icon: Icons.cloud_off_outlined,
+            icon: VerbumIcons.cloudSlash,
             title: 'No pudimos cargar tus publicaciones',
             message: 'Revisa tu conexión e inténtalo nuevamente.',
           );
@@ -209,7 +209,7 @@ class _PostsListState extends State<_PostsList> {
         }
         if (docs.isEmpty) {
           return const _MessageState(
-            icon: Icons.forum_outlined,
+            icon: VerbumIcons.chatsCircle,
             title: 'Tu voz aún tiene espacio',
             message:
                 'Cuando compartas una oración o reflexión en Comunidad, aparecerá aquí.',
@@ -301,8 +301,7 @@ class _PostsListState extends State<_PostsList> {
                       IconButton(
                         tooltip: 'Eliminar publicación',
                         onPressed: () => _deletePost(doc.id, text),
-                        icon: Icon(
-                          Icons.more_horiz_rounded,
+                        icon: VIcon(VerbumIcons.dotsThree,
                           color: scheme.onSurfaceVariant,
                         ),
                       ),
@@ -320,8 +319,7 @@ class _PostsListState extends State<_PostsList> {
                   const SizedBox(height: 14),
                   Row(
                     children: [
-                      Icon(
-                        Icons.public_rounded,
+                      VIcon(VerbumIcons.globe,
                         size: 14,
                         color: scheme.onSurfaceVariant,
                       ),
@@ -376,7 +374,7 @@ class _CollectionIntro extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.auto_stories_outlined, color: scheme.primary),
+          VIcon(VerbumIcons.bookOpen, color: scheme.primary),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -406,7 +404,7 @@ class _CollectionIntro extends StatelessWidget {
 }
 
 class _MessageState extends StatelessWidget {
-  final IconData icon;
+  final VerbumIcons icon;
   final String title;
   final String message;
   const _MessageState({
@@ -429,7 +427,7 @@ class _MessageState extends StatelessWidget {
                 color: scheme.primaryContainer.withValues(alpha: .7),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 31, color: scheme.primary),
+              child: VIcon(icon, size: 31, color: scheme.primary),
             ),
             const SizedBox(height: 18),
             Text(

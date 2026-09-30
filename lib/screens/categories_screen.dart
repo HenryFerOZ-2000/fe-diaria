@@ -19,6 +19,7 @@ import '../widgets/category_card.dart';
 import '../theme/app_theme.dart';
 import '../faith/faith_tradition.dart';
 import '../faith/tradition_capabilities.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla principal de Categorías con acceso a todos los módulos
 class CategoriesScreen extends StatefulWidget {
@@ -78,7 +79,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       CategoryCard(
         title: 'Devocionales diarios',
         description: 'Reflexiones diarias con versículos',
-        icon: Icons.book_rounded,
+        icon: VerbumIcons.book,
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => const DevotionalsScreen()),
@@ -88,7 +89,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       CategoryCard(
         title: 'Salmos por categoría',
         description: 'Salmos de protección, agradecimiento y consuelo',
-        icon: Icons.library_books_rounded,
+        icon: VerbumIcons.books,
         onTap: () {
           Navigator.of(
             context,
@@ -100,7 +101,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         description: TraditionUiStrings.categoriesTraditionalCardDescription(
           tradition,
         ),
-        icon: Icons.menu_book_rounded,
+        icon: VerbumIcons.bookOpenText,
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -113,7 +114,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       CategoryCard(
         title: 'Oración para…',
         description: 'Oraciones para situaciones específicas',
-        icon: Icons.favorite_rounded,
+        icon: VerbumIcons.heart,
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -125,7 +126,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       CategoryCard(
         title: 'Cómo te sientes hoy',
         description: 'Oraciones personalizadas según tu emoción',
-        icon: Icons.emoji_emotions_rounded,
+        icon: VerbumIcons.smiley,
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -137,7 +138,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       CategoryCard(
         title: 'Oraciones para dormir',
         description: 'Oraciones de paz y descanso nocturno',
-        icon: Icons.bedtime_rounded,
+        icon: VerbumIcons.moonStars,
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => const NightPrayersScreen()),
@@ -147,7 +148,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       CategoryCard(
         title: 'Peticiones especiales',
         description: 'Oraciones por salud, trabajo, familia y más',
-        icon: Icons.healing_rounded,
+        icon: VerbumIcons.firstAid,
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -159,7 +160,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       CategoryCard(
         title: 'Intenciones del día',
         description: 'Guarda y reza por tus intenciones personales',
-        icon: Icons.edit_note_rounded,
+        icon: VerbumIcons.notePencil,
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -172,7 +173,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         CategoryCard(
           title: 'Guía del Rosario',
           description: 'Aprende a rezar el rosario paso a paso',
-          icon: Icons.church_rounded,
+          icon: VerbumIcons.church,
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -185,7 +186,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         CategoryCard(
           title: 'Santos del día',
           description: 'Conoce a los santos y sus oraciones',
-          icon: Icons.auto_stories_rounded,
+          icon: VerbumIcons.bookOpen,
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => const SaintsScreen()),
@@ -196,7 +197,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         CategoryCard(
           title: 'Novena',
           description: 'Novena de Navidad día a día',
-          icon: Icons.calendar_view_day_rounded,
+          icon: VerbumIcons.calendarCheck,
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => const NovenaScreen()),
