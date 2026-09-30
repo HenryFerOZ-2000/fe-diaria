@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../theme/app_theme.dart';
 import '../application/share_card_layout.dart';
 import '../domain/share_card_format.dart';
 import '../domain/share_content.dart';
@@ -257,27 +256,35 @@ class _CardPalette {
   final Color accent;
   final Color halo;
 
+  // Valores fijos de la tarjeta exportada (cubiertos por goldens). No usan
+  // AppColors para que un cambio del tema de la app no altere las imágenes
+  // compartidas sin querer.
+  static const _paper = Color(0xFFFFFDF8);
+  static const _violet = Color(0xFF493878);
+  static const _deepViolet = Color(0xFF261E45);
+  static const _gold = Color(0xFFB58A45);
+
   static _CardPalette forStyle(ShareVisualStyle style) => switch (style) {
     ShareVisualStyle.sereneLight => const _CardPalette(
-      background: [AppColors.surface, Color(0xFFF3EEE5), Color(0xFFEAE4F0)],
-      ink: AppColors.primaryDark,
-      metadata: AppColors.primary,
-      accent: AppColors.secondary,
-      halo: AppColors.secondary,
+      background: [_paper, Color(0xFFF3EEE5), Color(0xFFEAE4F0)],
+      ink: _deepViolet,
+      metadata: _violet,
+      accent: _gold,
+      halo: _gold,
     ),
     ShareVisualStyle.contemplativeNight => const _CardPalette(
-      background: [Color(0xFF15121D), AppColors.primaryDark, Color(0xFF17141F)],
-      ink: AppColors.surface,
+      background: [Color(0xFF15121D), _deepViolet, Color(0xFF17141F)],
+      ink: _paper,
       metadata: Color(0xFFE2C998),
       accent: Color(0xFFD8B875),
-      halo: AppColors.secondary,
+      halo: _gold,
     ),
     ShareVisualStyle.livingTradition => const _CardPalette(
-      background: [AppColors.primaryDark, AppColors.primary, Color(0xFF60475B)],
-      ink: AppColors.surface,
+      background: [_deepViolet, _violet, Color(0xFF60475B)],
+      ink: _paper,
       metadata: Color(0xFFF0D8A7),
       accent: Color(0xFFD8B875),
-      halo: AppColors.secondary,
+      halo: _gold,
     ),
   };
 }

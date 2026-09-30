@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 OverlayEntry? _activeTopNotice;
 Timer? _activeTopNoticeTimer;
@@ -90,7 +90,7 @@ void showTopNotice(
                             message,
                             maxLines: 3,
                             overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               color: foregroundColor,
                               fontSize: 13.5,
                               fontWeight: FontWeight.w600,

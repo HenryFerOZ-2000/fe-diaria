@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'verbum_ambient_background.dart';
 import 'verbum_header_actions.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/icons/verbum_icons.dart';
 
 enum CommunityMemberAction { promote, demote, transfer }
 
@@ -121,7 +122,7 @@ class CommunityMembersPanel extends StatelessWidget {
                           children: [
                             Text(
                               'NUESTRA COMUNIDAD',
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 color: scheme.secondary,
                                 fontSize: 9,
                                 fontWeight: FontWeight.w800,
@@ -133,7 +134,7 @@ class CommunityMembersPanel extends StatelessWidget {
                               'Personas de la comunidad',
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.playfairDisplay(
+                              style: VerbumFonts.serif(
                                 color: scheme.onSurface,
                                 fontSize: 24,
                                 height: 1.08,
@@ -147,7 +148,7 @@ class CommunityMembersPanel extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       VerbumHeaderButton(
-                        icon: Icons.close_rounded,
+                        icon: VerbumIcons.close,
                         tooltip: 'Cerrar miembros',
                         onPressed: isSubmitting ? () {} : onClose,
                       ),
@@ -185,7 +186,7 @@ class CommunityMembersPanel extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   'Administración avanzada',
-                                  style: GoogleFonts.inter(
+                                  style: VerbumFonts.sans(
                                     color: scheme.primary,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -265,7 +266,7 @@ class _MemberCountPill extends StatelessWidget {
         ),
         child: Text(
           count == 1 ? '1 persona' : '$count personas',
-          style: GoogleFonts.inter(
+          style: VerbumFonts.sans(
             color: scheme.onSurfaceVariant,
             fontSize: 11,
             fontWeight: FontWeight.w700,
@@ -336,7 +337,7 @@ class _CommunityMemberCard extends StatelessWidget {
                       name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         color: scheme.onSurface,
                         fontSize: 14.5,
                         fontWeight: FontWeight.w700,
@@ -350,7 +351,7 @@ class _CommunityMemberCard extends StatelessWidget {
                           : 'Miembro de la comunidad',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         color: scheme.onSurfaceVariant,
                         fontSize: 11.5,
                         height: 1.25,
@@ -492,7 +493,7 @@ class _AvatarInitial extends StatelessWidget {
     return Center(
       child: Text(
         name.isEmpty ? '?' : name.characters.first.toUpperCase(),
-        style: GoogleFonts.playfairDisplay(
+        style: VerbumFonts.serif(
           color: scheme.primary,
           fontSize: 20,
           fontWeight: FontWeight.w700,
@@ -537,7 +538,7 @@ class _MemberRolePill extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               color: color,
               fontSize: 9.5,
               fontWeight: FontWeight.w700,
@@ -608,7 +609,7 @@ class _MembersMessageState extends StatelessWidget {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.playfairDisplay(
+                style: VerbumFonts.serif(
                   color: scheme.onSurface,
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -618,7 +619,7 @@ class _MembersMessageState extends StatelessWidget {
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: scheme.onSurfaceVariant,
                   fontSize: 13,
                   height: 1.45,

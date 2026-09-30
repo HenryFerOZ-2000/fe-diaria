@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/spiritual_stats.dart';
 import '../models/achievement.dart';
 import '../services/spiritual_stats_service.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class SpiritualStatsScreen extends StatefulWidget {
   const SpiritualStatsScreen({super.key});
@@ -168,7 +168,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
       appBar: AppBar(
         title: Text(
           'Datos espirituales',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -195,7 +195,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
                     // Métricas principales
                     Text(
                       'Métricas',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
                       ),
@@ -206,7 +206,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
                     // Logros
                     Text(
                       'Logros',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
                       ),
@@ -362,7 +362,7 @@ class _StatsCard extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     value,
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: color,
@@ -372,7 +372,7 @@ class _StatsCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   title,
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -382,7 +382,7 @@ class _StatsCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     fontSize: 10,
                     color: Colors.grey[600],
                   ),
@@ -450,7 +450,7 @@ class _AchievementCard extends StatelessWidget {
           Flexible(
             child: Text(
               achievement.title,
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
                 color: isUnlocked ? Colors.amber[900] : Colors.grey[600],
@@ -471,7 +471,7 @@ class _AchievementCard extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               '$progress/${achievement.target}',
-              style: GoogleFonts.inter(fontSize: 8, color: Colors.grey[600]),
+              style: VerbumFonts.sans(fontSize: 8, color: Colors.grey[600]),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

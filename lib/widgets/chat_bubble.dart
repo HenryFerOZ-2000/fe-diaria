@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class ChatBubble extends StatelessWidget {
   final String text;
@@ -44,7 +44,7 @@ class ChatBubble extends StatelessWidget {
           ),
           child: Text(
             text,
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               fontSize: 14,
               height: 1.5,
               color: colorScheme.onSurface,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
 import '../services/daily_content_service.dart';
@@ -8,6 +7,7 @@ import '../services/prayer_service.dart';
 import '../services/storage_service.dart';
 import '../widgets/verbum_ambient_background.dart';
 import 'traditional_prayers_categories_screen.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 Future<void> _syncAfterTraditionChange(BuildContext context) async {
   PrayerService().resetInMemoryDailyPrayers();
@@ -147,7 +147,7 @@ class _TraditionalPrayersReligionSelectionScreenState
                     Expanded(
                       child: Text(
                         'Verbum',
-                        style: GoogleFonts.playfairDisplay(
+                        style: VerbumFonts.serif(
                           color: scheme.onSurface,
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
@@ -167,7 +167,7 @@ class _TraditionalPrayersReligionSelectionScreenState
                     children: [
                       Text(
                         firstRun ? 'HAZLO TUYO' : 'TU PREFERENCIA',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           color: scheme.secondary,
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
@@ -179,7 +179,7 @@ class _TraditionalPrayersReligionSelectionScreenState
                         firstRun
                             ? 'Haz de Verbum un\nespacio más tuyo'
                             : 'Elige cómo quieres\nvivir Verbum',
-                        style: GoogleFonts.playfairDisplay(
+                        style: VerbumFonts.serif(
                           color: scheme.onSurface,
                           fontSize: 34,
                           height: 1.05,
@@ -190,7 +190,7 @@ class _TraditionalPrayersReligionSelectionScreenState
                       const SizedBox(height: 13),
                       Text(
                         'Esto adapta algunas oraciones, reflexiones y experiencias. No limita lo que puedes explorar.',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           color: scheme.onSurfaceVariant,
                           fontSize: 14,
                           height: 1.5,
@@ -224,7 +224,7 @@ class _TraditionalPrayersReligionSelectionScreenState
                           Expanded(
                             child: Text(
                               'Podrás cambiar esta elección cuando quieras desde Ajustes.',
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 color: scheme.onSurfaceVariant,
                                 fontSize: 11.5,
                                 height: 1.4,
@@ -363,7 +363,7 @@ class _TraditionCard extends StatelessWidget {
                     children: [
                       Text(
                         option.title,
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           color: scheme.onSurface,
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
@@ -372,7 +372,7 @@ class _TraditionCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         option.description,
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           color: scheme.onSurfaceVariant,
                           fontSize: 11.5,
                           height: 1.4,
@@ -431,7 +431,7 @@ class _StepBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.inter(
+        style: VerbumFonts.sans(
           color: dark ? scheme.primaryContainer : scheme.primary,
           fontSize: 9,
           fontWeight: FontWeight.w800,

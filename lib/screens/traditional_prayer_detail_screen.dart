@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/traditional_prayers_service.dart';
 import '../services/share_service.dart';
 import '../widgets/prayer_reading_experience.dart';
 import '../faith/content_provenance.dart';
 import '../faith/biblical_prayer_passages.dart';
 import '../features/sharing/domain/share_content.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 /// Pantalla de detalle de una oración tradicional
 class TraditionalPrayerDetailScreen extends StatefulWidget {
@@ -202,7 +202,7 @@ class _TraditionalPrayerDetailScreenState
                                   _prayer!['titulo'] as String? ??
                                       widget.prayerKey,
                                   textAlign: TextAlign.center,
-                                  style: GoogleFonts.playfairDisplay(
+                                  style: VerbumFonts.serif(
                                     color: Colors.white,
                                     fontSize: 24,
                                     fontWeight: FontWeight.w700,
@@ -212,7 +212,7 @@ class _TraditionalPrayerDetailScreenState
                                 Text(
                                   _prayer!['texto'] as String? ?? '',
                                   textAlign: TextAlign.center,
-                                  style: GoogleFonts.inter(
+                                  style: VerbumFonts.sans(
                                     color: Colors.white,
                                     fontSize: 20,
                                     height: 1.55,
@@ -251,7 +251,7 @@ class _ErrorState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(color: Colors.white70, fontSize: 16),
+              style: VerbumFonts.sans(color: Colors.white70, fontSize: 16),
             ),
             const SizedBox(height: 12),
             OutlinedButton(

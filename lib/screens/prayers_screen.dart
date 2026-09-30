@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
 import '../widgets/app_scaffold.dart';
@@ -13,6 +12,7 @@ import 'intention_prayer_read_screen.dart';
 import 'traditional_prayer_screen.dart';
 import 'traditional_prayers_list_screen.dart';
 import 'content_sources_screen.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class PrayersScreen extends StatefulWidget {
   const PrayersScreen({super.key});
@@ -38,7 +38,7 @@ class _PrayersScreenState extends State<PrayersScreen> {
       centerTitle: false,
       titleWidget: Text(
         'Oraciones',
-        style: GoogleFonts.playfairDisplay(
+        style: VerbumFonts.serif(
           fontSize: 24,
           fontWeight: FontWeight.bold,
           color: colorScheme.onSurface,
@@ -137,7 +137,7 @@ class _PrayersScreenState extends State<PrayersScreen> {
             children: [
               Text(
                 'UN MOMENTO PARA TI',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: const Color(0xFFD8B875),
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
@@ -147,7 +147,7 @@ class _PrayersScreenState extends State<PrayersScreen> {
               const SizedBox(height: 10),
               Text(
                 'Respira. Dios\nestá aquí.',
-                style: GoogleFonts.playfairDisplay(
+                style: VerbumFonts.serif(
                   color: Colors.white,
                   fontSize: 32,
                   height: 1.05,
@@ -160,7 +160,7 @@ class _PrayersScreenState extends State<PrayersScreen> {
                         tradition == FaithTradition.general
                     ? 'Encuentra una oración nacida de la Palabra.'
                     : 'Encuentra palabras para lo que hoy lleva tu corazón.',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: Colors.white.withValues(alpha: .74),
                   fontSize: 13,
                   height: 1.45,
@@ -189,7 +189,7 @@ class _PrayersScreenState extends State<PrayersScreen> {
         Expanded(
           child: Text(
             title,
-            style: GoogleFonts.playfairDisplay(
+            style: VerbumFonts.serif(
               fontSize: 22,
               fontWeight: FontWeight.w700,
               color: colorScheme.onSurface,

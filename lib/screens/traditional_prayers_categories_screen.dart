@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../services/ads_service.dart';
@@ -10,6 +9,8 @@ import '../widgets/traditional_prayer_library.dart';
 import '../widgets/verbum_header_actions.dart';
 import 'traditional_prayers_list_screen.dart';
 import 'traditional_prayers_religion_selection_screen.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import 'package:verbum/design_system/icons/verbum_icons.dart';
 
 /// Biblioteca de categorías según la tradición elegida por la persona.
 class TraditionalPrayersCategoriesScreen extends StatefulWidget {
@@ -104,7 +105,7 @@ class _TraditionalPrayersCategoriesScreenState
         child: Text(
           'Oraciones tradicionales',
           maxLines: 1,
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 23,
             fontWeight: FontWeight.w700,
           ),
@@ -114,7 +115,7 @@ class _TraditionalPrayersCategoriesScreenState
         Padding(
           padding: const EdgeInsets.only(right: 12),
           child: VerbumHeaderButton(
-            icon: Icons.tune_rounded,
+            icon: VerbumIcons.slidersHorizontal,
             tooltip: 'Cambiar tradición',
             onPressed: () async {
               await Navigator.of(context).push(

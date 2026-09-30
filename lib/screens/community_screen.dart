@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:share_plus/share_plus.dart';
@@ -23,6 +22,7 @@ import '../widgets/verbum_header_actions.dart';
 import '../data/spiritual_paths_catalog.dart';
 import '../models/spiritual_path.dart';
 import 'spiritual_path_detail_screen.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class CommunityScreen extends StatelessWidget {
   const CommunityScreen({super.key});
@@ -60,7 +60,7 @@ class CommunityScreen extends StatelessWidget {
             children: [
               Text(
                 'Comunidad',
-                style: GoogleFonts.playfairDisplay(
+                style: VerbumFonts.serif(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
                   color: colorScheme.onSurface,
@@ -68,7 +68,7 @@ class CommunityScreen extends StatelessWidget {
               ),
               Text(
                 'FE QUE SE COMPARTE',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   fontSize: 8,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.6,
@@ -109,11 +109,11 @@ class CommunityScreen extends StatelessWidget {
                   splashBorderRadius: BorderRadius.circular(11),
                   labelColor: Colors.white,
                   unselectedLabelColor: colorScheme.onSurfaceVariant,
-                  labelStyle: GoogleFonts.poppins(
+                  labelStyle: VerbumFonts.sans(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
-                  unselectedLabelStyle: GoogleFonts.poppins(
+                  unselectedLabelStyle: VerbumFonts.sans(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -566,7 +566,7 @@ class _MyCommunityEmptyView extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
                 color: colorScheme.onSurface,
@@ -576,7 +576,7 @@ class _MyCommunityEmptyView extends StatelessWidget {
             Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 14,
                 height: 1.5,
                 color: colorScheme.onSurface.withValues(alpha: 0.7),
@@ -676,7 +676,7 @@ class _CommunityBasicView extends StatelessWidget {
           children: [
             Text(
               'Nuestro espacio',
-              style: GoogleFonts.playfairDisplay(
+              style: VerbumFonts.serif(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
               ),
@@ -690,7 +690,7 @@ class _CommunityBasicView extends StatelessWidget {
               ),
               child: Text(
                 isAdmin ? 'ADMINISTRADOR' : 'MIEMBRO',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   fontSize: 9,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1,
@@ -735,7 +735,7 @@ class _CommunityBasicView extends StatelessWidget {
                     Expanded(
                       child: Text(
                         'Información y gestión',
-                        style: GoogleFonts.playfairDisplay(
+                        style: VerbumFonts.serif(
                           fontSize: 19,
                           fontWeight: FontWeight.w700,
                         ),
@@ -762,7 +762,7 @@ class _CommunityBasicView extends StatelessWidget {
                             const SizedBox(width: 4),
                             Text(
                               'Verificada',
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 color: colorScheme.primary,
@@ -805,7 +805,7 @@ class _CommunityBasicView extends StatelessWidget {
                       const SizedBox(width: 6),
                       Text(
                         city,
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 13.5,
                           color: colorScheme.onSurface.withValues(alpha: 0.8),
                         ),
@@ -817,7 +817,7 @@ class _CommunityBasicView extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     description,
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       fontSize: 14,
                       height: 1.5,
                       color: colorScheme.onSurface.withValues(alpha: 0.9),
@@ -841,7 +841,7 @@ class _CommunityBasicView extends StatelessWidget {
                         Expanded(
                           child: Text(
                             'Responsable: $priestName',
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               fontSize: 13.5,
                               fontWeight: FontWeight.w500,
                             ),
@@ -879,7 +879,7 @@ class _CommunityBasicView extends StatelessWidget {
                             children: [
                               Text(
                                 'Codigo de invitacion',
-                                style: GoogleFonts.inter(
+                                style: VerbumFonts.sans(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                   color: colorScheme.onSurface.withValues(
@@ -890,7 +890,7 @@ class _CommunityBasicView extends StatelessWidget {
                               const SizedBox(height: 2),
                               Text(
                                 inviteCode,
-                                style: GoogleFonts.inter(
+                                style: VerbumFonts.sans(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 0.8,
@@ -964,7 +964,7 @@ class _CommunityBasicView extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'Solo los administradores pueden publicar en esta comunidad.',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 13.5,
                         color: colorScheme.onSurface.withValues(alpha: 0.8),
                       ),
@@ -988,7 +988,7 @@ class _CommunityBasicView extends StatelessWidget {
           children: [
             Text(
               'Lo que compartimos',
-              style: GoogleFonts.playfairDisplay(
+              style: VerbumFonts.serif(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
               ),
@@ -1044,7 +1044,7 @@ class _CommunityBasicView extends StatelessWidget {
                       Expanded(
                         child: Text(
                           'Aun no hay publicaciones en esta comunidad.',
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             color: colorScheme.onSurface.withValues(alpha: 0.8),
                           ),
                         ),
@@ -1110,7 +1110,7 @@ class _CommunityPathCard extends StatelessWidget {
             children: [
               Text(
                 'Camino de la comunidad',
-                style: GoogleFonts.playfairDisplay(
+                style: VerbumFonts.serif(
                   fontSize: 23,
                   fontWeight: FontWeight.w700,
                 ),
@@ -1118,7 +1118,7 @@ class _CommunityPathCard extends StatelessWidget {
               const SizedBox(height: 5),
               Text(
                 'Elige un recorrido que todos puedan realizar juntos.',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   fontSize: 12,
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -1212,7 +1212,7 @@ class _CommunityPathCard extends StatelessWidget {
                   children: [
                     Text(
                       'CAMINO DE LA COMUNIDAD',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         color: accent,
                         fontSize: 8,
                         letterSpacing: 1.1,
@@ -1222,7 +1222,7 @@ class _CommunityPathCard extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       path?.title ?? 'Elijan un camino para recorrer juntos',
-                      style: GoogleFonts.playfairDisplay(
+                      style: VerbumFonts.serif(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
                       ),
@@ -1230,7 +1230,7 @@ class _CommunityPathCard extends StatelessWidget {
                     if (path != null)
                       Text(
                         path.subtitle,
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 10.5,
                           color: scheme.onSurfaceVariant,
                         ),
@@ -1339,7 +1339,7 @@ class _CommunityWelcomeHero extends StatelessWidget {
                         ),
                         child: Text(
                           isAdmin ? 'Tu comunidad · Admin' : 'Tu comunidad',
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             color: Colors.white,
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
@@ -1361,7 +1361,7 @@ class _CommunityWelcomeHero extends StatelessWidget {
                     name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.playfairDisplay(
+                    style: VerbumFonts.serif(
                       color: Colors.white,
                       fontSize: 26,
                       height: 1.05,
@@ -1380,7 +1380,7 @@ class _CommunityWelcomeHero extends StatelessWidget {
                         const SizedBox(width: 5),
                         Text(
                           city,
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             color: Colors.white70,
                             fontSize: 12,
                           ),
@@ -1446,7 +1446,7 @@ class _HeroAction extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   label,
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     color: Colors.white,
                     fontSize: 9,
                     fontWeight: FontWeight.w700,
@@ -1689,7 +1689,7 @@ class _ManageAdminsButton extends StatelessWidget {
               title: Text(
                 'Administración avanzada',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.playfairDisplay(
+                style: VerbumFonts.serif(
                   fontSize: 23,
                   fontWeight: FontWeight.w700,
                 ),
@@ -1752,7 +1752,7 @@ class _ManageAdminsButton extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     'Utiliza esta opción solo si la persona no aparece todavía en la lista principal.',
-                                    style: GoogleFonts.inter(
+                                    style: VerbumFonts.sans(
                                       color: scheme.onSurfaceVariant,
                                       fontSize: 12.5,
                                       height: 1.4,
@@ -1812,7 +1812,7 @@ class _ManageAdminsButton extends StatelessWidget {
                           const SizedBox(height: 20),
                           Text(
                             'Administradores actuales',
-                            style: GoogleFonts.playfairDisplay(
+                            style: VerbumFonts.serif(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                             ),
@@ -1865,7 +1865,7 @@ class _ManageAdminsButton extends StatelessWidget {
                                   isOwner
                                       ? 'Responsable principal'
                                       : 'Administrador',
-                                  style: GoogleFonts.inter(
+                                  style: VerbumFonts.sans(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -1915,7 +1915,7 @@ class _ManageAdminsButton extends StatelessWidget {
                                         ),
                                         child: Text(
                                           'Principal',
-                                          style: GoogleFonts.inter(
+                                          style: VerbumFonts.sans(
                                             color: scheme.secondary,
                                             fontSize: 9,
                                             fontWeight: FontWeight.w700,
@@ -1962,7 +1962,7 @@ class _ManageAdminsButton extends StatelessWidget {
                                                   title: Text(
                                                     'Transferir liderazgo',
                                                     style:
-                                                        GoogleFonts.playfairDisplay(
+                                                        VerbumFonts.serif(
                                                           fontWeight:
                                                               FontWeight.w700,
                                                         ),
@@ -2093,7 +2093,7 @@ class _CommunityMembersButton extends StatelessWidget {
                   children: [
                     Text(
                       'Personas de la comunidad',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         color: scheme.onSurface,
                         fontSize: 13.5,
                         fontWeight: FontWeight.w700,
@@ -2104,7 +2104,7 @@ class _CommunityMembersButton extends StatelessWidget {
                       'Conoce a quienes caminan contigo',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         color: scheme.onSurfaceVariant,
                         fontSize: 11.5,
                       ),
@@ -2341,7 +2341,7 @@ class _CommunityMembersButton extends StatelessWidget {
                         Text(
                           'Transferir liderazgo',
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.playfairDisplay(
+                          style: VerbumFonts.serif(
                             fontSize: 23,
                             fontWeight: FontWeight.w700,
                           ),
@@ -2350,7 +2350,7 @@ class _CommunityMembersButton extends StatelessWidget {
                         Text(
                           '${member.displayName} será la persona responsable principal y podrá gestionar a los administradores.',
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             color: scheme.onSurfaceVariant,
                             height: 1.45,
                           ),
@@ -2421,7 +2421,7 @@ class _CommunityComposerCard extends StatelessWidget {
         ),
         title: Text(
           '¿Qué quieres compartir?',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w700),
+          style: VerbumFonts.sans(fontWeight: FontWeight.w700),
         ),
         subtitle: const Text('Una reflexión, intención o mensaje'),
         trailing: const Icon(Icons.arrow_outward_rounded),
@@ -2695,7 +2695,7 @@ class _CommunityPostTile extends StatelessWidget {
                             Flexible(
                               child: Text(
                                 authorName.isNotEmpty ? authorName : 'Miembro',
-                                style: GoogleFonts.inter(
+                                style: VerbumFonts.sans(
                                   fontWeight: FontWeight.w600,
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -2716,7 +2716,7 @@ class _CommunityPostTile extends StatelessWidget {
                                 ),
                                 child: Text(
                                   'Admin',
-                                  style: GoogleFonts.inter(
+                                  style: VerbumFonts.sans(
                                     fontSize: 10.5,
                                     fontWeight: FontWeight.w700,
                                     color: colorScheme.primary,
@@ -2729,7 +2729,7 @@ class _CommunityPostTile extends StatelessWidget {
                       ),
                       Text(
                         timeLabel,
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 12,
                           color: colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
@@ -2802,7 +2802,7 @@ class _CommunityPostTile extends StatelessWidget {
                   const SizedBox(height: 10),
                   Text(
                     text,
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       fontSize: 14,
                       height: 1.45,
                       color: colorScheme.onSurface.withValues(alpha: 0.9),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../controllers/missions_controller.dart';
 import 'reading_chat_screen.dart';
 import '../services/share_service.dart';
 import '../widgets/prayer_reading_experience.dart';
 import '../features/sharing/domain/share_content.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class ReadingScreen extends StatefulWidget {
   final String title;
@@ -175,7 +175,7 @@ class _ReadingScreenState extends State<ReadingScreen>
                         children: [
                           Text(
                             'Progress today',
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               color: Colors.white.withValues(alpha: 0.85),
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -184,7 +184,7 @@ class _ReadingScreenState extends State<ReadingScreen>
                           const Spacer(),
                           Text(
                             '${(widget.progress.clamp(0.0, 1.0) * 100).round()}%',
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               color: Colors.white,
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
@@ -223,7 +223,7 @@ class _ReadingScreenState extends State<ReadingScreen>
                           Text(
                             widget.title,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.playfairDisplay(
+                            style: VerbumFonts.serif(
                               color: Colors.white,
                               fontSize: 24,
                               fontWeight: FontWeight.w700,
@@ -233,7 +233,7 @@ class _ReadingScreenState extends State<ReadingScreen>
                           Text(
                             widget.content,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               color: Colors.white,
                               fontSize: 20,
                               height: 1.55,
@@ -245,7 +245,7 @@ class _ReadingScreenState extends State<ReadingScreen>
                             const SizedBox(height: 16),
                             Text(
                               widget.reference!,
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 color: const Color(0xFFFFB74D),
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -324,7 +324,7 @@ class _ReadingScreenState extends State<ReadingScreen>
               const SizedBox(width: 8),
               Text(
                 label,
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: Colors.white,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,

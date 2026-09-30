@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../models/spiritual_path.dart';
 import '../services/spiritual_path_service.dart';
 import '../widgets/verbum_ambient_background.dart';
 import 'spiritual_path_day_screen.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class SpiritualPathDetailScreen extends StatefulWidget {
   final SpiritualPath path;
@@ -97,7 +97,7 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
                         const SizedBox(height: 26),
                         Text(
                           'LO QUE VAS A RECORRER',
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             fontSize: 9,
                             letterSpacing: 1.4,
                             fontWeight: FontWeight.w800,
@@ -107,7 +107,7 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
                         const SizedBox(height: 5),
                         Text(
                           'Siete pasos, a tu propio ritmo',
-                          style: GoogleFonts.playfairDisplay(
+                          style: VerbumFonts.serif(
                             fontSize: 22,
                             fontWeight: FontWeight.w700,
                           ),
@@ -212,7 +212,7 @@ class _PathHero extends StatelessWidget {
           const SizedBox(height: 22),
           Text(
             path.category.toUpperCase(),
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               color: const Color(0xFFF0D9A1),
               fontSize: 9,
               letterSpacing: 1.3,
@@ -222,7 +222,7 @@ class _PathHero extends StatelessWidget {
           const SizedBox(height: 5),
           Text(
             path.title,
-            style: GoogleFonts.playfairDisplay(
+            style: VerbumFonts.serif(
               color: Colors.white,
               fontSize: 30,
               fontWeight: FontWeight.w700,
@@ -231,7 +231,7 @@ class _PathHero extends StatelessWidget {
           const SizedBox(height: 9),
           Text(
             path.description,
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               color: Colors.white.withValues(alpha: .78),
               fontSize: 12.5,
               height: 1.55,
@@ -248,7 +248,7 @@ class _PathHero extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 '${path.days.length} días',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: Colors.white,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
@@ -263,7 +263,7 @@ class _PathHero extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 '${path.minutesPerDay} min diarios',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: Colors.white,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
@@ -285,7 +285,7 @@ class _PathHero extends StatelessWidget {
             const SizedBox(height: 7),
             Text(
               '${progress.completedDays.length} de ${path.days.length} días completados',
-              style: GoogleFonts.inter(color: Colors.white70, fontSize: 10.5),
+              style: VerbumFonts.sans(color: Colors.white70, fontSize: 10.5),
             ),
           ],
         ],
@@ -349,7 +349,7 @@ class _DayTile extends StatelessWidget {
                         )
                       : Text(
                           '${day.number}',
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             fontWeight: FontWeight.w800,
                             color: available ? accent : scheme.outline,
                           ),
@@ -362,7 +362,7 @@ class _DayTile extends StatelessWidget {
                     children: [
                       Text(
                         day.title,
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: available
@@ -372,7 +372,7 @@ class _DayTile extends StatelessWidget {
                       ),
                       Text(
                         day.subtitle,
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 10.5,
                           color: scheme.onSurfaceVariant,
                         ),

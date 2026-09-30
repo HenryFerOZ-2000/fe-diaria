@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/spiritual_stats.dart';
 import '../services/spiritual_stats_service.dart';
 import '../services/storage_service.dart';
 import '../services/streak_service.dart';
 import '../widgets/verbum_ambient_background.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class StreakScreen extends StatefulWidget {
   const StreakScreen({super.key});
@@ -155,7 +155,7 @@ class _StreakScreenState extends State<StreakScreen> {
                       surfaceTintColor: Colors.transparent,
                       title: Text(
                         'Mi constancia',
-                        style: GoogleFonts.playfairDisplay(
+                        style: VerbumFonts.serif(
                           color: scheme.onSurface,
                           fontSize: 23,
                           fontWeight: FontWeight.w700,
@@ -234,7 +234,7 @@ class _StreakScreenState extends State<StreakScreen> {
             children: [
               Text(
                 'TU CAMINO HASTA HOY',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: const Color(0xFFEBCB91),
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
@@ -247,7 +247,7 @@ class _StreakScreenState extends State<StreakScreen> {
                   children: [
                     TextSpan(
                       text: '$_current',
-                      style: GoogleFonts.playfairDisplay(
+                      style: VerbumFonts.serif(
                         color: Colors.white,
                         fontSize: 50,
                         height: .95,
@@ -258,7 +258,7 @@ class _StreakScreenState extends State<StreakScreen> {
                       text: _current == 1
                           ? '  día caminando'
                           : '  días caminando',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         color: Colors.white.withValues(alpha: .76),
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -311,7 +311,7 @@ class _StreakScreenState extends State<StreakScreen> {
                     label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       color: Colors.white.withValues(alpha: .55),
                       fontSize: 9,
                       fontWeight: FontWeight.w600,
@@ -322,7 +322,7 @@ class _StreakScreenState extends State<StreakScreen> {
                     value,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       color: Colors.white,
                       fontSize: 11.5,
                       fontWeight: FontWeight.w700,
@@ -363,7 +363,7 @@ class _StreakScreenState extends State<StreakScreen> {
               children: [
                 Text(
                   _todayComplete ? 'Hoy está a salvo' : 'Tu camino de hoy',
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     color: scheme.onSurface,
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
@@ -374,7 +374,7 @@ class _StreakScreenState extends State<StreakScreen> {
                   _todayComplete
                       ? 'Ya completaste tus tres momentos esenciales.'
                       : 'Completa tus tres momentos esenciales para cuidar tu constancia.',
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     color: scheme.onSurfaceVariant,
                     fontSize: 11.5,
                     height: 1.4,
@@ -407,7 +407,7 @@ class _StreakScreenState extends State<StreakScreen> {
       children: [
         Text(
           eyebrow,
-          style: GoogleFonts.inter(
+          style: VerbumFonts.sans(
             color: scheme.secondary,
             fontSize: 9.5,
             fontWeight: FontWeight.w800,
@@ -417,7 +417,7 @@ class _StreakScreenState extends State<StreakScreen> {
         const SizedBox(height: 4),
         Text(
           title,
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             color: scheme.onSurface,
             fontSize: 24,
             fontWeight: FontWeight.w700,
@@ -462,7 +462,7 @@ class _StreakScreenState extends State<StreakScreen> {
                 child: Text(
                   '${_months[_visibleMonth.month - 1][0].toUpperCase()}${_months[_visibleMonth.month - 1].substring(1)} ${_visibleMonth.year}',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     color: scheme.onSurface,
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
@@ -551,7 +551,7 @@ class _StreakScreenState extends State<StreakScreen> {
                         )
                       : Text(
                           '$dayNumber',
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             color: today
                                 ? scheme.primary
                                 : scheme.onSurfaceVariant,
@@ -599,7 +599,7 @@ class _StreakScreenState extends State<StreakScreen> {
         const SizedBox(width: 6),
         Text(
           label,
-          style: GoogleFonts.inter(
+          style: VerbumFonts.sans(
             color: scheme.onSurfaceVariant,
             fontSize: 10.5,
             fontWeight: FontWeight.w600,
@@ -653,7 +653,7 @@ class _StreakScreenState extends State<StreakScreen> {
                   children: [
                     Text(
                       '$target días de constancia',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         color: scheme.onSurface,
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
@@ -664,7 +664,7 @@ class _StreakScreenState extends State<StreakScreen> {
                       remaining == 1
                           ? 'Falta un día para este hito.'
                           : 'Faltan $remaining días para este hito.',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         color: scheme.onSurfaceVariant,
                         fontSize: 11.5,
                       ),
@@ -674,7 +674,7 @@ class _StreakScreenState extends State<StreakScreen> {
               ),
               Text(
                 '$_current/$target',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: scheme.primary,
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
@@ -738,7 +738,7 @@ class _StreakScreenState extends State<StreakScreen> {
           const SizedBox(height: 11),
           Text(
             value,
-            style: GoogleFonts.playfairDisplay(
+            style: VerbumFonts.serif(
               color: scheme.onSurface,
               fontSize: 28,
               height: 1,
@@ -748,7 +748,7 @@ class _StreakScreenState extends State<StreakScreen> {
           const SizedBox(height: 4),
           Text(
             label,
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               color: scheme.onSurfaceVariant,
               fontSize: 10.5,
               fontWeight: FontWeight.w600,
@@ -779,7 +779,7 @@ class _StreakScreenState extends State<StreakScreen> {
               children: [
                 Text(
                   'No se trata de no fallar',
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     color: scheme.onSurface,
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
@@ -788,7 +788,7 @@ class _StreakScreenState extends State<StreakScreen> {
                 const SizedBox(height: 5),
                 Text(
                   'Tu constancia crece cuando completas los tres momentos esenciales del día. Si interrumpes el recorrido, siempre puedes volver a comenzar.',
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     color: scheme.onSurfaceVariant,
                     fontSize: 11.5,
                     height: 1.5,

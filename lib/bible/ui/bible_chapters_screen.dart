@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../widgets/app_scaffold.dart';
 import '../data/bible_db.dart';
 import '../domain/bible_book_info.dart';
 import '../services/bible_reading_preferences.dart';
 import 'bible_verses_screen.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class BibleChaptersScreen extends StatefulWidget {
   final String bookId;
@@ -57,7 +57,7 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
     return AppScaffold(
       titleWidget: Text(
         widget.bookName,
-        style: GoogleFonts.playfairDisplay(
+        style: VerbumFonts.serif(
           fontSize: 23,
           fontWeight: FontWeight.w700,
         ),
@@ -116,7 +116,7 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
                 top: -22,
                 child: Text(
                   '${chapters.length}',
-                  style: GoogleFonts.playfairDisplay(
+                  style: VerbumFonts.serif(
                     color: Colors.white.withValues(alpha: .045),
                     fontSize: 112,
                     height: 1,
@@ -129,7 +129,7 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
                 children: [
                   Text(
                     (metadata?.section ?? 'LIBRO BÍBLICO').toUpperCase(),
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       color: const Color(0xFFEBCB91),
                       fontSize: 9,
                       fontWeight: FontWeight.w800,
@@ -139,7 +139,7 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
                   const SizedBox(height: 8),
                   Text(
                     widget.bookName,
-                    style: GoogleFonts.playfairDisplay(
+                    style: VerbumFonts.serif(
                       color: Colors.white,
                       fontSize: 31,
                       fontWeight: FontWeight.w800,
@@ -148,7 +148,7 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
                   const SizedBox(height: 6),
                   Text(
                     '${chapters.length} ${chapters.length == 1 ? 'capítulo' : 'capítulos'} · Reina-Valera 1909',
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       color: Colors.white.withValues(alpha: .68),
                       fontSize: 11.5,
                     ),
@@ -167,7 +167,7 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
                       icon: const Icon(Icons.bookmark_rounded, size: 17),
                       label: Text(
                         'Continuar capítulo ${lastHere.chapter}',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w700,
                         ),
@@ -182,7 +182,7 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
         const SizedBox(height: 24),
         Text(
           'ELIGE UN CAPÍTULO',
-          style: GoogleFonts.inter(
+          style: VerbumFonts.sans(
             color: scheme.secondary,
             fontSize: 9,
             fontWeight: FontWeight.w800,
@@ -192,7 +192,7 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
         const SizedBox(height: 5),
         Text(
           'Comienza tu lectura',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             color: scheme.onSurface,
             fontSize: 23,
             fontWeight: FontWeight.w700,
@@ -238,7 +238,7 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
                         children: [
                           Text(
                             '$chapter',
-                            style: GoogleFonts.playfairDisplay(
+                            style: VerbumFonts.serif(
                               color: isLast ? scheme.primary : scheme.onSurface,
                               fontSize: 19,
                               fontWeight: FontWeight.w700,

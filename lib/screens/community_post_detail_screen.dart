@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../services/community_posts_social_service.dart';
 import '../services/post_social_service.dart';
 import '../widgets/community_post_interaction_row.dart';
 import 'comments_screen.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 /// Detalle de una publicación de [community_posts]: texto, likes y hilo de comentarios.
 class CommunityPostDetailScreen extends StatelessWidget {
@@ -33,7 +33,7 @@ class CommunityPostDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Publicación',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -63,7 +63,7 @@ class CommunityPostDetailScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(24),
                       child: Text(
                         'Publicación no disponible.',
-                        style: GoogleFonts.inter(),
+                        style: VerbumFonts.sans(),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -102,7 +102,7 @@ class CommunityPostDetailScreen extends StatelessWidget {
                                     authorName.isNotEmpty
                                         ? authorName[0].toUpperCase()
                                         : '?',
-                                    style: GoogleFonts.inter(
+                                    style: VerbumFonts.sans(
                                       fontWeight: FontWeight.w700,
                                       color: colorScheme.primary,
                                     ),
@@ -118,14 +118,14 @@ class CommunityPostDetailScreen extends StatelessWidget {
                                   authorName.isNotEmpty
                                       ? authorName
                                       : 'Miembro',
-                                  style: GoogleFonts.inter(
+                                  style: VerbumFonts.sans(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 16,
                                   ),
                                 ),
                                 Text(
                                   _formatTimeAgo(ts?.toDate()),
-                                  style: GoogleFonts.inter(
+                                  style: VerbumFonts.sans(
                                     fontSize: 12,
                                     color: colorScheme.onSurface.withValues(
                                       alpha: 0.6,
@@ -140,7 +140,7 @@ class CommunityPostDetailScreen extends StatelessWidget {
                       const SizedBox(height: 14),
                       Text(
                         text,
-                        style: GoogleFonts.inter(fontSize: 15, height: 1.45),
+                        style: VerbumFonts.sans(fontSize: 15, height: 1.45),
                       ),
                       const SizedBox(height: 12),
                       CommunityPostInteractionRow(
@@ -163,7 +163,7 @@ class CommunityPostDetailScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 6),
             child: Text(
               'Comentarios',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontWeight: FontWeight.w700,
                 fontSize: 15,
               ),

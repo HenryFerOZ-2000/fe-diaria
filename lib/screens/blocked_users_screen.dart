@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/privacy_security_service.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class BlockedUsersScreen extends StatefulWidget {
   const BlockedUsersScreen({super.key});
@@ -96,7 +96,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
       appBar: AppBar(
         title: Text(
           'Usuarios bloqueados',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -116,7 +116,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                   const SizedBox(height: 16),
                   Text(
                     'No hay usuarios bloqueados',
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       fontSize: 16,
                       color: Colors.grey[600],
                     ),
@@ -153,7 +153,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                                 displayName.isNotEmpty
                                     ? displayName[0].toUpperCase()
                                     : '?',
-                                style: GoogleFonts.inter(
+                                style: VerbumFonts.sans(
                                   fontWeight: FontWeight.bold,
                                 ),
                               )
@@ -161,7 +161,7 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
                       ),
                       title: Text(
                         displayName,
-                        style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                        style: VerbumFonts.sans(fontWeight: FontWeight.w600),
                       ),
                       trailing: TextButton(
                         onPressed: () => _unblockUser(user['id'], displayName),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class PrayerLibraryHero extends StatelessWidget {
   const PrayerLibraryHero({
@@ -92,7 +92,7 @@ class PrayerLibraryHero extends StatelessWidget {
                       ),
                       child: Text(
                         badge!,
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           color: Colors.white.withValues(alpha: .78),
                           fontSize: 9,
                           fontWeight: FontWeight.w700,
@@ -104,7 +104,7 @@ class PrayerLibraryHero extends StatelessWidget {
               const SizedBox(height: 17),
               Text(
                 kicker,
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: const Color(0xFFE6C57F),
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
@@ -114,7 +114,7 @@ class PrayerLibraryHero extends StatelessWidget {
               const SizedBox(height: 7),
               Text(
                 title,
-                style: GoogleFonts.playfairDisplay(
+                style: VerbumFonts.serif(
                   color: Colors.white,
                   fontSize: 28,
                   height: 1.08,
@@ -124,7 +124,7 @@ class PrayerLibraryHero extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 description,
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: Colors.white.withValues(alpha: .76),
                   fontSize: 12,
                   height: 1.5,
@@ -261,7 +261,7 @@ class _PrayerLibraryCardState extends State<PrayerLibraryCard> {
                           children: [
                             Text(
                               widget.eyebrow.toUpperCase(),
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 color: widget.accent,
                                 fontSize: 8.5,
                                 fontWeight: FontWeight.w800,
@@ -273,7 +273,7 @@ class _PrayerLibraryCardState extends State<PrayerLibraryCard> {
                               widget.title,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.playfairDisplay(
+                              style: VerbumFonts.serif(
                                 color: scheme.onSurface,
                                 fontSize: 17,
                                 height: 1.14,
@@ -285,7 +285,7 @@ class _PrayerLibraryCardState extends State<PrayerLibraryCard> {
                               widget.subtitle,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 color: scheme.onSurfaceVariant,
                                 fontSize: 10.5,
                                 height: 1.35,
@@ -360,7 +360,7 @@ class PrayerLibraryEmptyState extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: GoogleFonts.playfairDisplay(
+              style: VerbumFonts.serif(
                 color: scheme.onSurface,
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -370,7 +370,7 @@ class PrayerLibraryEmptyState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 color: scheme.onSurfaceVariant,
                 fontSize: 12,
                 height: 1.45,

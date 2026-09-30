@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/privacy_security_service.dart';
 import '../providers/auth_provider.dart' as app_auth;
 import 'package:provider/provider.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class DeleteAccountScreen extends StatefulWidget {
   const DeleteAccountScreen({super.key});
@@ -78,7 +78,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
       appBar: AppBar(
         title: Text(
           'Eliminar cuenta',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -106,7 +106,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                   Expanded(
                     child: Text(
                       'Esta acción no se puede deshacer',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.red[900],
@@ -119,7 +119,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
             const SizedBox(height: 24),
             Text(
               '¿Qué se eliminará?',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
               ),
@@ -140,7 +140,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               child: CheckboxListTile(
                 title: Text(
                   'Entiendo que esta acción es permanente e irreversible',
-                  style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  style: VerbumFonts.sans(fontWeight: FontWeight.w600),
                 ),
                 value: _isConfirmed,
                 onChanged: (value) {
@@ -175,7 +175,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                       )
                     : Text(
                         'Eliminar cuenta permanentemente',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -199,7 +199,7 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[700]),
+              style: VerbumFonts.sans(fontSize: 14, color: Colors.grey[700]),
             ),
           ),
         ],

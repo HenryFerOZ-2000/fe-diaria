@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/social_service.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class SetupUsernameScreen extends StatefulWidget {
   const SetupUsernameScreen({super.key});
@@ -110,7 +110,7 @@ class _SetupUsernameScreenState extends State<SetupUsernameScreen> {
               const SizedBox(height: 20),
               Text(
                 '¡Bienvenido!',
-                style: GoogleFonts.playfairDisplay(
+                style: VerbumFonts.serif(
                   fontSize: 32,
                   fontWeight: FontWeight.w700,
                   color: colorScheme.onSurface,
@@ -119,7 +119,7 @@ class _SetupUsernameScreenState extends State<SetupUsernameScreen> {
               const SizedBox(height: 12),
               Text(
                 'Elige un nombre de usuario para tu perfil',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   fontSize: 16,
                   color: colorScheme.onSurface.withValues(alpha: 0.7),
                   height: 1.5,
@@ -139,7 +139,7 @@ class _SetupUsernameScreenState extends State<SetupUsernameScreen> {
                   filled: true,
                   fillColor: colorScheme.surface.withValues(alpha: 0.5),
                 ),
-                style: GoogleFonts.inter(),
+                style: VerbumFonts.sans(),
                 onChanged: (value) {
                   setState(() {
                     _error = null;
@@ -158,7 +158,7 @@ class _SetupUsernameScreenState extends State<SetupUsernameScreen> {
                   Expanded(
                     child: Text(
                       'Solo minúsculas, números, punto o guión bajo (3-20 caracteres)',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 12,
                         color: colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
@@ -180,7 +180,7 @@ class _SetupUsernameScreenState extends State<SetupUsernameScreen> {
                   ),
                   child: Text(
                     _error!,
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       color: Colors.red.shade800,
                       fontSize: 13,
                     ),
@@ -211,7 +211,7 @@ class _SetupUsernameScreenState extends State<SetupUsernameScreen> {
                         )
                       : Text(
                           'Continuar',
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             fontWeight: FontWeight.w700,
                             fontSize: 16,
                           ),
@@ -230,7 +230,7 @@ class _SetupUsernameScreenState extends State<SetupUsernameScreen> {
                       },
                 child: Text(
                   'Usar sugerencia: $_suggestedUsername',
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     fontSize: 14,
                     color: colorScheme.primary,
                     fontWeight: FontWeight.w600,

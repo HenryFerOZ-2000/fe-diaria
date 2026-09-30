@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/top_notice.dart';
@@ -15,6 +14,7 @@ import '../services/live_posts_service.dart';
 import '../services/profile_service.dart';
 import '../services/spiritual_stats_service.dart';
 import 'comments_screen.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class LivePost {
   final String id;
@@ -331,7 +331,7 @@ class _LiveScreenState extends State<LiveScreen> {
       showAppBar: widget.showAppBar,
       titleWidget: Text(
         'En Vivo',
-        style: GoogleFonts.playfairDisplay(
+        style: VerbumFonts.serif(
           fontSize: 24,
           fontWeight: FontWeight.bold,
           color: colorScheme.onSurface,
@@ -463,7 +463,7 @@ class _LiveFeedHeader extends StatelessWidget {
         children: [
           Text(
             'INTENCIONES COMPARTIDAS',
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               color: scheme.secondary,
               fontSize: 9.5,
               fontWeight: FontWeight.w800,
@@ -473,7 +473,7 @@ class _LiveFeedHeader extends StatelessWidget {
           const SizedBox(height: 5),
           Text(
             'Acompañarnos también es orar',
-            style: GoogleFonts.playfairDisplay(
+            style: VerbumFonts.serif(
               color: scheme.onSurface,
               fontSize: 23,
               height: 1.1,
@@ -483,7 +483,7 @@ class _LiveFeedHeader extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             'Escucha, comparte esperanza y hazle saber a alguien que no está solo.',
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               color: scheme.onSurfaceVariant,
               fontSize: 12.5,
               height: 1.45,
@@ -536,7 +536,7 @@ class _LiveFeedHeader extends StatelessWidget {
                         children: [
                           Text(
                             '¿Por quién quieres orar hoy?',
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               color: scheme.onSurface,
                               fontSize: 13.5,
                               fontWeight: FontWeight.w700,
@@ -545,7 +545,7 @@ class _LiveFeedHeader extends StatelessWidget {
                           const SizedBox(height: 2),
                           Text(
                             'Compartir una intención',
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               color: scheme.primary,
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
@@ -590,7 +590,7 @@ class _LiveFeedHeader extends StatelessWidget {
                       ? const Color(0xFF292431)
                       : const Color(0xFFFFFCF7),
                   selectedColor: scheme.primary.withValues(alpha: .12),
-                  labelStyle: GoogleFonts.inter(
+                  labelStyle: VerbumFonts.sans(
                     color: selected ? scheme.primary : scheme.onSurfaceVariant,
                     fontSize: 11,
                     fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
@@ -627,7 +627,7 @@ class _LiveEmptyState extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             filtered ? 'Aún no hay intenciones aquí' : 'Sé la primera voz',
-            style: GoogleFonts.playfairDisplay(
+            style: VerbumFonts.serif(
               color: scheme.onSurface,
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -637,7 +637,7 @@ class _LiveEmptyState extends StatelessWidget {
           Text(
             'Comparte algo que hoy quieras poner en manos de la comunidad.',
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               color: scheme.onSurfaceVariant,
               fontSize: 12,
               height: 1.4,
@@ -912,7 +912,7 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
                           child: photo == null || photo.isEmpty
                               ? Text(
                                   authorName.characters.first.toUpperCase(),
-                                  style: GoogleFonts.inter(
+                                  style: VerbumFonts.sans(
                                     color: accent,
                                     fontWeight: FontWeight.w800,
                                   ),
@@ -931,7 +931,7 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
                                       authorName,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.inter(
+                                      style: VerbumFonts.sans(
                                         color: scheme.onSurface,
                                         fontSize: 13.5,
                                         fontWeight: FontWeight.w800,
@@ -941,7 +941,7 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
                                   const SizedBox(width: 6),
                                   Text(
                                     '· ${widget.post.timeAgo}',
-                                    style: GoogleFonts.inter(
+                                    style: VerbumFonts.sans(
                                       color: scheme.onSurfaceVariant,
                                       fontSize: 10.8,
                                     ),
@@ -959,7 +959,7 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
                                   const SizedBox(width: 4),
                                   Text(
                                     widget.post.category.toUpperCase(),
-                                    style: GoogleFonts.inter(
+                                    style: VerbumFonts.sans(
                                       color: accent,
                                       fontSize: 8.8,
                                       fontWeight: FontWeight.w800,
@@ -1025,7 +1025,7 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
                           const SizedBox(width: 5),
                           Text(
                             _statusLabel,
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               color: accent,
                               fontSize: 8,
                               letterSpacing: .7,
@@ -1038,7 +1038,7 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
                     const SizedBox(height: 9),
                     Text(
                       widget.post.text,
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         color: scheme.onSurface.withValues(alpha: .92),
                         fontSize: 14.2,
                         height: 1.5,
@@ -1148,7 +1148,7 @@ class _PrayerJoinButton extends StatelessWidget {
                 joined ? 'Acompañando · $count' : 'Me uno · $count',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: color,
                   fontSize: 11.2,
                   fontWeight: FontWeight.w800,
@@ -1194,7 +1194,7 @@ class _ModernPostAction extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     label!,
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       color: color,
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -1328,7 +1328,7 @@ class _LegacyFeedPostTileState extends State<_FeedPostTile> {
                                     displayName.isNotEmpty
                                         ? displayName[0].toUpperCase()
                                         : '?',
-                                    style: GoogleFonts.inter(
+                                    style: VerbumFonts.sans(
                                       color: Colors.deepPurple,
                                       fontWeight: FontWeight.w700,
                                     ),
@@ -1347,7 +1347,7 @@ class _LegacyFeedPostTileState extends State<_FeedPostTile> {
                                         displayName.isNotEmpty
                                             ? displayName
                                             : 'Anónimo',
-                                        style: GoogleFonts.inter(
+                                        style: VerbumFonts.sans(
                                           fontSize: 14.5,
                                           fontWeight: FontWeight.w800,
                                           color: const Color(0xFF1F1F1F),
@@ -1373,7 +1373,7 @@ class _LegacyFeedPostTileState extends State<_FeedPostTile> {
                                         ),
                                         child: Text(
                                           'Tú',
-                                          style: GoogleFonts.inter(
+                                          style: VerbumFonts.sans(
                                             fontSize: 10,
                                             fontWeight: FontWeight.w700,
                                             color: Theme.of(
@@ -1386,7 +1386,7 @@ class _LegacyFeedPostTileState extends State<_FeedPostTile> {
                                     const SizedBox(width: 6),
                                     Text(
                                       '· ${widget.post.timeAgo}',
-                                      style: GoogleFonts.inter(
+                                      style: VerbumFonts.sans(
                                         fontSize: 12,
                                         color: Colors.grey[600],
                                       ),
@@ -1396,7 +1396,7 @@ class _LegacyFeedPostTileState extends State<_FeedPostTile> {
                                 const SizedBox(height: 2),
                                 Text(
                                   '@${username.isNotEmpty ? username : 'sin-username'}',
-                                  style: GoogleFonts.inter(
+                                  style: VerbumFonts.sans(
                                     fontSize: 12,
                                     color: Colors.grey[600],
                                     fontWeight: FontWeight.w500,
@@ -1406,7 +1406,7 @@ class _LegacyFeedPostTileState extends State<_FeedPostTile> {
                                 const SizedBox(height: 4),
                                 Text(
                                   widget.post.text,
-                                  style: GoogleFonts.inter(
+                                  style: VerbumFonts.sans(
                                     fontSize: 14.5,
                                     height: 1.45,
                                     color: const Color(0xFF1F1F1F),
@@ -1696,7 +1696,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                         children: [
                           Text(
                             'Nueva oración',
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: colorScheme.onSurface,
@@ -1705,7 +1705,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                           const SizedBox(height: 2),
                           Text(
                             'Comparte tu petición con la comunidad',
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               fontSize: 13,
                               color: colorScheme.onSurface.withValues(
                                 alpha: 0.6,
@@ -1743,14 +1743,14 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                         focusNode: _focusNode,
                         decoration: InputDecoration(
                           hintText: 'Escribe tu petición aquí...',
-                          hintStyle: GoogleFonts.inter(
+                          hintStyle: VerbumFonts.sans(
                             color: colorScheme.onSurface.withValues(alpha: 0.4),
                             fontSize: 15,
                           ),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.all(16),
                         ),
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 15,
                           height: 1.5,
                           color: colorScheme.onSurface,
@@ -1766,7 +1766,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                       children: [
                         Text(
                           '$_charCount / 10 caracteres mínimos',
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             fontSize: 12,
                             color: canPost
                                 ? Colors.green[600]
@@ -1780,7 +1780,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                     // Category selector
                     Text(
                       'Categoría',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: colorScheme.onSurface.withValues(alpha: 0.8),
@@ -1807,7 +1807,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                             vertical: 12,
                           ),
                         ),
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 15,
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.w500,
@@ -1890,7 +1890,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                         ),
                         child: Text(
                           'Cancelar',
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                             color: colorScheme.onSurface,
@@ -1956,7 +1956,7 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                             ],
                             Text(
                               _isSubmitting ? 'Publicando...' : 'Publicar',
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -2003,7 +2003,7 @@ class _ActionButton extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               label,
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
                 color: color,

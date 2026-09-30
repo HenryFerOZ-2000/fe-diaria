@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../providers/app_provider.dart';
 import '../services/notification_service.dart';
 import '../services/push_messaging_service.dart';
@@ -13,6 +12,7 @@ import '../faith/faith_tradition.dart';
 import '../features/liturgy/application/calendar_region_resolver.dart';
 import '../features/liturgy/presentation/catholic_calendar_settings_tile.dart';
 import 'traditional_prayers_religion_selection_screen.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 /// Pantalla de configuración con todas las opciones de la aplicación
 class SettingsScreen extends StatefulWidget {
@@ -118,7 +118,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 20),
             Text(
               localizations.selectLanguage,
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -230,7 +230,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Expanded(
                 child: Text(
                   languageName,
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     fontSize: 16,
                     fontWeight: isSelected
                         ? FontWeight.bold
@@ -262,7 +262,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         title: Text(
           localizations.settingsTitle,
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -303,14 +303,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ListTile(
                       title: Text(
                         localizations.language,
-                        style: GoogleFonts.roboto(fontSize: 16),
+                        style: VerbumFonts.sans(fontSize: 16),
                       ),
                       subtitle: Text(
                         LanguageService.getLanguageNameTranslated(
                           LanguageService.getLanguage(),
                           LanguageService.getLanguage(),
                         ),
-                        style: GoogleFonts.roboto(
+                        style: VerbumFonts.sans(
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.bold,
@@ -334,7 +334,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ListTile(
                       title: Text(
                         'Personalizar Experiencia',
-                        style: GoogleFonts.inter(fontSize: 16),
+                        style: VerbumFonts.sans(fontSize: 16),
                       ),
                       subtitle: Text(
                         provider.userName.isNotEmpty ||
@@ -343,7 +343,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ? '${provider.userName} - ${_getEmotionDisplayName(provider.userEmotion)}'
                                   : _getEmotionDisplayName(provider.userEmotion)
                             : 'Configura tu nombre y emoción',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.bold,
@@ -378,14 +378,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ListTile(
                       title: Text(
                         'Tradición cristiana',
-                        style: GoogleFonts.inter(fontSize: 16),
+                        style: VerbumFonts.sans(fontSize: 16),
                       ),
                       subtitle: Text(
                         _getReligionDisplayName(
                           StorageService()
                               .getValidatedTraditionalPrayersReligion(),
                         ),
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.bold,
@@ -456,11 +456,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SwitchListTile(
                       title: Text(
                         localizations.darkMode,
-                        style: GoogleFonts.inter(fontSize: 16),
+                        style: VerbumFonts.sans(fontSize: 16),
                       ),
                       subtitle: Text(
                         localizations.darkModeDescription,
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -477,11 +477,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ListTile(
                       title: Text(
                         localizations.fontSize,
-                        style: GoogleFonts.roboto(fontSize: 16),
+                        style: VerbumFonts.sans(fontSize: 16),
                       ),
                       subtitle: Text(
                         _getFontSizeLabel(provider.fontSize, localizations),
-                        style: GoogleFonts.roboto(
+                        style: VerbumFonts.sans(
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.primary,
                           fontWeight: FontWeight.bold,
@@ -518,11 +518,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SwitchListTile(
                       title: Text(
                         localizations.readingMode,
-                        style: GoogleFonts.roboto(fontSize: 16),
+                        style: VerbumFonts.sans(fontSize: 16),
                       ),
                       subtitle: Text(
                         localizations.readingModeDescription,
-                        style: GoogleFonts.roboto(
+                        style: VerbumFonts.sans(
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -539,11 +539,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SwitchListTile(
                       title: Text(
                         localizations.soundEnabled,
-                        style: GoogleFonts.roboto(fontSize: 16),
+                        style: VerbumFonts.sans(fontSize: 16),
                       ),
                       subtitle: Text(
                         localizations.soundEnabledDescription,
-                        style: GoogleFonts.roboto(
+                        style: VerbumFonts.sans(
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -565,11 +565,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ListTile(
                       title: Text(
                         localizations.widgetScreenTitle,
-                        style: GoogleFonts.inter(fontSize: 16),
+                        style: VerbumFonts.sans(fontSize: 16),
                       ),
                       subtitle: Text(
                         localizations.widgetSettingsSubtitle,
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -594,11 +594,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SwitchListTile(
                       title: Text(
                         localizations.dailyNotifications,
-                        style: GoogleFonts.roboto(fontSize: 16),
+                        style: VerbumFonts.sans(fontSize: 16),
                       ),
                       subtitle: Text(
                         localizations.dailyNotificationsDescription,
-                        style: GoogleFonts.roboto(
+                        style: VerbumFonts.sans(
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -640,11 +640,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       SwitchListTile(
                         title: Text(
                           'Notificación de la mañana',
-                          style: GoogleFonts.roboto(fontSize: 16),
+                          style: VerbumFonts.sans(fontSize: 16),
                         ),
                         subtitle: Text(
                           'Versículo del día a las ${provider.morningVerseNotificationTime}',
-                          style: GoogleFonts.roboto(
+                          style: VerbumFonts.sans(
                             fontSize: 14,
                             color: Theme.of(
                               context,
@@ -664,11 +664,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ListTile(
                           title: Text(
                             'Hora de la notificación matutina',
-                            style: GoogleFonts.roboto(fontSize: 16),
+                            style: VerbumFonts.sans(fontSize: 16),
                           ),
                           subtitle: Text(
                             provider.morningVerseNotificationTime,
-                            style: GoogleFonts.roboto(
+                            style: VerbumFonts.sans(
                               fontSize: 14,
                               color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,
@@ -692,11 +692,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       SwitchListTile(
                         title: Text(
                           'Notificación de la noche',
-                          style: GoogleFonts.roboto(fontSize: 16),
+                          style: VerbumFonts.sans(fontSize: 16),
                         ),
                         subtitle: Text(
                           'Oración de la noche a las ${provider.eveningPrayerNotificationTime}',
-                          style: GoogleFonts.roboto(
+                          style: VerbumFonts.sans(
                             fontSize: 14,
                             color: Theme.of(
                               context,
@@ -716,11 +716,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ListTile(
                           title: Text(
                             'Hora de la notificación nocturna',
-                            style: GoogleFonts.roboto(fontSize: 16),
+                            style: VerbumFonts.sans(fontSize: 16),
                           ),
                           subtitle: Text(
                             provider.eveningPrayerNotificationTime,
-                            style: GoogleFonts.roboto(
+                            style: VerbumFonts.sans(
                               fontSize: 14,
                               color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,
@@ -744,11 +744,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       SwitchListTile(
                         title: Text(
                           'Recordatorios cada 3 horas',
-                          style: GoogleFonts.roboto(fontSize: 16),
+                          style: VerbumFonts.sans(fontSize: 16),
                         ),
                         subtitle: Text(
                           'Recordatorios de oración de 9:00 a 21:00',
-                          style: GoogleFonts.roboto(
+                          style: VerbumFonts.sans(
                             fontSize: 14,
                             color: Theme.of(
                               context,
@@ -767,11 +767,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ListTile(
                         title: Text(
                           localizations.testNotification,
-                          style: GoogleFonts.roboto(fontSize: 16),
+                          style: VerbumFonts.sans(fontSize: 16),
                         ),
                         subtitle: Text(
                           localizations.testNotificationDescription,
-                          style: GoogleFonts.roboto(
+                          style: VerbumFonts.sans(
                             fontSize: 14,
                             color: Theme.of(
                               context,
@@ -786,11 +786,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ListTile(
                           title: Text(
                             'Diagnóstico de notificaciones (dev)',
-                            style: GoogleFonts.roboto(fontSize: 16),
+                            style: VerbumFonts.sans(fontSize: 16),
                           ),
                           subtitle: Text(
                             'Imprime estado en consola (FCM no está integrado)',
-                            style: GoogleFonts.roboto(
+                            style: VerbumFonts.sans(
                               fontSize: 14,
                               color: Theme.of(
                                 context,
@@ -832,11 +832,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ListTile(
                       title: Text(
                         localizations.appTitle,
-                        style: GoogleFonts.roboto(fontSize: 16),
+                        style: VerbumFonts.sans(fontSize: 16),
                       ),
                       subtitle: Text(
                         localizations.appVersion,
-                        style: GoogleFonts.roboto(
+                        style: VerbumFonts.sans(
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -850,11 +850,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ListTile(
                       title: Text(
                         'Biblia',
-                        style: GoogleFonts.roboto(fontSize: 16),
+                        style: VerbumFonts.sans(fontSize: 16),
                       ),
                       subtitle: Text(
                         'Texto bíblico: Reina-Valera 1909 (Dominio Público). Fuente: eBible.org.',
-                        style: GoogleFonts.roboto(
+                        style: VerbumFonts.sans(
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -878,7 +878,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildSectionHeader(String title, BuildContext context) {
     return Text(
       title,
-      style: GoogleFonts.inter(
+      style: VerbumFonts.sans(
         fontSize: 18,
         fontWeight: FontWeight.bold,
         color: Theme.of(context).colorScheme.primary,

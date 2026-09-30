@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../widgets/verbum_header_actions.dart';
 import '../../widgets/app_scaffold.dart';
 import '../data/bible_db.dart';
@@ -12,6 +11,7 @@ import 'bible_chapters_screen.dart';
 import 'bible_verses_screen.dart';
 import 'catholic_bible_screen.dart';
 import '../../screens/content_sources_screen.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class BibleBooksScreen extends StatefulWidget {
   const BibleBooksScreen({super.key});
@@ -167,7 +167,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
     return AppScaffold(
       titleWidget: Text(
         'Biblia',
-        style: GoogleFonts.playfairDisplay(
+        style: VerbumFonts.serif(
           fontSize: 25,
           fontWeight: FontWeight.w700,
         ),
@@ -294,7 +294,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
                 children: [
                   Text(
                     'LA PALABRA',
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       color: const Color(0xFFEBCB91),
                       fontSize: 9.5,
                       fontWeight: FontWeight.w800,
@@ -316,7 +316,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
                     ),
                     child: Text(
                       'RV1909 · SIN CONEXIÓN',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         color: Colors.white.withValues(alpha: .78),
                         fontSize: 8,
                         fontWeight: FontWeight.w700,
@@ -329,7 +329,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
               const SizedBox(height: 11),
               Text(
                 'Lee, escucha y\npermanece',
-                style: GoogleFonts.playfairDisplay(
+                style: VerbumFonts.serif(
                   color: Colors.white,
                   fontSize: 31,
                   height: 1.02,
@@ -339,7 +339,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
               const SizedBox(height: 10),
               Text(
                 'Toda la Escritura disponible para acompañarte donde estés.',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: Colors.white.withValues(alpha: .70),
                   fontSize: 12.5,
                   height: 1.45,
@@ -411,7 +411,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
       children: [
         Text(
           '${_searchResults.length} RESULTADOS',
-          style: GoogleFonts.inter(
+          style: VerbumFonts.sans(
             color: scheme.secondary,
             fontSize: 9,
             fontWeight: FontWeight.w800,
@@ -441,7 +441,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
                     children: [
                       Text(
                         '${book.name} ${verse.chapter}:${verse.verse}',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           color: scheme.primary,
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
@@ -452,7 +452,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
                         _sanitize(verse.text),
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.lora(
+                        style: VerbumFonts.serif(
                           color: scheme.onSurface,
                           fontSize: 14,
                           height: 1.45,
@@ -516,7 +516,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
                   children: [
                     Text(
                       'CONTINUAR LEYENDO',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         color: scheme.primary,
                         fontSize: 8.5,
                         fontWeight: FontWeight.w800,
@@ -526,7 +526,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
                     const SizedBox(height: 4),
                     Text(
                       '${position.bookName} ${position.chapter}:${position.verse}',
-                      style: GoogleFonts.playfairDisplay(
+                      style: VerbumFonts.serif(
                         color: scheme.onSurface,
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -627,7 +627,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
       children: [
         Text(
           eyebrow,
-          style: GoogleFonts.inter(
+          style: VerbumFonts.sans(
             color: scheme.secondary,
             fontSize: 9,
             fontWeight: FontWeight.w800,
@@ -637,7 +637,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
         const SizedBox(height: 3),
         Text(
           title,
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             color: scheme.onSurface,
             fontSize: 22,
             fontWeight: FontWeight.w700,
@@ -665,12 +665,12 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
         children: [
           Icon(icon, color: scheme.primary, size: 31),
           const SizedBox(height: 9),
-          Text(title, style: GoogleFonts.inter(fontWeight: FontWeight.w800)),
+          Text(title, style: VerbumFonts.sans(fontWeight: FontWeight.w800)),
           const SizedBox(height: 5),
           Text(
             text,
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               color: scheme.onSurfaceVariant,
               fontSize: 12,
             ),
@@ -716,7 +716,7 @@ class _QuickBook extends StatelessWidget {
                 book.name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: scheme.onSurface,
                   fontSize: 10.5,
                   fontWeight: FontWeight.w700,
@@ -767,7 +767,7 @@ class _TestamentOption extends StatelessWidget {
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               color: selected ? scheme.primary : scheme.onSurfaceVariant,
               fontSize: 11,
               fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
@@ -808,7 +808,7 @@ class _BookSection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
             child: Text(
               title.toUpperCase(),
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 color: scheme.secondary,
                 fontSize: 9,
                 fontWeight: FontWeight.w800,
@@ -832,7 +832,7 @@ class _BookSection extends StatelessWidget {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                   title: Text(
                     book.name,
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       color: scheme.onSurface,
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
@@ -840,7 +840,7 @@ class _BookSection extends StatelessWidget {
                   ),
                   subtitle: Text(
                     'Abrir capítulos',
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       color: scheme.onSurfaceVariant,
                       fontSize: 10.5,
                     ),

@@ -55,6 +55,9 @@ import 'screens/traditional_prayers_religion_selection_screen.dart';
 // import 'services/purchase_service.dart'; // Deshabilitado - opción de pago único removida
 import 'services/content_validator.dart';
 import 'services/daily_content_service.dart';
+import 'design_system/design_system.dart';
+import 'features/liturgy/application/liturgical_accent_controller.dart';
+import 'features/liturgy/presentation/liturgical_theme_accent.dart';
 import 'theme/app_theme.dart';
 import 'widgets/verbum_bottom_navigation.dart';
 import 'screens/welcome_auth_screen.dart';
@@ -169,9 +172,12 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AppProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(
+          create: (_) => createAppLiturgicalAccentController()..refresh(),
+        ),
       ],
-      child: Consumer2<AppProvider, AuthProvider>(
-        builder: (context, provider, auth, child) {
+      child: Consumer3<AppProvider, AuthProvider, LiturgicalAccentController>(
+        builder: (context, provider, auth, liturgicalAccent, child) {
           final bool onboardingCompleted = _checkOnboarding();
           final bool traditionSelected = _hasFaithSelection();
 
@@ -196,8 +202,22 @@ class MyApp extends StatelessWidget {
             navigatorKey: _navigatorKey,
             title: 'Verbum',
             debugShowCheckedModeBanner: false,
-            theme: lightTheme,
-            darkTheme: darkTheme,
+            theme: buildVerbumTheme(
+              brightness: Brightness.light,
+              accent: liturgicalThemeAccent(
+                liturgicalAccent.color,
+                Brightness.light,
+              ),
+              pageTransitionsTheme: appPageTransitionsTheme,
+            ),
+            darkTheme: buildVerbumTheme(
+              brightness: Brightness.dark,
+              accent: liturgicalThemeAccent(
+                liturgicalAccent.color,
+                Brightness.dark,
+              ),
+              pageTransitionsTheme: appPageTransitionsTheme,
+            ),
             themeMode: provider.darkMode ? ThemeMode.dark : ThemeMode.light,
             builder: (context, child) {
               SystemUiService.applyFromContext(context);

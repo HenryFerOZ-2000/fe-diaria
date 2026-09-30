@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/privacy_security_service.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class PrivacySafetyScreen extends StatefulWidget {
   const PrivacySafetyScreen({super.key});
@@ -45,7 +45,7 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
       appBar: AppBar(
         title: Text(
           'Privacidad y seguridad',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -139,7 +139,7 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(
+      style: VerbumFonts.sans(
         fontSize: 14,
         fontWeight: FontWeight.w700,
         color: Colors.grey[600],
@@ -166,14 +166,14 @@ class _PrivacySafetyScreenState extends State<PrivacySafetyScreen> {
         leading: Icon(icon, color: titleColor),
         title: Text(
           title,
-          style: GoogleFonts.inter(
+          style: VerbumFonts.sans(
             fontWeight: FontWeight.w600,
             color: titleColor,
           ),
         ),
         subtitle: Text(
           subtitle,
-          style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
+          style: VerbumFonts.sans(fontSize: 12, color: Colors.grey[600]),
         ),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,

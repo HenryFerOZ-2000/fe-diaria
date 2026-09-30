@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class PostCard extends StatelessWidget {
   final String userName;
@@ -53,7 +53,7 @@ class PostCard extends StatelessWidget {
                 backgroundColor: colorScheme.primary.withValues(alpha: 0.15),
                 child: Text(
                   userName.isNotEmpty ? userName[0].toUpperCase() : '?',
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
                   ),
@@ -66,7 +66,7 @@ class PostCard extends StatelessWidget {
                   children: [
                     Text(
                       userName,
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontWeight: FontWeight.w700,
                         fontSize: 14,
                         color: colorScheme.onSurface,
@@ -74,7 +74,7 @@ class PostCard extends StatelessWidget {
                     ),
                     Text(
                       timeAgo,
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 12,
                         color: colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
@@ -98,7 +98,7 @@ class PostCard extends StatelessWidget {
                 icon: const Icon(Icons.favorite, size: 16),
                 label: Text(
                   'Unirse ($joinCount)',
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     fontWeight: FontWeight.w700,
                     fontSize: 12,
                   ),
@@ -109,7 +109,7 @@ class PostCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             text,
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               fontSize: 14,
               height: 1.6,
               color: colorScheme.onSurface.withValues(alpha: 0.9),
@@ -125,7 +125,7 @@ class PostCard extends StatelessWidget {
               ),
               Text(
                 '$likes',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   fontSize: 13,
                   color: colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
@@ -138,7 +138,7 @@ class PostCard extends StatelessWidget {
               ),
               Text(
                 '$comments',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   fontSize: 13,
                   color: colorScheme.onSurface.withValues(alpha: 0.7),
                 ),

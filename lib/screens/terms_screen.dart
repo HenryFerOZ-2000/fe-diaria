@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class TermsScreen extends StatelessWidget {
   const TermsScreen({super.key});
@@ -10,7 +10,7 @@ class TermsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Términos de uso',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -26,7 +26,7 @@ class TermsScreen extends StatelessWidget {
           children: [
             Text(
               'Términos de Uso',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -34,12 +34,12 @@ class TermsScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Última actualización: ${DateTime.now().year}',
-              style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
+              style: VerbumFonts.sans(fontSize: 12, color: Colors.grey[600]),
             ),
             const SizedBox(height: 24),
             Text(
               'Al usar esta aplicación, aceptas estos términos de uso. Por favor, léelos cuidadosamente.',
-              style: GoogleFonts.inter(fontSize: 14, height: 1.6),
+              style: VerbumFonts.sans(fontSize: 14, height: 1.6),
             ),
             const SizedBox(height: 24),
             _buildSection(
@@ -91,10 +91,10 @@ class TermsScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700),
+            style: VerbumFonts.sans(fontSize: 18, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
-          Text(content, style: GoogleFonts.inter(fontSize: 14, height: 1.6)),
+          Text(content, style: VerbumFonts.sans(fontSize: 14, height: 1.6)),
         ],
       ),
     );

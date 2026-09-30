@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../features/sharing/domain/share_content.dart';
 import '../services/share_service.dart';
 import '../widgets/prayer_reading_experience.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class MissionReadScreen extends StatefulWidget {
   final String title;
@@ -80,7 +80,7 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
         centerTitle: true,
         title: Text(
           widget.title,
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: colorScheme.onSurface,
@@ -130,7 +130,7 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
                       Expanded(
                         child: Text(
                           widget.title,
-                          style: GoogleFonts.playfairDisplay(
+                          style: VerbumFonts.serif(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                             color: colorScheme.onSurface,
@@ -143,7 +143,7 @@ class _MissionReadScreenState extends State<MissionReadScreen> {
                 const SizedBox(height: 14),
                 Text(
                   widget.content,
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     fontSize: 16,
                     height: 1.65,
                     color: colorScheme.onSurface,

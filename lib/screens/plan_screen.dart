@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class PlanScreen extends StatelessWidget {
   const PlanScreen({super.key});
@@ -15,7 +15,7 @@ class PlanScreen extends StatelessWidget {
           children: [
             Text(
               'Plan actual',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
               ),
@@ -23,7 +23,7 @@ class PlanScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Plan: free (placeholder)',
-              style: GoogleFonts.inter(fontSize: 14),
+              style: VerbumFonts.sans(fontSize: 14),
             ),
             const SizedBox(height: 16),
             ElevatedButton(

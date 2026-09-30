@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../faith/content_provenance.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../controllers/missions_controller.dart';
 import '../features/sharing/domain/share_content.dart';
 import '../providers/app_provider.dart';
@@ -8,6 +7,7 @@ import '../services/share_service.dart';
 import '../services/daily_progress_service.dart';
 import '../services/spiritual_stats_service.dart';
 import '../widgets/prayer_reading_experience.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 /// Pantalla contenedora que maneja el flujo de misiones diarias
 /// usando PageView para transiciones fluidas tipo wizard
@@ -462,7 +462,7 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
                         children: [
                           Text(
                             'Progress today',
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               color: Colors.white.withValues(alpha: 0.85),
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -471,7 +471,7 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
                           const Spacer(),
                           Text(
                             '${(_getProgress().clamp(0.0, 1.0) * 100).round()}%',
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               color: Colors.white,
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
@@ -638,7 +638,7 @@ class _MissionStepWidgetState extends State<_MissionStepWidget>
             Text(
               widget.mission.title,
               textAlign: TextAlign.center,
-              style: GoogleFonts.playfairDisplay(
+              style: VerbumFonts.serif(
                 color: Colors.white,
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
@@ -669,7 +669,7 @@ class _MissionStepWidgetState extends State<_MissionStepWidget>
                         Text(
                           'Esta misión estará disponible a las 7:00 PM',
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             color: Colors.white.withValues(alpha: 0.7),
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -679,7 +679,7 @@ class _MissionStepWidgetState extends State<_MissionStepWidget>
                         Text(
                           'Vuelve más tarde para completar tu oración de la noche',
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             color: Colors.white.withValues(alpha: 0.5),
                             fontSize: 14,
                           ),
@@ -693,7 +693,7 @@ class _MissionStepWidgetState extends State<_MissionStepWidget>
               Text(
                 widget.content,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: Colors.white,
                   fontSize: 20,
                   height: 1.55,
@@ -704,7 +704,7 @@ class _MissionStepWidgetState extends State<_MissionStepWidget>
                 const SizedBox(height: 16),
                 Text(
                   widget.reference!,
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     color: const Color(0xFFFFB74D),
                     fontSize: 18,
                     fontWeight: FontWeight.w700,

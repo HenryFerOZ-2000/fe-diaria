@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../utils/app_constants.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class HelpSupportScreen extends StatelessWidget {
   const HelpSupportScreen({super.key});
@@ -69,7 +69,7 @@ class HelpSupportScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Ayuda y soporte',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -172,7 +172,7 @@ class HelpSupportScreen extends StatelessWidget {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: GoogleFonts.inter(
+      style: VerbumFonts.sans(
         fontSize: 14,
         fontWeight: FontWeight.w700,
         color: Colors.grey[600],
@@ -199,11 +199,11 @@ class HelpSupportScreen extends StatelessWidget {
         leading: Icon(icon),
         title: Text(
           title,
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+          style: VerbumFonts.sans(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
           subtitle,
-          style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
+          style: VerbumFonts.sans(fontSize: 12, color: Colors.grey[600]),
         ),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,

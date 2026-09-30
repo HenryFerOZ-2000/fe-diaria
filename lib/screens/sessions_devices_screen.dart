@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class SessionsDevicesScreen extends StatelessWidget {
   const SessionsDevicesScreen({super.key});
@@ -10,7 +10,7 @@ class SessionsDevicesScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Sesiones y dispositivos',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -27,7 +27,7 @@ class SessionsDevicesScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Próximamente',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Colors.grey[600],
@@ -39,7 +39,7 @@ class SessionsDevicesScreen extends StatelessWidget {
               child: Text(
                 'Esta funcionalidad te permitirá ver y gestionar todas tus sesiones activas y dispositivos conectados.',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600]),
+                style: VerbumFonts.sans(fontSize: 14, color: Colors.grey[600]),
               ),
             ),
           ],

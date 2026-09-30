@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../models/spiritual_stats.dart';
@@ -14,6 +13,7 @@ import '../widgets/verbum_header_actions.dart';
 import 'favorites_screen.dart';
 import 'traditional_prayers_religion_selection_screen.dart';
 import 'welcome_auth_screen.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class ProfileHubScreen extends StatefulWidget {
   const ProfileHubScreen({super.key});
@@ -148,7 +148,7 @@ class _ProfileContent extends StatelessWidget {
           surfaceTintColor: Colors.transparent,
           title: Text(
             'Tu espacio',
-            style: GoogleFonts.playfairDisplay(
+            style: VerbumFonts.serif(
               fontSize: 25,
               fontWeight: FontWeight.w700,
             ),
@@ -323,7 +323,7 @@ class _ProfileContent extends StatelessWidget {
               Center(
                 child: Text(
                   'Tu actividad se sincroniza de forma segura',
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     fontSize: 11,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -404,7 +404,7 @@ class _IdentityCard extends StatelessWidget {
                       ? null
                       : Text(
                           name.characters.first.toUpperCase(),
-                          style: GoogleFonts.playfairDisplay(
+                          style: VerbumFonts.serif(
                             color: Colors.white,
                             fontSize: 29,
                             fontWeight: FontWeight.w700,
@@ -421,7 +421,7 @@ class _IdentityCard extends StatelessWidget {
                       name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.playfairDisplay(
+                      style: VerbumFonts.serif(
                         color: Colors.white,
                         fontSize: 23,
                         fontWeight: FontWeight.w700,
@@ -430,7 +430,7 @@ class _IdentityCard extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       username.isEmpty ? 'Tu camino en Verbum' : '@$username',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         color: Colors.white.withValues(alpha: .72),
                         fontSize: 13,
                       ),
@@ -450,7 +450,7 @@ class _IdentityCard extends StatelessWidget {
                       ),
                       child: Text(
                         tradition,
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           color: const Color(0xFFF1DDAA),
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -537,7 +537,7 @@ class _WeeklyJourneyCard extends StatelessWidget {
                       children: [
                         Text(
                           'Tu semana con Dios',
-                          style: GoogleFonts.playfairDisplay(
+                          style: VerbumFonts.serif(
                             fontSize: 19,
                             fontWeight: FontWeight.w700,
                           ),
@@ -546,7 +546,7 @@ class _WeeklyJourneyCard extends StatelessWidget {
                           todayDone
                               ? 'Hoy ya diste tu paso'
                               : 'Aún puedes dedicarte un momento',
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             fontSize: 12,
                             color: scheme.onSurfaceVariant,
                           ),
@@ -556,7 +556,7 @@ class _WeeklyJourneyCard extends StatelessWidget {
                   ),
                   Text(
                     '${stats.currentStreak}',
-                    style: GoogleFonts.playfairDisplay(
+                    style: VerbumFonts.serif(
                       fontSize: 27,
                       fontWeight: FontWeight.w700,
                       color: scheme.primary,
@@ -565,7 +565,7 @@ class _WeeklyJourneyCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     'días',
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       fontSize: 11,
                       color: scheme.onSurfaceVariant,
                     ),
@@ -583,7 +583,7 @@ class _WeeklyJourneyCard extends StatelessWidget {
                     children: [
                       Text(
                         labels[index],
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                           color: scheme.onSurfaceVariant,
@@ -621,7 +621,7 @@ class _WeeklyJourneyCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       '$completed de 7 días esta semana',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: scheme.onSurfaceVariant,
@@ -630,7 +630,7 @@ class _WeeklyJourneyCard extends StatelessWidget {
                   ),
                   Text(
                     'Ver constancia',
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: scheme.primary,
@@ -681,7 +681,7 @@ class _MetricCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             value,
-            style: GoogleFonts.playfairDisplay(
+            style: VerbumFonts.serif(
               fontSize: 21,
               fontWeight: FontWeight.w700,
               color: scheme.onSurface,
@@ -691,7 +691,7 @@ class _MetricCard extends StatelessWidget {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               fontSize: 10.5,
               color: scheme.onSurfaceVariant,
             ),
@@ -712,7 +712,7 @@ class _SectionTitle extends StatelessWidget {
     children: [
       Text(
         eyebrow,
-        style: GoogleFonts.inter(
+        style: VerbumFonts.sans(
           fontSize: 10,
           letterSpacing: 1.5,
           fontWeight: FontWeight.w700,
@@ -722,7 +722,7 @@ class _SectionTitle extends StatelessWidget {
       const SizedBox(height: 3),
       Text(
         title,
-        style: GoogleFonts.playfairDisplay(
+        style: VerbumFonts.serif(
           fontSize: 21,
           fontWeight: FontWeight.w700,
         ),
@@ -792,13 +792,13 @@ class _ProfileAction extends StatelessWidget {
       ),
       title: Text(
         title,
-        style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700),
+        style: VerbumFonts.sans(fontSize: 14, fontWeight: FontWeight.w700),
       ),
       subtitle: Text(
         subtitle,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: GoogleFonts.inter(fontSize: 11, color: scheme.onSurfaceVariant),
+        style: VerbumFonts.sans(fontSize: 11, color: scheme.onSurfaceVariant),
       ),
       trailing: Icon(
         Icons.chevron_right_rounded,
@@ -836,7 +836,7 @@ class _CompletionCard extends StatelessWidget {
             Expanded(
               child: Text(
                 'Completa tu nombre y usuario para que la comunidad pueda reconocerte.',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -882,7 +882,7 @@ class _SignOutSheet extends StatelessWidget {
           const SizedBox(height: 20),
           Text(
             '¿Cerrar sesión?',
-            style: GoogleFonts.playfairDisplay(
+            style: VerbumFonts.serif(
               fontSize: 23,
               fontWeight: FontWeight.w700,
             ),
@@ -891,7 +891,7 @@ class _SignOutSheet extends StatelessWidget {
           Text(
             'Tu camino y tus datos permanecerán guardados para cuando regreses.',
             textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               fontSize: 13,
               color: scheme.onSurfaceVariant,
             ),

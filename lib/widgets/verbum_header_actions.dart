@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../design_system/design_system.dart';
+
 /// Acciones canónicas de los encabezados de Verbum.
 /// Mantiene iconografía, tamaño, orden y superficie iguales en toda la app.
 class VerbumHeaderActions extends StatelessWidget {
@@ -27,7 +29,7 @@ class VerbumHeaderActions extends StatelessWidget {
         children: [
           if (showSettings)
             VerbumHeaderButton(
-              icon: Icons.tune_rounded,
+              icon: VerbumIcons.slidersHorizontal,
               tooltip: 'Configuración',
               onPressed:
                   onSettingsPressed ??
@@ -36,7 +38,7 @@ class VerbumHeaderActions extends StatelessWidget {
           if (showSettings && showProfile) const SizedBox(width: 8),
           if (showProfile)
             VerbumHeaderButton(
-              icon: Icons.person_outline_rounded,
+              icon: VerbumIcons.user,
               tooltip: 'Mi perfil',
               emphasized: true,
               onPressed:
@@ -49,8 +51,9 @@ class VerbumHeaderActions extends StatelessWidget {
   }
 }
 
+/// Botón de cabecera: círculo con filete, o en tinta si [emphasized].
 class VerbumHeaderButton extends StatelessWidget {
-  final IconData icon;
+  final VerbumIcons icon;
   final String tooltip;
   final VoidCallback onPressed;
   final bool emphasized;
@@ -65,35 +68,13 @@ class VerbumHeaderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final background = emphasized
-        ? scheme.primary
-        : scheme.surface.withValues(alpha: dark ? .72 : .84);
-    final foreground = emphasized ? scheme.onPrimary : scheme.primary;
-
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: background,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: BorderSide(
-            color: emphasized
-                ? scheme.primary.withValues(alpha: .75)
-                : scheme.outlineVariant.withValues(alpha: .9),
-          ),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onPressed,
-          child: SizedBox(
-            width: 40,
-            height: 40,
-            child: Icon(icon, size: 20, color: foreground),
-          ),
-        ),
-      ),
+    return VIconButton(
+      icon: icon,
+      semanticLabel: tooltip,
+      onPressed: onPressed,
+      variant: emphasized
+          ? VIconButtonVariant.solid
+          : VIconButtonVariant.outlined,
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/groq_chat_service.dart' as groq;
 import '../services/app_analytics_service.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class ReadingChatMessage {
   final String text;
@@ -143,7 +143,7 @@ class _ReadingChatScreenState extends State<ReadingChatScreen> {
                       Text(
                         widget.title,
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.playfairDisplay(
+                        style: VerbumFonts.serif(
                           color: Colors.white,
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
@@ -165,7 +165,7 @@ class _ReadingChatScreenState extends State<ReadingChatScreen> {
                           children: [
                             Text(
                               widget.content,
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 color: Colors.white,
                                 fontSize: 16,
                                 height: 1.45,
@@ -177,7 +177,7 @@ class _ReadingChatScreenState extends State<ReadingChatScreen> {
                               const SizedBox(height: 8),
                               Text(
                                 widget.reference!,
-                                style: GoogleFonts.inter(
+                                style: VerbumFonts.sans(
                                   color: const Color(0xFFFFB74D),
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
@@ -244,7 +244,7 @@ class _ReadingChatScreenState extends State<ReadingChatScreen> {
                             ),
                             child: Text(
                               msg.text,
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 color: Colors.white,
                                 fontSize: 14,
                                 height: 1.45,

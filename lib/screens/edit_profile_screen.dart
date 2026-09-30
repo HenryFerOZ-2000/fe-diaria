@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../services/profile_service.dart';
 import '../services/social_service.dart';
 import '../widgets/verbum_ambient_background.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -172,7 +172,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               AppBar(
                 title: Text(
                   'Editar perfil',
-                  style: GoogleFonts.playfairDisplay(
+                  style: VerbumFonts.serif(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                   ),
@@ -254,7 +254,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             const SizedBox(height: 13),
                             Text(
                               'Tu rostro en la comunidad',
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 fontSize: 12,
                                 color: scheme.onSurfaceVariant,
                               ),
@@ -265,7 +265,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       const SizedBox(height: 30),
                       Text(
                         'CÓMO QUIERES APARECER',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 10,
                           letterSpacing: 1.5,
                           fontWeight: FontWeight.w700,
@@ -275,7 +275,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       const SizedBox(height: 6),
                       Text(
                         'Tu identidad en Verbum',
-                        style: GoogleFonts.playfairDisplay(
+                        style: VerbumFonts.serif(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
                         ),
@@ -331,7 +331,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 Expanded(
                                   child: Text(
                                     'Tu usuario ayuda a que otros puedan reconocerte cuando compartes en Comunidad.',
-                                    style: GoogleFonts.inter(
+                                    style: VerbumFonts.sans(
                                       fontSize: 11,
                                       height: 1.45,
                                       color: scheme.onSurfaceVariant,
@@ -367,7 +367,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Center(
                         child: Text(
                           'Puedes cambiar estos datos cuando quieras',
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             fontSize: 11,
                             color: scheme.onSurfaceVariant,
                           ),

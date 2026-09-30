@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../services/post_social_service.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 /// Fila like + comentarios para publicaciones de comunidad (misma idea que En Vivo).
 class CommunityPostInteractionRow extends StatefulWidget {
@@ -180,7 +180,7 @@ class _MiniAction extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               label,
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
                 color: color,

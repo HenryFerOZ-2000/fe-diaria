@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/verbum_header_actions.dart';
 import '../services/groq_chat_service.dart' as groq;
 import '../providers/auth_provider.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class ChatMessage {
   final String text;
@@ -148,14 +148,14 @@ class _ChatScreenState extends State<ChatScreen> {
             children: [
               Text(
                 'Acompañamiento',
-                style: GoogleFonts.playfairDisplay(
+                style: VerbumFonts.serif(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               Text(
                 'UN ESPACIO SEGURO PARA HABLAR',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   fontSize: 8,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.1,
@@ -236,7 +236,7 @@ class _ChatScreenState extends State<ChatScreen> {
             const SizedBox(width: 10),
             Text(
               'Pensando...',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 14,
                 color: colorScheme.onSurface.withValues(alpha: 0.7),
               ),
@@ -268,7 +268,7 @@ class _ChatScreenState extends State<ChatScreen> {
               controller: _controller,
               decoration: InputDecoration(
                 hintText: 'Escribe tu mensaje',
-                hintStyle: GoogleFonts.inter(
+                hintStyle: VerbumFonts.sans(
                   color: colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 filled: true,

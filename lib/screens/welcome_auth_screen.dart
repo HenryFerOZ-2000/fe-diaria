@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/storage_service.dart';
 import '../services/social_service.dart';
 import '../widgets/verbum_ambient_background.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class WelcomeAuthScreen extends StatefulWidget {
   const WelcomeAuthScreen({super.key});
@@ -247,7 +247,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                     Expanded(
                       child: Text(
                         'Verbum',
-                        style: GoogleFonts.playfairDisplay(
+                        style: VerbumFonts.serif(
                           color: colorScheme.onSurface,
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
@@ -270,7 +270,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                       ),
                       child: Text(
                         'PASO 2 DE 2',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           color: isDark
                               ? colorScheme.primaryContainer
                               : colorScheme.primary,
@@ -317,7 +317,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                     children: [
                       Text(
                         'Tu camino puede\nacompañarte siempre',
-                        style: GoogleFonts.playfairDisplay(
+                        style: VerbumFonts.serif(
                           fontSize: 32,
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.6,
@@ -330,7 +330,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                         constraints: const BoxConstraints(maxWidth: 500),
                         child: Text(
                           'Guarda tus oraciones, progreso y comunidades en todos tus dispositivos.',
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             fontSize: 14,
                             height: 1.5,
                             color: colorScheme.onSurface.withValues(
@@ -367,7 +367,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                     children: [
                       Text(
                         'Guarda tu camino',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.2,
@@ -377,7 +377,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                       const SizedBox(height: 4),
                       Text(
                         'Elige cómo quieres continuar. Crear una cuenta es opcional.',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 13,
                           height: 1.4,
                           color: colorScheme.onSurface.withValues(alpha: 0.70),
@@ -402,7 +402,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                             ),
                             label: Text(
                               'Usar correo electrónico',
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.w600,
                                 color: colorScheme.primary,
@@ -428,7 +428,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                           ),
                           child: Text(
                             _error!,
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               color: Colors.red.shade800,
                               fontSize: 13,
                               height: 1.4,
@@ -458,7 +458,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                             _isLoading
                                 ? 'Procesando...'
                                 : 'Explorar sin crear una cuenta',
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                               color: colorScheme.onSurface.withValues(
@@ -478,7 +478,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                   children: [
                     Text(
                       'Al continuar aceptas nuestros',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 11.2,
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -494,7 +494,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                     ),
                     Text(
                       'y',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 11.2,
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -524,7 +524,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
       children: [
         Text(
           'La forma más rápida de conservar tu progreso.',
-          style: GoogleFonts.inter(
+          style: VerbumFonts.sans(
             fontSize: 13.5,
             height: 1.45,
             color: colorScheme.onSurface.withValues(alpha: 0.7),
@@ -547,7 +547,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                 : const Icon(Icons.g_mobiledata_rounded, size: 27),
             label: Text(
               _isLoading ? 'Conectando...' : 'Continuar con Google',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontWeight: FontWeight.w700,
                 fontSize: 15,
               ),
@@ -588,7 +588,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
               ),
               label: Text(
                 'Volver a Google',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   fontSize: 12.8,
                   fontWeight: FontWeight.w600,
                   color: colorScheme.onSurface.withValues(alpha: 0.78),
@@ -612,7 +612,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
             _isSignUp
                 ? 'Crea una cuenta con tu correo electrónico'
                 : 'Ingresa con tu correo y contraseña',
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               fontSize: 13.5,
               height: 1.45,
               color: colorScheme.onSurface.withValues(alpha: 0.74),
@@ -748,7 +748,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                 onPressed: _handlePasswordReset,
                 child: Text(
                   '¿Olvidaste tu contraseña?',
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     fontSize: 13,
                     color: colorScheme.primary,
                     fontWeight: FontWeight.w600,
@@ -782,7 +782,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
                     )
                   : Text(
                       _isSignUp ? 'Crear cuenta' : 'Iniciar sesión',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontWeight: FontWeight.w700,
                         fontSize: 15,
                       ),
@@ -834,7 +834,7 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
               ),
               child: Text(
                 label,
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: selected ? scheme.primary : scheme.onSurfaceVariant,
                   fontSize: 13,
                   fontWeight: selected ? FontWeight.w800 : FontWeight.w600,

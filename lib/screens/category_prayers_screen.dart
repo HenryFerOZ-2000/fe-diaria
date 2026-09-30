@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import '../features/sharing/domain/share_content.dart';
 import '../faith/content_provenance.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/category_prayers_service.dart';
 import '../services/share_service.dart';
 import '../services/ads_service.dart';
 import '../services/storage_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../widgets/prayer_card.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class CategoryPrayersScreen extends StatefulWidget {
   const CategoryPrayersScreen({super.key});
@@ -86,7 +86,7 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
       appBar: AppBar(
         title: Text(
           'Oraciones para…',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 26,
             fontWeight: FontWeight.bold,
           ),
@@ -191,7 +191,7 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
                     icon: const Icon(Icons.home, size: 24),
                     label: Text(
                       'Regresar al inicio',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
@@ -218,7 +218,7 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
   Widget _buildHeader(ColorScheme colorScheme) {
     return Text(
       'Elige una categoría',
-      style: GoogleFonts.inter(
+      style: VerbumFonts.sans(
         fontSize: 22,
         fontWeight: FontWeight.w700,
         color: colorScheme.onSurface,
@@ -287,7 +287,7 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
               ],
               Text(
                 title,
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: colorScheme.onSurface,
@@ -393,7 +393,7 @@ class _CategoryPrayerDetailScreenState
       appBar: AppBar(
         title: Text(
           title,
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 26,
             fontWeight: FontWeight.bold,
           ),
@@ -484,7 +484,7 @@ class _CategoryPrayerDetailScreenState
                 icon: const Icon(Icons.home, size: 24),
                 label: Text(
                   'Regresar al inicio',
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),

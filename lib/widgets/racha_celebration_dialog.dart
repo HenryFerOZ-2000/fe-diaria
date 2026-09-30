@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class RachaCelebrationDialog extends StatefulWidget {
   final int totalDays;
@@ -173,7 +173,7 @@ class _RachaCelebrationDialogState extends State<RachaCelebrationDialog>
                             ? 'UN HITO EN TU CAMINO'
                             : 'TU DÍA ESTÁ A SALVO',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           color: const Color(0xFFB27A34),
                           fontSize: 9.5,
                           fontWeight: FontWeight.w800,
@@ -186,7 +186,7 @@ class _RachaCelebrationDialogState extends State<RachaCelebrationDialog>
                             ? '${widget.totalDays} días de constancia'
                             : 'Un día más caminando con Dios',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.playfairDisplay(
+                        style: VerbumFonts.serif(
                           color: scheme.onSurface,
                           fontSize: 27,
                           height: 1.08,
@@ -199,7 +199,7 @@ class _RachaCelebrationDialogState extends State<RachaCelebrationDialog>
                             ? 'Cada uno de estos días comenzó con una pequeña decisión: hacer espacio para Dios.'
                             : 'Hoy hiciste espacio para detenerte, escuchar y volver a lo esencial.',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           color: scheme.onSurfaceVariant,
                           fontSize: 13,
                           height: 1.5,

@@ -13,6 +13,7 @@ import '../domain/share_content.dart';
 import '../domain/share_page.dart';
 import '../domain/share_visual_style.dart';
 import 'verbum_share_card.dart';
+import 'package:verbum/design_system/icons/verbum_icons.dart';
 
 class ShareComposerScreen extends StatefulWidget {
   const ShareComposerScreen({
@@ -349,7 +350,7 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
         ),
         const SizedBox(width: 12),
         VerbumHeaderButton(
-          icon: Icons.close_rounded,
+          icon: VerbumIcons.close,
           tooltip: 'Cerrar',
           onPressed: () {
             if (!_busy) Navigator.of(context).maybePop();

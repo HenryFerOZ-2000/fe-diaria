@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../features/sharing/domain/share_content.dart';
 import '../models/spiritual_path.dart';
@@ -7,6 +6,7 @@ import '../services/read_aloud_service.dart';
 import '../services/share_service.dart';
 import '../services/spiritual_path_service.dart';
 import 'reading_chat_screen.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class SpiritualPathDayScreen extends StatefulWidget {
   final SpiritualPath path;
@@ -132,7 +132,7 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                           path.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             color: Colors.white,
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
@@ -140,7 +140,7 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                         ),
                         Text(
                           'DÍA ${widget.dayNumber} DE ${path.days.length}',
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             color: Colors.white60,
                             fontSize: 8,
                             letterSpacing: 1.2,
@@ -352,7 +352,7 @@ class _ReadingPage extends StatelessWidget {
             const SizedBox(height: 24),
             Text(
               eyebrow,
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 color: accent,
                 fontSize: 9,
                 letterSpacing: 1.5,
@@ -362,7 +362,7 @@ class _ReadingPage extends StatelessWidget {
             const SizedBox(height: 7),
             Text(
               title,
-              style: GoogleFonts.playfairDisplay(
+              style: VerbumFonts.serif(
                 color: const Color(0xFF282034),
                 fontSize: 27,
                 fontWeight: FontWeight.w700,
@@ -372,7 +372,7 @@ class _ReadingPage extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               subtitle,
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 color: const Color(0xFF716879),
                 fontSize: 11.5,
                 height: 1.45,
@@ -382,12 +382,12 @@ class _ReadingPage extends StatelessWidget {
             Text(
               body,
               style: serifBody
-                  ? GoogleFonts.merriweather(
+                  ? VerbumFonts.serif(
                       color: const Color(0xFF30283A),
                       fontSize: 18,
                       height: 1.8,
                     )
-                  : GoogleFonts.inter(
+                  : VerbumFonts.sans(
                       color: const Color(0xFF30283A),
                       fontSize: 16,
                       height: 1.75,
@@ -403,7 +403,7 @@ class _ReadingPage extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 footer!,
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: accent,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -447,7 +447,7 @@ class _CompletionDialog extends StatelessWidget {
       title: Text(
         finished ? 'Has completado el camino' : 'Tu paso de hoy está completo',
         textAlign: TextAlign.center,
-        style: GoogleFonts.playfairDisplay(
+        style: VerbumFonts.serif(
           fontSize: 23,
           fontWeight: FontWeight.w700,
         ),
@@ -457,7 +457,7 @@ class _CompletionDialog extends StatelessWidget {
             ? 'Lo recorrido no termina aquí: llévalo contigo y vuelve cuando lo necesites.'
             : 'No necesitas hacer más. Permite que este momento te acompañe durante el día.',
         textAlign: TextAlign.center,
-        style: GoogleFonts.inter(fontSize: 13, height: 1.5),
+        style: VerbumFonts.sans(fontSize: 13, height: 1.5),
       ),
       actionsAlignment: MainAxisAlignment.center,
       actions: [

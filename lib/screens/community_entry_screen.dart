@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../services/community_service.dart';
 import '../widgets/verbum_ambient_background.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 enum CommunityEntryMode { landing, join, create, success }
 
@@ -116,7 +116,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
                   children: [
                     Text(
                       'CRECER JUNTOS',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         color: const Color(0xFFD8B875),
                         fontWeight: FontWeight.w800,
                         fontSize: 10,
@@ -126,7 +126,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
                     const SizedBox(height: 8),
                     Text(
                       'La fe se vive mejor\nen comunidad.',
-                      style: GoogleFonts.playfairDisplay(
+                      style: VerbumFonts.serif(
                         color: Colors.white,
                         fontSize: 30,
                         height: 1.05,
@@ -142,7 +142,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
         const SizedBox(height: 22),
         Text(
           'Conecta con tu iglesia, parroquia o grupo para compartir, orar y caminar acompañado.',
-          style: GoogleFonts.inter(
+          style: VerbumFonts.sans(
             fontSize: 14,
             height: 1.55,
             color: scheme.onSurfaceVariant,
@@ -178,7 +178,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
         _eyebrow('INGRESAR'),
         Text(
           'Encuentra tu\ncomunidad',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 36,
             height: 1.05,
             fontWeight: FontWeight.w700,
@@ -198,7 +198,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
             FilteringTextInputFormatter.allow(RegExp('[A-Za-z0-9]')),
             LengthLimitingTextInputFormatter(8),
           ],
-          style: GoogleFonts.inter(
+          style: VerbumFonts.sans(
             fontSize: 25,
             fontWeight: FontWeight.w800,
             letterSpacing: 5,
@@ -264,7 +264,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
                   children: [
                     Text(
                       data['name']?.toString() ?? 'Comunidad',
-                      style: GoogleFonts.playfairDisplay(
+                      style: VerbumFonts.serif(
                         fontSize: 21,
                         fontWeight: FontWeight.w700,
                       ),
@@ -305,7 +305,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
             'Cuenta su historia',
             'Todo listo',
           ][_createStep],
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 32,
             fontWeight: FontWeight.w700,
           ),
@@ -419,7 +419,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
         Text(
           'Tu comunidad\nestá lista',
           textAlign: TextAlign.center,
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 36,
             height: 1.05,
             fontWeight: FontWeight.w700,
@@ -445,7 +445,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
               const SizedBox(height: 8),
               Text(
                 _createdCode ?? '',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 5,
@@ -559,7 +559,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
     padding: const EdgeInsets.only(bottom: 8),
     child: Text(
       text,
-      style: GoogleFonts.inter(
+      style: VerbumFonts.sans(
         fontSize: 10,
         fontWeight: FontWeight.w800,
         letterSpacing: 1.8,

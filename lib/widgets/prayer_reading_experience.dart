@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/share_service.dart';
 import '../services/read_aloud_service.dart';
 import '../faith/content_provenance.dart';
 import '../features/sharing/domain/share_content.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class PrayerReadingExperience extends StatefulWidget {
   final bool loading;
@@ -215,7 +215,7 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       color: Colors.white70,
                       fontSize: 9,
                       fontWeight: FontWeight.w800,
@@ -306,7 +306,7 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
               Text(
                 widget.title ?? '',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.playfairDisplay(
+                style: VerbumFonts.serif(
                   color: ink,
                   fontSize: 29,
                   height: 1.12,
@@ -316,7 +316,7 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
               const SizedBox(height: 12),
               Text(
                 '${_estimatedMinutes(widget.text ?? '')} MIN DE LECTURA',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: widget.accent,
                   fontSize: 9,
                   fontWeight: FontWeight.w800,
@@ -330,7 +330,7 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
                   child: Text(
                     paragraph.trim(),
                     textAlign: _centerText ? TextAlign.center : TextAlign.left,
-                    style: GoogleFonts.lora(
+                    style: VerbumFonts.serif(
                       color: ink.withValues(alpha: .92),
                       fontSize: _fontSize,
                       height: 1.72,
@@ -358,7 +358,7 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
                           children: [
                             Text(
                               widget.verseReference!,
-                              style: GoogleFonts.playfairDisplay(
+                              style: VerbumFonts.serif(
                                 color: ink,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
@@ -370,7 +370,7 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
                                 _shortTranslation(
                                   widget.provenance!.translation!,
                                 ),
-                                style: GoogleFonts.inter(
+                                style: VerbumFonts.sans(
                                   color: ink.withValues(alpha: .56),
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
@@ -396,7 +396,7 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
                       .map(
                         (tag) => Text(
                           '#$tag',
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             fontSize: 10,
                             color: ink.withValues(alpha: .5),
                           ),
@@ -526,7 +526,7 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
           Text(
             'No pudimos abrir esta oración',
             textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
+            style: VerbumFonts.serif(
               color: Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.w700,
@@ -562,7 +562,7 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
             children: [
               Text(
                 'Ajustes de lectura',
-                style: GoogleFonts.playfairDisplay(
+                style: VerbumFonts.serif(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
                 ),

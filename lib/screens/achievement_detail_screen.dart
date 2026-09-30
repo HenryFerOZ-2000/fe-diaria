@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/achievement.dart';
 import '../models/spiritual_stats.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class AchievementDetailScreen extends StatelessWidget {
   final Achievement achievement;
@@ -51,7 +51,7 @@ class AchievementDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Detalle del logro',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -103,7 +103,7 @@ class AchievementDetailScreen extends StatelessWidget {
             // Título
             Text(
               achievement.title,
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -113,7 +113,7 @@ class AchievementDetailScreen extends StatelessWidget {
             // Descripción
             Text(
               achievement.description,
-              style: GoogleFonts.inter(fontSize: 16, color: Colors.grey[600]),
+              style: VerbumFonts.sans(fontSize: 16, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
@@ -154,7 +154,7 @@ class AchievementDetailScreen extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         isUnlocked ? '¡Logro desbloqueado!' : 'Bloqueado',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: isUnlocked
@@ -168,7 +168,7 @@ class AchievementDetailScreen extends StatelessWidget {
                   // Progreso
                   Text(
                     '$progress / ${achievement.target}',
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: isUnlocked ? Colors.amber[700] : Colors.grey[800],
@@ -190,7 +190,7 @@ class AchievementDetailScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     '${(progressPercent * 100).toStringAsFixed(0)}% completado',
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       fontSize: 12,
                       color: Colors.grey[600],
                     ),
@@ -228,7 +228,7 @@ class AchievementDetailScreen extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         'Cómo desbloquear',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
@@ -238,7 +238,7 @@ class AchievementDetailScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     _getHowToUnlockText(),
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       fontSize: 14,
                       color: Colors.grey[700],
                     ),
@@ -272,7 +272,7 @@ class AchievementDetailScreen extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         'Recompensa',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
@@ -282,7 +282,7 @@ class AchievementDetailScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     _getRewardText(),
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: Colors.amber[700],
@@ -321,7 +321,7 @@ class AchievementDetailScreen extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         'Fecha de desbloqueo',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
@@ -331,7 +331,7 @@ class AchievementDetailScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     isUnlocked ? '—' : 'Aún no desbloqueado',
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       fontSize: 14,
                       color: Colors.grey[600],
                     ),

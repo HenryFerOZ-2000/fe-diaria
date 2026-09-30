@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/live_posts_service.dart';
 import '../services/post_social_service.dart';
 import '../widgets/top_notice.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class CommentsScreen extends StatefulWidget {
   final String postId;
@@ -177,7 +177,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 return Center(
                   child: Text(
                     'Error al cargar comentarios: ${snapshot.error}',
-                    style: GoogleFonts.inter(),
+                    style: VerbumFonts.sans(),
                   ),
                 );
               }
@@ -196,7 +196,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                       const SizedBox(height: 16),
                       Text(
                         'Sé el primero en comentar',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 16,
                           color: Colors.grey[600],
                         ),
@@ -262,7 +262,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                           Expanded(
                             child: Text(
                               'Respondiendo a $_replyingToAuthorName',
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 fontSize: 12,
                                 color: Colors.blue[900],
                               ),
@@ -343,7 +343,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
       appBar: AppBar(
         title: Text(
           'Comentarios',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -474,7 +474,7 @@ class _CommentItemState extends State<_CommentItem> {
                             authorName.isNotEmpty
                                 ? authorName[0].toUpperCase()
                                 : '?',
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               color: Colors.deepPurple,
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
@@ -501,7 +501,7 @@ class _CommentItemState extends State<_CommentItem> {
                                   Flexible(
                                     child: Text(
                                       authorName,
-                                      style: GoogleFonts.inter(
+                                      style: VerbumFonts.sans(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 13,
                                       ),
@@ -526,7 +526,7 @@ class _CommentItemState extends State<_CommentItem> {
                                       ),
                                       child: Text(
                                         'Tú',
-                                        style: GoogleFonts.inter(
+                                        style: VerbumFonts.sans(
                                           fontSize: 10,
                                           fontWeight: FontWeight.w700,
                                           color: Theme.of(
@@ -541,7 +541,7 @@ class _CommentItemState extends State<_CommentItem> {
                               const SizedBox(height: 2),
                               Text(
                                 '@${username.isNotEmpty ? username : 'sin-username'}',
-                                style: GoogleFonts.inter(
+                                style: VerbumFonts.sans(
                                   fontSize: 11,
                                   color: Colors.grey[600],
                                   fontWeight: FontWeight.w500,
@@ -551,7 +551,7 @@ class _CommentItemState extends State<_CommentItem> {
                               const SizedBox(height: 4),
                               Text(
                                 text,
-                                style: GoogleFonts.inter(
+                                style: VerbumFonts.sans(
                                   fontSize: 14,
                                   height: 1.4,
                                 ),
@@ -564,7 +564,7 @@ class _CommentItemState extends State<_CommentItem> {
                           children: [
                             Text(
                               widget.formatTimeAgo(createdAt?.toDate()),
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 fontSize: 11,
                                 color: Colors.grey[600],
                               ),
@@ -578,7 +578,7 @@ class _CommentItemState extends State<_CommentItem> {
                               ),
                               child: Text(
                                 'Responder',
-                                style: GoogleFonts.inter(
+                                style: VerbumFonts.sans(
                                   fontSize: 11,
                                   color: Colors.blue[700],
                                   fontWeight: FontWeight.w600,
@@ -614,7 +614,7 @@ class _CommentItemState extends State<_CommentItem> {
                                         _showReplies
                                             ? 'Ocultar'
                                             : 'Ver $displayReplyCount ${displayReplyCount == 1 ? 'respuesta' : 'respuestas'}',
-                                        style: GoogleFonts.inter(
+                                        style: VerbumFonts.sans(
                                           fontSize: 11,
                                           color: Colors.blue[700],
                                           fontWeight: FontWeight.w600,
@@ -666,7 +666,7 @@ class _CommentItemState extends State<_CommentItem> {
                                 const SizedBox(width: 4),
                                 Text(
                                   '$count',
-                                  style: GoogleFonts.inter(
+                                  style: VerbumFonts.sans(
                                     fontSize: 12,
                                     color: Colors.grey[600],
                                   ),
@@ -793,7 +793,7 @@ class _ReplyItemState extends State<_ReplyItem> {
                         authorName.isNotEmpty
                             ? authorName[0].toUpperCase()
                             : '?',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           color: Colors.deepPurple,
                           fontWeight: FontWeight.bold,
                           fontSize: 10,
@@ -820,7 +820,7 @@ class _ReplyItemState extends State<_ReplyItem> {
                               Flexible(
                                 child: Text(
                                   authorName,
-                                  style: GoogleFonts.inter(
+                                  style: VerbumFonts.sans(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 12,
                                   ),
@@ -841,7 +841,7 @@ class _ReplyItemState extends State<_ReplyItem> {
                                   ),
                                   child: Text(
                                     'Tú',
-                                    style: GoogleFonts.inter(
+                                    style: VerbumFonts.sans(
                                       fontSize: 10,
                                       fontWeight: FontWeight.w700,
                                       color: Theme.of(
@@ -856,7 +856,7 @@ class _ReplyItemState extends State<_ReplyItem> {
                           const SizedBox(height: 2),
                           Text(
                             '@${username.isNotEmpty ? username : 'sin-username'}',
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               fontSize: 10,
                               color: Colors.grey[600],
                               fontWeight: FontWeight.w500,
@@ -866,7 +866,7 @@ class _ReplyItemState extends State<_ReplyItem> {
                           const SizedBox(height: 2),
                           Text(
                             text,
-                            style: GoogleFonts.inter(fontSize: 13, height: 1.4),
+                            style: VerbumFonts.sans(fontSize: 13, height: 1.4),
                           ),
                         ],
                       ),
@@ -876,7 +876,7 @@ class _ReplyItemState extends State<_ReplyItem> {
                       children: [
                         Text(
                           widget.formatTimeAgo(createdAt?.toDate()),
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             fontSize: 10,
                             color: Colors.grey[600],
                           ),
@@ -934,7 +934,7 @@ class _ReplyItemState extends State<_ReplyItem> {
                                       const SizedBox(width: 4),
                                       Text(
                                         '$count',
-                                        style: GoogleFonts.inter(
+                                        style: VerbumFonts.sans(
                                           fontSize: 11,
                                           color: Colors.grey[600],
                                         ),

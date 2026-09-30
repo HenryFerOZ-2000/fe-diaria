@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/storage_service.dart';
 import '../services/notification_service.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 /// Pantalla de onboarding simple para nuevos usuarios
 class OnboardingScreen extends StatefulWidget {
@@ -115,7 +115,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           // Título
           Text(
             'Bienvenido',
-            style: GoogleFonts.playfairDisplay(
+            style: VerbumFonts.serif(
               fontSize: 48,
               fontWeight: FontWeight.bold,
               color: colorScheme.primary,
@@ -128,7 +128,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           // Mensaje
           Text(
             'Déjanos acompañarte cada día con versículos y oraciones que llenarán tu corazón de paz y esperanza.',
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               fontSize: 22,
               color: Colors.black87,
               height: 1.6,
@@ -162,7 +162,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     )
                   : Text(
                       'Comenzar',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/language_service.dart';
 import '../main.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 /// Pantalla de selección de idioma inicial
 /// Se muestra solo la primera vez que se abre la app
@@ -114,7 +114,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
                       // Título
                       Text(
                         'Verbum',
-                        style: GoogleFonts.playfairDisplay(
+                        style: VerbumFonts.serif(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -124,7 +124,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
                       const SizedBox(height: 16),
                       Text(
                         'Selecciona tu idioma',
-                        style: GoogleFonts.roboto(
+                        style: VerbumFonts.sans(
                           fontSize: 18,
                           color: Colors.white.withValues(alpha: 0.9),
                         ),
@@ -201,7 +201,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen>
               Expanded(
                 child: Text(
                   languageName,
-                  style: GoogleFonts.roboto(
+                  style: VerbumFonts.sans(
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                     color: isSelected

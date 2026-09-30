@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/help_support_service.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class ReportProblemScreen extends StatefulWidget {
   const ReportProblemScreen({super.key});
@@ -72,7 +72,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
       appBar: AppBar(
         title: Text(
           'Reportar un problema',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -89,7 +89,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
             // Categoría
             Text(
               'Categoría',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: Colors.grey[600],
@@ -128,7 +128,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
             // Descripción
             Text(
               'Descripción del problema',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: Colors.grey[600],
@@ -159,7 +159,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
             const SizedBox(height: 8),
             Text(
               'Nota: Adjuntar captura de pantalla próximamente',
-              style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
+              style: VerbumFonts.sans(fontSize: 12, color: Colors.grey[600]),
             ),
             const SizedBox(height: 32),
             // Botón enviar
@@ -179,7 +179,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
                     )
                   : Text(
                       'Enviar reporte',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),

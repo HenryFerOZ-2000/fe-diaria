@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 /// Tile de misión diaria con check animado.
 class MissionTile extends StatelessWidget {
@@ -63,7 +63,7 @@ class MissionTile extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: colorScheme.onSurface,

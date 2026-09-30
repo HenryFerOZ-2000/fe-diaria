@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../services/ads_service.dart';
@@ -9,6 +8,7 @@ import '../widgets/app_scaffold.dart';
 import '../widgets/traditional_prayer_library.dart';
 import '../widgets/verbum_header_actions.dart';
 import 'traditional_prayer_detail_screen.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 /// Biblioteca de oraciones pertenecientes a una categoría concreta.
 class TraditionalPrayersListScreen extends StatefulWidget {
@@ -100,7 +100,7 @@ class _TraditionalPrayersListScreenState
         child: Text(
           displayName,
           maxLines: 1,
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 23,
             fontWeight: FontWeight.w700,
           ),

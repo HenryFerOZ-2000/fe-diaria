@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../providers/app_provider.dart';
 import '../services/personalization_service.dart';
 import '../services/storage_service.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 /// Pantalla de personalización del usuario
 class PersonalizationScreen extends StatefulWidget {
@@ -177,7 +177,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
       appBar: AppBar(
         title: Text(
           'Personalización',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -266,7 +266,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
         const SizedBox(width: 12),
         Text(
           title,
-          style: GoogleFonts.inter(
+          style: VerbumFonts.sans(
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: colorScheme.onSurface,
@@ -295,10 +295,10 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
       ),
       child: TextField(
         controller: _nameController,
-        style: GoogleFonts.inter(fontSize: 16, color: colorScheme.onSurface),
+        style: VerbumFonts.sans(fontSize: 16, color: colorScheme.onSurface),
         decoration: InputDecoration(
           hintText: 'Ej: usuario123 o tu nombre para saludos',
-          hintStyle: GoogleFonts.inter(color: colorScheme.onSurfaceVariant),
+          hintStyle: VerbumFonts.sans(color: colorScheme.onSurfaceVariant),
           prefixIcon: Icon(Icons.alternate_email, color: colorScheme.primary),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(20),
@@ -383,7 +383,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
               const SizedBox(height: 8),
               Text(
                 emotion['name'] as String,
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   fontSize: 12,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                   color: isSelected
@@ -431,7 +431,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
                   const SizedBox(width: 8),
                   Text(
                     'Guardar Personalización',
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -461,7 +461,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
         children: [
           Text(
             '¿Cuánto tiempo quieres dedicar normalmente?',
-            style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700),
+            style: VerbumFonts.sans(fontSize: 13, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 10),
           Wrap(
@@ -480,7 +480,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
           const SizedBox(height: 17),
           Text(
             '¿Cuándo prefieres encontrar tu momento principal?',
-            style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700),
+            style: VerbumFonts.sans(fontSize: 13, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 10),
           Wrap(
@@ -521,7 +521,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
           Expanded(
             child: Text(
               'Tu nombre de usuario se usará en saludos (p. ej. "¿Cómo te sientes hoy, X?") y en notificaciones. También puedes elegir una emoción para recibir versículos y oraciones acordes.',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 14,
                 color: colorScheme.onSurfaceVariant,
                 height: 1.5,

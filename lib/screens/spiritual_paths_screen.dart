@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../data/spiritual_paths_catalog.dart';
 import '../models/spiritual_path.dart';
 import '../services/spiritual_path_service.dart';
 import '../widgets/verbum_ambient_background.dart';
 import 'spiritual_path_detail_screen.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class SpiritualPathsScreen extends StatefulWidget {
   const SpiritualPathsScreen({super.key});
@@ -56,7 +56,7 @@ class _SpiritualPathsScreenState extends State<SpiritualPathsScreen> {
               AppBar(
                 title: Text(
                   'Caminos',
-                  style: GoogleFonts.playfairDisplay(
+                  style: VerbumFonts.serif(
                     fontSize: 25,
                     fontWeight: FontWeight.w700,
                   ),
@@ -173,7 +173,7 @@ class _PathsHero extends StatelessWidget {
               const Spacer(),
               Text(
                 activePath == null ? 'RECOMENDADO PARA HOY' : 'EN CURSO',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: const Color(0xFFF0D9A1),
                   fontSize: 9,
                   fontWeight: FontWeight.w800,
@@ -187,7 +187,7 @@ class _PathsHero extends StatelessWidget {
             activePath == null
                 ? 'Un camino para este momento'
                 : 'Continúa tu camino',
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               fontSize: 11,
               color: Colors.white.withValues(alpha: .66),
             ),
@@ -195,7 +195,7 @@ class _PathsHero extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             recommended.title,
-            style: GoogleFonts.playfairDisplay(
+            style: VerbumFonts.serif(
               color: Colors.white,
               fontSize: 28,
               fontWeight: FontWeight.w700,
@@ -204,7 +204,7 @@ class _PathsHero extends StatelessWidget {
           const SizedBox(height: 7),
           Text(
             recommended.subtitle,
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               color: Colors.white.withValues(alpha: .75),
               fontSize: 13,
               height: 1.45,
@@ -285,7 +285,7 @@ class _PathCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             path.title,
-                            style: GoogleFonts.playfairDisplay(
+                            style: VerbumFonts.serif(
                               fontSize: 19,
                               fontWeight: FontWeight.w700,
                             ),
@@ -304,7 +304,7 @@ class _PathCard extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       '${path.days.length} días · ${path.minutesPerDay} min al día',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 11,
                         color: scheme.onSurfaceVariant,
                       ),
@@ -344,7 +344,7 @@ class _SectionHeader extends StatelessWidget {
     children: [
       Text(
         eyebrow,
-        style: GoogleFonts.inter(
+        style: VerbumFonts.sans(
           fontSize: 9,
           fontWeight: FontWeight.w800,
           letterSpacing: 1.4,
@@ -354,7 +354,7 @@ class _SectionHeader extends StatelessWidget {
       const SizedBox(height: 4),
       Text(
         title,
-        style: GoogleFonts.playfairDisplay(
+        style: VerbumFonts.serif(
           fontSize: 22,
           fontWeight: FontWeight.w700,
         ),

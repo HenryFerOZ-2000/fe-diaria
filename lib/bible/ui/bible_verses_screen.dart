@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../features/sharing/domain/share_content.dart';
 import '../../screens/reading_chat_screen.dart';
 import '../../services/share_service.dart';
@@ -11,6 +10,7 @@ import '../data/bible_db.dart';
 import '../domain/verse.dart';
 import '../services/bible_reading_preferences.dart';
 import '../../services/read_aloud_service.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class BibleVersesScreen extends StatefulWidget {
   final String bookId;
@@ -305,14 +305,14 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
             '${widget.bookName} ${widget.chapter}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.playfairDisplay(
+            style: VerbumFonts.serif(
               fontSize: 21,
               fontWeight: FontWeight.w700,
             ),
           ),
           Text(
             'REINA-VALERA 1909',
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               color: scheme.secondary,
               fontSize: 7.5,
               fontWeight: FontWeight.w800,
@@ -336,7 +336,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
           onPressed: _showReaderSettings,
           child: Text(
             'Aa',
-            style: GoogleFonts.lora(fontSize: 17, fontWeight: FontWeight.w700),
+            style: VerbumFonts.serif(fontSize: 17, fontWeight: FontWeight.w700),
           ),
         ),
         const SizedBox(width: 6),
@@ -385,7 +385,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
                     children: [
                       Text(
                         '${widget.chapter}',
-                        style: GoogleFonts.playfairDisplay(
+                        style: VerbumFonts.serif(
                           color: textColor,
                           fontSize: 58,
                           height: .8,
@@ -397,7 +397,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
                         padding: const EdgeInsets.only(bottom: 2),
                         child: Text(
                           'CAPÍTULO',
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             color: textColor.withValues(alpha: .48),
                             fontSize: 9,
                             fontWeight: FontWeight.w800,
@@ -464,7 +464,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
                                 children: [
                                   TextSpan(
                                     text: '${verse.verse}  ',
-                                    style: GoogleFonts.inter(
+                                    style: VerbumFonts.sans(
                                       color: const Color(0xFFB17D34),
                                       fontSize: (_fontSize * .58).clamp(9, 13),
                                       fontWeight: FontWeight.w800,
@@ -473,7 +473,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
                                   TextSpan(text: _sanitize(verse.text)),
                                 ],
                               ),
-                              style: GoogleFonts.lora(
+                              style: VerbumFonts.serif(
                                 color: textColor.withValues(alpha: .94),
                                 fontSize: _fontSize,
                                 height: _lineHeight,
@@ -490,7 +490,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
                 Center(
                   child: Text(
                     'FIN DEL CAPÍTULO ${widget.chapter}',
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       color: textColor.withValues(alpha: .40),
                       fontSize: 8.5,
                       fontWeight: FontWeight.w800,
@@ -537,7 +537,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
               ),
               child: Text(
                 '${widget.chapter} de $_maxChapter',
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   color: scheme.primary,
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
@@ -588,7 +588,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
             ),
             Text(
               '${_selected.length}',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 color: scheme.primary,
                 fontWeight: FontWeight.w800,
               ),
@@ -642,7 +642,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
               children: [
                 Text(
                   'Tu espacio de lectura',
-                  style: GoogleFonts.playfairDisplay(
+                  style: VerbumFonts.serif(
                     color: scheme.onSurface,
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
@@ -651,7 +651,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
                 const SizedBox(height: 5),
                 Text(
                   'Ajusta la página para leer con calma.',
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     color: scheme.onSurfaceVariant,
                     fontSize: 12.5,
                   ),
@@ -659,7 +659,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    Text('A', style: GoogleFonts.lora(fontSize: 14)),
+                    Text('A', style: VerbumFonts.serif(fontSize: 14)),
                     Expanded(
                       child: Slider(
                         value: _fontSize,
@@ -670,7 +670,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
                         onChangeEnd: _preferences.setFontSize,
                       ),
                     ),
-                    Text('A', style: GoogleFonts.lora(fontSize: 24)),
+                    Text('A', style: VerbumFonts.serif(fontSize: 24)),
                   ],
                 ),
                 Row(
@@ -772,7 +772,7 @@ class _ToneOption extends StatelessWidget {
           ),
           child: Text(
             label,
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               color: darkLabel ? Colors.white : const Color(0xFF332A23),
               fontSize: 11,
               fontWeight: FontWeight.w700,

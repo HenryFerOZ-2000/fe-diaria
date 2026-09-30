@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/privacy_security_service.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class ReportContentScreen extends StatefulWidget {
   const ReportContentScreen({super.key});
@@ -87,7 +87,7 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
       appBar: AppBar(
         title: Text(
           'Reportar contenido',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -104,7 +104,7 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
             // Tipo
             Text(
               'Tipo de contenido',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: Colors.grey[600],
@@ -140,7 +140,7 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
             // ID o enlace
             Text(
               'ID o enlace',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: Colors.grey[600],
@@ -168,7 +168,7 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
             // Motivo
             Text(
               'Motivo',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: Colors.grey[600],
@@ -204,7 +204,7 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
             // Descripción
             Text(
               'Descripción adicional',
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: Colors.grey[600],
@@ -241,7 +241,7 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
                     )
                   : Text(
                       'Enviar reporte',
-                      style: GoogleFonts.inter(
+                      style: VerbumFonts.sans(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),

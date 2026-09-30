@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class PrayerButton extends StatefulWidget {
   final IconData icon;
@@ -148,7 +148,7 @@ class _PrayerButtonState extends State<PrayerButton>
                             children: [
                               Text(
                                 eyebrow.toUpperCase(),
-                                style: GoogleFonts.inter(
+                                style: VerbumFonts.sans(
                                   fontSize: 8.5,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 1.35,
@@ -160,7 +160,7 @@ class _PrayerButtonState extends State<PrayerButton>
                                 widget.title,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.playfairDisplay(
+                                style: VerbumFonts.serif(
                                   fontSize: 18,
                                   height: 1.1,
                                   fontWeight: FontWeight.w700,
@@ -172,7 +172,7 @@ class _PrayerButtonState extends State<PrayerButton>
                                 subtitle,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.inter(
+                                style: VerbumFonts.sans(
                                   fontSize: 10.5,
                                   color: scheme.onSurfaceVariant,
                                 ),

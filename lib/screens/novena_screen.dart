@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import '../features/sharing/domain/share_content.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../services/traditional_prayers_service.dart';
 import '../services/ads_service.dart';
 import '../services/storage_service.dart';
 import '../services/share_service.dart';
 import '../faith/tradition_guard.dart';
+import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 /// Pantalla principal de la Novena - Selección de día
 class NovenaScreen extends StatefulWidget {
@@ -90,7 +90,7 @@ class _NovenaScreenState extends State<NovenaScreen> {
       appBar: AppBar(
         title: Text(
           'Novena de Navidad',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 26,
             fontWeight: FontWeight.bold,
           ),
@@ -123,7 +123,7 @@ class _NovenaScreenState extends State<NovenaScreen> {
                     children: [
                       Text(
                         'Selecciona un día',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
                           color: colorScheme.onSurface,
@@ -132,7 +132,7 @@ class _NovenaScreenState extends State<NovenaScreen> {
                       const SizedBox(height: 8),
                       Text(
                         'La Novena de Navidad es una tradición de nueve días de preparación espiritual para celebrar el nacimiento de Jesús.',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 16,
                           color: colorScheme.onSurfaceVariant,
                           height: 1.5,
@@ -233,7 +233,7 @@ class _NovenaScreenState extends State<NovenaScreen> {
                 else
                   Text(
                     'Día',
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       fontSize: 14,
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -241,7 +241,7 @@ class _NovenaScreenState extends State<NovenaScreen> {
                 const SizedBox(height: 4),
                 Text(
                   '$day',
-                  style: GoogleFonts.playfairDisplay(
+                  style: VerbumFonts.serif(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: isCompleted
@@ -400,7 +400,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
       appBar: AppBar(
         title: Text(
           'Día ${widget.day} - Paso $_currentStep',
-          style: GoogleFonts.playfairDisplay(
+          style: VerbumFonts.serif(
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
@@ -446,7 +446,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                             const SizedBox(height: 16),
                             Text(
                               'No se pudo cargar el paso',
-                              style: GoogleFonts.inter(fontSize: 16),
+                              style: VerbumFonts.sans(fontSize: 16),
                             ),
                           ],
                         ),
@@ -473,7 +473,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                                 const SizedBox(width: 12),
                                 Text(
                                   '$_currentStep/$_totalSteps',
-                                  style: GoogleFonts.inter(
+                                  style: VerbumFonts.sans(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     color: colorScheme.primary,
@@ -556,7 +556,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                                 icon: const Icon(Icons.home, size: 24),
                                 label: Text(
                                   'Regresar al inicio',
-                                  style: GoogleFonts.inter(
+                                  style: VerbumFonts.sans(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -657,7 +657,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
               Expanded(
                 child: Text(
                   title,
-                  style: GoogleFonts.playfairDisplay(
+                  style: VerbumFonts.serif(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: colorScheme.primary,
@@ -669,7 +669,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
           const SizedBox(height: 24),
           Text(
             text,
-            style: GoogleFonts.inter(
+            style: VerbumFonts.sans(
               fontSize: 18,
               height: 1.8,
               color: colorScheme.onSurface,
