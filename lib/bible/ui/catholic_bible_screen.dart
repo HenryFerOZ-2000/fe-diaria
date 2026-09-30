@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+
+import '../../design_system/design_system.dart';
+import '../../widgets/app_scaffold.dart';
 import '../../widgets/source_link.dart';
+import '../application/bible_reference.dart';
 import '../domain/bible_book_info.dart';
 import '../domain/catholic_bible_catalog.dart';
 
+/// Índice de "El Libro del Pueblo de Dios": cada libro se abre en el sitio de
+/// la Santa Sede.
 class CatholicBibleScreen extends StatefulWidget {
   const CatholicBibleScreen({super.key});
 
@@ -12,121 +18,105 @@ class CatholicBibleScreen extends StatefulWidget {
 
 class _CatholicBibleScreenState extends State<CatholicBibleScreen> {
   String _query = '';
+  BibleTestament _testament = BibleTestament.old;
 
-  String _normalize(String text) => text
-      .toLowerCase()
-      .replaceAll('á', 'a')
-      .replaceAll('é', 'e')
-      .replaceAll('í', 'i')
-      .replaceAll('ó', 'o')
-      .replaceAll('ú', 'u');
+  void _open(String page) => openSource(context, '$catholicBibleSource$page');
 
   @override
-  Widget build(BuildContext context) => DefaultTabController(
-    length: 2,
-    child: Scaffold(
-      appBar: AppBar(title: const Text('Biblia católica')),
-      body: SafeArea(
-        child: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) => [
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'El Libro del Pueblo de Dios',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Traducción argentina · 1990\nLectura en línea en la Santa Sede. Cada libro se abre en tu navegador; requiere conexión. Tus marcas de RV1909 permanecen en Verbum.',
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          decoration: const InputDecoration(
-                            labelText: 'Buscar un libro',
-                            prefixIcon: Icon(Icons.search),
-                          ),
-                          onChanged: (value) =>
-                              setState(() => _query = _normalize(value.trim())),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const TabBar(
-                    isScrollable: true,
-                    tabs: [
-                      Tab(text: 'Antiguo · 46 libros'),
-                      Tab(text: 'Nuevo · 27 libros'),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-          body: TabBarView(
-            children: [
-              _books(context, BibleTestament.old),
-              _books(context, BibleTestament.newTestament),
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
-
-  Widget _books(BuildContext context, BibleTestament testament) {
+  Widget build(BuildContext context) {
+    final type = context.type;
+    final p = context.palette;
     final books = catholicBibleBooks
         .where(
           (book) =>
-              book.testament == testament &&
-              _normalize(book.name).contains(_query),
+              book.testament == _testament &&
+              normalizeBookName(book.name).contains(_query),
         )
         .toList();
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        if (books.isEmpty)
-          const Padding(
-            padding: EdgeInsets.all(24),
-            child: Text('No hay libros que coincidan en este testamento.'),
+
+    return AppScaffold(
+      titleWidget: Text('Biblia católica', style: type.heading),
+      centerTitle: false,
+      showBanner: false,
+      showGuestNotice: false,
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(
+          VerbumSpace.gutter,
+          4,
+          VerbumSpace.gutter,
+          28,
+        ),
+        children: [
+          Text('El Libro del Pueblo de Dios', style: type.title),
+          const SizedBox(height: 6),
+          Text(
+            'Traducción argentina · 1990. Lectura en línea en la Santa Sede: '
+            'cada libro se abre en tu navegador y requiere conexión. Tus '
+            'marcas de RV1909 permanecen en Verbum.',
+            style: type.body,
           ),
-        for (final book in books)
-          Card(
-            child: ListTile(
-              title: Text(book.name),
-              subtitle: Text(book.section),
-              trailing: const Icon(
-                Icons.open_in_new,
-                semanticLabel: 'Abrir en la Santa Sede',
+          const SizedBox(height: 14),
+          TextField(
+            decoration: InputDecoration(
+              hintText: 'Buscar un libro',
+              prefixIcon: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: VIcon(
+                  VerbumIcons.magnifyingGlass,
+                  size: 20,
+                  color: p.inkSubtle,
+                ),
               ),
-              onTap: () => openSource(
-                context,
-                '$catholicBibleSource${catholicBookPages[book.id]}',
-              ),
+              prefixIconConstraints: const BoxConstraints(minWidth: 44),
             ),
+            onChanged: (value) =>
+                setState(() => _query = normalizeBookName(value)),
           ),
-        if (testament == BibleTestament.old && _query.isEmpty) ...[
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Text(
-              'Textos que esta edición presenta por separado',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+          const SizedBox(height: 14),
+          VSegmentedControl<BibleTestament>(
+            selected: _testament,
+            onChanged: (value) => setState(() => _testament = value),
+            segments: const [
+              VSegment(value: BibleTestament.old, label: 'Antiguo · 46'),
+              VSegment(value: BibleTestament.newTestament, label: 'Nuevo · 27'),
+            ],
           ),
-          for (final entry in catholicSupplementPages.entries)
-            ListTile(
-              title: Text(entry.key),
-              trailing: const Icon(Icons.open_in_new),
-              onTap: () =>
-                  openSource(context, '$catholicBibleSource${entry.value}'),
+          const SizedBox(height: 14),
+          if (books.isEmpty)
+            const VEmptyState(
+              icon: VerbumIcons.magnifyingGlass,
+              title: 'No hay libros que coincidan en este testamento.',
+            )
+          else
+            VListGroup(
+              children: [
+                for (final book in books)
+                  VListRow(
+                    title: book.name,
+                    subtitle: book.section,
+                    trailing: VerbumIcons.arrowSquareOut,
+                    semanticHint: 'Abrir en la Santa Sede',
+                    onTap: () => _open(catholicBookPages[book.id]!),
+                  ),
+              ],
             ),
+          if (_testament == BibleTestament.old && _query.isEmpty) ...[
+            const SizedBox(height: 14),
+            VListGroup(
+              title: 'Textos que esta edición presenta por separado',
+              children: [
+                for (final entry in catholicSupplementPages.entries)
+                  VListRow(
+                    title: entry.key,
+                    trailing: VerbumIcons.arrowSquareOut,
+                    semanticHint: 'Abrir en la Santa Sede',
+                    onTap: () => _open(entry.value),
+                  ),
+              ],
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }

@@ -4,7 +4,7 @@ import '../data/bible_db.dart';
 import '../domain/bible_book_info.dart';
 import '../services/bible_reading_preferences.dart';
 import 'bible_verses_screen.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import '../../design_system/design_system.dart';
 
 class BibleChaptersScreen extends StatefulWidget {
   final String bookId;
@@ -57,10 +57,7 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
     return AppScaffold(
       titleWidget: Text(
         widget.bookName,
-        style: VerbumFonts.serif(
-          fontSize: 23,
-          fontWeight: FontWeight.w700,
-        ),
+        style: context.type.heading.copyWith(fontSize: 24),
       ),
       centerTitle: false,
       showBanner: false,
@@ -69,11 +66,16 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
         future: _chaptersFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: VEmptyState(loading: true, title: 'Cargando capítulos…'),
+            );
           }
           if (snapshot.hasError || snapshot.data?.isEmpty != false) {
             return const Center(
-              child: Text('No se pudieron cargar los capítulos.'),
+              child: VEmptyState(
+                icon: VerbumIcons.bookOpenText,
+                title: 'No se pudieron cargar los capítulos.',
+              ),
             );
           }
           return _buildContent(context, snapshot.data!);
@@ -83,187 +85,113 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
   }
 
   Widget _buildContent(BuildContext context, List<int> chapters) {
-    final scheme = Theme.of(context).colorScheme;
     final metadata = bibleBookById(widget.bookId);
     final lastHere = _lastPosition?.bookId == widget.bookId
         ? _lastPosition
         : null;
+    final count = chapters.length;
     return ListView(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 9, 16, 28),
+      padding: const EdgeInsets.fromLTRB(
+        VerbumSpace.gutter,
+        4,
+        VerbumSpace.gutter,
+        28,
+      ),
       children: [
-        Container(
-          padding: const EdgeInsets.fromLTRB(21, 22, 21, 20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(28),
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF251E34), Color(0xFF4C3958), Color(0xFF74513F)],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF392844).withValues(alpha: .22),
-                blurRadius: 26,
-                offset: const Offset(0, 12),
-              ),
-            ],
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                right: -12,
-                top: -22,
-                child: Text(
-                  '${chapters.length}',
-                  style: VerbumFonts.serif(
-                    color: Colors.white.withValues(alpha: .045),
-                    fontSize: 112,
-                    height: 1,
-                    fontWeight: FontWeight.w800,
+        VFeatureCard(
+          eyebrow: metadata?.section ?? 'Libro bíblico',
+          title: widget.bookName,
+          body:
+              '$count ${count == 1 ? 'capítulo' : 'capítulos'} · Reina-Valera 1909',
+          watermark: VerbumIcons.books,
+          footer: lastHere == null
+              ? null
+              : VButton(
+                  label: 'Continuar capítulo ${lastHere.chapter}',
+                  icon: VerbumIcons.bookmarkSimple,
+                  iconLeading: true,
+                  variant: VButtonVariant.inverse,
+                  compact: true,
+                  onPressed: () => _openChapter(
+                    lastHere.chapter,
+                    initialVerse: lastHere.verse,
                   ),
                 ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    (metadata?.section ?? 'LIBRO BÍBLICO').toUpperCase(),
-                    style: VerbumFonts.sans(
-                      color: const Color(0xFFEBCB91),
-                      fontSize: 9,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.35,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    widget.bookName,
-                    style: VerbumFonts.serif(
-                      color: Colors.white,
-                      fontSize: 31,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '${chapters.length} ${chapters.length == 1 ? 'capítulo' : 'capítulos'} · Reina-Valera 1909',
-                    style: VerbumFonts.sans(
-                      color: Colors.white.withValues(alpha: .68),
-                      fontSize: 11.5,
-                    ),
-                  ),
-                  if (lastHere != null) ...[
-                    const SizedBox(height: 17),
-                    FilledButton.tonalIcon(
-                      onPressed: () => _openChapter(
-                        lastHere.chapter,
-                        initialVerse: lastHere.verse,
-                      ),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.white.withValues(alpha: .13),
-                        foregroundColor: Colors.white,
-                      ),
-                      icon: const Icon(Icons.bookmark_rounded, size: 17),
-                      label: Text(
-                        'Continuar capítulo ${lastHere.chapter}',
-                        style: VerbumFonts.sans(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ],
-          ),
         ),
-        const SizedBox(height: 24),
-        Text(
-          'ELIGE UN CAPÍTULO',
-          style: VerbumFonts.sans(
-            color: scheme.secondary,
-            fontSize: 9,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.35,
-          ),
+        const VSectionHeader(
+          'Elige un capítulo',
+          padding: EdgeInsets.fromLTRB(2, 24, 2, 12),
         ),
-        const SizedBox(height: 5),
-        Text(
-          'Comienza tu lectura',
-          style: VerbumFonts.serif(
-            color: scheme.onSurface,
-            fontSize: 23,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 13),
         LayoutBuilder(
           builder: (context, constraints) {
-            final columns = constraints.maxWidth > 520 ? 6 : 5;
+            final columns = constraints.maxWidth > 520 ? 7 : 5;
             return GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: columns,
-                childAspectRatio: 1,
                 mainAxisSpacing: 9,
                 crossAxisSpacing: 9,
               ),
-              itemCount: chapters.length,
-              itemBuilder: (context, index) {
-                final chapter = chapters[index];
-                final isLast = lastHere?.chapter == chapter;
-                return Material(
-                  color: isLast
-                      ? scheme.primary.withValues(alpha: .12)
-                      : scheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  child: InkWell(
-                    onTap: () => _openChapter(chapter),
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: isLast
-                              ? scheme.primary.withValues(alpha: .45)
-                              : scheme.outline.withValues(alpha: .14),
-                        ),
-                      ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Text(
-                            '$chapter',
-                            style: VerbumFonts.serif(
-                              color: isLast ? scheme.primary : scheme.onSurface,
-                              fontSize: 19,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          if (isLast)
-                            Positioned(
-                              right: 7,
-                              top: 6,
-                              child: Icon(
-                                Icons.bookmark_rounded,
-                                size: 11,
-                                color: scheme.primary,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
+              itemCount: count,
+              itemBuilder: (context, index) => _ChapterTile(
+                chapter: chapters[index],
+                current: lastHere?.chapter == chapters[index],
+                onTap: () => _openChapter(chapters[index]),
+              ),
             );
           },
         ),
       ],
+    );
+  }
+}
+
+class _ChapterTile extends StatelessWidget {
+  const _ChapterTile({
+    required this.chapter,
+    required this.current,
+    required this.onTap,
+  });
+
+  final int chapter;
+  final bool current;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return VSurfaceCard(
+      onTap: onTap,
+      radius: VerbumRadius.tile,
+      padding: EdgeInsets.zero,
+      borderColor: current ? p.rubric : null,
+      semanticLabel: current
+          ? 'Capítulo $chapter, último leído'
+          : 'Capítulo $chapter',
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Text(
+            '$chapter',
+            style: context.type.heading.copyWith(
+              color: current ? p.rubric : p.ink,
+            ),
+          ),
+          if (current)
+            Positioned(
+              right: 7,
+              top: 6,
+              child: VIcon(
+                VerbumIcons.bookmarkSimple,
+                weight: VIconWeight.fill,
+                size: 11,
+                color: p.rubric,
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

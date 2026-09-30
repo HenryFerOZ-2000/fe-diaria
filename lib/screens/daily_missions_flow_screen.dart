@@ -8,6 +8,7 @@ import '../services/daily_progress_service.dart';
 import '../services/spiritual_stats_service.dart';
 import '../widgets/prayer_reading_experience.dart';
 import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import '../bible/application/passage_text.dart';
 
 /// Pantalla contenedora que maneja el flujo de misiones diarias
 /// usando PageView para transiciones fluidas tipo wizard
@@ -116,19 +117,7 @@ class _DailyMissionsFlowScreenState extends State<DailyMissionsFlowScreen> {
   }
 
   /// Limpia las etiquetas Strong del texto del versículo
-  String _cleanVerseText(String text) {
-    // Remover etiquetas strong="GXXXX" o strong='GXXXX'
-    var cleaned = text;
-    cleaned = cleaned.replaceAll(RegExp(r'strong="[^"]+"'), '');
-    cleaned = cleaned.replaceAll(RegExp(r"strong='[^']+'"), '');
-    // Remover cualquier carácter residual de las etiquetas
-    cleaned = cleaned.replaceAll(
-      RegExp(r'\|\s*'),
-      ' ',
-    ); // Limpiar pipes residuales
-    cleaned = cleaned.replaceAll(RegExp(r'\s+'), ' '); // Normalizar espacios
-    return cleaned.trim();
-  }
+  String _cleanVerseText(String text) => sanitizeVerseText(text);
 
   String _getMissionContent(String id) {
     switch (id) {

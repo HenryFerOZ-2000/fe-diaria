@@ -6,6 +6,7 @@ enum VerbumIcons {
   arrowClockwise('arrow-clockwise'),
   arrowLeft('arrow-left'),
   arrowRight('arrow-right'),
+  arrowSquareOut('arrow-square-out'),
   arrowsClockwise('arrows-clockwise'),
   baby('baby'),
   barbell('barbell'),

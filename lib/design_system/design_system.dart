@@ -7,17 +7,21 @@
 /// * components: widgets de presentación reutilizables, sin lógica de negocio.
 library;
 
+export 'components/v_action_bar.dart';
 export 'components/v_action_tile.dart';
 export 'components/v_button.dart';
 export 'components/v_category_tile.dart';
 export 'components/v_drop_cap_text.dart';
+export 'components/v_empty_state.dart';
 export 'components/v_feature_card.dart';
 export 'components/v_icon.dart';
 export 'components/v_icon_button.dart';
+export 'components/v_list_group.dart';
 export 'components/v_meta_chip.dart';
 export 'components/v_progress_bar.dart';
 export 'components/v_rubric_label.dart';
 export 'components/v_section_header.dart';
+export 'components/v_segmented_control.dart';
 export 'components/v_step_tile.dart';
 export 'components/v_surface_card.dart';
 export 'components/v_tile_grid.dart';

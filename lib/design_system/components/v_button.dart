@@ -14,6 +14,9 @@ enum VButtonVariant {
 
   /// Solo texto en rojo rúbrica: acción terciaria.
   text,
+
+  /// Papel sobre superficies en tinta (p. ej. dentro de VFeatureCard).
+  inverse,
 }
 
 /// Botón de la app con icono opcional (a la derecha por defecto, como una
@@ -54,6 +57,7 @@ class VButton extends StatelessWidget {
         BorderSide(color: p.line, width: 1.2),
       ),
       VButtonVariant.text => (Colors.transparent, p.rubric, BorderSide.none),
+      VButtonVariant.inverse => (p.onInk, p.ink, BorderSide.none),
     };
     final enabled = onPressed != null;
     final color = enabled ? fg : p.inkSubtle;
