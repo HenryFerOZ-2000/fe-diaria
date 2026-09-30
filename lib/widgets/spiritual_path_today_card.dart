@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../data/spiritual_paths_catalog.dart';
 import '../models/spiritual_path.dart';
@@ -8,6 +7,7 @@ import '../screens/spiritual_paths_screen.dart';
 import '../services/spiritual_path_service.dart';
 import '../services/personalization_service.dart';
 import '../services/storage_service.dart';
+import '../design_system/design_system.dart';
 
 class SpiritualPathTodayCard extends StatefulWidget {
   const SpiritualPathTodayCard({super.key});
@@ -59,6 +59,13 @@ class _SpiritualPathTodayCardState extends State<SpiritualPathTodayCard> {
     if (mounted) setState(() => _state = _load());
   }
 
+  Future<void> _openCatalog() async {
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const SpiritualPathsScreen()));
+    if (mounted) setState(() => _state = _load());
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<_TodayPathState>(
@@ -68,125 +75,98 @@ class _SpiritualPathTodayCardState extends State<SpiritualPathTodayCard> {
         final state = snapshot.data!;
         final path = state.path;
         final next = state.progress.nextDay(path.days.length);
-        final scheme = Theme.of(context).colorScheme;
-        return Container(
-          padding: const EdgeInsets.all(17),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color.alphaBlend(
-                  path.accent.withValues(alpha: .11),
-                  scheme.surface,
-                ),
-                scheme.surface.withValues(alpha: .92),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: path.accent.withValues(alpha: .25)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        return SpiritualPathTodayView(
+          title: path.title,
+          isActive: state.isActive,
+          detail: state.isActive
+              ? 'Día $next · ${path.days[next - 1].title}'
+              : '${path.subtitle} · Ritmo de ${state.preferredMinutes} min',
+          progress: state.isActive
+              ? state.progress.progressFor(path.days.length)
+              : null,
+          onContinue: () => _open(state),
+          onSeeAll: _openCatalog,
+        );
+      },
+    );
+  }
+}
+
+/// Vista del camino espiritual en "Hoy". Solo presentación.
+class SpiritualPathTodayView extends StatelessWidget {
+  const SpiritualPathTodayView({
+    super.key,
+    required this.title,
+    required this.detail,
+    required this.isActive,
+    required this.onContinue,
+    required this.onSeeAll,
+    this.progress,
+  });
+
+  final String title;
+  final String detail;
+  final bool isActive;
+
+  /// Avance del camino activo (0–1); `null` si aún no se ha empezado.
+  final double? progress;
+  final VoidCallback onContinue;
+  final VoidCallback onSeeAll;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final type = context.type;
+    return VSurfaceCard(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 41,
-                    height: 41,
-                    decoration: BoxDecoration(
-                      color: path.accent.withValues(alpha: .13),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(path.icon, size: 21, color: path.accent),
-                  ),
-                  const SizedBox(width: 11),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          state.isActive
-                              ? 'TU CAMINO ACTIVO'
-                              : 'PARA ESTE MOMENTO',
-                          style: GoogleFonts.inter(
-                            fontSize: 8.5,
-                            letterSpacing: 1.25,
-                            fontWeight: FontWeight.w800,
-                            color: path.accent,
-                          ),
-                        ),
-                        Text(
-                          path.title,
-                          style: GoogleFonts.playfairDisplay(
-                            fontSize: 19,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const SpiritualPathsScreen(),
-                        ),
-                      );
-                      if (mounted) setState(() => _state = _load());
-                    },
-                    child: const Text('Ver todos'),
-                  ),
-                ],
+              VIcon(
+                VerbumIcons.compass,
+                weight: VIconWeight.duotone,
+                size: 30,
+                color: p.gold,
               ),
-              const SizedBox(height: 13),
-              Text(
-                state.isActive
-                    ? 'Día $next · ${path.days[next - 1].title}'
-                    : '${path.subtitle} · Ritmo de ${state.preferredMinutes} min',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: scheme.onSurfaceVariant,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    VRubricLabel(
+                      isActive ? 'Tu camino activo' : 'Para este momento',
+                    ),
+                    const SizedBox(height: 2),
+                    Text(title, style: type.heading),
+                  ],
                 ),
               ),
-              if (state.isActive) ...[
-                const SizedBox(height: 9),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(99),
-                  child: LinearProgressIndicator(
-                    value: state.progress.progressFor(path.days.length),
-                    minHeight: 4,
-                    color: path.accent,
-                    backgroundColor: path.accent.withValues(alpha: .12),
-                  ),
-                ),
-              ],
-              const SizedBox(height: 13),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: () => _open(state),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: path.accent,
-                    foregroundColor: Colors.white,
-                  ),
-                  icon: Icon(
-                    state.isActive
-                        ? Icons.play_arrow_rounded
-                        : Icons.route_rounded,
-                  ),
-                  label: Text(
-                    state.isActive
-                        ? 'Continuar mi camino'
-                        : 'Explorar este camino',
-                  ),
-                ),
+              VButton(
+                label: 'Ver todos',
+                variant: VButtonVariant.text,
+                compact: true,
+                onPressed: onSeeAll,
               ),
             ],
           ),
-        );
-      },
+          const SizedBox(height: 10),
+          Text(detail, style: type.body),
+          if (progress != null) ...[
+            const SizedBox(height: 10),
+            VProgressBar(value: progress!, semanticLabel: 'Avance del camino'),
+          ],
+          const SizedBox(height: 14),
+          VButton(
+            label: isActive ? 'Continuar mi camino' : 'Explorar este camino',
+            icon: VerbumIcons.arrowRight,
+            variant: VButtonVariant.outlined,
+            expanded: true,
+            onPressed: onContinue,
+          ),
+        ],
+      ),
     );
   }
 }
