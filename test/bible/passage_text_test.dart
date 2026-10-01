@@ -30,4 +30,21 @@ void main() {
     expect(ReaderTone.parse('sepia'), ReaderTone.system);
     expect(ReaderTone.parse(null), ReaderTone.system);
   });
+
+  test('suaviza las versales con que abre cada capítulo', () {
+    expect(
+      softenOpeningCaps('Y ACONTECIÓ en aquellos días'),
+      'Y aconteció en aquellos días',
+    );
+    expect(
+      softenOpeningCaps('HABIENDO muchos tentado'),
+      'Habiendo muchos tentado',
+    );
+    expect(softenOpeningCaps('EN el principio'), 'En el principio');
+    expect(
+      softenOpeningCaps('¿POR qué se amotinan las gentes'),
+      '¿Por qué se amotinan las gentes',
+    );
+    expect(softenOpeningCaps('Jehová es mi pastor'), 'Jehová es mi pastor');
+  });
 }

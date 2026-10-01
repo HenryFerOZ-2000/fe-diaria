@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
+import '../domain/chapter_summary.dart';
 import '../domain/verse.dart';
 
 class BibleDb {
@@ -100,6 +101,26 @@ class BibleDb {
       [book],
     );
     return rows.map((r) => (r['chapter'] as int)).toList();
+  }
+
+  /// Capítulos del libro con su número de versículos y el primero de
+  /// ellos, en una sola consulta.
+  Future<List<ChapterSummary>> getChapterSummaries(String book) async {
+    await verifyAndInit();
+    final rows = await _db!.rawQuery(
+      'SELECT chapter, COUNT(*) AS verses, '
+      'MAX(CASE WHEN verse = 1 THEN text END) AS opening '
+      'FROM verses WHERE book = ? GROUP BY chapter ORDER BY chapter ASC',
+      [book],
+    );
+    return [
+      for (final r in rows)
+        (
+          chapter: r['chapter'] as int,
+          verseCount: r['verses'] as int,
+          opening: (r['opening'] as String?) ?? '',
+        ),
+    ];
   }
 
   Future<List<Verse>> searchVerses(String query, {int limit = 60}) async {

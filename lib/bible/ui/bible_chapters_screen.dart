@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import '../../widgets/app_scaffold.dart';
 import '../data/bible_db.dart';
 import '../domain/bible_book_info.dart';
+import '../domain/chapter_summary.dart';
 import '../services/bible_reading_preferences.dart';
 import 'bible_verses_screen.dart';
 import 'book_covers.dart';
+import 'chapter_row.dart';
 import '../../design_system/design_system.dart';
 
 class BibleChaptersScreen extends StatefulWidget {
@@ -22,14 +24,14 @@ class BibleChaptersScreen extends StatefulWidget {
 }
 
 class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
-  late Future<List<int>> _chaptersFuture;
+  late Future<List<ChapterSummary>> _chaptersFuture;
   final _preferences = BibleReadingPreferences();
   BibleReadingPosition? _lastPosition;
 
   @override
   void initState() {
     super.initState();
-    _chaptersFuture = BibleDb.instance.getChapters(widget.bookId);
+    _chaptersFuture = BibleDb.instance.getChapterSummaries(widget.bookId);
     _loadLastPosition();
   }
 
@@ -75,7 +77,7 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
         ],
         stops: const [0, .42],
       ),
-      body: FutureBuilder<List<int>>(
+      body: FutureBuilder<List<ChapterSummary>>(
         future: _chaptersFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -99,7 +101,7 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
 
   Widget _buildContent(
     BuildContext context,
-    List<int> chapters,
+    List<ChapterSummary> chapters,
     BibleBookInfo? book,
   ) {
     final p = context.palette;
@@ -184,33 +186,19 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
           trailing: '$count',
           padding: const EdgeInsets.fromLTRB(2, 28, 2, 12),
         ),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final columns = constraints.maxWidth > 520 ? 7 : 5;
-            return GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: columns,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-              ),
-              itemCount: count,
-              itemBuilder: (context, index) {
-                final chapter = chapters[index];
-                final current = lastHere?.chapter == chapter;
-                return VNumberTile(
-                  number: chapter,
-                  state: current ? VStepState.current : VStepState.upcoming,
-                  semanticLabel: current
-                      ? 'Capítulo $chapter, último leído'
-                      : 'Capítulo $chapter',
-                  onTap: () => _openChapter(chapter),
-                );
-              },
-            );
-          },
-        ),
+        for (final summary in chapters)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: ChapterRow(
+              summary: summary,
+              lastVerse: lastHere?.chapter == summary.chapter
+                  ? lastHere!.verse
+                  : null,
+              onTap: () => lastHere?.chapter == summary.chapter
+                  ? _openChapter(summary.chapter, initialVerse: lastHere!.verse)
+                  : _openChapter(summary.chapter),
+            ),
+          ),
       ],
     );
   }

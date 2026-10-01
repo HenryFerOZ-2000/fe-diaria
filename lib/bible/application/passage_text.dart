@@ -10,6 +10,16 @@ String sanitizeVerseText(String text) => text
     .replaceAll(RegExp(r'\s{2,}'), ' ')
     .trim();
 
+/// La RV1909 abre cada capítulo en versales ("Y ACONTECIÓ en…"); para una
+/// vista previa se pasa a minúsculas: "Y aconteció en…".
+String softenOpeningCaps(String text) => text.replaceFirstMapped(
+  RegExp(r'^([¿¡«"]*)((?:[A-ZÁÉÍÓÚÑÜ]+[\s,;:.]*)+)(?=[a-záéíóúñü]|$)'),
+  (m) {
+    final lower = m[2]!.toLowerCase();
+    return '${m[1]}${lower[0].toUpperCase()}${lower.substring(1)}';
+  },
+);
+
 /// Versículos seleccionados, en orden de lectura.
 List<Verse> selectedInOrder(List<Verse> verses, Set<int> selected) =>
     verses.where((v) => selected.contains(v.verse)).toList()

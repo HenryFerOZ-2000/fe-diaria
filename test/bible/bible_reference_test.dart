@@ -16,7 +16,9 @@ void main() {
   });
 
   test('libros con número y texto que no es referencia', () {
-    final first = bibleBooks.firstWhere((b) => RegExp(r'^\d ').hasMatch(b.name));
+    final first = bibleBooks.firstWhere(
+      (b) => RegExp(r'^\d ').hasMatch(b.name),
+    );
     expect(parseBibleReference('${first.name} 2:1')?.book.id, first.id);
     expect(parseBibleReference('esperanza'), isNull);
     expect(parseBibleReference('Libro Inventado 3'), isNull);
