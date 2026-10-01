@@ -10,6 +10,7 @@ library;
 export 'components/v_action_bar.dart';
 export 'components/v_action_tile.dart';
 export 'components/v_bottom_bar.dart';
+export 'components/v_book_cover.dart';
 export 'components/v_button.dart';
 export 'components/v_candle.dart';
 export 'components/v_category_tile.dart';

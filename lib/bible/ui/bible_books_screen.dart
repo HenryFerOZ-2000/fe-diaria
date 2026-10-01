@@ -9,6 +9,7 @@ import '../domain/verse.dart';
 import '../services/bible_reading_preferences.dart';
 import 'bible_chapters_screen.dart';
 import 'bible_verses_screen.dart';
+import 'book_covers.dart';
 import 'catholic_bible_screen.dart';
 import '../../screens/content_sources_screen.dart';
 import '../../design_system/design_system.dart';
@@ -231,27 +232,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
           Padding(padding: _gutter, child: _buildHero(context)),
           if (_recentBooks.isNotEmpty) ...[
             _header('Leíste hace poco'),
-            SizedBox(
-              height: 40,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: _gutter,
-                itemCount: _recentBooks.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  final book = _recentBooks[index];
-                  return ActionChip(
-                    avatar: VIcon(
-                      VerbumIcons.clockCounterClockwise,
-                      size: 15,
-                      color: p.rubric,
-                    ),
-                    label: Text(book.name),
-                    onPressed: () => _openBook(book),
-                  );
-                },
-              ),
-            ),
+            _Shelf(books: _recentBooks, coverWidth: 76, onOpen: _openBook),
           ],
           _header('Para empezar'),
           SizedBox(
@@ -290,30 +271,27 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
               ],
             ),
           ),
-          for (final section in booksBySection(_testament).entries)
+          // Un estante de portadas por sección.
+          for (final section in booksBySection(_testament).entries) ...[
             Padding(
               padding: const EdgeInsets.fromLTRB(
-                VerbumSpace.gutter,
-                18,
-                VerbumSpace.gutter,
-                0,
+                VerbumSpace.gutter + 2,
+                20,
+                VerbumSpace.gutter + 2,
+                10,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Text(section.key, style: type.rubric),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      for (final book in section.value)
-                        _BookPill(book: book, onTap: () => _openBook(book)),
-                    ],
+                  Expanded(child: Text(section.key, style: type.rubric)),
+                  Text(
+                    '${section.value.length}',
+                    style: type.caption.copyWith(fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
             ),
+            _Shelf(books: section.value, coverWidth: 96, onOpen: _openBook),
+          ],
           _header('Ediciones'),
           Padding(
             padding: _gutter,
@@ -482,30 +460,37 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
   String _sanitize(String text) => sanitizeVerseText(text);
 }
 
-/// Un libro como píldora tocable.
-class _BookPill extends StatelessWidget {
-  const _BookPill({required this.book, required this.onTap});
+/// Fila horizontal de portadas.
+class _Shelf extends StatelessWidget {
+  const _Shelf({
+    required this.books,
+    required this.coverWidth,
+    required this.onOpen,
+  });
 
-  final BibleBookInfo book;
-  final VoidCallback onTap;
+  final List<BibleBookInfo> books;
+  final double coverWidth;
+  final ValueChanged<BibleBookInfo> onOpen;
 
   @override
   Widget build(BuildContext context) {
-    final p = context.palette;
-    return Material(
-      color: p.surface,
-      elevation: 3,
-      shadowColor: p.ink.withValues(alpha: .14),
-      borderRadius: BorderRadius.circular(VerbumRadius.control),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(VerbumRadius.control),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-          child: Text(
-            book.name,
-            style: context.type.bodyStrong.copyWith(fontSize: 14),
-          ),
+    return SizedBox(
+      height: coverWidth * 1.5 + 12,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
+        padding: const EdgeInsets.fromLTRB(
+          VerbumSpace.gutter,
+          0,
+          VerbumSpace.gutter,
+          12,
+        ),
+        itemCount: books.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        itemBuilder: (context, i) => BibleBookCover(
+          book: books[i],
+          width: coverWidth,
+          onTap: () => onOpen(books[i]),
         ),
       ),
     );
