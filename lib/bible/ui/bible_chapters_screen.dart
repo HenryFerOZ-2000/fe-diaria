@@ -135,63 +135,22 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
                 crossAxisSpacing: 9,
               ),
               itemCount: count,
-              itemBuilder: (context, index) => _ChapterTile(
-                chapter: chapters[index],
-                current: lastHere?.chapter == chapters[index],
-                onTap: () => _openChapter(chapters[index]),
-              ),
+              itemBuilder: (context, index) {
+                final chapter = chapters[index];
+                final current = lastHere?.chapter == chapter;
+                return VNumberTile(
+                  number: chapter,
+                  state: current ? VStepState.current : VStepState.upcoming,
+                  semanticLabel: current
+                      ? 'Capítulo $chapter, último leído'
+                      : 'Capítulo $chapter',
+                  onTap: () => _openChapter(chapter),
+                );
+              },
             );
           },
         ),
       ],
-    );
-  }
-}
-
-class _ChapterTile extends StatelessWidget {
-  const _ChapterTile({
-    required this.chapter,
-    required this.current,
-    required this.onTap,
-  });
-
-  final int chapter;
-  final bool current;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    return VSurfaceCard(
-      onTap: onTap,
-      radius: VerbumRadius.tile,
-      padding: EdgeInsets.zero,
-      borderColor: current ? p.rubric : null,
-      semanticLabel: current
-          ? 'Capítulo $chapter, último leído'
-          : 'Capítulo $chapter',
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Text(
-            '$chapter',
-            style: context.type.heading.copyWith(
-              color: current ? p.rubric : p.ink,
-            ),
-          ),
-          if (current)
-            Positioned(
-              right: 7,
-              top: 6,
-              child: VIcon(
-                VerbumIcons.bookmarkSimple,
-                weight: VIconWeight.fill,
-                size: 11,
-                color: p.rubric,
-              ),
-            ),
-        ],
-      ),
     );
   }
 }

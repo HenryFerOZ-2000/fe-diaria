@@ -84,173 +84,63 @@ class _NovenaScreenState extends State<NovenaScreen> {
     if (_blockedByTradition) {
       return const SizedBox.shrink();
     }
-    final colorScheme = Theme.of(context).colorScheme;
-
+    final lastDay = StorageService().getNovenaLastDay();
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Novena de Navidad',
-          style: VerbumFonts.serif(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text('Novena de Navidad', style: context.type.heading),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
-              Theme.of(context).scaffoldBackgroundColor,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: _isLoading
-              ? Center(
-                  child: CircularProgressIndicator(color: colorScheme.primary),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      body: SafeArea(
+        child: _isLoading
+            ? const Center(
+                child: VEmptyState(loading: true, title: 'Cargando…'),
+              )
+            : ListView(
+                padding: const EdgeInsets.fromLTRB(
+                  VerbumSpace.gutter,
+                  4,
+                  VerbumSpace.gutter,
+                  28,
+                ),
+                children: [
+                  const VFeatureCard(
+                    eyebrow: 'Nueve días',
+                    title: 'Preparar el corazón para la Navidad',
+                    body:
+                        'Una tradición de nueve días de oración para celebrar el nacimiento de Jesús.',
+                    watermark: VerbumIcons.starFour,
+                  ),
+                  const VSectionHeader(
+                    'Selecciona un día',
+                    padding: EdgeInsets.fromLTRB(2, 24, 2, 12),
+                  ),
+                  GridView.count(
+                    crossAxisCount: 3,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
                     children: [
-                      Text(
-                        'Selecciona un día',
-                        style: VerbumFonts.sans(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'La Novena de Navidad es una tradición de nueve días de preparación espiritual para celebrar el nacimiento de Jesús.',
-                        style: VerbumFonts.sans(
-                          fontSize: 16,
-                          color: colorScheme.onSurfaceVariant,
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                              childAspectRatio: 1.0,
+                      for (var day = 1; day <= 9; day++)
+                        VNumberTile(
+                          number: day,
+                          caption: 'Día',
+                          state: lastDay != null && day < lastDay
+                              ? VStepState.done
+                              : lastDay == day
+                              ? VStepState.current
+                              : VStepState.upcoming,
+                          semanticLabel: 'Día $day',
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => NovenaDayScreen(day: day),
                             ),
-                        itemCount: 9,
-                        itemBuilder: (context, index) {
-                          final day = index + 1;
-                          final lastDay = StorageService().getNovenaLastDay();
-                          final isCompleted = lastDay != null && day < lastDay;
-                          final isInProgress =
-                              lastDay != null && day == lastDay;
-
-                          return _buildDayButton(
-                            context: context,
-                            colorScheme: colorScheme,
-                            day: day,
-                            isCompleted: isCompleted,
-                            isInProgress: isInProgress,
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      NovenaDayScreen(day: day),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
+                          ),
+                        ),
                     ],
                   ),
-                ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDayButton({
-    required BuildContext context,
-    required ColorScheme colorScheme,
-    required int day,
-    required VoidCallback onTap,
-    bool isCompleted = false,
-    bool isInProgress = false,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        splashColor: colorScheme.primary.withValues(alpha: 0.1),
-        highlightColor: colorScheme.primary.withValues(alpha: 0.05),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: colorScheme.primary.withValues(alpha: 0.15),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.primary.withValues(alpha: 0.08),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-                spreadRadius: 0,
+                ],
               ),
-            ],
-          ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (isCompleted)
-                  VIcon(VerbumIcons.checkCircle, weight: VIconWeight.fill,
-                    color: colorScheme.secondary,
-                    size: 20,
-                  )
-                else if (isInProgress)
-                  VIcon(VerbumIcons.playCircle,
-                    color: colorScheme.primary,
-                    size: 20,
-                  )
-                else
-                  Text(
-                    'Día',
-                    style: VerbumFonts.sans(
-                      fontSize: 14,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                const SizedBox(height: 4),
-                Text(
-                  '$day',
-                  style: VerbumFonts.serif(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: isCompleted
-                        ? colorScheme.secondary
-                        : colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -390,339 +280,150 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
       });
     }
 
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final p = context.palette;
+    final type = context.type;
     final stepData = _service.getNovenaStep(widget.day, _currentStep);
+    final title = stepData?['titulo'] as String? ?? '';
+    final text = stepData?['texto'] as String? ?? '';
+    final isCarol = title.toLowerCase().contains('villancico');
+    final isLast = _currentStep >= _totalSteps;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Día ${widget.day} - Paso $_currentStep',
-          style: VerbumFonts.serif(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text('Día ${widget.day}', style: type.heading),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
-              Theme.of(context).scaffoldBackgroundColor,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: _isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(
-                          color: colorScheme.primary,
-                        ),
-                      )
-                    : stepData == null
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            VIcon(VerbumIcons.warningCircle,
-                              size: 64,
-                              color: colorScheme.onSurface.withValues(
-                                alpha: 0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No se pudo cargar el paso',
-                              style: VerbumFonts.sans(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      )
-                    : SingleChildScrollView(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Indicador de progreso
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: LinearProgressIndicator(
-                                    value: _currentStep / _totalSteps,
-                                    backgroundColor: colorScheme.primary
-                                        .withValues(alpha: 0.1),
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      colorScheme.primary,
-                                    ),
-                                    minHeight: 6,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  '$_currentStep/$_totalSteps',
-                                  style: VerbumFonts.sans(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: colorScheme.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 24),
-                            // Contenido del paso
-                            _buildStepCard(
-                              context: context,
-                              title: stepData['titulo'] as String? ?? '',
-                              text: stepData['texto'] as String? ?? '',
-                              colorScheme: colorScheme,
-                              isVillancico:
-                                  (stepData['titulo'] as String? ?? '')
-                                      .toLowerCase()
-                                      .contains('villancico'),
-                            ),
-                            const SizedBox(height: 24),
-                            // Botones de navegación
-                            Row(
-                              children: [
-                                if (_currentStep > 1)
-                                  Expanded(
-                                    child: ElevatedButton.icon(
-                                      onPressed: _previousStep,
-                                      icon: const VIcon(VerbumIcons.arrowLeft),
-                                      label: const Text('Anterior'),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: colorScheme.surface,
-                                        foregroundColor: colorScheme.onSurface,
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 16,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            16,
-                                          ),
-                                        ),
-                                        elevation: 0,
-                                      ),
-                                    ),
-                                  ),
-                                if (_currentStep > 1) const SizedBox(width: 12),
-                                Expanded(
-                                  child: ElevatedButton.icon(
-                                    onPressed: _currentStep < _totalSteps
-                                        ? _nextStep
-                                        : null,
-                                    icon: const VIcon(VerbumIcons.arrowRight),
-                                    label: Text(
-                                      _currentStep < _totalSteps
-                                          ? 'Siguiente'
-                                          : 'Finalizado',
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: colorScheme.primary,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 16,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      elevation: 2,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            // Botón de regreso al inicio
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                onPressed: () {
-                                  Navigator.of(context).pushNamed('/home');
-                                },
-                                icon: const VIcon(VerbumIcons.house, weight: VIconWeight.fill, size: 24),
-                                label: Text(
-                                  'Regresar al inicio',
-                                  style: VerbumFonts.sans(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: colorScheme.primary,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  elevation: 2,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+        actions: [
+          if (stepData != null && !isCarol)
+            VIconButton(
+              icon: VerbumIcons.shareNetwork,
+              semanticLabel: 'Compartir',
+              variant: VIconButtonVariant.ghost,
+              onPressed: () => ShareService.openComposer(
+                context,
+                ShareContent(
+                  title: 'Novena de Navidad - Día ${widget.day}',
+                  body: text,
+                  reference: title,
+                  kind: ShareContentKind.prayer,
+                  tradition: ShareTradition.catholic,
+                ),
               ),
-              // Banner Ad fijo en la parte inferior
-              if (!_adsRemoved)
-                Container(
-                  alignment: Alignment.center,
-                  width: double.infinity,
-                  height: _bannerAd != null
-                      ? _bannerAd!.size.height.toDouble()
-                      : 50,
-                  decoration: BoxDecoration(
-                    color: isDark ? colorScheme.surface : Colors.white,
-                    border: Border(
-                      top: BorderSide(
-                        color: colorScheme.outline.withValues(alpha: 0.1),
-                        width: 1,
+            ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: VEmptyState(loading: true, title: 'Cargando…'),
+                    )
+                  : stepData == null
+                  ? const Center(
+                      child: VEmptyState(
+                        icon: VerbumIcons.warningCircle,
+                        title: 'No se pudo cargar el paso',
                       ),
-                    ),
-                  ),
-                  child: _bannerAd != null
-                      ? AdWidget(ad: _bannerAd!)
-                      : const SizedBox(
-                          height: 50,
-                          child: Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : ListView(
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: VProgressBar(
+                                value: _currentStep / _totalSteps,
+                                semanticLabel: 'Avance del día',
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              '$_currentStep/$_totalSteps',
+                              style: type.caption.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 26),
+                        VIcon(
+                          isCarol
+                              ? VerbumIcons.musicNote
+                              : VerbumIcons.bookOpenText,
+                          weight: VIconWeight.duotone,
+                          size: 32,
+                          color: p.gold,
+                        ),
+                        const SizedBox(height: 12),
+                        VRubricLabel('Paso $_currentStep de $_totalSteps'),
+                        const SizedBox(height: 6),
+                        Text(title, style: type.display.copyWith(fontSize: 30)),
+                        const SizedBox(height: 20),
+                        if (text.length >= 120)
+                          VDropCapText(text, style: type.scripture)
+                        else
+                          Text(text, style: type.scripture),
+                        const SizedBox(height: 24),
+                        Center(
+                          child: VButton(
+                            label: 'Regresar al inicio',
+                            icon: VerbumIcons.house,
+                            iconLeading: true,
+                            variant: VButtonVariant.text,
+                            onPressed: () =>
+                                Navigator.of(context).pushNamed('/home'),
                           ),
                         ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStepCard({
-    required BuildContext context,
-    required String title,
-    required String text,
-    required ColorScheme colorScheme,
-    required bool isVillancico,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.primary.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isVillancico
-                      ? colorScheme.secondary.withValues(alpha: 0.15)
-                      : colorScheme.primary.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: VIcon(
-                  isVillancico ? VerbumIcons.musicNote : VerbumIcons.book,
-                  color: isVillancico
-                      ? colorScheme.secondary
-                      : colorScheme.primary,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  title,
-                  style: VerbumFonts.serif(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.primary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Text(
-            text,
-            style: VerbumFonts.sans(
-              fontSize: 18,
-              height: 1.8,
-              color: colorScheme.onSurface,
-            ),
-            softWrap: true,
-            overflow: TextOverflow.visible,
-          ),
-          const SizedBox(height: 24),
-          if (isVillancico)
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _nextStep,
-                icon: const VIcon(VerbumIcons.play, weight: VIconWeight.fill),
-                label: const Text('Continuar'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.secondary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 2,
-                ),
-              ),
-            )
-          else
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  ShareService.openComposer(
-                    context,
-                    ShareContent(
-                      title: 'Novena de Navidad - Día ${widget.day}',
-                      body: text,
-                      reference: title,
-                      kind: ShareContentKind.prayer,
-                      tradition: ShareTradition.catholic,
+                      ],
                     ),
-                  );
-                },
-                icon: const VIcon(VerbumIcons.shareNetwork),
-                label: const Text('Compartir'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 2,
+            ),
+            if (stepData != null)
+              VBottomBar(
+                child: Row(
+                  children: [
+                    if (_currentStep > 1) ...[
+                      VIconButton(
+                        icon: VerbumIcons.arrowLeft,
+                        semanticLabel: 'Paso anterior',
+                        size: 50,
+                        onPressed: _previousStep,
+                      ),
+                      const SizedBox(width: 10),
+                    ],
+                    Expanded(
+                      child: VButton(
+                        label: isLast ? 'Día completado' : 'Siguiente',
+                        icon: isLast
+                            ? VerbumIcons.check
+                            : VerbumIcons.arrowRight,
+                        expanded: true,
+                        onPressed: isLast ? null : _nextStep,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-        ],
+            if (!_adsRemoved)
+              Container(
+                alignment: Alignment.center,
+                width: double.infinity,
+                height: _bannerAd != null
+                    ? _bannerAd!.size.height.toDouble()
+                    : 50,
+                color: p.surface,
+                child: _bannerAd != null
+                    ? AdWidget(ad: _bannerAd!)
+                    : const SizedBox(
+                        height: 50,
+                        child: Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+              ),
+          ],
+        ),
       ),
     );
   }

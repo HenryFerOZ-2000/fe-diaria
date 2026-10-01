@@ -635,7 +635,6 @@ void main() {
         category: 'Esperanza',
         minutesPerDay: 5,
         icon: VerbumIcons.flowerLotus,
-        accent: Color(0xFF6B7398),
         days: [day, secondDay],
       );
 

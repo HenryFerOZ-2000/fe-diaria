@@ -1101,9 +1101,11 @@ class _CommunityPathCard extends StatelessWidget {
               ...SpiritualPathsCatalog.paths.map(
                 (path) => ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: CircleAvatar(
-                    backgroundColor: path.accent.withValues(alpha: .12),
-                    child: VIcon(path.icon, color: path.accent),
+                  leading: VIcon(
+                    path.icon,
+                    weight: VIconWeight.duotone,
+                    size: 28,
+                    color: context.palette.gold,
                   ),
                   title: Text(path.title),
                   subtitle: Text(path.subtitle),
@@ -1141,7 +1143,7 @@ class _CommunityPathCard extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final hasPath = pathId?.isNotEmpty == true;
     final path = hasPath ? SpiritualPathsCatalog.byId(pathId!) : null;
-    final accent = path?.accent ?? scheme.secondary;
+    final accent = context.palette.gold;
     return Material(
       color: Colors.transparent,
       child: InkWell(

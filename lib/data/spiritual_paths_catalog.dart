@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
-
 import '../models/spiritual_path.dart';
-import 'package:verbum/design_system/design_system.dart';
+import '../design_system/icons/verbum_icons.dart';
 
 class SpiritualPathsCatalog {
   static const paths = <SpiritualPath>[
@@ -14,7 +12,6 @@ class SpiritualPathsCatalog {
       category: 'Paz y confianza',
       minutesPerDay: 5,
       icon: VerbumIcons.flowerLotus,
-      accent: Color(0xFF6B7398),
       days: [
         SpiritualPathDay(
           number: 1,
@@ -122,7 +119,6 @@ class SpiritualPathsCatalog {
       category: 'Bienestar espiritual',
       minutesPerDay: 4,
       icon: VerbumIcons.wind,
-      accent: Color(0xFF5F8178),
       days: [
         SpiritualPathDay(
           number: 1,
@@ -230,7 +226,6 @@ class SpiritualPathsCatalog {
       category: 'Vida diaria',
       minutesPerDay: 3,
       icon: VerbumIcons.sun,
-      accent: Color(0xFFB58A45),
       days: [
         SpiritualPathDay(
           number: 1,
@@ -336,7 +331,6 @@ class SpiritualPathsCatalog {
       category: 'Descanso',
       minutesPerDay: 6,
       icon: VerbumIcons.moon,
-      accent: Color(0xFF77649A),
       days: [
         SpiritualPathDay(
           number: 1,

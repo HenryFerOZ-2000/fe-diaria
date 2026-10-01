@@ -51,27 +51,12 @@ class OnboardingHeader extends StatelessWidget {
   }
 }
 
-/// Barra inferior fija para la acción principal del paso.
+/// Barra inferior del recorrido inicial (ver [VBottomBar]).
 class OnboardingBottomBar extends StatelessWidget {
   const OnboardingBottomBar({super.key, required this.child});
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: p.surface,
-        border: Border(top: BorderSide(color: p.line)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-          child: child,
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => VBottomBar(child: child);
 }
