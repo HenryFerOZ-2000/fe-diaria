@@ -8,6 +8,7 @@ import '../services/spiritual_path_service.dart';
 import '../services/personalization_service.dart';
 import '../services/storage_service.dart';
 import '../design_system/design_system.dart';
+import '../features/paths/presentation/path_photos.dart';
 
 class SpiritualPathTodayCard extends StatefulWidget {
   const SpiritualPathTodayCard({super.key});
@@ -76,11 +77,12 @@ class _SpiritualPathTodayCardState extends State<SpiritualPathTodayCard> {
         final path = state.path;
         final next = state.progress.nextDay(path.days.length);
         return SpiritualPathTodayView(
+          pathId: path.id,
           title: path.title,
           isActive: state.isActive,
           detail: state.isActive
-              ? 'Día $next · ${path.days[next - 1].title}'
-              : '${path.subtitle} · Ritmo de ${state.preferredMinutes} min',
+              ? 'Camino · día $next de ${path.days.length}'
+              : 'Para este momento · ${state.preferredMinutes} min',
           progress: state.isActive
               ? state.progress.progressFor(path.days.length)
               : null,
@@ -92,10 +94,13 @@ class _SpiritualPathTodayCardState extends State<SpiritualPathTodayCard> {
   }
 }
 
-/// Vista del camino espiritual en "Hoy". Solo presentación.
+/// Vista del camino espiritual en "Hoy": foto enmarcada, avance en
+/// salvia y, en la cabecera, el acceso a todos los caminos.
+/// Solo presentación.
 class SpiritualPathTodayView extends StatelessWidget {
   const SpiritualPathTodayView({
     super.key,
+    required this.pathId,
     required this.title,
     required this.detail,
     required this.isActive,
@@ -104,6 +109,7 @@ class SpiritualPathTodayView extends StatelessWidget {
     this.progress,
   });
 
+  final String pathId;
   final String title;
   final String detail;
   final bool isActive;
@@ -117,56 +123,61 @@ class SpiritualPathTodayView extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = context.palette;
     final type = context.type;
-    return VSurfaceCard(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        VSectionHeader(
+          'Continúa',
+          trailing: 'Ver caminos',
+          onTrailingTap: onSeeAll,
+          padding: const EdgeInsets.fromLTRB(2, 0, 2, 10),
+        ),
+        VSurfaceCard(
+          onTap: onContinue,
+          radius: VerbumRadius.card,
+          padding: const EdgeInsets.all(12),
+          semanticLabel: '$title. $detail',
+          child: Row(
             children: [
-              VIcon(
-                VerbumIcons.compass,
-                weight: VIconWeight.duotone,
-                size: 30,
-                color: p.gold,
-              ),
-              const SizedBox(width: 12),
+              VPhotoFrame(photoForPath(pathId), width: 62, aspectRatio: 1),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    VRubricLabel(
-                      isActive ? 'Tu camino activo' : 'Para este momento',
+                    Text(
+                      detail,
+                      style: type.caption.copyWith(fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 2),
-                    Text(title, style: type.heading),
+                    Text(
+                      title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: type.heading.copyWith(fontSize: 16),
+                    ),
+                    if (progress != null) ...[
+                      const SizedBox(height: 8),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(99),
+                        child: LinearProgressIndicator(
+                          value: progress,
+                          minHeight: 6,
+                          color: p.sage,
+                          backgroundColor: p.surfaceMuted,
+                          semanticsLabel: 'Avance del camino',
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
-              VButton(
-                label: 'Ver todos',
-                variant: VButtonVariant.text,
-                compact: true,
-                onPressed: onSeeAll,
-              ),
+              const SizedBox(width: 8),
+              VIcon(VerbumIcons.caretRight, size: 18, color: p.inkSubtle),
             ],
           ),
-          const SizedBox(height: 10),
-          Text(detail, style: type.body),
-          if (progress != null) ...[
-            const SizedBox(height: 10),
-            VProgressBar(value: progress!, semanticLabel: 'Avance del camino'),
-          ],
-          const SizedBox(height: 14),
-          VButton(
-            label: isActive ? 'Continuar mi camino' : 'Explorar este camino',
-            icon: VerbumIcons.arrowRight,
-            variant: VButtonVariant.outlined,
-            expanded: true,
-            onPressed: onContinue,
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

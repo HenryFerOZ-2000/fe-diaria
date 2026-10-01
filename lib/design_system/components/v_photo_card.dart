@@ -22,6 +22,14 @@ class VPhotoCard extends StatelessWidget {
   final VoidCallback onTap;
   final double width;
 
+  /// Alto que necesita una fila de tarjetas de [width]: foto con marco,
+  /// título de hasta dos líneas y leyenda, según el tamaño de letra.
+  static double rowHeight(BuildContext context, double width) {
+    const frame = 5.0;
+    final photo = (width - frame * 2) * 5 / 4 + frame * 2;
+    return photo + 10 + MediaQuery.textScalerOf(context).scale(62);
+  }
+
   @override
   Widget build(BuildContext context) {
     final type = context.type;

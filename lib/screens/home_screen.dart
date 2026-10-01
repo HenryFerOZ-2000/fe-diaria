@@ -10,6 +10,8 @@ import '../features/today/application/today_schedule.dart';
 import '../features/today/presentation/cover_photos.dart';
 import '../features/today/presentation/today_cover.dart';
 import '../features/today/presentation/today_journey.dart';
+import '../features/prayers/presentation/pray_now_carousel.dart';
+import '../bible/ui/bible_continue_card.dart';
 import '../services/share_service.dart';
 import '../features/sharing/domain/share_content.dart';
 import '../providers/auth_provider.dart';
@@ -44,6 +46,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Timer? _dailyRefreshTimer;
   bool _isMorningPrayer = true;
   bool _streakDialogShowing = false;
+
+  /// Pasada la portada, la barra de estado pasa a fondo lavanda y texto
+  /// oscuro para que la hora siga legible.
+  bool _pastCover = false;
   late final StreakController _streakController;
   final SpiritualStatsService _spiritualStatsService = SpiritualStatsService();
   final DailyProgressService _dailyProgressService = DailyProgressService();
@@ -226,9 +232,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final now = DateTime.now();
     // Sobre la foto, hora y batería en claro.
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
+      value:
+          (_pastCover ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light)
+              .copyWith(statusBarColor: Colors.transparent),
       child: Scaffold(
         backgroundColor: p.background,
         body: Consumer<AppProvider>(
@@ -239,73 +245,106 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 .firstOrNull;
             return FadeTransition(
               opacity: _fadeAnimation,
-              child: ListView(
-                padding: EdgeInsets.zero,
-                physics: const BouncingScrollPhysics(),
+              child: Stack(
                 children: [
-                  ChangeNotifierProvider<StreakController>.value(
-                    value: _streakController,
-                    child: Consumer<StreakController>(
-                      builder: (context, streak, _) {
-                        _maybeShowStreakCelebration(streak);
-                        return TodayCover(
-                          now: now,
-                          photo: coverPhotoFor(now),
-                          userName: auth.firebaseUser?.displayName,
-                          streakDays: streak.totalDays,
-                          verseText: verse?.text,
-                          verseReference: verse?.reference,
-                          onRead: verseMission == null
-                              ? null
-                              : () => _openMissionRead(
-                                  context,
-                                  verseMission,
-                                  provider,
-                                ),
-                          onShare: verse == null
-                              ? null
-                              : () => ShareService.openComposer(
-                                  context,
-                                  ShareContent(
-                                    title: 'Palabra de hoy',
-                                    body: verse.text,
-                                    reference: '${verse.reference} · RV1909',
-                                    sourceLabel: 'RV1909',
-                                    kind: ShareContentKind.verse,
+                  NotificationListener<ScrollUpdateNotification>(
+                    onNotification: (n) {
+                      final past = n.metrics.pixels > 380;
+                      if (past != _pastCover) setState(() => _pastCover = past);
+                      return false;
+                    },
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      physics: const BouncingScrollPhysics(),
+                      children: [
+                        ChangeNotifierProvider<StreakController>.value(
+                          value: _streakController,
+                          child: Consumer<StreakController>(
+                            builder: (context, streak, _) {
+                              _maybeShowStreakCelebration(streak);
+                              return TodayCover(
+                                now: now,
+                                night: isCoverNight(now),
+                                userName: auth.firebaseUser?.displayName,
+                                streakDays: streak.totalDays,
+                                verseText: verse?.text,
+                                verseReference: verse?.reference,
+                                onRead: verseMission == null
+                                    ? null
+                                    : () => _openMissionRead(
+                                        context,
+                                        verseMission,
+                                        provider,
+                                      ),
+                                onShare: verse == null
+                                    ? null
+                                    : () => ShareService.openComposer(
+                                        context,
+                                        ShareContent(
+                                          title: 'Palabra de hoy',
+                                          body: verse.text,
+                                          reference:
+                                              '${verse.reference} · RV1909',
+                                          sourceLabel: 'RV1909',
+                                          kind: ShareContentKind.verse,
+                                        ),
+                                      ),
+                                onProfile: () =>
+                                    Navigator.of(context).pushNamed('/profile'),
+                                onStreak: () =>
+                                    Navigator.of(context).pushNamed('/streak'),
+                              );
+                            },
+                          ),
+                        ),
+                        // El siguiente paso se monta sobre el final de la portada.
+                        Transform.translate(
+                          offset: const Offset(0, -64),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: VerbumSpace.gutter,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                TodayJourney(
+                                  missions: _missionsController.missions,
+                                  nightAvailable: isNightPrayerAvailable(now),
+                                  onOpen: (mission) => _openMissionRead(
+                                    context,
+                                    mission,
+                                    provider,
                                   ),
                                 ),
-                          onProfile: () =>
-                              Navigator.of(context).pushNamed('/profile'),
-                          onStreak: () =>
-                              Navigator.of(context).pushNamed('/streak'),
-                        );
-                      },
+                                if (provider.isLoading) ...[
+                                  const SizedBox(height: 12),
+                                  const VProgressBar(value: 0.35, height: 3),
+                                ],
+                                const SizedBox(height: 26),
+                                const SpiritualPathTodayCard(),
+                                const BibleContinueCard(),
+                                PrayNowCarousel(now: now),
+                                const SizedBox(height: 10),
+                                const TodayLiturgySection(),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  // El siguiente paso se monta sobre el final de la portada.
-                  Transform.translate(
-                    offset: const Offset(0, -64),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: VerbumSpace.gutter,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          TodayJourney(
-                            missions: _missionsController.missions,
-                            nightAvailable: isNightPrayerAvailable(now),
-                            onOpen: (mission) =>
-                                _openMissionRead(context, mission, provider),
-                          ),
-                          if (provider.isLoading) ...[
-                            const SizedBox(height: 12),
-                            const VProgressBar(value: 0.35, height: 3),
-                          ],
-                          const SizedBox(height: 22),
-                          const SpiritualPathTodayCard(),
-                          const TodayLiturgySection(),
-                        ],
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: IgnorePointer(
+                      child: AnimatedOpacity(
+                        opacity: _pastCover ? 1 : 0,
+                        duration: const Duration(milliseconds: 200),
+                        child: Container(
+                          height: MediaQuery.paddingOf(context).top,
+                          color: p.background.withValues(alpha: .96),
+                        ),
                       ),
                     ),
                   ),

@@ -60,7 +60,6 @@ void main() {
 
   TodayCover cover({VoidCallback? onRead, VoidCallback? onShare}) => TodayCover(
     now: DateTime(2026, 9, 30, 9),
-    photo: VerbumPhotos.coverMountains,
     userName: 'Ana López',
     streakDays: 3,
     verseText: 'Lámpara es a mis pies tu palabra, y lumbrera a mi camino.',

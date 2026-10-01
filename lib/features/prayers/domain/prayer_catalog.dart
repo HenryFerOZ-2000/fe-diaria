@@ -230,3 +230,15 @@ List<PrayerSection> prayerSectionsFor(FaithTradition tradition) {
     ),
   ];
 }
+
+/// Oraciones para "Orar ahora" en Hoy: las tradicionales, empezando por
+/// una distinta según el momento del día (madrugada, mañana, tarde,
+/// noche), para que la portada no muestre siempre lo mismo.
+List<PrayerEntry> prayNowEntries(FaithTradition tradition, int hour) {
+  final entries = prayerSectionsFor(
+    tradition,
+  ).firstWhere((s) => s.id == 'traditional').entries;
+  if (entries.isEmpty) return entries;
+  final start = (hour ~/ 6) % entries.length;
+  return [...entries.skip(start), ...entries.take(start)];
+}

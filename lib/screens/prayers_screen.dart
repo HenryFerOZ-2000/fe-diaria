@@ -107,7 +107,7 @@ class PrayersScreen extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: MediaQuery.textScalerOf(context).scale(68) + 214,
+            height: VPhotoCard.rowHeight(context, 164),
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               clipBehavior: Clip.none,

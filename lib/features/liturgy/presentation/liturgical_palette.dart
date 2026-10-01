@@ -38,6 +38,17 @@ final class LiturgicalPalette {
     };
   }
 
+  /// El color tal cual, para un punto o muestra (no para texto).
+  static Color swatch(LiturgicalColor color) => switch (color) {
+    LiturgicalColor.white => const Color(0xFFFFFFFF),
+    LiturgicalColor.green => const Color(0xFF4E8A6F),
+    LiturgicalColor.red => const Color(0xFFB8463F),
+    LiturgicalColor.purple => const Color(0xFF7A55A0),
+    LiturgicalColor.rose => const Color(0xFFE29BB2),
+    LiturgicalColor.gold => const Color(0xFFD9B44A),
+    LiturgicalColor.black => const Color(0xFF2E2C2A),
+  };
+
   static String label(LiturgicalColor color) => switch (color) {
     LiturgicalColor.white => 'Blanco',
     LiturgicalColor.green => 'Verde',

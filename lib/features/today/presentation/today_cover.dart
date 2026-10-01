@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../design_system/design_system.dart';
 import '../application/today_schedule.dart';
+import 'cover_photos.dart';
 
 /// Portada de "Hoy": un paisaje sereno con la Palabra del día como
 /// protagonista, al estilo de la portada de una revista.
@@ -16,7 +17,7 @@ class TodayCover extends StatelessWidget {
   const TodayCover({
     super.key,
     required this.now,
-    required this.photo,
+    this.night = false,
     required this.streakDays,
     required this.onProfile,
     required this.onStreak,
@@ -28,7 +29,9 @@ class TodayCover extends StatelessWidget {
   });
 
   final DateTime now;
-  final VerbumPhotos photo;
+
+  /// Velo más profundo para la noche.
+  final bool night;
   final int streakDays;
   final VoidCallback onProfile;
   final VoidCallback onStreak;
@@ -40,10 +43,10 @@ class TodayCover extends StatelessWidget {
 
   /// Cuanto más largo el versículo, más pequeña la letra.
   static double _verseSize(String text) => text.length <= 90
-      ? 34
+      ? 37
       : text.length <= 160
-      ? 28
-      : 24;
+      ? 31
+      : 26;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +67,7 @@ class TodayCover extends StatelessWidget {
         children: [
           Positioned.fill(
             child: ExcludeSemantics(
-              child: Image.asset(photo.asset, fit: BoxFit.cover),
+              child: Image.asset(coverPhoto.asset, fit: BoxFit.cover),
             ),
           ),
           // Velo: legible arriba (saludo) y abajo (versículo); la foto
@@ -76,13 +79,13 @@ class TodayCover extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    _tinta.withValues(alpha: .5),
-                    _indigo.withValues(alpha: .05),
-                    _tinta.withValues(alpha: .38),
-                    _tinta.withValues(alpha: .8),
+                    _tinta.withValues(alpha: night ? .8 : .45),
+                    _indigo.withValues(alpha: night ? .55 : .05),
+                    _tinta.withValues(alpha: night ? .62 : .35),
+                    _tinta.withValues(alpha: night ? .88 : .78),
                     p.background,
                   ],
-                  stops: const [0, .28, .52, .82, 1],
+                  stops: const [0, .28, .52, .8, 1],
                 ),
               ),
             ),

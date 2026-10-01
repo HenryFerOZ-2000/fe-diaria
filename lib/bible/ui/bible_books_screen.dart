@@ -236,7 +236,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
           ],
           _header('Para empezar'),
           SizedBox(
-            height: MediaQuery.textScalerOf(context).scale(52) + 172,
+            height: VPhotoCard.rowHeight(context, 132),
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               clipBehavior: Clip.none,

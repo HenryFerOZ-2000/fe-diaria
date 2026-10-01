@@ -57,4 +57,11 @@ void main() {
       expect(k, isNot(contains('novena_navidad')), reason: t.name);
     }
   });
+
+  test('orar ahora rota según el momento del día sin perder oraciones', () {
+    final morning = prayNowEntries(FaithTradition.catholic, 8);
+    final night = prayNowEntries(FaithTradition.catholic, 21);
+    expect(morning.first.key, isNot(night.first.key));
+    expect(morning.map((e) => e.key).toSet(), night.map((e) => e.key).toSet());
+  });
 }
