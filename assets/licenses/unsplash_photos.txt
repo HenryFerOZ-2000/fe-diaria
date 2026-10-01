@@ -1,6 +1,7 @@
 Fotografías bajo la Licencia Unsplash (https://unsplash.com/license).
 bible_hills.jpg  https://unsplash.com/photos/yLrWrIeqk64
 candle.jpg  https://unsplash.com/photos/3CA_-xcpulY
+chat_bench.jpg  https://unsplash.com/photos/2P590YvJig4
 clouds.jpg  https://unsplash.com/photos/6sFJ3j15AjY
 coffee_bible.jpg  https://unsplash.com/photos/WWD93Icc30Y
 community_candles.jpg  https://unsplash.com/photos/cNjqRLohmaU

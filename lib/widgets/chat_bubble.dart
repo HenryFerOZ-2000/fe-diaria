@@ -2,8 +2,37 @@ import 'package:flutter/material.dart';
 
 import '../design_system/design_system.dart';
 
-/// Burbuja de conversación: el acompañante en papel con filete, la persona
-/// en el tono de apoyo, alineada a la derecha.
+/// Avatar del acompañante: una paloma sobre mantequilla.
+class CompanionAvatar extends StatelessWidget {
+  const CompanionAvatar({super.key, this.size = 32});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return ExcludeSemantics(
+      child: Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: p.butter,
+          borderRadius: BorderRadius.circular(size * .36),
+        ),
+        child: VIcon(
+          VerbumIcons.bird,
+          weight: VIconWeight.fill,
+          size: size * .56,
+          color: p.onButter,
+        ),
+      ),
+    );
+  }
+}
+
+/// Burbuja de conversación: el acompañante en tarjeta blanca con su avatar;
+/// la persona en índigo, alineada a la derecha.
 class ChatBubble extends StatelessWidget {
   final String text;
   final bool isUser;
@@ -13,34 +42,48 @@ class ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    const r = Radius.circular(18);
-    return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: EdgeInsets.only(
-          left: isUser ? 48 : 0,
-          right: isUser ? 0 : 48,
-          bottom: 10,
+    const r = Radius.circular(20);
+    final bubble = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+      decoration: BoxDecoration(
+        color: isUser ? p.emphasis : p.surface,
+        borderRadius: BorderRadius.only(
+          topLeft: isUser ? r : const Radius.circular(6),
+          topRight: r,
+          bottomLeft: r,
+          bottomRight: isUser ? const Radius.circular(6) : r,
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-        decoration: BoxDecoration(
-          color: isUser ? p.surfaceMuted : p.surface,
-          borderRadius: BorderRadius.only(
-            topLeft: r,
-            topRight: r,
-            bottomLeft: isUser ? r : const Radius.circular(4),
-            bottomRight: isUser ? const Radius.circular(4) : r,
+        boxShadow: isUser ? null : VerbumShadows.subtle(p),
+      ),
+      child: SelectableText(
+        text,
+        style: context.type.body.copyWith(
+          color: isUser ? p.onEmphasis : p.ink,
+          fontSize: 15,
+          height: 1.5,
+        ),
+      ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!isUser) ...[const CompanionAvatar(), const SizedBox(width: 8)],
+          Flexible(
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: isUser ? 56 : 0,
+                right: isUser ? 0 : 24,
+              ),
+              child: bubble,
+            ),
           ),
-          border: isUser ? null : Border.all(color: p.line),
-        ),
-        child: SelectableText(
-          text,
-          style: context.type.body.copyWith(
-            color: p.ink,
-            fontSize: 14.5,
-            height: 1.5,
-          ),
-        ),
+        ],
       ),
     );
   }

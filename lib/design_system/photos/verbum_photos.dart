@@ -3,6 +3,7 @@
 enum VerbumPhotos {
   bibleHills,
   candle,
+  chatBench,
   clouds,
   coffeeBible,
   communityCandles,

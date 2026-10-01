@@ -13,6 +13,7 @@ class VPhotoCover extends StatelessWidget {
     required this.child,
     this.minHeight = 360,
     this.bottomPadding = 40,
+    this.alignment = Alignment.center,
   });
 
   /// `AssetImage` o `NetworkImage` (p. ej. la foto de una comunidad).
@@ -22,6 +23,9 @@ class VPhotoCover extends StatelessWidget {
   final Widget child;
   final double minHeight;
   final double bottomPadding;
+
+  /// Qué parte de la foto se ve cuando se recorta.
+  final Alignment alignment;
 
   static const _tinta = Color(0xFF22245A);
 
@@ -37,6 +41,7 @@ class VPhotoCover extends StatelessWidget {
               child: Image(
                 image: image,
                 fit: BoxFit.cover,
+                alignment: alignment,
                 errorBuilder: (_, _, _) => ColoredBox(color: p.inverse),
               ),
             ),
