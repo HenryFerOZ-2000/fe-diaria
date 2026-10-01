@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../services/live_posts_service.dart';
 import '../services/post_social_service.dart';
 import '../widgets/top_notice.dart';
+import '../widgets/sign_in_prompt.dart';
 import 'package:verbum/design_system/design_system.dart';
 
 class CommentsScreen extends StatefulWidget {
@@ -58,11 +59,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
     final uid = _auth.currentUser?.uid;
     if (uid == null) {
-      showTopNotice(
-        context,
-        message: 'Inicia sesión para comentar.',
-        isError: true,
-      );
+      SignInPrompt.ask(context, title: 'Inicia sesión para comentar');
       return;
     }
 
@@ -249,23 +246,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   4,
                 ),
                 child: uid == null
-                    ? Row(
-                        children: [
-                          VIcon(VerbumIcons.lockSimple, color: p.inkSubtle),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              'Inicia sesión para comentar',
-                              style: type.bodyStrong,
-                            ),
-                          ),
-                          VButton(
-                            label: 'Iniciar sesión',
-                            compact: true,
-                            onPressed: () =>
-                                Navigator.of(context).pushNamed('/welcome'),
-                          ),
-                        ],
+                    ? const SignInPrompt.bar(
+                        title: 'Inicia sesión para comentar',
                       )
                     : Column(
                         mainAxisSize: MainAxisSize.min,
@@ -584,11 +566,7 @@ Future<void> _toggleLikeOrWarn(
   String uid,
 ) async {
   if (uid.isEmpty) {
-    showTopNotice(
-      context,
-      message: 'Inicia sesión para reaccionar.',
-      isError: true,
-    );
+    SignInPrompt.ask(context, title: 'Inicia sesión para reaccionar');
     return;
   }
   try {

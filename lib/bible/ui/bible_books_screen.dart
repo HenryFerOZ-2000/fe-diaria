@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../../widgets/verbum_header_actions.dart';
-import '../../widgets/app_scaffold.dart';
+import '../../widgets/cover_tab_page.dart';
 import '../data/bible_db.dart';
 import '../domain/bible_book_info.dart';
 import '../domain/verse.dart';
@@ -150,29 +149,63 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
-      titleWidget: const SizedBox.shrink(),
-      centerTitle: false,
-      leading: const VerbumSettingsButton(),
-      actions: const [VerbumHeaderActions(showSettings: false)],
-      showBanner: false,
-      showGuestNotice: false,
-      body: _loading
-          ? const Center(
-              child: VEmptyState(
-                loading: true,
-                title: 'Preparando tu Biblia sin conexión…',
+    final p = context.palette;
+    final type = context.type;
+    return CoverTabPage(
+      cover: VPhotoCover(
+        image: AssetImage(VerbumPhotos.bibleHills.asset),
+        minHeight: 340,
+        bottomPadding: 26,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const CoverTopActions(),
+            const SizedBox(height: 96),
+            Text(
+              'BIBLIA',
+              style: type.rubric.copyWith(color: p.butter, letterSpacing: 1.5),
+            ),
+            const SizedBox(height: 4),
+            Semantics(
+              header: true,
+              child: Text(
+                'Abre la Palabra',
+                style: type.display.copyWith(
+                  color: Colors.white,
+                  fontSize: 30,
+                  height: 1.1,
+                ),
               ),
-            )
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Reina-Valera 1909 · 66 libros · sin conexión',
+              style: type.body.copyWith(
+                color: Colors.white.withValues(alpha: .9),
+              ),
+            ),
+          ],
+        ),
+      ),
+      children: _loading
+          ? const [
+              Padding(
+                padding: EdgeInsets.all(32),
+                child: VEmptyState(
+                  loading: true,
+                  title: 'Preparando tu Biblia sin conexión…',
+                ),
+              ),
+            ]
           : _error != null
-          ? Center(
-              child: VEmptyState(
+          ? [
+              VEmptyState(
                 icon: VerbumIcons.bookOpenText,
                 title: _error!,
                 actionLabel: 'Reintentar',
                 onAction: _init,
               ),
-            )
+            ]
           : _buildContent(context),
     );
   }
@@ -193,131 +226,106 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
 
   static const _gutter = EdgeInsets.symmetric(horizontal: VerbumSpace.gutter);
 
-  Widget _buildContent(BuildContext context) {
-    final p = context.palette;
+  List<Widget> _buildContent(BuildContext context) {
     final type = context.type;
     final query = _searchController.text.trim();
-    return ListView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.only(top: 4, bottom: 28),
-      children: [
-        const Padding(
-          padding: _gutter,
-          child: VTwoToneTitle('la Palabra', 'Abre', accentFirst: true),
-        ),
+    return [
+      Padding(padding: _gutter, child: _buildSearch(context)),
+      if (query.length >= 2)
         Padding(
           padding: const EdgeInsets.fromLTRB(
             VerbumSpace.gutter,
-            6,
-            VerbumSpace.gutter,
             16,
+            VerbumSpace.gutter,
+            0,
           ),
-          child: Text(
-            'Reina-Valera 1909 · 66 libros · sin conexión',
-            style: type.body.copyWith(color: p.inkMuted),
+          child: _buildSearchResults(context),
+        )
+      else ...[
+        const SizedBox(height: 16),
+        Padding(padding: _gutter, child: _buildHero(context)),
+        if (_recentBooks.isNotEmpty) ...[
+          _header('Leíste hace poco'),
+          _Shelf(books: _recentBooks, coverWidth: 76, onOpen: _openBook),
+        ],
+        _header('Para empezar'),
+        SizedBox(
+          height: VPhotoCard.rowHeight(context, 132),
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
+            padding: _gutter,
+            itemCount: _starters.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 14),
+            itemBuilder: (context, i) {
+              final (id, caption, photo) = _starters[i];
+              final book = bibleBookById(id)!;
+              return VPhotoCard(
+                photo: photo,
+                title: book.name,
+                caption: caption,
+                width: 132,
+                onTap: () => _openBook(book),
+              );
+            },
           ),
         ),
-        Padding(padding: _gutter, child: _buildSearch(context)),
-        if (query.length >= 2)
+        _header('Todos los libros'),
+        Padding(
+          padding: _gutter,
+          child: VSegmentedControl<BibleTestament>(
+            selected: _testament,
+            onChanged: (value) => setState(() => _testament = value),
+            segments: const [
+              VSegment(value: BibleTestament.old, label: 'Antiguo · 39'),
+              VSegment(value: BibleTestament.newTestament, label: 'Nuevo · 27'),
+            ],
+          ),
+        ),
+        // Un estante de portadas por sección.
+        for (final section in booksBySection(_testament).entries) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(
-              VerbumSpace.gutter,
-              16,
-              VerbumSpace.gutter,
-              0,
+              VerbumSpace.gutter + 2,
+              20,
+              VerbumSpace.gutter + 2,
+              10,
             ),
-            child: _buildSearchResults(context),
-          )
-        else ...[
-          const SizedBox(height: 16),
-          Padding(padding: _gutter, child: _buildHero(context)),
-          if (_recentBooks.isNotEmpty) ...[
-            _header('Leíste hace poco'),
-            _Shelf(books: _recentBooks, coverWidth: 76, onOpen: _openBook),
-          ],
-          _header('Para empezar'),
-          SizedBox(
-            height: VPhotoCard.rowHeight(context, 132),
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              clipBehavior: Clip.none,
-              padding: _gutter,
-              itemCount: _starters.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 14),
-              itemBuilder: (context, i) {
-                final (id, caption, photo) = _starters[i];
-                final book = bibleBookById(id)!;
-                return VPhotoCard(
-                  photo: photo,
-                  title: book.name,
-                  caption: caption,
-                  width: 132,
-                  onTap: () => _openBook(book),
-                );
-              },
-            ),
-          ),
-          _header('Todos los libros'),
-          Padding(
-            padding: _gutter,
-            child: VSegmentedControl<BibleTestament>(
-              selected: _testament,
-              onChanged: (value) => setState(() => _testament = value),
-              segments: const [
-                VSegment(value: BibleTestament.old, label: 'Antiguo · 39'),
-                VSegment(
-                  value: BibleTestament.newTestament,
-                  label: 'Nuevo · 27',
-                ),
-              ],
-            ),
-          ),
-          // Un estante de portadas por sección.
-          for (final section in booksBySection(_testament).entries) ...[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                VerbumSpace.gutter + 2,
-                20,
-                VerbumSpace.gutter + 2,
-                10,
-              ),
-              child: Row(
-                children: [
-                  Expanded(child: Text(section.key, style: type.rubric)),
-                  Text(
-                    '${section.value.length}',
-                    style: type.caption.copyWith(fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-            ),
-            _Shelf(books: section.value, coverWidth: 96, onOpen: _openBook),
-          ],
-          _header('Ediciones'),
-          Padding(
-            padding: _gutter,
-            child: VListGroup(
+            child: Row(
               children: [
-                VListRow(
-                  leading: VerbumIcons.bookOpen,
-                  title: 'Estás leyendo Reina-Valera 1909',
-                  subtitle: '66 libros · Sin conexión · Edición protestante',
-                  trailing: VerbumIcons.info,
-                  onTap: () => _push(const ContentSourcesScreen()),
-                ),
-                VListRow(
-                  leading: VerbumIcons.globe,
-                  title: 'Consultar la Biblia católica',
-                  subtitle:
-                      '73 libros · El Libro del Pueblo de Dios · En línea',
-                  onTap: () => _push(const CatholicBibleScreen()),
+                Expanded(child: Text(section.key, style: type.rubric)),
+                Text(
+                  '${section.value.length}',
+                  style: type.caption.copyWith(fontWeight: FontWeight.w600),
                 ),
               ],
             ),
           ),
+          _Shelf(books: section.value, coverWidth: 96, onOpen: _openBook),
         ],
+        _header('Ediciones'),
+        Padding(
+          padding: _gutter,
+          child: VListGroup(
+            children: [
+              VListRow(
+                leading: VerbumIcons.bookOpen,
+                title: 'Estás leyendo Reina-Valera 1909',
+                subtitle: '66 libros · Sin conexión · Edición protestante',
+                trailing: VerbumIcons.info,
+                onTap: () => _push(const ContentSourcesScreen()),
+              ),
+              VListRow(
+                leading: VerbumIcons.globe,
+                title: 'Consultar la Biblia católica',
+                subtitle: '73 libros · El Libro del Pueblo de Dios · En línea',
+                onTap: () => _push(const CatholicBibleScreen()),
+              ),
+            ],
+          ),
+        ),
       ],
-    );
+    ];
   }
 
   Widget _header(String title) => VSectionHeader(
@@ -341,7 +349,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
         eyebrow: 'Para comenzar',
         title: 'El Evangelio de Juan',
         body: 'Un buen lugar para conocer a Jesús, capítulo a capítulo.',
-        photo: VerbumPhotos.bibleHills,
+        watermark: VerbumIcons.bookOpenText,
         onTap: () => _openChapter(john, 1),
         footer: VButton(
           label: 'Empezar a leer',
@@ -358,7 +366,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
       eyebrow: 'Continúa donde quedaste',
       title: '${position.bookName} ${position.chapter}',
       body: 'Versículo ${position.verse} · Reina-Valera 1909',
-      photo: VerbumPhotos.bibleHills,
+      watermark: VerbumIcons.bookmarkSimple,
       onTap: open,
       footer: VButton(
         label: 'Seguir leyendo',

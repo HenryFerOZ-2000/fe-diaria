@@ -94,7 +94,6 @@ class _TraditionalPrayersCategoriesScreenState
     final traditionName = _traditionName(_religion);
 
     return AppScaffold(
-      showGuestNotice: false,
       showBanner: !_adsRemoved,
       bannerAd: _bannerAd,
       centerTitle: false,

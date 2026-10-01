@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/top_notice.dart';
+import '../widgets/sign_in_prompt.dart';
 import '../widgets/verbum_header_actions.dart';
 import '../services/social_service.dart';
 import '../services/live_posts_service.dart';
@@ -728,10 +729,9 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
 
   Future<void> _toggleJoin() async {
     if (widget.currentUid.isEmpty) {
-      showTopNotice(
+      SignInPrompt.ask(
         context,
-        message: 'Inicia sesión para orar con la comunidad.',
-        isError: true,
+        title: 'Inicia sesión para orar con la comunidad',
       );
       return;
     }

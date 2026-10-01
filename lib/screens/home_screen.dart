@@ -22,6 +22,7 @@ import '../widgets/racha_celebration_dialog.dart';
 import '../services/spiritual_stats_service.dart';
 import '../services/daily_progress_service.dart';
 import '../widgets/spiritual_path_today_card.dart';
+import '../widgets/sign_in_prompt.dart';
 import '../features/liturgy/presentation/today_liturgy_section.dart';
 import '../features/today/domain/daily_practice_catalog.dart';
 
@@ -324,6 +325,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   const VProgressBar(value: 0.35, height: 3),
                                 ],
                                 const SizedBox(height: 26),
+                                // Solo para invitados; se oculta con sesión.
+                                const SignInPrompt(
+                                  margin: EdgeInsets.only(bottom: 26),
+                                ),
                                 const SpiritualPathTodayCard(),
                                 const BibleContinueCard(),
                                 PrayNowCarousel(now: now),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import '../providers/auth_provider.dart';
 import '../design_system/design_system.dart';
 import 'verbum_ambient_background.dart';
 
@@ -26,7 +24,6 @@ class AppScaffold extends StatelessWidget {
   final bool showAppBar;
   final PreferredSizeWidget? bottom;
   final double? appBarElevation;
-  final bool showGuestNotice;
   final BannerAd? bannerAd;
   final bool showBanner;
 
@@ -49,7 +46,6 @@ class AppScaffold extends StatelessWidget {
     this.showAppBar = true,
     this.bottom,
     this.appBarElevation,
-    this.showGuestNotice = true,
     this.bannerAd,
     this.showBanner = false,
   });
@@ -60,89 +56,6 @@ class AppScaffold extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     // Guest notice (only when not signed in)
-    Widget? guestNotice;
-    if (showGuestNotice) {
-      final auth = Provider.of<AuthProvider?>(context, listen: true);
-      final isGuest = auth == null || !auth.isSignedIn;
-      if (isGuest) {
-        final p = context.palette;
-        guestNotice = Container(
-          width: double.infinity,
-          margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: BoxDecoration(
-            color: p.surfaceMuted,
-            borderRadius: BorderRadius.circular(VerbumRadius.control),
-          ),
-          child: Row(
-            children: [
-              VIcon(VerbumIcons.info, size: 18, color: p.inkMuted),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Modo invitado: inicia sesión para sincronizar rachas, favoritos y progreso.',
-                  style: context.type.caption.copyWith(
-                    color: p.inkMuted,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              TextButton(
-                onPressed: () async {
-                  final authProv = Provider.of<AuthProvider?>(
-                    context,
-                    listen: false,
-                  );
-                  if (authProv == null) {
-                    Navigator.of(context).pushNamed('/welcome');
-                    return;
-                  }
-                  try {
-                    await authProv.signIn();
-                    if (context.mounted && authProv.isSignedIn) {
-                      Navigator.of(
-                        context,
-                      ).pushNamedAndRemoveUntil('/home', (route) => false);
-                    }
-                  } catch (e) {
-                    final err = e.toString().replaceFirst('Exception: ', '');
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            err.length > 120
-                                ? '${err.substring(0, 120)}...'
-                                : err,
-                          ),
-                          duration: const Duration(seconds: 4),
-                        ),
-                      );
-                    }
-                  }
-                },
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
-                  minimumSize: const Size(0, 0),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  'Iniciar sesión',
-                  style: context.type.caption.copyWith(
-                    color: context.palette.rubric,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      }
-    }
-
     return Scaffold(
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       // Con degradado propio, el fondo continúa bajo la barra superior.
@@ -171,7 +84,6 @@ class AppScaffold extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              if (guestNotice != null) guestNotice,
               Expanded(child: body),
               // Banner Ad flotante - siempre visible en la parte inferior
               if (showBanner && bannerAd != null)

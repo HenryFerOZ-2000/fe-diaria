@@ -25,6 +25,7 @@ import '../features/paths/presentation/path_photos.dart';
 import '../services/spiritual_path_service.dart';
 import 'package:verbum/design_system/design_system.dart';
 import '../features/community/presentation/community_cover.dart';
+import '../widgets/sign_in_prompt.dart';
 
 /// Firma para pedir la portada de "Mi comunidad" con los datos del grupo.
 typedef MyCommunityCoverBuilder =
@@ -122,13 +123,27 @@ class _MyCommunityTabState extends State<_MyCommunityTab> {
       subtitle: 'Tu parroquia o grupo, en un solo lugar.',
     );
     if (uid == null) {
-      return _MyCommunityEmptyView(
-        cover: defaultCover,
-        title: 'Inicia sesión para ver tu comunidad',
-        subtitle: 'Cuando inicies sesión podrás unirte con un código.',
-        buttonLabel: 'Iniciar sesión',
-        buttonIcon: VerbumIcons.signIn,
-        onJoin: () => Navigator.of(context).pushNamed('/welcome'),
+      return ListView(
+        padding: EdgeInsets.only(
+          bottom: 28 + MediaQuery.paddingOf(context).bottom,
+        ),
+        children: [
+          defaultCover,
+          const Padding(
+            padding: EdgeInsets.fromLTRB(
+              VerbumSpace.gutter,
+              8,
+              VerbumSpace.gutter,
+              0,
+            ),
+            child: SignInPrompt(
+              title: 'Inicia sesión para ver tu comunidad',
+              message:
+                  'Con tu cuenta puedes unirte con un código o crear la '
+                  'comunidad de tu parroquia o grupo.',
+            ),
+          ),
+        ],
       );
     }
 

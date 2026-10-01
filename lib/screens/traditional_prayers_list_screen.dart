@@ -90,7 +90,6 @@ class _TraditionalPrayersListScreenState
     final displayName = _service.getCategoryDisplayName(widget.category);
 
     return AppScaffold(
-      showGuestNotice: false,
       showBanner: !_adsRemoved,
       bannerAd: _bannerAd,
       centerTitle: false,

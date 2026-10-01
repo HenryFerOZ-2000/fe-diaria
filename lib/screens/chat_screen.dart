@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../widgets/chat_bubble.dart';
 import '../services/groq_chat_service.dart' as groq;
 import '../providers/auth_provider.dart';
+import '../widgets/sign_in_prompt.dart';
 import '../design_system/design_system.dart';
 
 class ChatMessage {
@@ -342,7 +343,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildInput(BuildContext context, {required bool signedIn}) {
     final p = context.palette;
-    final type = context.type;
     // El campo queda por encima de la barra flotante (o del teclado).
     final bottom = MediaQuery.viewInsetsOf(context).bottom > 0
         ? 10.0
@@ -402,24 +402,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ],
               )
-            : Row(
-                children: [
-                  VIcon(VerbumIcons.lockSimple, color: p.inkSubtle),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Inicia sesión para conversar',
-                      style: type.bodyStrong,
-                    ),
-                  ),
-                  VButton(
-                    label: 'Iniciar sesión',
-                    compact: true,
-                    onPressed: () =>
-                        Navigator.of(context).pushNamed('/welcome'),
-                  ),
-                ],
-              ),
+            : const SignInPrompt.bar(title: 'Inicia sesión para conversar'),
       ),
     );
   }

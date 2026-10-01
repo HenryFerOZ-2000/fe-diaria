@@ -38,7 +38,6 @@ class _CatholicBibleScreenState extends State<CatholicBibleScreen> {
       titleWidget: Text('Biblia católica', style: type.heading),
       centerTitle: false,
       showBanner: false,
-      showGuestNotice: false,
       body: ListView(
         padding: const EdgeInsets.fromLTRB(
           VerbumSpace.gutter,

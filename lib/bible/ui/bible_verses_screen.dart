@@ -271,7 +271,6 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
       titleWidget: const SizedBox.shrink(),
       centerTitle: false,
       showBanner: false,
-      showGuestNotice: false,
       backgroundColor: colors.page,
       actions: [
         VIconButton(

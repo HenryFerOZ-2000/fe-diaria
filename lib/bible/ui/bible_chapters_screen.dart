@@ -75,7 +75,6 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
       titleWidget: const SizedBox.shrink(),
       centerTitle: false,
       showBanner: false,
-      showGuestNotice: false,
       // El fondo toma el color de la portada del libro y se aclara.
       gradient: LinearGradient(
         begin: Alignment.topCenter,
