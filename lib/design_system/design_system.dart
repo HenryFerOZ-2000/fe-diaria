@@ -20,6 +20,7 @@ export 'components/v_icon.dart';
 export 'components/v_icon_button.dart';
 export 'components/v_list_group.dart';
 export 'components/v_meta_chip.dart';
+export 'components/v_month_calendar.dart';
 export 'components/v_notice.dart';
 export 'components/v_progress_bar.dart';
 export 'components/v_radio_card.dart';

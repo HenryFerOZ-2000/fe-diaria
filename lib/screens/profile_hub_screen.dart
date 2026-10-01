@@ -16,6 +16,7 @@ import 'welcome_auth_screen.dart';
 import 'package:verbum/design_system/design_system.dart';
 import '../features/today/application/constancy_progress.dart';
 import '../features/today/presentation/constancy_card.dart';
+import '../features/today/application/constancy_calendar.dart';
 
 class ProfileHubScreen extends StatefulWidget {
   const ProfileHubScreen({super.key});
@@ -327,9 +328,6 @@ class _ProfileContent extends StatelessWidget {
     );
   }
 
-  static String _dateKey(DateTime date) =>
-      '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-
   /// La misma tarjeta de constancia de "Hoy", con los datos de la semana.
   Widget _weekCard(BuildContext context) {
     final now = DateTime.now();
@@ -340,7 +338,7 @@ class _ProfileContent extends StatelessWidget {
     ).subtract(Duration(days: now.weekday - 1));
     final week = [
       for (var i = 0; i < 7; i++)
-        stats.activeDaysMap[_dateKey(monday.add(Duration(days: i)))] == true,
+        stats.activeDaysMap[ymdKey(monday.add(Duration(days: i)))] == true,
     ];
     return ConstancyCard(
       progress: ConstancyProgress.from(

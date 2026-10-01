@@ -3,6 +3,7 @@ final class ConstancyProgress {
   const ConstancyProgress._({
     required this.totalDays,
     required this.nextMilestone,
+    required this.previousMilestone,
     required this.progress,
     required this.todayMessage,
   });
@@ -37,6 +38,7 @@ final class ConstancyProgress {
     return ConstancyProgress._(
       totalDays: totalDays,
       nextMilestone: next,
+      previousMilestone: start,
       progress: progress,
       todayMessage: message,
     );
@@ -44,6 +46,11 @@ final class ConstancyProgress {
 
   final int totalDays;
   final int nextMilestone;
+
+  /// Hito ya alcanzado desde el que se mide el avance (0 al empezar).
+  final int previousMilestone;
+
+  int get remainingDays => nextMilestone - totalDays;
 
   /// Avance entre el hito anterior y [nextMilestone], de 0 a 1.
   final double progress;
