@@ -14,6 +14,7 @@ class CommunityPostsSocialService implements PostSocialService {
 
   @override
   Future<void> togglePostLike(String postId, String uid) async {
+    if (uid.isEmpty) throw StateError('Inicia sesión para unirte.');
     try {
       final postRef = _firestore.collection(_collection).doc(postId);
       final likeRef = postRef.collection('likes').doc(uid);
@@ -38,6 +39,9 @@ class CommunityPostsSocialService implements PostSocialService {
 
   @override
   Stream<bool> isPostLikedStream(String postId, String uid) {
+    // Sin sesión no hay "me gusta" que consultar (y Firestore no admite
+    // rutas vacías).
+    if (uid.isEmpty) return Stream.value(false);
     return _firestore
         .collection(_collection)
         .doc(postId)
@@ -151,6 +155,7 @@ class CommunityPostsSocialService implements PostSocialService {
     String commentId,
     String uid,
   ) async {
+    if (uid.isEmpty) throw StateError('Inicia sesión para reaccionar.');
     try {
       final commentRef = _firestore
           .collection(_collection)
@@ -183,6 +188,7 @@ class CommunityPostsSocialService implements PostSocialService {
     String commentId,
     String uid,
   ) {
+    if (uid.isEmpty) return Stream.value(false);
     return _firestore
         .collection(_collection)
         .doc(postId)

@@ -57,7 +57,14 @@ class _CommentsScreenState extends State<CommentsScreen> {
     if (_isSubmittingComment) return;
 
     final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
+    if (uid == null) {
+      showTopNotice(
+        context,
+        message: 'Inicia sesión para comentar.',
+        isError: true,
+      );
+      return;
+    }
 
     setState(() => _isSubmittingComment = true);
 
@@ -161,8 +168,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
   Widget _buildThreadBody(BuildContext context) {
     final uid = _auth.currentUser?.uid;
-    final mediaQuery = MediaQuery.of(context);
-    final bottomInset = mediaQuery.viewInsets.bottom;
+    final p = context.palette;
+    final type = context.type;
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return Column(
       children: [
@@ -174,41 +182,38 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasError) {
-                return Center(
-                  child: Text(
-                    'Error al cargar comentarios: ${snapshot.error}',
-                    style: VerbumFonts.sans(),
+                debugPrint('Comments error: ${snapshot.error}');
+                return const Center(
+                  child: VEmptyState(
+                    icon: VerbumIcons.cloudSlash,
+                    title: 'No pudimos cargar los comentarios',
+                    message: 'Revisa tu conexión e inténtalo de nuevo.',
                   ),
                 );
               }
 
               final comments = snapshot.data?.docs ?? [];
               if (comments.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      VIcon(
-                        VerbumIcons.chatCircle,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Sé el primero en comentar',
-                        style: VerbumFonts.sans(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
+                return const Center(
+                  child: VEmptyState(
+                    icon: VerbumIcons.chatCircle,
+                    title: 'Sé el primero en acompañar',
+                    message:
+                        'Una palabra de ánimo o una oración puede sostener a '
+                        'alguien hoy.',
                   ),
                 );
               }
 
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
+              return ListView.separated(
+                padding: const EdgeInsets.fromLTRB(
+                  VerbumSpace.gutter,
+                  8,
+                  VerbumSpace.gutter,
+                  20,
+                ),
                 itemCount: comments.length,
+                separatorBuilder: (_, _) => const SizedBox(height: 14),
                 itemBuilder: (context, index) {
                   final comment = comments[index];
                   return _CommentItem(
@@ -225,108 +230,145 @@ class _CommentsScreenState extends State<CommentsScreen> {
             },
           ),
         ),
-        // Input de comentario
         AnimatedPadding(
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOut,
           padding: EdgeInsets.only(bottom: bottomInset),
-          child: SafeArea(
-            top: false,
-            minimum: const EdgeInsets.only(bottom: 8),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                border: Border(
-                  top: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
+          child: Material(
+            color: p.surface,
+            elevation: 8,
+            shadowColor: p.ink.withValues(alpha: .2),
+            child: SafeArea(
+              top: false,
+              minimum: const EdgeInsets.only(bottom: 8),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  VerbumSpace.gutter,
+                  10,
+                  VerbumSpace.gutter,
+                  4,
                 ),
-              ),
-              padding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-                top: 8,
-                bottom: 8,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (_replyingToAuthorName != null)
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      margin: const EdgeInsets.only(bottom: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.blue[50],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
+                child: uid == null
+                    ? Row(
                         children: [
+                          VIcon(VerbumIcons.lockSimple, color: p.inkSubtle),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              'Respondiendo a $_replyingToAuthorName',
-                              style: VerbumFonts.sans(
-                                fontSize: 12,
-                                color: Colors.blue[900],
-                              ),
+                              'Inicia sesión para comentar',
+                              style: type.bodyStrong,
                             ),
                           ),
-                          IconButton(
-                            icon: const VIcon(VerbumIcons.close, size: 18),
-                            onPressed: _cancelReply,
-                            color: Colors.blue[900],
+                          VButton(
+                            label: 'Iniciar sesión',
+                            compact: true,
+                            onPressed: () =>
+                                Navigator.of(context).pushNamed('/welcome'),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (_replyingToAuthorName != null)
+                            Container(
+                              padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
+                              margin: const EdgeInsets.only(bottom: 8),
+                              decoration: BoxDecoration(
+                                color: p.surfaceMuted,
+                                borderRadius: BorderRadius.circular(
+                                  VerbumRadius.control,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  VIcon(
+                                    VerbumIcons.arrowUpRight,
+                                    size: 16,
+                                    color: p.rubric,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      'Respondiendo a $_replyingToAuthorName',
+                                      style: type.caption.copyWith(
+                                        color: p.rubric,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    tooltip: 'Cancelar respuesta',
+                                    icon: VIcon(
+                                      VerbumIcons.close,
+                                      size: 16,
+                                      color: p.rubric,
+                                    ),
+                                    onPressed: _cancelReply,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _commentController,
+                                  minLines: 1,
+                                  maxLines: 4,
+                                  textCapitalization:
+                                      TextCapitalization.sentences,
+                                  textInputAction: TextInputAction.send,
+                                  scrollPadding: const EdgeInsets.only(
+                                    bottom: 120,
+                                  ),
+                                  onSubmitted: _isSubmittingComment
+                                      ? null
+                                      : (_) => _submitComment(),
+                                  decoration: InputDecoration(
+                                    hintText: _replyingToCommentId != null
+                                        ? 'Escribe una respuesta…'
+                                        : 'Escribe un comentario…',
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Material(
+                                color: p.emphasis,
+                                shape: const CircleBorder(),
+                                child: InkWell(
+                                  customBorder: const CircleBorder(),
+                                  onTap: _isSubmittingComment
+                                      ? null
+                                      : _submitComment,
+                                  child: SizedBox.square(
+                                    dimension: 46,
+                                    child: Center(
+                                      child: _isSubmittingComment
+                                          ? SizedBox.square(
+                                              dimension: 18,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: p.onEmphasis,
+                                              ),
+                                            )
+                                          : Semantics(
+                                              label: 'Enviar',
+                                              child: VIcon(
+                                                VerbumIcons.paperPlaneRight,
+                                                weight: VIconWeight.fill,
+                                                size: 20,
+                                                color: p.onEmphasis,
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _commentController,
-                          decoration: InputDecoration(
-                            hintText: _replyingToCommentId != null
-                                ? 'Escribe una respuesta...'
-                                : 'Escribe un comentario...',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                          ),
-                          maxLines: null,
-                          textInputAction: TextInputAction.send,
-                          scrollPadding: const EdgeInsets.only(bottom: 120),
-                          onSubmitted: _isSubmittingComment
-                              ? null
-                              : (_) => _submitComment(),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        onPressed: _isSubmittingComment ? null : _submitComment,
-                        icon: _isSubmittingComment
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const VIcon(
-                                VerbumIcons.paperPlaneRight,
-                                weight: VIconWeight.fill,
-                              ),
-                        style: IconButton.styleFrom(
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary,
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
               ),
             ),
           ),
@@ -338,20 +380,221 @@ class _CommentsScreenState extends State<CommentsScreen> {
   @override
   Widget build(BuildContext context) {
     final body = _buildThreadBody(context);
-    if (widget.embedded) {
-      return body;
-    }
+    if (widget.embedded) return body;
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: VAppBar(
-        title: Text(
-          'Comentarios',
-          style: VerbumFonts.serif(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: false,
-      ),
+      resizeToAvoidBottomInset: false,
+      appBar: const VAppBar(title: Text('Comentarios')),
       body: body,
     );
+  }
+}
+
+/// Nombre visible: el del perfil, el guardado con el comentario o uno
+/// genérico; nunca vacío.
+String _displayName(Map<String, dynamic>? profile, String fallback) {
+  for (final candidate in [profile?['displayName'] as String?, fallback]) {
+    final name = candidate?.trim() ?? '';
+    if (name.isNotEmpty && name != 'Anónimo') return name;
+  }
+  return 'Miembro de Verbum';
+}
+
+/// Avatar del autor: foto o inicial sobre lavanda.
+class _Avatar extends StatelessWidget {
+  const _Avatar({required this.name, this.photo, this.size = 38});
+
+  final String name;
+  final String? photo;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final url = photo?.trim();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(size * .34),
+      child: Container(
+        width: size,
+        height: size,
+        color: p.surfaceMuted,
+        alignment: Alignment.center,
+        child: url != null && url.isNotEmpty
+            ? Image.network(
+                url,
+                width: size,
+                height: size,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => _initial(context),
+              )
+            : _initial(context),
+      ),
+    );
+  }
+
+  Widget _initial(BuildContext context) => Text(
+    name.isNotEmpty ? name.characters.first.toUpperCase() : '?',
+    style: context.type.bodyStrong.copyWith(
+      color: context.palette.rubric,
+      fontSize: size * .38,
+    ),
+  );
+}
+
+/// Burbuja de un comentario o respuesta: autor, "Tú", texto y hora.
+class _Bubble extends StatelessWidget {
+  const _Bubble({
+    required this.authorName,
+    required this.username,
+    required this.text,
+    required this.time,
+    required this.isMine,
+    this.compact = false,
+  });
+
+  final String authorName;
+  final String username;
+  final String text;
+  final String time;
+  final bool isMine;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final type = context.type;
+    return VSurfaceCard(
+      radius: VerbumRadius.tile,
+      padding: EdgeInsets.all(compact ? 11 : 13),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Flexible(
+                child: Text(
+                  authorName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: type.bodyStrong.copyWith(
+                    fontSize: compact ? 12.5 : 13.5,
+                  ),
+                ),
+              ),
+              if (isMine) ...[
+                const SizedBox(width: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 1,
+                  ),
+                  decoration: BoxDecoration(
+                    color: p.butter,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                  child: Text(
+                    'Tú',
+                    style: type.caption.copyWith(
+                      color: p.onButter,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 10.5,
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(width: 6),
+              Text('· $time', style: type.caption.copyWith(fontSize: 11)),
+            ],
+          ),
+          if (username.isNotEmpty)
+            Text(
+              '@$username',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: type.caption.copyWith(fontSize: 11),
+            ),
+          const SizedBox(height: 5),
+          Text(
+            text,
+            style: type.body.copyWith(
+              color: p.ink,
+              fontSize: compact ? 13.5 : 14.5,
+              height: 1.45,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Acción pequeña bajo una burbuja ("Responder", "♡ 3").
+class _TinyAction extends StatelessWidget {
+  const _TinyAction({
+    required this.label,
+    required this.onTap,
+    this.icon,
+    this.active = false,
+  });
+
+  final String label;
+  final VoidCallback onTap;
+  final VerbumIcons? icon;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final color = active ? p.rubric : p.inkMuted;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(99),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              VIcon(
+                icon!,
+                size: 15,
+                weight: active ? VIconWeight.fill : VIconWeight.regular,
+                color: color,
+              ),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              label,
+              style: context.type.caption.copyWith(
+                color: color,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Future<void> _toggleLikeOrWarn(
+  BuildContext context,
+  PostSocialService service,
+  String postId,
+  String commentId,
+  String uid,
+) async {
+  if (uid.isEmpty) {
+    showTopNotice(
+      context,
+      message: 'Inicia sesión para reaccionar.',
+      isError: true,
+    );
+    return;
+  }
+  try {
+    await service.toggleCommentLike(postId, commentId, uid);
+  } catch (e) {
+    debugPrint('Error toggling comment like: $e');
   }
 }
 
@@ -361,7 +604,7 @@ class _CommentItem extends StatefulWidget {
   final Map<String, dynamic> data;
   final PostSocialService service;
   final String currentUid;
-  final Function(String, String, String?) onReply;
+  final void Function(String, String, String?) onReply;
   final String Function(DateTime?) formatTimeAgo;
 
   const _CommentItem({
@@ -406,31 +649,22 @@ class _CommentItemState extends State<_CommentItem> {
       widget.commentId,
       widget.currentUid,
     );
-    _likeCountStream = _getLikeCountStream();
+    _likeCountStream = widget.service.getCommentLikeCountStream(
+      widget.postId,
+      widget.commentId,
+    );
     _repliesStream = widget.service.getRepliesStream(
       widget.postId,
       widget.commentId,
     );
   }
 
-  Future<void> _toggleLike() async {
-    try {
-      await widget.service.toggleCommentLike(
-        widget.postId,
-        widget.commentId,
-        widget.currentUid,
-      );
-    } catch (e) {
-      debugPrint('Error toggling comment like: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final text = widget.data['text'] ?? '';
+    final text = (widget.data['text'] ?? '') as String;
     final authorUid = (widget.data['authorUid'] as String? ?? '').trim();
-    final fallbackDisplayName =
-        ((widget.data['authorName'] as String?) ?? 'Anónimo').trim();
+    final fallbackName = ((widget.data['authorName'] as String?) ?? 'Anónimo')
+        .trim();
     final fallbackUsername = ((widget.data['authorUsername'] as String?) ?? '')
         .trim();
     final fallbackPhoto = widget.data['authorPhoto'] as String?;
@@ -443,282 +677,114 @@ class _CommentItemState extends State<_CommentItem> {
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: _authorProfileStream,
       builder: (context, profileSnapshot) {
-        final profileData = profileSnapshot.data?.data();
-        final authorName =
-            ((profileData?['displayName'] as String?) ?? fallbackDisplayName)
-                .trim();
-        final username =
-            ((profileData?['username'] as String?) ?? fallbackUsername).trim();
-        final authorPhoto =
-            (profileData?['photoURL'] as String?) ?? fallbackPhoto;
+        final profile = profileSnapshot.data?.data();
+        final authorName = _displayName(profile, fallbackName);
+        final username = ((profile?['username'] as String?) ?? fallbackUsername)
+            .trim();
+        final photo = (profile?['photoURL'] as String?) ?? fallbackPhoto;
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Comentario principal
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: 18,
-                    backgroundImage: authorPhoto != null
-                        ? NetworkImage(authorPhoto)
-                        : null,
-                    backgroundColor: Colors.deepPurple.withValues(alpha: 0.12),
-                    child: authorPhoto == null
-                        ? Text(
-                            authorName.isNotEmpty
-                                ? authorName[0].toUpperCase()
-                                : '?',
-                            style: VerbumFonts.sans(
-                              color: Colors.deepPurple,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _Avatar(name: authorName, photo: photo),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _Bubble(
+                        authorName: authorName,
+                        username: username,
+                        text: text,
+                        time: widget.formatTimeAgo(createdAt?.toDate()),
+                        isMine: isMine,
+                      ),
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          StreamBuilder<bool>(
+                            stream: _isLikedStream,
+                            builder: (context, liked) => StreamBuilder<int>(
+                              stream: _likeCountStream,
+                              builder: (context, likes) => _TinyAction(
+                                icon: VerbumIcons.heart,
+                                label: '${likes.data ?? likeCount}',
+                                active: liked.data ?? false,
+                                onTap: () => _toggleLikeOrWarn(
+                                  context,
+                                  widget.service,
+                                  widget.postId,
+                                  widget.commentId,
+                                  widget.currentUid,
+                                ),
+                              ),
                             ),
-                          )
-                        : null,
+                          ),
+                          _TinyAction(
+                            label: 'Responder',
+                            onTap: () => widget.onReply(
+                              widget.commentId,
+                              authorName,
+                              widget.data['rootId'] as String?,
+                            ),
+                          ),
+                          StreamBuilder<bool>(
+                            stream: _hasRepliesStream,
+                            builder: (context, hasRepliesSnapshot) {
+                              final hasReplies =
+                                  hasRepliesSnapshot.data ?? false;
+                              if (!hasReplies && replyCount == 0) {
+                                return const SizedBox.shrink();
+                              }
+                              final n = replyCount > 0 ? replyCount : 1;
+                              return _TinyAction(
+                                label: _showReplies
+                                    ? 'Ocultar respuestas'
+                                    : 'Ver $n ${n == 1 ? 'respuesta' : 'respuestas'}',
+                                active: true,
+                                onTap: () => setState(
+                                  () => _showReplies = !_showReplies,
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      authorName,
-                                      style: VerbumFonts.sans(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 13,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  if (isMine) ...[
-                                    const SizedBox(width: 8),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withValues(alpha: 0.12),
-                                        borderRadius: BorderRadius.circular(
-                                          999,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        'Tú',
-                                        style: VerbumFonts.sans(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w700,
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '@${username.isNotEmpty ? username : 'sin-username'}',
-                                style: VerbumFonts.sans(
-                                  fontSize: 11,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                text,
-                                style: VerbumFonts.sans(
-                                  fontSize: 14,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Text(
-                              widget.formatTimeAgo(createdAt?.toDate()),
-                              style: VerbumFonts.sans(
-                                fontSize: 11,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            InkWell(
-                              onTap: () => widget.onReply(
-                                widget.commentId,
-                                authorName,
-                                widget.data['rootId'] as String?,
-                              ),
-                              child: Text(
-                                'Responder',
-                                style: VerbumFonts.sans(
-                                  fontSize: 11,
-                                  color: Colors.blue[700],
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            StreamBuilder<bool>(
-                              stream: _hasRepliesStream,
-                              builder: (context, hasRepliesSnapshot) {
-                                final hasReplies =
-                                    hasRepliesSnapshot.data ?? false;
-                                final shouldShowToggle =
-                                    hasReplies || replyCount > 0;
-
-                                if (!shouldShowToggle) {
-                                  return const SizedBox.shrink();
-                                }
-
-                                final displayReplyCount = hasReplies
-                                    ? (replyCount > 0 ? replyCount : 1)
-                                    : replyCount;
-
-                                return Row(
-                                  children: [
-                                    const SizedBox(width: 12),
-                                    InkWell(
-                                      onTap: () {
-                                        setState(
-                                          () => _showReplies = !_showReplies,
-                                        );
-                                      },
-                                      child: Text(
-                                        _showReplies
-                                            ? 'Ocultar'
-                                            : 'Ver $displayReplyCount ${displayReplyCount == 1 ? 'respuesta' : 'respuestas'}',
-                                        style: VerbumFonts.sans(
-                                          fontSize: 11,
-                                          color: Colors.blue[700],
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              // Like button
-              Padding(
-                padding: const EdgeInsets.only(left: 50, top: 4),
-                child: StreamBuilder<bool>(
-                  stream: _isLikedStream,
-                  builder: (context, likedSnapshot) {
-                    final isLiked = likedSnapshot.data ?? false;
-                    return StreamBuilder<int>(
-                      stream: _likeCountStream,
-                      builder: (context, countSnapshot) {
-                        final count = countSnapshot.data ?? likeCount;
-                        return InkWell(
-                          onTap: _toggleLike,
-                          borderRadius: BorderRadius.circular(20),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 4,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                VIcon(
-                                  isLiked
-                                      ? VerbumIcons.heart
-                                      : VerbumIcons.heart,
-                                  size: 16,
-                                  color: isLiked
-                                      ? Colors.red
-                                      : Colors.grey[600],
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '$count',
-                                  style: VerbumFonts.sans(
-                                    fontSize: 12,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
                 ),
-              ),
-              // Respuestas
-              if (_showReplies)
-                StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: _repliesStream,
-                  builder: (context, repliesSnapshot) {
-                    if (!repliesSnapshot.hasData) {
-                      return const SizedBox.shrink();
-                    }
-                    final replies = repliesSnapshot.data?.docs ?? [];
-                    if (replies.isEmpty) {
-                      return const SizedBox.shrink();
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 50, top: 12),
-                      child: Column(
-                        children: replies.map((replyDoc) {
-                          final replyData = replyDoc.data();
-                          return _ReplyItem(
+              ],
+            ),
+            if (_showReplies)
+              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: _repliesStream,
+                builder: (context, repliesSnapshot) {
+                  final replies = repliesSnapshot.data?.docs ?? [];
+                  if (replies.isEmpty) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 48, top: 6),
+                    child: Column(
+                      children: [
+                        for (final reply in replies)
+                          _ReplyItem(
                             postId: widget.postId,
-                            replyId: replyDoc.id,
-                            data: replyData,
+                            replyId: reply.id,
+                            data: reply.data(),
                             service: widget.service,
                             currentUid: widget.currentUid,
                             formatTimeAgo: widget.formatTimeAgo,
-                          );
-                        }).toList(),
-                      ),
-                    );
-                  },
-                ),
-            ],
-          ),
+                          ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+          ],
         );
       },
-    );
-  }
-
-  Stream<int> _getLikeCountStream() {
-    return widget.service.getCommentLikeCountStream(
-      widget.postId,
-      widget.commentId,
     );
   }
 }
@@ -745,12 +811,37 @@ class _ReplyItem extends StatefulWidget {
 }
 
 class _ReplyItemState extends State<_ReplyItem> {
+  late final Stream<DocumentSnapshot<Map<String, dynamic>>>? _profileStream;
+  late final Stream<bool> _isLikedStream;
+  late final Stream<int> _likeCountStream;
+
+  @override
+  void initState() {
+    super.initState();
+    final authorUid = (widget.data['authorUid'] as String? ?? '').trim();
+    _profileStream = authorUid.isNotEmpty
+        ? FirebaseFirestore.instance
+              .collection('users')
+              .doc(authorUid)
+              .snapshots()
+        : null;
+    _isLikedStream = widget.service.isCommentLikedStream(
+      widget.postId,
+      widget.replyId,
+      widget.currentUid,
+    );
+    _likeCountStream = widget.service.getCommentLikeCountStream(
+      widget.postId,
+      widget.replyId,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final text = widget.data['text'] ?? '';
+    final text = (widget.data['text'] ?? '') as String;
     final authorUid = (widget.data['authorUid'] as String? ?? '').trim();
-    final fallbackDisplayName =
-        ((widget.data['authorName'] as String?) ?? 'Anónimo').trim();
+    final fallbackName = ((widget.data['authorName'] as String?) ?? 'Anónimo')
+        .trim();
     final fallbackUsername = ((widget.data['authorUsername'] as String?) ?? '')
         .trim();
     final fallbackPhoto = widget.data['authorPhoto'] as String?;
@@ -759,191 +850,49 @@ class _ReplyItemState extends State<_ReplyItem> {
         widget.currentUid.isNotEmpty && authorUid == widget.currentUid;
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      stream: authorUid.isNotEmpty
-          ? FirebaseFirestore.instance
-                .collection('users')
-                .doc(authorUid)
-                .snapshots()
-          : null,
+      stream: _profileStream,
       builder: (context, profileSnapshot) {
-        final profileData = profileSnapshot.data?.data();
-        final authorName =
-            ((profileData?['displayName'] as String?) ?? fallbackDisplayName)
-                .trim();
-        final username =
-            ((profileData?['username'] as String?) ?? fallbackUsername).trim();
-        final authorPhoto =
-            (profileData?['photoURL'] as String?) ?? fallbackPhoto;
+        final profile = profileSnapshot.data?.data();
+        final authorName = _displayName(profile, fallbackName);
+        final username = ((profile?['username'] as String?) ?? fallbackUsername)
+            .trim();
+        final photo = (profile?['photoURL'] as String?) ?? fallbackPhoto;
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                radius: 14,
-                backgroundImage: authorPhoto != null
-                    ? NetworkImage(authorPhoto)
-                    : null,
-                backgroundColor: Colors.deepPurple.withValues(alpha: 0.12),
-                child: authorPhoto == null
-                    ? Text(
-                        authorName.isNotEmpty
-                            ? authorName[0].toUpperCase()
-                            : '?',
-                        style: VerbumFonts.sans(
-                          color: Colors.deepPurple,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 10,
-                        ),
-                      )
-                    : null,
-              ),
+              _Avatar(name: authorName, photo: photo, size: 30),
               const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  authorName,
-                                  style: VerbumFonts.sans(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 12,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              if (isMine) ...[
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.primary
-                                        .withValues(alpha: 0.12),
-                                    borderRadius: BorderRadius.circular(999),
-                                  ),
-                                  child: Text(
-                                    'Tú',
-                                    style: VerbumFonts.sans(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w700,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '@${username.isNotEmpty ? username : 'sin-username'}',
-                            style: VerbumFonts.sans(
-                              fontSize: 10,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w500,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            text,
-                            style: VerbumFonts.sans(fontSize: 13, height: 1.4),
-                          ),
-                        ],
-                      ),
+                    _Bubble(
+                      authorName: authorName,
+                      username: username,
+                      text: text,
+                      time: widget.formatTimeAgo(createdAt?.toDate()),
+                      isMine: isMine,
+                      compact: true,
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(
-                          widget.formatTimeAgo(createdAt?.toDate()),
-                          style: VerbumFonts.sans(
-                            fontSize: 10,
-                            color: Colors.grey[600],
+                    StreamBuilder<bool>(
+                      stream: _isLikedStream,
+                      builder: (context, liked) => StreamBuilder<int>(
+                        stream: _likeCountStream,
+                        builder: (context, likes) => _TinyAction(
+                          icon: VerbumIcons.heart,
+                          label: '${likes.data ?? 0}',
+                          active: liked.data ?? false,
+                          onTap: () => _toggleLikeOrWarn(
+                            context,
+                            widget.service,
+                            widget.postId,
+                            widget.replyId,
+                            widget.currentUid,
                           ),
                         ),
-                      ],
-                    ),
-                    // Like button para reply
-                    Padding(
-                      padding: const EdgeInsets.only(left: 0, top: 4),
-                      child: StreamBuilder<bool>(
-                        stream: widget.service.isCommentLikedStream(
-                          widget.postId,
-                          widget.replyId,
-                          widget.currentUid,
-                        ),
-                        builder: (context, likedSnapshot) {
-                          final isLiked = likedSnapshot.data ?? false;
-                          return StreamBuilder<int>(
-                            stream: widget.service.getCommentLikeCountStream(
-                              widget.postId,
-                              widget.replyId,
-                            ),
-                            builder: (context, countSnapshot) {
-                              final count = countSnapshot.data ?? 0;
-                              return InkWell(
-                                onTap: () async {
-                                  try {
-                                    await widget.service.toggleCommentLike(
-                                      widget.postId,
-                                      widget.replyId,
-                                      widget.currentUid,
-                                    );
-                                  } catch (e) {
-                                    debugPrint('Error toggling reply like: $e');
-                                  }
-                                },
-                                borderRadius: BorderRadius.circular(20),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                    vertical: 2,
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      VIcon(
-                                        isLiked
-                                            ? VerbumIcons.heart
-                                            : VerbumIcons.heart,
-                                        size: 14,
-                                        color: isLiked
-                                            ? Colors.red
-                                            : Colors.grey[600],
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '$count',
-                                        style: VerbumFonts.sans(
-                                          fontSize: 11,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
                       ),
                     ),
                   ],
