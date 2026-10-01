@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/spiritual_paths_catalog.dart';
+import '../features/paths/presentation/path_photos.dart';
 import '../models/spiritual_path.dart';
 import '../services/spiritual_path_service.dart';
 import '../widgets/verbum_ambient_background.dart';
@@ -87,7 +88,7 @@ class _SpiritualPathsScreenState extends State<SpiritualPathsScreen> {
                               : 'En curso',
                           title: featured.title,
                           body: featured.subtitle,
-                          watermark: featured.icon,
+                          photo: photoForPath(featured.id),
                           footer: VButton(
                             label: active == null
                                 ? 'Conocer el camino'
@@ -164,12 +165,7 @@ class _PathCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
       child: Row(
         children: [
-          VIcon(
-            path.icon,
-            weight: VIconWeight.duotone,
-            size: 34,
-            color: active ? p.rubric : p.gold,
-          ),
+          VPhotoFrame(photoForPath(path.id), width: 58, aspectRatio: 1),
           const SizedBox(width: 14),
           Expanded(
             child: Column(

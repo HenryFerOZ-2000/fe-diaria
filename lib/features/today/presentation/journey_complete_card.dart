@@ -15,13 +15,8 @@ class JourneyCompleteCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       child: Row(
         children: [
-          VIcon(
-            VerbumIcons.sealCheck,
-            weight: VIconWeight.duotone,
-            size: 32,
-            color: p.accent,
-          ),
-          const SizedBox(width: 14),
+          const VPhotoFrame(VerbumPhotos.sunset, width: 64, tiltDegrees: -5),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

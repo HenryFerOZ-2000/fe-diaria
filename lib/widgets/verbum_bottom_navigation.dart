@@ -47,7 +47,10 @@ class VerbumBottomNavigation extends StatelessWidget {
           height: veryCompact ? 58 : 62,
           backgroundColor: Colors.transparent,
           elevation: 0,
-          indicatorColor: palette.accentSoft,
+          // El botón central ya es su propio indicador.
+          indicatorColor: selectedIndex == 2
+              ? Colors.transparent
+              : palette.accentSoft,
           indicatorShape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(VerbumRadius.control),
           ),

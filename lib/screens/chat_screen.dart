@@ -150,12 +150,8 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Text('Acompañamiento', style: context.type.heading),
                 Text(
-                  'UN ESPACIO SEGURO PARA HABLAR',
-                  style: context.type.rubric.copyWith(
-                    color: p.gold,
-                    fontSize: 8.5,
-                    letterSpacing: 1.2,
-                  ),
+                  'Un espacio seguro para hablar',
+                  style: context.type.rubric.copyWith(color: p.gold),
                 ),
               ],
             ),

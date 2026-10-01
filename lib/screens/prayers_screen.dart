@@ -60,7 +60,7 @@ class PrayersScreen extends StatelessWidget {
               body: usesBiblicalPrayers(tradition)
                   ? 'Encuentra una oración nacida de la Palabra.'
                   : 'Encuentra palabras para lo que hoy lleva tu corazón.',
-              watermark: VerbumIcons.handsPraying,
+              photo: VerbumPhotos.prayingHands,
             ),
             for (final section in prayerSectionsFor(tradition)) ...[
               VSectionHeader(

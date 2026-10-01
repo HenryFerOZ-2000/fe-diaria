@@ -104,7 +104,7 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
           title: widget.bookName,
           body:
               '$count ${count == 1 ? 'capítulo' : 'capítulos'} · Reina-Valera 1909',
-          watermark: VerbumIcons.books,
+          photo: VerbumPhotos.coffeeBible,
           footer: lastHere == null
               ? null
               : VButton(

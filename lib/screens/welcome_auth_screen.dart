@@ -228,8 +228,9 @@ class _WelcomeAuthScreenState extends State<WelcomeAuthScreen> {
               const SizedBox(height: 26),
               const VRubricLabel('Guarda tu camino'),
               const SizedBox(height: 8),
-              Text(
-                'Tu camino puede acompañarte siempre',
+              VTwoToneTitle(
+                'Tu camino puede',
+                'acompañarte siempre',
                 style: type.display.copyWith(fontSize: 36),
               ),
               const SizedBox(height: 10),

@@ -194,11 +194,11 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
           eyebrow: 'La Palabra',
           title: 'Lee, escucha y permanece',
           body: 'Toda la Escritura disponible para acompañarte donde estés.',
-          watermark: VerbumIcons.bookOpenText,
+          photo: VerbumPhotos.bibleHills,
           footer: VMetaChip(
             icon: VerbumIcons.checkCircle,
             label: 'RV1909 · Sin conexión',
-            color: context.palette.gold,
+            color: context.palette.butter,
           ),
         ),
         const SizedBox(height: 14),

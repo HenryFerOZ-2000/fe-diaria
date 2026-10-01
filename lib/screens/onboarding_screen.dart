@@ -82,13 +82,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: [
                     const Center(child: VCandle(size: 48)),
                     Text(
-                      'TE DAMOS LA BIENVENIDA',
+                      'Te damos la bienvenida',
                       textAlign: TextAlign.center,
                       style: type.rubric,
                     ),
                     const SizedBox(height: 10),
-                    Text(
-                      'Un momento con Dios, cada día',
+                    VTwoToneTitle(
+                      'Un momento con Dios,',
+                      'cada día',
                       textAlign: TextAlign.center,
                       style: type.display.copyWith(fontSize: 38),
                     ),

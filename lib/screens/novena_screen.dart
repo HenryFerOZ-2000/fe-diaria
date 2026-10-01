@@ -108,7 +108,7 @@ class _NovenaScreenState extends State<NovenaScreen> {
                     title: 'Preparar el corazón para la Navidad',
                     body:
                         'Una tradición de nueve días de oración para celebrar el nacimiento de Jesús.',
-                    watermark: VerbumIcons.starFour,
+                    photo: VerbumPhotos.candle,
                   ),
                   const VSectionHeader(
                     'Selecciona un día',

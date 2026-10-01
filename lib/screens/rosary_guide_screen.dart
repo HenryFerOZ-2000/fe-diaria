@@ -116,7 +116,7 @@ class _RosaryGuideScreenState extends State<RosaryGuideScreen> {
                           eyebrow: 'Con María',
                           title: guide.title,
                           body: guide.description,
-                          watermark: VerbumIcons.starFour,
+                          photo: VerbumPhotos.rosary,
                         ),
                         if (todayMysteries != null) ...[
                           VSectionHeader(

@@ -50,12 +50,7 @@ class VStepTile extends StatelessWidget {
         p.rubric,
         BorderSide(color: p.rubric, width: 1.5),
       ),
-      VStepState.upcoming => (
-        p.surface,
-        p.ink,
-        p.gold,
-        BorderSide.none,
-      ),
+      VStepState.upcoming => (p.surface, p.ink, p.gold, BorderSide.none),
     };
     final stateLabel = switch (state) {
       VStepState.done => 'completado',

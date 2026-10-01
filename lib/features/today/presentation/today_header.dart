@@ -51,10 +51,7 @@ class TodayHeader extends StatelessWidget {
                       if (name != null)
                         TextSpan(
                           text: ' $name',
-                          style: TextStyle(
-                            color: p.rubric,
-                            fontStyle: FontStyle.italic,
-                          ),
+                          style: TextStyle(color: p.gold),
                         ),
                     ],
                   ),

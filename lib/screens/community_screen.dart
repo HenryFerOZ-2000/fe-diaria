@@ -46,10 +46,9 @@ class CommunityScreen extends StatelessWidget {
                 style: context.type.display.copyWith(fontSize: 30),
               ),
               Text(
-                'FE QUE SE COMPARTE',
+                'Fe que se comparte',
                 style: context.type.rubric.copyWith(
                   color: context.palette.gold,
-                  fontSize: 8.5,
                 ),
               ),
             ],

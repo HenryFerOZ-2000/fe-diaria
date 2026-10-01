@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../features/paths/presentation/path_photos.dart';
 import '../models/spiritual_path.dart';
 import '../services/spiritual_path_service.dart';
 import '../widgets/verbum_ambient_background.dart';
@@ -103,26 +104,30 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
                           eyebrow: 'Lo que vas a recorrer',
                           padding: const EdgeInsets.fromLTRB(2, 26, 2, 12),
                         ),
-                        for (final day in path.days) ...[
-                          VStepRow(
-                            number: day.number,
-                            title: day.title,
-                            subtitle: day.subtitle,
-                            state: progress.completedDays.contains(day.number)
-                                ? VStepState.done
-                                : day.number == next && !complete
-                                ? VStepState.current
-                                : VStepState.upcoming,
-                            locked:
-                                !(day.number <= next ||
-                                    progress.completedDays.contains(
-                                      day.number,
-                                    ) ||
-                                    complete),
-                            onTap: () => _openDay(day.number),
-                          ),
-                          const SizedBox(height: 8),
-                        ],
+                        VDashedPath(
+                          gap: 16,
+                          children: [
+                            for (final day in path.days)
+                              VStepRow(
+                                number: day.number,
+                                title: day.title,
+                                subtitle: day.subtitle,
+                                state:
+                                    progress.completedDays.contains(day.number)
+                                    ? VStepState.done
+                                    : day.number == next && !complete
+                                    ? VStepState.current
+                                    : VStepState.upcoming,
+                                locked:
+                                    !(day.number <= next ||
+                                        progress.completedDays.contains(
+                                          day.number,
+                                        ) ||
+                                        complete),
+                                onTap: () => _openDay(day.number),
+                              ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -165,7 +170,7 @@ class _PathHero extends StatelessWidget {
       eyebrow: path.category,
       title: path.title,
       body: path.description,
-      watermark: path.icon,
+      photo: photoForPath(path.id),
       footer: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -176,12 +181,12 @@ class _PathHero extends StatelessWidget {
               VMetaChip(
                 icon: VerbumIcons.calendarBlank,
                 label: '${path.days.length} días',
-                color: p.gold,
+                color: p.butter,
               ),
               VMetaChip(
                 icon: VerbumIcons.clock,
                 label: '${path.minutesPerDay} min diarios',
-                color: p.gold,
+                color: p.butter,
               ),
             ],
           ),
