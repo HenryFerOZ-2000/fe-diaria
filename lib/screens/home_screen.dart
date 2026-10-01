@@ -222,26 +222,37 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final p = context.palette;
     return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                VerbumSpace.gutter,
-                14,
-                VerbumSpace.gutter,
-                8,
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [p.surfaceMuted, p.background],
+            stops: const [0, 0.5],
+          ),
+        ),
+        child: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  VerbumSpace.gutter,
+                  14,
+                  VerbumSpace.gutter,
+                  8,
+                ),
+                child: TodayHeader(
+                  now: DateTime.now(),
+                  userName: auth.firebaseUser?.displayName,
+                  actions: const VerbumHeaderActions(padding: EdgeInsets.zero),
+                ),
               ),
-              child: TodayHeader(
-                now: DateTime.now(),
-                userName: auth.firebaseUser?.displayName,
-                actions: const VerbumHeaderActions(padding: EdgeInsets.zero),
-              ),
-            ),
-            Expanded(child: _buildVerseTab(context)),
-          ],
+              Expanded(child: _buildVerseTab(context)),
+            ],
+          ),
         ),
       ),
     );
@@ -267,42 +278,48 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   const VProgressBar(value: 0.35, height: 3),
                   const SizedBox(height: 12),
                 ],
-                ChangeNotifierProvider<StreakController>.value(
-                  value: _streakController,
-                  child: Consumer<StreakController>(
-                    builder: (context, streak, _) {
-                      _maybeShowStreakCelebration(streak);
-                      return ConstancyCard(
-                        progress: ConstancyProgress.from(
-                          totalDays: streak.totalDays,
-                          completedMoments:
-                              _missionsController.completedEssentialCount,
-                          totalMoments:
-                              _missionsController.essentialMissions.length,
-                        ),
-                        weekLabels: [for (final d in streak.days) d.label],
-                        weekCompleted: [
-                          for (final d in streak.days) d.completed,
-                        ],
-                        todayIndex: DateTime.now().weekday - 1,
-                        celebrate: streak.playAnimation,
-                        onTap: () => Navigator.of(context).pushNamed('/streak'),
-                      );
-                    },
-                  ),
-                ),
                 HomeTodaySections(
-                  missions: TodayJourneySection(
-                    essentials: _missionsController.essentialMissions,
-                    nextMission: _missionsController.nextEssentialMission,
-                    optionalMission: _missionsController.missions
-                        .where((mission) => mission.isOptional)
-                        .firstOrNull,
-                    nightAvailable: isNightPrayerAvailable(DateTime.now()),
-                    verseText: provider.todayVerse?.text,
-                    verseReference: provider.todayVerse?.reference,
-                    onOpen: (mission) =>
-                        _openMissionRead(context, mission, provider),
+                  missions: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TodayJourneySection(
+                        missions: _missionsController.missions,
+                        nightAvailable: isNightPrayerAvailable(DateTime.now()),
+                        verseText: provider.todayVerse?.text,
+                        verseReference: provider.todayVerse?.reference,
+                        onOpen: (mission) =>
+                            _openMissionRead(context, mission, provider),
+                      ),
+                      const SizedBox(height: 8),
+                      ChangeNotifierProvider<StreakController>.value(
+                        value: _streakController,
+                        child: Consumer<StreakController>(
+                          builder: (context, streak, _) {
+                            _maybeShowStreakCelebration(streak);
+                            return ConstancyCard(
+                              progress: ConstancyProgress.from(
+                                totalDays: streak.totalDays,
+                                completedMoments:
+                                    _missionsController.completedEssentialCount,
+                                totalMoments: _missionsController
+                                    .essentialMissions
+                                    .length,
+                              ),
+                              weekLabels: [
+                                for (final d in streak.days) d.label,
+                              ],
+                              weekCompleted: [
+                                for (final d in streak.days) d.completed,
+                              ],
+                              todayIndex: DateTime.now().weekday - 1,
+                              celebrate: streak.playAnimation,
+                              onTap: () =>
+                                  Navigator.of(context).pushNamed('/streak'),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                   spiritualPath: const SpiritualPathTodayCard(),
                   liturgy: const TodayLiturgySection(),

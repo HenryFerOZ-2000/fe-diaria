@@ -329,7 +329,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
-  int _currentIndex = 2; // Default en "Hoy"
+  int _currentIndex = 0; // Default en "Hoy"
   int? _homeTabIndex;
   late List<AnimationController> _animationControllers;
   late List<Animation<double>> _fadeAnimations;
@@ -358,11 +358,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   List<Widget> get _screens => [
-    const ChatScreen(),
-    const CommunityScreen(),
-    HomeScreen(initialTabIndex: _homeTabIndex), // Hoy
-    const PrayersScreen(),
+    HomeScreen(initialTabIndex: _homeTabIndex),
     const BibleScreen(),
+    const PrayersScreen(),
+    const CommunityScreen(),
+    const ChatScreen(),
   ];
 
   @override

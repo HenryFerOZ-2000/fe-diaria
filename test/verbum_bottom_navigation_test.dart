@@ -25,7 +25,7 @@ void main() {
           ),
           child: Scaffold(
             bottomNavigationBar: VerbumBottomNavigation(
-              selectedIndex: 2,
+              selectedIndex: 0,
               onDestinationSelected: (_) {},
             ),
           ),
@@ -63,10 +63,10 @@ void main() {
     expect(icons.where((i) => i.icon == VerbumIcons.handsPraying), isNotEmpty);
     expect(icons.where((i) => i.icon == VerbumIcons.bookOpenText), isNotEmpty);
     expect(find.byIcon(Icons.favorite_border_rounded), findsNothing);
-    // selectedIndex 2 = Hoy: su icono va relleno, los demás en regular.
+    // selectedIndex 0 = Hoy: su icono va relleno, los demás en regular.
     final filled = icons.where((i) => i.weight == VIconWeight.fill).toList();
     expect(filled, hasLength(1));
-    expect(filled.single.icon, isNot(VerbumIcons.handsPraying));
+    expect(filled.single.icon, iconForDayHour(dayHourFor(DateTime.now())));
   });
 
   test('el icono de Hoy sigue las horas del día', () {

@@ -45,9 +45,7 @@ void main() {
         home: Scaffold(
           body: SingleChildScrollView(
             child: TodayJourneySection(
-              essentials: essentials,
-              nextMission: essentials.where((m) => !m.completed).firstOrNull,
-              optionalMission: night,
+              missions: [...essentials, night],
               nightAvailable: nightAvailable,
               verseText:
                   'Nadie que pone la mano en el arado y mira hacia atrás.',
@@ -62,29 +60,26 @@ void main() {
     return essentials;
   }
 
-  testWidgets('con la Palabra pendiente muestra el versículo con capitular', (
+  testWidgets('con la Palabra pendiente la centra con el versículo', (
     tester,
   ) async {
     await pump(tester, essentials: missions());
 
-    expect(find.text('Palabra del día'), findsOneWidget);
-    expect(find.byType(VDropCapText), findsOneWidget);
-    expect(find.text('Lucas 9, 62'), findsOneWidget);
+    expect(find.text('Ahora'), findsOneWidget);
+    expect(find.textContaining('mira hacia atrás'), findsOneWidget);
     expect(find.text('0 de 3'), findsOneWidget);
   });
 
-  testWidgets('marca los pasos hechos y el siguiente', (tester) async {
+  testWidgets('centra el siguiente pendiente y marca los hechos', (
+    tester,
+  ) async {
+    Mission? opened;
     final list = missions()..first.completed = true;
-    await pump(tester, essentials: list);
+    await pump(tester, essentials: list, onOpen: (m) => opened = m);
 
-    final tiles = tester.widgetList<VStepTile>(find.byType(VStepTile)).toList();
-    expect(tiles.map((t) => t.state), [
-      VStepState.done,
-      VStepState.current,
-      VStepState.upcoming,
-    ]);
-    expect(find.text('Tu siguiente paso'), findsOneWidget);
-    expect(find.text('Hazla oración'), findsOneWidget);
+    expect(find.text('Hecho'), findsOneWidget);
+    await tester.tap(find.text('Comenzar').first);
+    expect(opened?.id, 'morning');
   });
 
   testWidgets('todo completo muestra el cierre y la noche bloqueada', (
@@ -101,5 +96,33 @@ void main() {
     expect(find.text('Disponible desde las 19:00'), findsOneWidget);
     await tester.tap(find.text('Cierra tu día con Dios'));
     expect(opened, isNull, reason: 'la noche no abre antes de las 19:00');
+  });
+
+  testWidgets('resiste 320 px y texto al 200 %', (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      MediaQuery(
+        data: const MediaQueryData(
+          size: Size(320, 640),
+          textScaler: TextScaler.linear(2),
+        ),
+        child: MaterialApp(
+          theme: buildVerbumTheme(brightness: Brightness.light),
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: TodayJourneySection(
+                missions: [...missions(), night],
+                nightAvailable: true,
+                onOpen: (_) {},
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
   });
 }

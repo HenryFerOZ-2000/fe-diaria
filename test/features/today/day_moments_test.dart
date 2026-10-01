@@ -15,7 +15,7 @@ void main() {
 
   test('asigna la hora de oración a cada momento', () {
     final moments = dayMomentsFor([m('verse'), m('morning'), m('night')]);
-    expect(moments.map((x) => x.time), ['7:00', '12:00', '21:00']);
+    expect(moments.map((x) => x.time), ['7:00', '12:00', '19:00']);
   });
 
   test('centra el primer esencial pendiente', () {

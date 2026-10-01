@@ -32,15 +32,10 @@ class TodayHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${shortSpanishDate(now)} · ${dayInvitationFor(now)}'
-                    .toUpperCase(),
+                '${shortSpanishDate(now)} · ${dayInvitationFor(now)}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: type.rubric.copyWith(
-                  color: p.inkSubtle,
-                  fontSize: 9.5,
-                  letterSpacing: 1.6,
-                ),
+                style: type.rubric.copyWith(color: p.inkMuted),
               ),
               const SizedBox(height: 4),
               Semantics(
