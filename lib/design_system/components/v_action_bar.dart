@@ -17,12 +17,12 @@ class VActionBarItem {
   final String label;
   final VoidCallback onPressed;
 
-  /// Acción principal: icono en pan de oro.
+  /// Acción principal: icono en mantequilla.
   final bool emphasized;
 }
 
 /// Barra flotante en tinta con acciones rotuladas (p. ej. sobre versículos
-/// seleccionados). [leading] muestra el contexto: "2 versículos".
+/// seleccionados). [leading] da contexto al botón de cerrar: "2 versículos".
 class VActionBar extends StatelessWidget {
   const VActionBar({
     super.key,
@@ -53,32 +53,24 @@ class VActionBar extends StatelessWidget {
           children: [
             if (onClose != null)
               IconButton(
-                tooltip: 'Cancelar selección',
+                tooltip: leading == null
+                    ? 'Cancelar selección'
+                    : 'Cancelar selección ($leading)',
                 onPressed: onClose,
                 icon: VIcon(VerbumIcons.close, size: 20, color: fg),
               ),
-            if (leading != null)
-              Padding(
-                padding: const EdgeInsets.only(right: 4),
-                child: Text(
-                  leading!,
-                  style: type.bodyStrong.copyWith(color: fg, fontSize: 13),
-                ),
-              ),
-            const Spacer(),
             for (final item in items)
-              Tooltip(
-                message: item.label,
-                excludeFromSemantics: true,
-                child: Semantics(
-                  button: true,
-                  label: item.label,
-                  excludeSemantics: true,
-                  child: InkWell(
-                    onTap: item.onPressed,
-                    borderRadius: BorderRadius.circular(12),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(minWidth: 56),
+              Expanded(
+                child: Tooltip(
+                  message: item.label,
+                  excludeFromSemantics: true,
+                  child: Semantics(
+                    button: true,
+                    label: item.label,
+                    excludeSemantics: true,
+                    child: InkWell(
+                      onTap: item.onPressed,
+                      borderRadius: BorderRadius.circular(12),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 6,
@@ -93,11 +85,13 @@ class VActionBar extends StatelessWidget {
                                   ? VIconWeight.fill
                                   : VIconWeight.regular,
                               size: 21,
-                              color: item.emphasized ? p.gold : fg,
+                              color: item.emphasized ? p.butter : fg,
                             ),
                             const SizedBox(height: 3),
                             Text(
                               item.label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: type.caption.copyWith(
                                 color: fg.withValues(alpha: 0.78),
                                 fontSize: 10,

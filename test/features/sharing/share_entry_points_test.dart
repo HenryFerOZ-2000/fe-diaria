@@ -328,13 +328,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    await tester.tap(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is Text &&
-            widget.textSpan?.toPlainText() == '16  $verseText',
-      ),
-    );
+    await tester.tapOnText(find.textRange.ofSubstring(verseText));
     await tester.pump();
     await tester.tap(find.byTooltip('Compartir'));
     await _pumpRoute(tester);

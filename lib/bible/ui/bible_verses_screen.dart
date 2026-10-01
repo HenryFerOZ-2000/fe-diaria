@@ -17,7 +17,7 @@ import 'reader/chapter_heading.dart';
 import 'reader/chapter_nav_bar.dart';
 import 'reader/reader_colors.dart';
 import 'reader/reader_settings_sheet.dart';
-import 'reader/verse_tile.dart';
+import 'reader/chapter_text.dart';
 
 class BibleVersesScreen extends StatefulWidget {
   final String bookId;
@@ -44,7 +44,7 @@ class BibleVersesScreen extends StatefulWidget {
 class _BibleVersesScreenState extends State<BibleVersesScreen> {
   final _preferences = BibleReadingPreferences();
   final _scrollController = ScrollController();
-  final Map<int, GlobalKey> _verseKeys = {};
+  final _chapterKey = GlobalKey<ChapterTextState>();
   late Future<List<Verse>> _versesFuture;
   List<Verse> _verses = const [];
   Set<int> _selected = {};
@@ -156,14 +156,12 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
     _positionDebounce?.cancel();
     _positionDebounce = Timer(const Duration(milliseconds: 450), () {
       if (!mounted) return;
-      for (final entry in _verseKeys.entries) {
-        final context = entry.value.currentContext;
-        if (context == null) continue;
-        final box = context.findRenderObject() as RenderBox?;
-        if (box == null || !box.attached) continue;
-        final top = box.localToGlobal(Offset.zero).dy;
-        if (top >= 72) {
-          _savePosition(entry.key);
+      final chapter = _chapterKey.currentState;
+      if (chapter == null) return;
+      for (final verse in _verses) {
+        final top = chapter.verseTop(verse.verse);
+        if (top != null && top >= 72) {
+          _savePosition(verse.verse);
           break;
         }
       }
@@ -174,15 +172,12 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
     if (_didScrollToInitial || widget.initialVerse <= 1) return;
     _didScrollToInitial = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final target = _verseKeys[widget.initialVerse]?.currentContext;
-      if (target == null || !mounted) return;
-      Scrollable.ensureVisible(
-        target,
+      if (!mounted) return;
+      _chapterKey.currentState?.showVerse(
+        widget.initialVerse,
         duration: MediaQuery.disableAnimationsOf(context)
             ? Duration.zero
             : const Duration(milliseconds: 520),
-        curve: Curves.easeOutCubic,
-        alignment: .12,
       );
     });
   }
@@ -273,25 +268,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
   Widget build(BuildContext context) {
     final colors = ReaderColors.of(context, _tone);
     return AppScaffold(
-      titleWidget: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${widget.bookName} ${widget.chapter}',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: context.type.heading,
-          ),
-          Text(
-            'REINA-VALERA 1909',
-            style: context.type.rubric.copyWith(
-              color: context.palette.gold,
-              fontSize: 8.5,
-              letterSpacing: 1.2,
-            ),
-          ),
-        ],
-      ),
+      titleWidget: const SizedBox.shrink(),
       centerTitle: false,
       showBanner: false,
       showGuestNotice: false,
@@ -301,15 +278,13 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
           icon: _speaking ? VerbumIcons.stop : VerbumIcons.headphones,
           semanticLabel: _speaking ? 'Detener audio' : 'Escuchar capítulo',
           onPressed: _toggleReadAloud,
-          variant: VIconButtonVariant.ghost,
         ),
         VIconButton(
           icon: VerbumIcons.textAa,
           semanticLabel: 'Ajustes de lectura',
           onPressed: _showReaderSettings,
-          variant: VIconButtonVariant.ghost,
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 12),
       ],
       bottomNavigationBar: _selected.isNotEmpty
           ? SafeArea(
@@ -382,47 +357,54 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
       child: SingleChildScrollView(
         controller: _scrollController,
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 40),
+        padding: const EdgeInsets.fromLTRB(
+          VerbumSpace.gutter,
+          4,
+          VerbumSpace.gutter,
+          40,
+        ),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 680),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 8),
                 ChapterHeading(
                   bookName: widget.bookName,
                   chapter: widget.chapter,
+                  lastChapter: _maxChapter,
                   textColor: colors.text,
                 ),
                 const SizedBox(height: 22),
-                for (final verse in verses)
-                  KeyedSubtree(
-                    key: _verseKeys.putIfAbsent(verse.verse, GlobalKey.new),
-                    child: VerseTile(
-                      number: verse.verse,
-                      text: _sanitize(verse.text),
-                      fontSize: _fontSize,
-                      lineHeight: _lineHeight,
-                      textColor: colors.text,
-                      selected: _selected.contains(verse.verse),
-                      highlighted: _highlights.contains(
+                ChapterText(
+                  key: _chapterKey,
+                  verses: [
+                    for (final verse in verses)
+                      (number: verse.verse, text: _sanitize(verse.text)),
+                  ],
+                  fontSize: _fontSize,
+                  lineHeight: _lineHeight,
+                  textColor: colors.text,
+                  selected: _selected,
+                  highlighted: {
+                    for (final verse in verses)
+                      if (_highlights.contains(
                         _preferences.highlightKey(
                           widget.bookId,
                           widget.chapter,
                           verse.verse,
                         ),
-                      ),
-                      onTap: () => _toggleSelection(verse.verse),
-                    ),
-                  ),
+                      ))
+                        verse.verse,
+                  },
+                  onTap: _toggleSelection,
+                ),
                 const SizedBox(height: 24),
                 Center(
                   child: Text(
-                    'FIN DEL CAPÍTULO ${widget.chapter}',
-                    style: context.type.rubric.copyWith(
-                      color: colors.text.withValues(alpha: .4),
-                      fontSize: 9,
+                    'Fin del capítulo ${widget.chapter}',
+                    style: context.type.caption.copyWith(
+                      color: colors.text.withValues(alpha: .45),
                     ),
                   ),
                 ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:verbum/bible/ui/reader/chapter_nav_bar.dart';
-import 'package:verbum/bible/ui/reader/verse_tile.dart';
+import 'package:verbum/bible/ui/reader/chapter_text.dart';
 import 'package:verbum/design_system/design_system.dart';
 
 void main() {
@@ -30,29 +30,30 @@ void main() {
     expect(opened, 2, reason: 'no hay capítulo anterior al 1');
   });
 
-  testWidgets('el versículo 1 abre con capitular y el resto con número', (
+  testWidgets('el capítulo es texto corrido y cada versículo se toca', (
     tester,
   ) async {
-    Widget tile(int n) => VerseTile(
-      number: n,
-      text: 'En el principio era el Verbo.',
-      fontSize: 18,
-      lineHeight: 1.6,
-      textColor: Colors.black,
-      selected: false,
-      highlighted: false,
-      onTap: () {},
-    );
-    await tester.pumpWidget(app(Column(children: [tile(1), tile(2)])));
-
-    expect(find.byType(VDropCapText), findsOneWidget);
-    expect(
-      find.byWidgetPredicate(
-        (w) =>
-            w is Text &&
-            w.textSpan?.toPlainText() == '2  En el principio era el Verbo.',
+    final tapped = <int>[];
+    await tester.pumpWidget(
+      app(
+        ChapterText(
+          verses: const [
+            (number: 1, text: 'En el principio era el Verbo.'),
+            (number: 2, text: 'Este era en el principio con Dios.'),
+          ],
+          fontSize: 18,
+          lineHeight: 1.6,
+          textColor: Colors.black,
+          selected: const {},
+          highlighted: const {2},
+          onTap: tapped.add,
+        ),
       ),
-      findsOneWidget,
     );
+
+    expect(find.text('1'), findsOneWidget);
+    expect(find.text('2'), findsOneWidget);
+    await tester.tapOnText(find.textRange.ofSubstring('con Dios'));
+    expect(tapped, [2]);
   });
 }
