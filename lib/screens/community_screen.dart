@@ -26,6 +26,7 @@ import '../services/spiritual_path_service.dart';
 import 'package:verbum/design_system/design_system.dart';
 import '../features/community/presentation/community_cover.dart';
 import '../widgets/sign_in_prompt.dart';
+import '../widgets/cover_scroll_frame.dart';
 
 /// Firma para pedir la portada de "Mi comunidad" con los datos del grupo.
 typedef MyCommunityCoverBuilder =
@@ -48,7 +49,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
 
   void _onTab(CommunityTab tab) => setState(() => _tab = tab);
 
+  /// Para medir cada portada (franja bajo la hora).
+  final _liveKey = GlobalKey();
+  final _mineKey = GlobalKey();
+
   Widget _liveCover(int weeklyCount) => CommunityCover(
+    key: _liveKey,
     image: AssetImage(VerbumPhotos.communityCandles.asset),
     eyebrow: 'Fe que se comparte',
     title: 'Comunidad',
@@ -70,6 +76,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
     Widget? extra,
     ImageProvider? image,
   }) => CommunityCover(
+    key: _mineKey,
     image: image ?? AssetImage(VerbumPhotos.communityGroup.asset),
     eyebrow: 'Mi comunidad',
     title: title,
@@ -81,20 +88,20 @@ class _CommunityScreenState extends State<CommunityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Sobre la foto, hora y batería en claro.
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        backgroundColor: context.palette.background,
-        body: IndexedStack(
-          index: _tab.index,
-          children: [
-            LiveScreen(showAppBar: false, coverBuilder: _liveCover),
-            _MyCommunityTab(cover: _mineCover),
-          ],
-        ),
+    return Scaffold(
+      backgroundColor: context.palette.background,
+      body: IndexedStack(
+        index: _tab.index,
+        children: [
+          CoverScrollFrame(
+            coverKey: _liveKey,
+            child: LiveScreen(showAppBar: false, coverBuilder: _liveCover),
+          ),
+          CoverScrollFrame(
+            coverKey: _mineKey,
+            child: _MyCommunityTab(cover: _mineCover),
+          ),
+        ],
       ),
     );
   }

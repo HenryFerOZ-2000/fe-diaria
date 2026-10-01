@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
@@ -23,6 +22,7 @@ import '../services/spiritual_stats_service.dart';
 import '../services/daily_progress_service.dart';
 import '../widgets/spiritual_path_today_card.dart';
 import '../widgets/sign_in_prompt.dart';
+import '../widgets/cover_scroll_frame.dart';
 import '../features/liturgy/presentation/today_liturgy_section.dart';
 import '../features/today/domain/daily_practice_catalog.dart';
 
@@ -48,9 +48,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool _isMorningPrayer = true;
   bool _streakDialogShowing = false;
 
-  /// Pasada la portada, la barra de estado pasa a fondo lavanda y texto
-  /// oscuro para que la hora siga legible.
-  bool _pastCover = false;
+  /// Para medir la portada (franja bajo la hora).
+  final _coverKey = GlobalKey();
   late final StreakController _streakController;
   final SpiritualStatsService _spiritualStatsService = SpiritualStatsService();
   final DailyProgressService _dailyProgressService = DailyProgressService();
@@ -231,136 +230,103 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final p = context.palette;
     final auth = context.watch<AuthProvider>();
     final now = DateTime.now();
-    // Sobre la foto, hora y batería en claro.
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value:
-          (_pastCover ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light)
-              .copyWith(statusBarColor: Colors.transparent),
-      child: Scaffold(
-        backgroundColor: p.background,
-        body: Consumer<AppProvider>(
-          builder: (context, provider, child) {
-            final verse = provider.todayVerse;
-            final verseMission = _missionsController.missions
-                .where((m) => m.id == 'verse')
-                .firstOrNull;
-            return FadeTransition(
-              opacity: _fadeAnimation,
-              child: Stack(
+    return Scaffold(
+      backgroundColor: p.background,
+      body: Consumer<AppProvider>(
+        builder: (context, provider, child) {
+          final verse = provider.todayVerse;
+          final verseMission = _missionsController.missions
+              .where((m) => m.id == 'verse')
+              .firstOrNull;
+          return FadeTransition(
+            opacity: _fadeAnimation,
+            child: CoverScrollFrame(
+              coverKey: _coverKey,
+              child: ListView(
+                // Deja ver el final por encima de la barra flotante.
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.paddingOf(context).bottom,
+                ),
+                physics: const BouncingScrollPhysics(),
                 children: [
-                  NotificationListener<ScrollUpdateNotification>(
-                    onNotification: (n) {
-                      final past = n.metrics.pixels > 380;
-                      if (past != _pastCover) setState(() => _pastCover = past);
-                      return false;
-                    },
-                    child: ListView(
-                      // Deja ver el final por encima de la barra flotante.
-                      padding: EdgeInsets.only(
-                        bottom: MediaQuery.paddingOf(context).bottom,
-                      ),
-                      physics: const BouncingScrollPhysics(),
-                      children: [
-                        ChangeNotifierProvider<StreakController>.value(
-                          value: _streakController,
-                          child: Consumer<StreakController>(
-                            builder: (context, streak, _) {
-                              _maybeShowStreakCelebration(streak);
-                              return TodayCover(
-                                now: now,
-                                night: isCoverNight(now),
-                                userName: auth.firebaseUser?.displayName,
-                                streakDays: streak.totalDays,
-                                verseText: verse?.text,
-                                verseReference: verse?.reference,
-                                onRead: verseMission == null
-                                    ? null
-                                    : () => _openMissionRead(
-                                        context,
-                                        verseMission,
-                                        provider,
-                                      ),
-                                onShare: verse == null
-                                    ? null
-                                    : () => ShareService.openComposer(
-                                        context,
-                                        ShareContent(
-                                          title: 'Palabra de hoy',
-                                          body: verse.text,
-                                          reference:
-                                              '${verse.reference} · RV1909',
-                                          sourceLabel: 'RV1909',
-                                          kind: ShareContentKind.verse,
-                                        ),
-                                      ),
-                                onProfile: () =>
-                                    Navigator.of(context).pushNamed('/profile'),
-                                onStreak: () =>
-                                    Navigator.of(context).pushNamed('/streak'),
-                              );
-                            },
-                          ),
-                        ),
-                        // El siguiente paso se monta sobre el final de la portada.
-                        Transform.translate(
-                          offset: const Offset(0, -64),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: VerbumSpace.gutter,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                TodayJourney(
-                                  missions: _missionsController.missions,
-                                  nightAvailable: isNightPrayerAvailable(now),
-                                  onOpen: (mission) => _openMissionRead(
-                                    context,
-                                    mission,
-                                    provider,
+                  ChangeNotifierProvider<StreakController>.value(
+                    value: _streakController,
+                    child: Consumer<StreakController>(
+                      builder: (context, streak, _) {
+                        _maybeShowStreakCelebration(streak);
+                        return TodayCover(
+                          now: now,
+                          night: isCoverNight(now),
+                          userName: auth.firebaseUser?.displayName,
+                          streakDays: streak.totalDays,
+                          verseText: verse?.text,
+                          verseReference: verse?.reference,
+                          onRead: verseMission == null
+                              ? null
+                              : () => _openMissionRead(
+                                  context,
+                                  verseMission,
+                                  provider,
+                                ),
+                          onShare: verse == null
+                              ? null
+                              : () => ShareService.openComposer(
+                                  context,
+                                  ShareContent(
+                                    title: 'Palabra de hoy',
+                                    body: verse.text,
+                                    reference: '${verse.reference} · RV1909',
+                                    sourceLabel: 'RV1909',
+                                    kind: ShareContentKind.verse,
                                   ),
                                 ),
-                                if (provider.isLoading) ...[
-                                  const SizedBox(height: 12),
-                                  const VProgressBar(value: 0.35, height: 3),
-                                ],
-                                const SizedBox(height: 26),
-                                // Solo para invitados; se oculta con sesión.
-                                const SignInPrompt(
-                                  margin: EdgeInsets.only(bottom: 26),
-                                ),
-                                const SpiritualPathTodayCard(),
-                                const BibleContinueCard(),
-                                PrayNowCarousel(now: now),
-                                const SizedBox(height: 10),
-                                const TodayLiturgySection(),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                          onProfile: () =>
+                              Navigator.of(context).pushNamed('/profile'),
+                          onStreak: () =>
+                              Navigator.of(context).pushNamed('/streak'),
+                        );
+                      },
                     ),
                   ),
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: IgnorePointer(
-                      child: AnimatedOpacity(
-                        opacity: _pastCover ? 1 : 0,
-                        duration: const Duration(milliseconds: 200),
-                        child: Container(
-                          height: MediaQuery.paddingOf(context).top,
-                          color: p.background.withValues(alpha: .96),
-                        ),
+                  // El siguiente paso se monta sobre el final de la portada.
+                  Transform.translate(
+                    offset: const Offset(0, -64),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: VerbumSpace.gutter,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          TodayJourney(
+                            missions: _missionsController.missions,
+                            nightAvailable: isNightPrayerAvailable(now),
+                            onOpen: (mission) =>
+                                _openMissionRead(context, mission, provider),
+                          ),
+                          if (provider.isLoading) ...[
+                            const SizedBox(height: 12),
+                            const VProgressBar(value: 0.35, height: 3),
+                          ],
+                          const SizedBox(height: 26),
+                          // Solo para invitados; se oculta con sesión.
+                          const SignInPrompt(
+                            margin: EdgeInsets.only(bottom: 26),
+                          ),
+                          const SpiritualPathTodayCard(),
+                          const BibleContinueCard(),
+                          PrayNowCarousel(now: now),
+                          const SizedBox(height: 10),
+                          const TodayLiturgySection(),
+                        ],
                       ),
                     ),
                   ),
                 ],
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

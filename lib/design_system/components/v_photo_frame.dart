@@ -41,7 +41,13 @@ class VPhotoFrame extends StatelessWidget {
             borderRadius: BorderRadius.circular(VerbumRadius.tile - 5),
             child: AspectRatio(
               aspectRatio: aspectRatio,
-              child: Image.asset(photo.asset, fit: BoxFit.cover),
+              child: Image.asset(
+                photo.asset,
+                fit: BoxFit.cover,
+                // Decodifica al tamaño mostrado, no al original.
+                cacheWidth: (width * MediaQuery.devicePixelRatioOf(context))
+                    .round(),
+              ),
             ),
           ),
         ),

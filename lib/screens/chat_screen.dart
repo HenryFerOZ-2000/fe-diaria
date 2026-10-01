@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../widgets/chat_bubble.dart';
 import '../services/groq_chat_service.dart' as groq;
 import '../providers/auth_provider.dart';
 import '../widgets/sign_in_prompt.dart';
+import '../widgets/cover_scroll_frame.dart';
 import '../design_system/design_system.dart';
 
 class ChatMessage {
@@ -129,7 +129,8 @@ class _ChatScreenState extends State<ChatScreen> {
     (VerbumIcons.sun, 'Necesito esperanza hoy'),
   ];
 
-  bool _pastCover = false;
+  /// Para medir la portada (franja bajo la hora).
+  final _coverKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -138,205 +139,172 @@ class _ChatScreenState extends State<ChatScreen> {
     final signedIn = context.watch<AuthProvider>().isSignedIn;
     final started = _messages.any((m) => m.isUser);
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value:
-          (_pastCover ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light)
-              .copyWith(statusBarColor: Colors.transparent),
-      child: Scaffold(
-        backgroundColor: p.background,
-        resizeToAvoidBottomInset: true,
-        body: Column(
-          children: [
-            Expanded(
-              child: Stack(
+    return Scaffold(
+      backgroundColor: p.background,
+      resizeToAvoidBottomInset: true,
+      body: Column(
+        children: [
+          Expanded(
+            child: CoverScrollFrame(
+              coverKey: _coverKey,
+              child: ListView(
+                controller: _scrollController,
+                padding: const EdgeInsets.only(bottom: 16),
                 children: [
-                  NotificationListener<ScrollUpdateNotification>(
-                    onNotification: (n) {
-                      final past = n.metrics.pixels > 260;
-                      if (past != _pastCover) setState(() => _pastCover = past);
-                      return false;
-                    },
-                    child: ListView(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.only(bottom: 16),
+                  VPhotoCover(
+                    key: _coverKey,
+                    image: AssetImage(VerbumPhotos.chatBench.asset),
+                    // La banca queda arriba del título.
+                    alignment: const Alignment(0, .85),
+                    minHeight: started ? 300 : 360,
+                    bottomPadding: 28,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        VPhotoCover(
-                          image: AssetImage(VerbumPhotos.chatBench.asset),
-                          // La banca queda arriba del título.
-                          alignment: const Alignment(0, .85),
-                          minHeight: started ? 300 : 360,
-                          bottomPadding: 28,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  VGlassButton(
-                                    icon: VerbumIcons.slidersHorizontal,
-                                    tooltip: 'Configuración',
-                                    onPressed: () => Navigator.of(
-                                      context,
-                                    ).pushNamed('/settings'),
-                                  ),
-                                  const Spacer(),
-                                  VGlassButton(
-                                    icon: VerbumIcons.user,
-                                    tooltip: 'Mi perfil',
-                                    onPressed: () => Navigator.of(
-                                      context,
-                                    ).pushNamed('/profile'),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: started ? 70 : 96),
-                              Text(
-                                'ACOMPAÑAMIENTO',
-                                style: type.rubric.copyWith(
-                                  color: p.butter,
-                                  letterSpacing: 1.5,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Semantics(
-                                header: true,
-                                child: Text(
-                                  'Un espacio seguro para hablar',
-                                  style: type.display.copyWith(
-                                    color: Colors.white,
-                                    fontSize: 30,
-                                    height: 1.1,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                'Cuéntame lo que llevas hoy en el corazón.',
-                                style: type.body.copyWith(
-                                  color: Colors.white.withValues(alpha: .9),
-                                ),
-                              ),
-                            ],
+                        Row(
+                          children: [
+                            VGlassButton(
+                              icon: VerbumIcons.slidersHorizontal,
+                              tooltip: 'Configuración',
+                              onPressed: () =>
+                                  Navigator.of(context).pushNamed('/settings'),
+                            ),
+                            const Spacer(),
+                            VGlassButton(
+                              icon: VerbumIcons.user,
+                              tooltip: 'Mi perfil',
+                              onPressed: () =>
+                                  Navigator.of(context).pushNamed('/profile'),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: started ? 70 : 96),
+                        Text(
+                          'ACOMPAÑAMIENTO',
+                          style: type.rubric.copyWith(
+                            color: p.butter,
+                            letterSpacing: 1.5,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: VerbumSpace.gutter,
+                        const SizedBox(height: 4),
+                        Semantics(
+                          header: true,
+                          child: Text(
+                            'Un espacio seguro para hablar',
+                            style: type.display.copyWith(
+                              color: Colors.white,
+                              fontSize: 30,
+                              height: 1.1,
+                            ),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              for (var i = 0; i < _messages.length; i++)
-                                TweenAnimationBuilder<double>(
-                                  key: ValueKey('msg_$i'),
-                                  tween: Tween(begin: 0.0, end: 1.0),
-                                  duration: const Duration(milliseconds: 260),
-                                  curve: Curves.easeOutCubic,
-                                  builder: (context, value, child) => Opacity(
-                                    opacity: value,
-                                    child: Transform.translate(
-                                      offset: Offset(0, (1 - value) * 12),
-                                      child: child,
-                                    ),
-                                  ),
-                                  child: ChatBubble(
-                                    text: _messages[i].text,
-                                    isUser: _messages[i].isUser,
-                                  ),
-                                ),
-                              if (_isLoading) const _TypingIndicator(),
-                              if (!started) ...[
-                                const SizedBox(height: 6),
-                                Text(
-                                  'Puedes empezar por aquí',
-                                  style: type.caption.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                for (final (icon, text) in _suggestions)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 8),
-                                    child: VSurfaceCard(
-                                      radius: VerbumRadius.tile,
-                                      padding: const EdgeInsets.fromLTRB(
-                                        12,
-                                        10,
-                                        12,
-                                        10,
-                                      ),
-                                      onTap: signedIn && !_isLoading
-                                          ? () => _sendMessage(text)
-                                          : null,
-                                      semanticLabel: text,
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 34,
-                                            height: 34,
-                                            alignment: Alignment.center,
-                                            decoration: BoxDecoration(
-                                              color: p.surfaceMuted,
-                                              borderRadius:
-                                                  BorderRadius.circular(11),
-                                            ),
-                                            child: VIcon(
-                                              icon,
-                                              size: 18,
-                                              color: p.rubric,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: Text(
-                                              text,
-                                              style: type.bodyStrong,
-                                            ),
-                                          ),
-                                          VIcon(
-                                            VerbumIcons.arrowUpRight,
-                                            size: 16,
-                                            color: p.inkSubtle,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Soy una guía con inteligencia artificial: '
-                                  'te acompaño, pero no sustituyo a un '
-                                  'sacerdote, pastor o profesional.',
-                                  textAlign: TextAlign.center,
-                                  style: type.caption,
-                                ),
-                              ],
-                            ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Cuéntame lo que llevas hoy en el corazón.',
+                          style: type.body.copyWith(
+                            color: Colors.white.withValues(alpha: .9),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: IgnorePointer(
-                      child: AnimatedOpacity(
-                        opacity: _pastCover ? 1 : 0,
-                        duration: const Duration(milliseconds: 200),
-                        child: Container(
-                          height: MediaQuery.paddingOf(context).top,
-                          color: p.background.withValues(alpha: .96),
-                        ),
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: VerbumSpace.gutter,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        for (var i = 0; i < _messages.length; i++)
+                          TweenAnimationBuilder<double>(
+                            key: ValueKey('msg_$i'),
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            duration: const Duration(milliseconds: 260),
+                            curve: Curves.easeOutCubic,
+                            builder: (context, value, child) => Opacity(
+                              opacity: value,
+                              child: Transform.translate(
+                                offset: Offset(0, (1 - value) * 12),
+                                child: child,
+                              ),
+                            ),
+                            child: ChatBubble(
+                              text: _messages[i].text,
+                              isUser: _messages[i].isUser,
+                            ),
+                          ),
+                        if (_isLoading) const _TypingIndicator(),
+                        if (!started) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            'Puedes empezar por aquí',
+                            style: type.caption.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          for (final (icon, text) in _suggestions)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: VSurfaceCard(
+                                radius: VerbumRadius.tile,
+                                padding: const EdgeInsets.fromLTRB(
+                                  12,
+                                  10,
+                                  12,
+                                  10,
+                                ),
+                                onTap: signedIn && !_isLoading
+                                    ? () => _sendMessage(text)
+                                    : null,
+                                semanticLabel: text,
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 34,
+                                      height: 34,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: p.surfaceMuted,
+                                        borderRadius: BorderRadius.circular(11),
+                                      ),
+                                      child: VIcon(
+                                        icon,
+                                        size: 18,
+                                        color: p.rubric,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(text, style: type.bodyStrong),
+                                    ),
+                                    VIcon(
+                                      VerbumIcons.arrowUpRight,
+                                      size: 16,
+                                      color: p.inkSubtle,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Soy una guía con inteligencia artificial: '
+                            'te acompaño, pero no sustituyo a un '
+                            'sacerdote, pastor o profesional.',
+                            textAlign: TextAlign.center,
+                            style: type.caption,
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-            _buildInput(context, signedIn: signedIn),
-          ],
-        ),
+          ),
+          _buildInput(context, signedIn: signedIn),
+        ],
       ),
     );
   }

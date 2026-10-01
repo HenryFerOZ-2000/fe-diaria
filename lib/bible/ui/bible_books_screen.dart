@@ -154,6 +154,8 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
     return CoverTabPage(
       cover: VPhotoCover(
         image: AssetImage(VerbumPhotos.bibleHills.asset),
+        // Las páginas de la Biblia están en la parte baja de la foto.
+        alignment: const Alignment(0, .75),
         minHeight: 340,
         bottomPadding: 26,
         child: Column(
