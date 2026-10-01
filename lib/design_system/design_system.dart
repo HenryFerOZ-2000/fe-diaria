@@ -46,6 +46,7 @@ export 'components/v_winding_path.dart';
 export 'icons/verbum_icons.dart';
 export 'photos/verbum_photos.dart';
 export 'theme/verbum_context.dart';
+export 'theme/verbum_page_transitions.dart';
 export 'theme/verbum_theme.dart';
 export 'tokens/verbum_palette.dart';
 export 'tokens/verbum_radius.dart';

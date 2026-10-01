@@ -234,7 +234,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
           child: Material(
             color: p.surface,
             elevation: 8,
-            shadowColor: p.ink.withValues(alpha: .2),
+            shadowColor: VerbumShadows.tint(p, .2),
             child: SafeArea(
               top: false,
               minimum: const EdgeInsets.only(bottom: 8),

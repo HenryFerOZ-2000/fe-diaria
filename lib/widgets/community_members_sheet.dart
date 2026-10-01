@@ -308,7 +308,7 @@ class _CommunityMemberCard extends StatelessWidget {
                   color: p.surface,
                   surfaceTintColor: Colors.transparent,
                   elevation: 8,
-                  shadowColor: p.ink.withValues(alpha: .2),
+                  shadowColor: VerbumShadows.tint(p, .2),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(VerbumRadius.control),
                   ),

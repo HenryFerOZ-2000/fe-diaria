@@ -56,7 +56,6 @@ import 'screens/traditional_prayers_religion_selection_screen.dart';
 import 'services/content_validator.dart';
 import 'services/daily_content_service.dart';
 import 'design_system/design_system.dart';
-import 'theme/app_theme.dart';
 import 'widgets/verbum_bottom_navigation.dart';
 import 'screens/welcome_auth_screen.dart';
 import 'bible/ui/bible_books_screen.dart';
@@ -199,11 +198,11 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             theme: buildVerbumTheme(
               brightness: Brightness.light,
-              pageTransitionsTheme: appPageTransitionsTheme,
+              pageTransitionsTheme: verbumPageTransitions,
             ),
             darkTheme: buildVerbumTheme(
               brightness: Brightness.dark,
-              pageTransitionsTheme: appPageTransitionsTheme,
+              pageTransitionsTheme: verbumPageTransitions,
             ),
             themeMode: provider.darkMode ? ThemeMode.dark : ThemeMode.light,
             builder: (context, child) {

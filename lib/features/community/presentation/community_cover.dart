@@ -174,7 +174,7 @@ class _Tabs extends StatelessWidget {
             color: selected ? p.surface : Colors.transparent,
             borderRadius: BorderRadius.circular(14),
             elevation: selected ? 2 : 0,
-            shadowColor: p.ink.withValues(alpha: .25),
+            shadowColor: VerbumShadows.tint(p, .25),
             child: InkWell(
               borderRadius: BorderRadius.circular(14),
               onTap: () => onTab(value),

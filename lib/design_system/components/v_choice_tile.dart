@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../tokens/verbum_shadows.dart';
 
 import '../icons/verbum_icons.dart';
 import '../theme/verbum_context.dart';
@@ -31,7 +32,7 @@ class VChoiceTile extends StatelessWidget {
       excludeSemantics: true,
       child: Material(
         elevation: selected ? 0 : 6,
-        shadowColor: p.ink.withValues(alpha: .18),
+        shadowColor: VerbumShadows.tint(p, .18),
         color: selected ? p.accentSoft : p.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(VerbumRadius.tile),

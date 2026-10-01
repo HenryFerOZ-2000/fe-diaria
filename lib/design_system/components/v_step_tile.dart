@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../tokens/verbum_shadows.dart';
 
 import '../icons/verbum_icons.dart';
 import '../theme/verbum_context.dart';
@@ -54,7 +55,7 @@ class VStepTile extends StatelessWidget {
       excludeSemantics: true,
       child: Material(
         elevation: current ? 0 : 5,
-        shadowColor: p.ink.withValues(alpha: .16),
+        shadowColor: VerbumShadows.tint(p, .16),
         color: bg,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(VerbumRadius.tile - 2),

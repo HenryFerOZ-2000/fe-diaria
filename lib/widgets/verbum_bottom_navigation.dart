@@ -69,7 +69,7 @@ class VerbumBottomNavigation extends StatelessWidget {
                     borderRadius: BorderRadius.circular(_barHeight / 2),
                     boxShadow: [
                       BoxShadow(
-                        color: _tinta.withValues(alpha: .35),
+                        color: VerbumShadows.tint(p, .35),
                         blurRadius: 28,
                         offset: const Offset(0, 14),
                         spreadRadius: -10,

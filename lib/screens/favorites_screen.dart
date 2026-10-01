@@ -179,9 +179,7 @@ class _FavoriteCardState extends State<_FavoriteCard>
       child: Card(
         margin: const EdgeInsets.only(bottom: 16),
         elevation: 2,
-        shadowColor: Theme.of(
-          context,
-        ).colorScheme.primary.withValues(alpha: 0.1),
+        shadowColor: VerbumShadows.tint(context.palette, .1),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         color: Theme.of(context).colorScheme.surface,
         surfaceTintColor: Colors.transparent,

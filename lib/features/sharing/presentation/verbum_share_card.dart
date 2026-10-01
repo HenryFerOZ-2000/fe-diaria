@@ -257,34 +257,39 @@ class _CardPalette {
   final Color halo;
 
   // Valores fijos de la tarjeta exportada (cubiertos por goldens). No usan
-  // AppColors para que un cambio del tema de la app no altere las imágenes
+  // la paleta del tema para que un cambio del tema no altere las imágenes
   // compartidas sin querer.
-  static const _paper = Color(0xFFFFFDF8);
-  static const _violet = Color(0xFF493878);
-  static const _deepViolet = Color(0xFF261E45);
-  static const _gold = Color(0xFFB58A45);
+  // Paleta "Camino claro": lavanda, tinta, índigo, periwinkle y mantequilla.
+  static const _white = Color(0xFFFFFFFF);
+  static const _lavender = Color(0xFFF1F2FC);
+  static const _lavender2 = Color(0xFFE5E7F8);
+  static const _ink = Color(0xFF22245A);
+  static const _indigo = Color(0xFF3A3C8E);
+  static const _periwinkle = Color(0xFF6F72D3);
+  static const _butter = Color(0xFFF4DF7A);
+  static const _night = Color(0xFF10122A);
 
   static _CardPalette forStyle(ShareVisualStyle style) => switch (style) {
     ShareVisualStyle.sereneLight => const _CardPalette(
-      background: [_paper, Color(0xFFF3EEE5), Color(0xFFEAE4F0)],
-      ink: _deepViolet,
-      metadata: _violet,
-      accent: _gold,
-      halo: _gold,
+      background: [_white, _lavender, _lavender2],
+      ink: _ink,
+      metadata: _indigo,
+      accent: _periwinkle,
+      halo: _periwinkle,
     ),
     ShareVisualStyle.contemplativeNight => const _CardPalette(
-      background: [Color(0xFF15121D), _deepViolet, Color(0xFF17141F)],
-      ink: _paper,
-      metadata: Color(0xFFE2C998),
-      accent: Color(0xFFD8B875),
-      halo: _gold,
+      background: [_night, Color(0xFF1A1D3A), _night],
+      ink: _lavender,
+      metadata: _butter,
+      accent: _butter,
+      halo: _periwinkle,
     ),
     ShareVisualStyle.livingTradition => const _CardPalette(
-      background: [_deepViolet, _violet, Color(0xFF60475B)],
-      ink: _paper,
-      metadata: Color(0xFFF0D8A7),
-      accent: Color(0xFFD8B875),
-      halo: _gold,
+      background: [_indigo, _periwinkle, Color(0xFF5D60C4)],
+      ink: _white,
+      metadata: _butter,
+      accent: _butter,
+      halo: _butter,
     ),
   };
 }

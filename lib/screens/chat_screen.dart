@@ -318,7 +318,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Material(
       color: p.surface,
       elevation: 8,
-      shadowColor: p.ink.withValues(alpha: .2),
+      shadowColor: VerbumShadows.tint(p, .2),
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           VerbumSpace.gutter,

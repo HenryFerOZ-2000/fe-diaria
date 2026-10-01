@@ -455,16 +455,16 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
                           gradient: LinearGradient(
                             colors: switch (style) {
                               ShareVisualStyle.sereneLight => const [
-                                Color(0xFFFBF8F1),
-                                Color(0xFFEAE4F0),
+                                Color(0xFFFFFFFF),
+                                Color(0xFFE5E7F8),
                               ],
                               ShareVisualStyle.contemplativeNight => const [
-                                Color(0xFF15121D),
-                                Color(0xFF30233E),
+                                Color(0xFF10122A),
+                                Color(0xFF1A1D3A),
                               ],
                               ShareVisualStyle.livingTradition => const [
-                                Color(0xFF392544),
-                                Color(0xFF60475B),
+                                Color(0xFF3A3C8E),
+                                Color(0xFF6F72D3),
                               ],
                             },
                           ),
@@ -475,8 +475,8 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
                               : VerbumIcons.sparkle,
                           size: 20,
                           color: style == ShareVisualStyle.sereneLight
-                              ? const Color(0xFF392544)
-                              : const Color(0xFFF0D8A7),
+                              ? const Color(0xFF3A3C8E)
+                              : const Color(0xFFF4DF7A),
                         ),
                       ),
                       const SizedBox(height: 6),

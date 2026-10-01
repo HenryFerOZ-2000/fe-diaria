@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../tokens/verbum_shadows.dart';
 
 import '../icons/verbum_icons.dart';
 import '../theme/verbum_context.dart';
@@ -48,7 +49,7 @@ class VStepRow extends StatelessWidget {
         opacity: locked ? .6 : 1,
         child: Material(
           elevation: current ? 0 : 6,
-          shadowColor: p.ink.withValues(alpha: .18),
+          shadowColor: VerbumShadows.tint(p, .18),
           color: p.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(VerbumRadius.tile + 2),
@@ -80,11 +81,7 @@ class VStepRow extends StatelessWidget {
                       ),
                     ),
                     child: done
-                        ? VIcon(
-                            VerbumIcons.check,
-                            size: 17,
-                            color: p.surface,
-                          )
+                        ? VIcon(VerbumIcons.check, size: 17, color: p.surface)
                         : Text(
                             '$number',
                             style: type.bodyStrong.copyWith(

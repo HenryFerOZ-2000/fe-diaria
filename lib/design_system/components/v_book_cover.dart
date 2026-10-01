@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../tokens/verbum_shadows.dart';
 
 import '../icons/verbum_icons.dart';
 import '../theme/verbum_context.dart';
@@ -66,7 +67,7 @@ class VBookCover extends StatelessWidget {
           child: Material(
             color: background,
             elevation: 5,
-            shadowColor: context.palette.ink.withValues(alpha: .28),
+            shadowColor: VerbumShadows.tint(context.palette, .28),
             borderRadius: radius,
             clipBehavior: Clip.antiAlias,
             child: InkWell(
