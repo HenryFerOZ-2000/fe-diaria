@@ -18,106 +18,79 @@ import '../services/storage_service.dart';
 import '../faith/faith_tradition.dart';
 import '../faith/tradition_capabilities.dart';
 import '../widgets/verbum_ambient_background.dart';
-import '../widgets/verbum_header_actions.dart';
 import '../data/spiritual_paths_catalog.dart';
 import '../models/spiritual_path.dart';
 import 'spiritual_path_detail_screen.dart';
 import 'package:verbum/design_system/design_system.dart';
+import '../features/community/presentation/community_cover.dart';
 
-class CommunityScreen extends StatelessWidget {
+/// Firma para pedir la portada de "Mi comunidad" con los datos del grupo.
+typedef MyCommunityCoverBuilder =
+    Widget Function({
+      required String title,
+      String? subtitle,
+      Widget? extra,
+      ImageProvider? image,
+    });
+
+class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+  State<CommunityScreen> createState() => _CommunityScreenState();
+}
 
-    return DefaultTabController(
-      length: 2,
+class _CommunityScreenState extends State<CommunityScreen> {
+  CommunityTab _tab = CommunityTab.live;
+
+  void _onTab(CommunityTab tab) => setState(() => _tab = tab);
+
+  Widget _liveCover(int weeklyCount) => CommunityCover(
+    image: AssetImage(VerbumPhotos.communityCandles.asset),
+    eyebrow: 'Fe que se comparte',
+    title: 'Comunidad',
+    subtitle: 'Nadie ora solo.',
+    extra: weeklyCount == 0
+        ? null
+        : CommunityGlassChip(
+            dotColor: const Color(0xFF7EE0B5),
+            label:
+                '$weeklyCount ${weeklyCount == 1 ? 'intención' : 'intenciones'} esta semana',
+          ),
+    tab: _tab,
+    onTab: _onTab,
+  );
+
+  Widget _mineCover({
+    required String title,
+    String? subtitle,
+    Widget? extra,
+    ImageProvider? image,
+  }) => CommunityCover(
+    image: image ?? AssetImage(VerbumPhotos.communityGroup.asset),
+    eyebrow: 'Mi comunidad',
+    title: title,
+    subtitle: subtitle,
+    extra: extra,
+    tab: _tab,
+    onTab: _onTab,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    // Sobre la foto, hora y batería en claro.
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
       child: Scaffold(
-        extendBodyBehindAppBar: false,
-        appBar: VAppBar(
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Comunidad',
-                style: context.type.display.copyWith(fontSize: 30),
-              ),
-              Text(
-                'Fe que se comparte',
-                style: context.type.rubric.copyWith(
-                  color: context.palette.gold,
-                ),
-              ),
-            ],
-          ),
-          centerTitle: false,
-          actions: const [VerbumHeaderActions()],
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(52),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-              child: Container(
-                height: 44,
-                decoration: BoxDecoration(
-                  color: context.palette.surfaceMuted,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                padding: const EdgeInsets.all(4),
-                child: TabBar(
-                  indicator: BoxDecoration(
-                    color: context.palette.emphasis,
-                    borderRadius: BorderRadius.circular(11),
-                  ),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  dividerColor: Colors.transparent,
-                  splashBorderRadius: BorderRadius.circular(11),
-                  labelColor: context.palette.onEmphasis,
-                  unselectedLabelColor: colorScheme.onSurfaceVariant,
-                  labelStyle: VerbumFonts.sans(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  unselectedLabelStyle: VerbumFonts.sans(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  tabs: const [
-                    Tab(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          VIcon(
-                            VerbumIcons.circle,
-                            weight: VIconWeight.fill,
-                            size: 7,
-                          ),
-                          SizedBox(width: 7),
-                          Text('En vivo'),
-                        ],
-                      ),
-                    ),
-                    Tab(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          VIcon(VerbumIcons.usersThree, size: 17),
-                          SizedBox(width: 7),
-                          Text('Mi comunidad'),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        body: const VerbumAmbientBackground(
-          child: TabBarView(
-            children: [LiveScreen(showAppBar: false), _MyCommunityTab()],
-          ),
+        backgroundColor: context.palette.background,
+        body: IndexedStack(
+          index: _tab.index,
+          children: [
+            LiveScreen(showAppBar: false, coverBuilder: _liveCover),
+            _MyCommunityTab(cover: _mineCover),
+          ],
         ),
       ),
     );
@@ -125,7 +98,9 @@ class CommunityScreen extends StatelessWidget {
 }
 
 class _MyCommunityTab extends StatefulWidget {
-  const _MyCommunityTab();
+  const _MyCommunityTab({required this.cover});
+
+  final MyCommunityCoverBuilder cover;
 
   @override
   State<_MyCommunityTab> createState() => _MyCommunityTabState();
@@ -140,11 +115,16 @@ class _MyCommunityTabState extends State<_MyCommunityTab> {
   @override
   Widget build(BuildContext context) {
     final uid = _auth.currentUser?.uid;
+    final defaultCover = widget.cover(
+      title: 'Crece en la fe con otros',
+      subtitle: 'Tu parroquia o grupo, en un solo lugar.',
+    );
     if (uid == null) {
       return _MyCommunityEmptyView(
-        title: 'Inicia sesion para ver tu comunidad',
-        subtitle: 'Cuando inicies sesion, podras unirte con un codigo.',
-        buttonLabel: 'Iniciar sesion',
+        cover: defaultCover,
+        title: 'Inicia sesión para ver tu comunidad',
+        subtitle: 'Cuando inicies sesión podrás unirte con un código.',
+        buttonLabel: 'Iniciar sesión',
         buttonIcon: VerbumIcons.signIn,
         onJoin: () => Navigator.of(context).pushNamed('/welcome'),
       );
@@ -154,12 +134,16 @@ class _MyCommunityTabState extends State<_MyCommunityTab> {
       stream: _profileService.userStream(uid),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return _MyCommunityLoading(cover: defaultCover);
         }
 
         if (snapshot.hasError) {
-          return const Center(
-            child: Text('No se pudo cargar tu comunidad por ahora.'),
+          return _MyCommunityEmptyView(
+            cover: defaultCover,
+            title: 'No se pudo cargar tu comunidad',
+            subtitle: 'Revisa tu conexión e inténtalo de nuevo.',
+            buttonLabel: 'Entendido',
+            buttonIcon: VerbumIcons.info,
           );
         }
 
@@ -169,6 +153,7 @@ class _MyCommunityTabState extends State<_MyCommunityTab> {
 
         if (!hasCommunity) {
           return _MyCommunityEmptyView(
+            cover: defaultCover,
             onJoin: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -194,18 +179,15 @@ class _MyCommunityTabState extends State<_MyCommunityTab> {
           stream: _communityService.communityStream(communityId),
           builder: (context, communitySnapshot) {
             if (communitySnapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return _MyCommunityLoading(cover: defaultCover);
             }
 
-            if (communitySnapshot.hasError) {
-              return const Center(
-                child: Text('No se pudo cargar tu comunidad por ahora.'),
-              );
-            }
-
-            if (!communitySnapshot.hasData || !communitySnapshot.data!.exists) {
-              return const _MyCommunityEmptyView(
-                title: 'Tu comunidad no esta disponible',
+            if (communitySnapshot.hasError ||
+                !communitySnapshot.hasData ||
+                !communitySnapshot.data!.exists) {
+              return _MyCommunityEmptyView(
+                cover: defaultCover,
+                title: 'Tu comunidad no está disponible',
                 subtitle:
                     'No pudimos encontrar la comunidad asociada a tu perfil.',
                 buttonLabel: 'Entendido',
@@ -223,6 +205,7 @@ class _MyCommunityTabState extends State<_MyCommunityTab> {
             final createdBy = (data['createdBy'] as String?)?.trim() ?? '';
             final isCreator = createdBy == uid;
             return _CommunityBasicView(
+              cover: widget.cover,
               communityId: communityId,
               data: data,
               isAdmin: isAdmin,
@@ -497,7 +480,28 @@ class _MyCommunityTabState extends State<_MyCommunityTab> {
   }
 }
 
+class _MyCommunityLoading extends StatelessWidget {
+  const _MyCommunityLoading({required this.cover});
+
+  final Widget cover;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        cover,
+        const Padding(
+          padding: EdgeInsets.all(40),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ],
+    );
+  }
+}
+
 class _MyCommunityEmptyView extends StatelessWidget {
+  final Widget cover;
   final String title;
   final String subtitle;
   final String buttonLabel;
@@ -506,10 +510,11 @@ class _MyCommunityEmptyView extends StatelessWidget {
   final VoidCallback? onCreate;
 
   const _MyCommunityEmptyView({
-    this.title = 'Aun no perteneces a ninguna comunidad',
+    required this.cover,
+    this.title = 'Aún no perteneces a ninguna comunidad',
     this.subtitle =
-        'Unete con un codigo o crea una comunidad nueva para tu parroquia o grupo.',
-    this.buttonLabel = 'Unirme a una comunidad',
+        'Únete con un código o crea una comunidad para tu parroquia o grupo.',
+    this.buttonLabel = 'Unirme con un código',
     this.buttonIcon = VerbumIcons.key,
     this.onJoin,
     this.onCreate,
@@ -517,75 +522,75 @@ class _MyCommunityEmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            VIcon(
-              VerbumIcons.usersThree,
-              weight: VIconWeight.fill,
-              size: 64,
-              color: colorScheme.primary.withValues(alpha: 0.8),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: VerbumFonts.sans(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: VerbumFonts.sans(
-                fontSize: 14,
-                height: 1.5,
-                color: colorScheme.onSurface.withValues(alpha: 0.7),
-              ),
-            ),
-            const SizedBox(height: 20),
-            if (onJoin != null && onCreate != null) ...[
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: onJoin,
-                  icon: VIcon(buttonIcon),
-                  label: Text(buttonLabel),
+    final p = context.palette;
+    final type = context.type;
+    return ListView(
+      padding: const EdgeInsets.only(bottom: 28),
+      children: [
+        cover,
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            VerbumSpace.gutter,
+            8,
+            VerbumSpace.gutter,
+            0,
+          ),
+          child: VSurfaceCard(
+            radius: VerbumRadius.card,
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    const VPhotoFrame(
+                      VerbumPhotos.handsTogether,
+                      width: 64,
+                      aspectRatio: 1,
+                      tiltDegrees: -4,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: type.heading.copyWith(fontSize: 18),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: onCreate,
-                  icon: const VIcon(VerbumIcons.plusCircle),
-                  label: const Text('Crear comunidad'),
-                ),
-              ),
-            ] else
-              ElevatedButton.icon(
-                onPressed: onJoin,
-                icon: VIcon(buttonIcon),
-                label: Text(buttonLabel),
-              ),
-          ],
+                const SizedBox(height: 12),
+                Text(subtitle, style: type.body.copyWith(color: p.inkMuted)),
+                const SizedBox(height: 18),
+                if (onJoin != null)
+                  VButton(
+                    label: buttonLabel,
+                    icon: buttonIcon,
+                    iconLeading: true,
+                    expanded: true,
+                    onPressed: onJoin,
+                  ),
+                if (onCreate != null) ...[
+                  const SizedBox(height: 10),
+                  VButton(
+                    label: 'Crear una comunidad',
+                    icon: VerbumIcons.plusCircle,
+                    iconLeading: true,
+                    variant: VButtonVariant.outlined,
+                    expanded: true,
+                    onPressed: onCreate,
+                  ),
+                ],
+              ],
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }
 
 class _CommunityBasicView extends StatelessWidget {
+  final MyCommunityCoverBuilder cover;
   final String communityId;
   final Map<String, dynamic> data;
   final bool isAdmin;
@@ -596,6 +601,7 @@ class _CommunityBasicView extends StatelessWidget {
   final CommunityPostsSocialService communitySocial;
 
   const _CommunityBasicView({
+    required this.cover,
     required this.communityId,
     required this.data,
     required this.isAdmin,
@@ -619,434 +625,441 @@ class _CommunityBasicView extends StatelessWidget {
     final inviteCode = (data['inviteCode'] as String?)?.trim() ?? '';
     final canPublish = isAdmin || membersCanPost;
 
+    final title = name?.isNotEmpty == true ? name! : 'Mi comunidad';
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(bottom: 28),
       children: [
-        _CommunityWelcomeHero(
-          name: name?.isNotEmpty == true ? name! : 'Mi comunidad',
-          city: city ?? '',
-          imageUrl: imageUrl,
-          isAdmin: isAdmin,
-          isVerified: isVerified,
-          inviteCode: inviteCode,
-        ),
-        if (isAdmin ||
-            ((data['activeSpiritualPathId'] as String?)?.isNotEmpty ==
-                true)) ...[
-          const SizedBox(height: 14),
-          _CommunityPathCard(
-            communityId: communityId,
-            currentUid: currentUid,
-            pathId: data['activeSpiritualPathId'] as String?,
-            isAdmin: isAdmin,
-            communityService: communityService,
-          ),
-        ],
-        const SizedBox(height: 18),
-        Row(
-          children: [
-            Text(
-              'Nuestro espacio',
-              style: VerbumFonts.serif(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: colorScheme.tertiary.withValues(alpha: .12),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Text(
-                isAdmin ? 'ADMINISTRADOR' : 'MIEMBRO',
-                style: VerbumFonts.sans(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1,
-                  color: colorScheme.tertiary,
+        cover(
+          title: title,
+          image: imageUrl != null && imageUrl.isNotEmpty
+              ? NetworkImage(imageUrl)
+              : null,
+          extra: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (isVerified)
+                const CommunityGlassChip(
+                  icon: VerbumIcons.sealCheck,
+                  label: 'Verificada',
                 ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Card(
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: colorScheme.outlineVariant),
+              if (city != null && city.isNotEmpty)
+                CommunityGlassChip(icon: VerbumIcons.mapPin, label: city),
+              if (isAdmin && inviteCode.isNotEmpty)
+                CommunityGlassChip(
+                  icon: VerbumIcons.userPlus,
+                  label: 'Invitar · $inviteCode',
+                  onTap: () => SharePlus.instance.share(
+                    ShareParams(
+                      text:
+                          'Te invito a unirte a $title en Verbum. Usa el código $inviteCode.',
+                    ),
+                  ),
+                ),
+            ],
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (imageUrl != null && imageUrl.isNotEmpty) ...[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          color: colorScheme.surfaceContainerHighest,
-                          alignment: Alignment.center,
-                          child: const VIcon(VerbumIcons.imageBroken),
-                        ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: VerbumSpace.gutter),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (isAdmin ||
+                  ((data['activeSpiritualPathId'] as String?)?.isNotEmpty ==
+                      true)) ...[
+                const SizedBox(height: 14),
+                _CommunityPathCard(
+                  communityId: communityId,
+                  currentUid: currentUid,
+                  pathId: data['activeSpiritualPathId'] as String?,
+                  isAdmin: isAdmin,
+                  communityService: communityService,
+                ),
+              ],
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Text('Nuestro espacio', style: context.type.heading),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: context.palette.butter,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      isAdmin ? 'Guía' : 'Miembro',
+                      style: context.type.caption.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: context.palette.onButter,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 14),
                 ],
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Información y gestión',
-                        style: VerbumFonts.serif(
-                          fontSize: 19,
-                          fontWeight: FontWeight.w700,
-                        ),
+              ),
+              const SizedBox(height: 10),
+              VSurfaceCard(
+                radius: VerbumRadius.card,
+                padding: EdgeInsets.zero,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Información y gestión',
+                              style: context.type.heading.copyWith(
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          if (isVerified)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colorScheme.primary.withValues(
+                                  alpha: 0.12,
+                                ),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  VIcon(
+                                    VerbumIcons.sealCheck,
+                                    weight: VIconWeight.fill,
+                                    size: 14,
+                                    color: colorScheme.primary,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Verificada',
+                                    style: VerbumFonts.sans(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
                       ),
-                    ),
-                    if (isVerified)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                      if (isAdmin) ...[
+                        const SizedBox(height: 12),
+                        _EditCommunityButton(
+                          communityId: communityId,
+                          currentUid: currentUid,
+                          data: data,
+                          communityService: communityService,
                         ),
-                        decoration: BoxDecoration(
-                          color: colorScheme.primary.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                      ],
+                      const SizedBox(height: 8),
+                      _CommunityMembersButton(
+                        communityId: communityId,
+                        currentUid: currentUid,
+                        communityService: communityService,
+                        adminIds: ((data['adminIds'] as List?) ?? const [])
+                            .map((id) => id?.toString() ?? '')
+                            .where((id) => id.isNotEmpty)
+                            .toSet(),
+                        createdBy: ((data['createdBy'] as String?) ?? '')
+                            .trim(),
+                      ),
+                      if (city != null && city.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Row(
                           children: [
                             VIcon(
-                              VerbumIcons.sealCheck,
-                              weight: VIconWeight.fill,
-                              size: 14,
-                              color: colorScheme.primary,
+                              VerbumIcons.mapPin,
+                              size: 16,
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.7,
+                              ),
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 6),
                             Text(
-                              'Verificada',
+                              city,
                               style: VerbumFonts.sans(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: colorScheme.primary,
+                                fontSize: 13.5,
+                                color: colorScheme.onSurface.withValues(
+                                  alpha: 0.8,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                  ],
-                ),
-                if (isAdmin) ...[
-                  const SizedBox(height: 12),
-                  _EditCommunityButton(
-                    communityId: communityId,
-                    currentUid: currentUid,
-                    data: data,
-                    communityService: communityService,
-                  ),
-                ],
-                const SizedBox(height: 8),
-                _CommunityMembersButton(
-                  communityId: communityId,
-                  currentUid: currentUid,
-                  communityService: communityService,
-                  adminIds: ((data['adminIds'] as List?) ?? const [])
-                      .map((id) => id?.toString() ?? '')
-                      .where((id) => id.isNotEmpty)
-                      .toSet(),
-                  createdBy: ((data['createdBy'] as String?) ?? '').trim(),
-                ),
-                if (city != null && city.isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      VIcon(
-                        VerbumIcons.mapPin,
-                        size: 16,
-                        color: colorScheme.onSurface.withValues(alpha: 0.7),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        city,
-                        style: VerbumFonts.sans(
-                          fontSize: 13.5,
-                          color: colorScheme.onSurface.withValues(alpha: 0.8),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-                if (description != null && description.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    description,
-                    style: VerbumFonts.sans(
-                      fontSize: 14,
-                      height: 1.5,
-                      color: colorScheme.onSurface.withValues(alpha: 0.9),
-                    ),
-                  ),
-                ],
-                if (priestName != null && priestName.isNotEmpty) ...[
-                  const SizedBox(height: 14),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest.withValues(
-                        alpha: 0.6,
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      children: [
-                        const VIcon(VerbumIcons.user, size: 18),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Responsable: $priestName',
-                            style: VerbumFonts.sans(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w500,
-                            ),
+                      ],
+                      if (description != null && description.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          description,
+                          style: VerbumFonts.sans(
+                            fontSize: 14,
+                            height: 1.5,
+                            color: colorScheme.onSurface.withValues(alpha: 0.9),
                           ),
                         ),
                       ],
-                    ),
-                  ),
-                ],
-                if (isAdmin && inviteCode.isNotEmpty) ...[
-                  const SizedBox(height: 14),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primary.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: colorScheme.primary.withValues(alpha: 0.2),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        VIcon(
-                          VerbumIcons.key,
-                          size: 20,
-                          color: colorScheme.primary,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      if (priestName != null && priestName.isNotEmpty) ...[
+                        const SizedBox(height: 14),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surfaceContainerHighest
+                                .withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
                             children: [
-                              Text(
-                                'Codigo de invitacion',
-                                style: VerbumFonts.sans(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: colorScheme.onSurface.withValues(
-                                    alpha: 0.65,
+                              const VIcon(VerbumIcons.user, size: 18),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Responsable: $priestName',
+                                  style: VerbumFonts.sans(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w500,
                                   ),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                inviteCode,
-                                style: VerbumFonts.sans(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.8,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        IconButton(
-                          tooltip: 'Copiar codigo',
-                          onPressed: () async {
-                            await Clipboard.setData(
-                              ClipboardData(text: inviteCode),
-                            );
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Codigo copiado al portapapeles'),
-                              ),
-                            );
-                          },
-                          icon: const VIcon(VerbumIcons.copy),
-                        ),
-                        IconButton(
-                          tooltip: 'Compartir invitación',
-                          onPressed: () => SharePlus.instance.share(
-                            ShareParams(
-                              text:
-                                  'Te invito a unirte a ${name?.isNotEmpty == true ? name : 'mi comunidad'} en Verbum. Usa el código $inviteCode.',
+                      ],
+                      if (isAdmin && inviteCode.isNotEmpty) ...[
+                        const SizedBox(height: 14),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colorScheme.primary.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: colorScheme.primary.withValues(alpha: 0.2),
                             ),
                           ),
-                          icon: const VIcon(VerbumIcons.shareNetwork),
+                          child: Row(
+                            children: [
+                              VIcon(
+                                VerbumIcons.key,
+                                size: 20,
+                                color: colorScheme.primary,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Codigo de invitacion',
+                                      style: VerbumFonts.sans(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: colorScheme.onSurface.withValues(
+                                          alpha: 0.65,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      inviteCode,
+                                      style: VerbumFonts.sans(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.8,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                tooltip: 'Copiar codigo',
+                                onPressed: () async {
+                                  await Clipboard.setData(
+                                    ClipboardData(text: inviteCode),
+                                  );
+                                  if (!context.mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Codigo copiado al portapapeles',
+                                      ),
+                                    ),
+                                  );
+                                },
+                                icon: const VIcon(VerbumIcons.copy),
+                              ),
+                              IconButton(
+                                tooltip: 'Compartir invitación',
+                                onPressed: () => SharePlus.instance.share(
+                                  ShareParams(
+                                    text:
+                                        'Te invito a unirte a ${name?.isNotEmpty == true ? name : 'mi comunidad'} en Verbum. Usa el código $inviteCode.',
+                                  ),
+                                ),
+                                icon: const VIcon(VerbumIcons.shareNetwork),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              if (canPublish) ...[
+                const SizedBox(height: 12),
+                _CommunityComposerCard(
+                  communityId: communityId,
+                  currentUid: currentUid,
+                  currentUserData: currentUserData,
+                  communityService: communityService,
+                ),
+                const SizedBox(height: 12),
+              ] else if (!isAdmin && !membersCanPost) ...[
+                const SizedBox(height: 12),
+                Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(
+                      color: colorScheme.outline.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        VIcon(
+                          VerbumIcons.info,
+                          size: 18,
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Solo los administradores pueden publicar en esta comunidad.',
+                            style: VerbumFonts.sans(
+                              fontSize: 13.5,
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.8,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
+                const SizedBox(height: 12),
               ],
-            ),
-          ),
-        ),
-        if (canPublish) ...[
-          const SizedBox(height: 12),
-          _CommunityComposerCard(
-            communityId: communityId,
-            currentUid: currentUid,
-            currentUserData: currentUserData,
-            communityService: communityService,
-          ),
-          const SizedBox(height: 12),
-        ] else if (!isAdmin && !membersCanPost) ...[
-          const SizedBox(height: 12),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(
-                color: colorScheme.outline.withValues(alpha: 0.2),
+              _LeaveCommunityButton(
+                communityId: communityId,
+                currentUid: currentUid,
+                isAdmin: isAdmin,
+                isCreator: isCreator,
+                communityService: communityService,
               ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  VIcon(
-                    VerbumIcons.info,
-                    size: 18,
-                    color: colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Solo los administradores pueden publicar en esta comunidad.',
-                      style: VerbumFonts.sans(
-                        fontSize: 13.5,
-                        color: colorScheme.onSurface.withValues(alpha: 0.8),
+              const SizedBox(height: 12),
+              Text('Muro', style: context.type.heading),
+              const SizedBox(height: 8),
+              StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
+                stream: communityService.communityPostsStream(communityId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Text(
+                        'No se pudieron cargar las publicaciones por ahora.',
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-        ],
-        _LeaveCommunityButton(
-          communityId: communityId,
-          currentUid: currentUid,
-          isAdmin: isAdmin,
-          isCreator: isCreator,
-          communityService: communityService,
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Text(
-              'Lo que compartimos',
-              style: VerbumFonts.serif(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const Spacer(),
-            VIcon(VerbumIcons.sparkle, size: 17, color: colorScheme.secondary),
-          ],
-        ),
-        const SizedBox(height: 8),
-        StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
-          stream: communityService.communityPostsStream(communityId),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24),
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
-            if (snapshot.hasError) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Text(
-                  'No se pudieron cargar las publicaciones por ahora.',
-                ),
-              );
-            }
+                    );
+                  }
 
-            final docs = snapshot.data ?? [];
-            if (kDebugMode) {
-              debugPrint(
-                '[Verbum/community_feed] UI communityId=$communityId '
-                'postsEnLista=${docs.length}',
-              );
-            }
-            if (docs.isEmpty) {
-              return Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(
-                    color: colorScheme.outline.withValues(alpha: 0.2),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      VIcon(
-                        VerbumIcons.chatsCircle,
-                        color: colorScheme.onSurface.withValues(alpha: 0.7),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'Aun no hay publicaciones en esta comunidad.',
-                          style: VerbumFonts.sans(
-                            color: colorScheme.onSurface.withValues(alpha: 0.8),
-                          ),
+                  final docs = snapshot.data ?? [];
+                  if (kDebugMode) {
+                    debugPrint(
+                      '[Verbum/community_feed] UI communityId=$communityId '
+                      'postsEnLista=${docs.length}',
+                    );
+                  }
+                  if (docs.isEmpty) {
+                    return Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(
+                          color: colorScheme.outline.withValues(alpha: 0.2),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              );
-            }
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            VIcon(
+                              VerbumIcons.chatsCircle,
+                              color: colorScheme.onSurface.withValues(
+                                alpha: 0.7,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'Aun no hay publicaciones en esta comunidad.',
+                                style: VerbumFonts.sans(
+                                  color: colorScheme.onSurface.withValues(
+                                    alpha: 0.8,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
 
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: docs.map((doc) {
-                final post = doc.data();
-                return _CommunityPostTile(
-                  postId: doc.id,
-                  post: post,
-                  currentUid: currentUid,
-                  isAdmin: isAdmin,
-                  communityAdminIds: ((data['adminIds'] as List?) ?? const [])
-                      .map((id) => id?.toString() ?? '')
-                      .where((id) => id.isNotEmpty)
-                      .toSet(),
-                  communityService: communityService,
-                  social: communitySocial,
-                );
-              }).toList(),
-            );
-          },
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: docs.map((doc) {
+                      final post = doc.data();
+                      return _CommunityPostTile(
+                        postId: doc.id,
+                        post: post,
+                        currentUid: currentUid,
+                        isAdmin: isAdmin,
+                        communityAdminIds:
+                            ((data['adminIds'] as List?) ?? const [])
+                                .map((id) => id?.toString() ?? '')
+                                .where((id) => id.isNotEmpty)
+                                .toSet(),
+                        communityService: communityService,
+                        social: communitySocial,
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -1221,218 +1234,6 @@ class _CommunityPathCard extends StatelessWidget {
               else
                 const VIcon(VerbumIcons.caretRight),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CommunityWelcomeHero extends StatelessWidget {
-  final String name;
-  final String city;
-  final String? imageUrl;
-  final bool isAdmin;
-  final bool isVerified;
-  final String inviteCode;
-
-  const _CommunityWelcomeHero({
-    required this.name,
-    required this.city,
-    required this.imageUrl,
-    required this.isAdmin,
-    required this.isVerified,
-    required this.inviteCode,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 210,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: .12),
-            blurRadius: 30,
-            offset: const Offset(0, 14),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            if (imageUrl != null && imageUrl!.isNotEmpty)
-              Image.network(
-                imageUrl!,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-              ),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    context.palette.inverse,
-                    context.palette.inverse.withValues(alpha: .86),
-                    Color.alphaBlend(
-                      context.palette.gold.withValues(alpha: .35),
-                      context.palette.inverse,
-                    ).withValues(alpha: .78),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              right: -24,
-              top: -22,
-              child: VIcon(
-                VerbumIcons.usersThree,
-                weight: VIconWeight.fill,
-                size: 190,
-                color: Colors.white.withValues(alpha: .06),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: .13),
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: .18),
-                          ),
-                        ),
-                        child: Text(
-                          isAdmin ? 'Tu comunidad · Admin' : 'Tu comunidad',
-                          style: VerbumFonts.sans(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      if (isVerified) ...[
-                        const SizedBox(width: 8),
-                        VIcon(
-                          VerbumIcons.sealCheck,
-                          weight: VIconWeight.fill,
-                          color: context.palette.gold,
-                          size: 20,
-                        ),
-                      ],
-                    ],
-                  ),
-                  const Spacer(),
-                  Text(
-                    name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: VerbumFonts.serif(
-                      color: Colors.white,
-                      fontSize: 26,
-                      height: 1.05,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  if (city.isNotEmpty) ...[
-                    const SizedBox(height: 7),
-                    Row(
-                      children: [
-                        const VIcon(
-                          VerbumIcons.mapPin,
-                          color: Colors.white70,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          city,
-                          style: VerbumFonts.sans(
-                            color: Colors.white70,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      _HeroAction(
-                        icon: VerbumIcons.slidersHorizontal,
-                        label: 'Preferencias',
-                        onTap: () =>
-                            Navigator.of(context).pushNamed('/settings'),
-                      ),
-                      if (isAdmin && inviteCode.isNotEmpty) ...[
-                        const SizedBox(width: 9),
-                        _HeroAction(
-                          icon: VerbumIcons.shareNetwork,
-                          label: 'Invitar',
-                          onTap: () => SharePlus.instance.share(
-                            ShareParams(
-                              text:
-                                  'Te invito a unirte a $name en Verbum. Usa el código $inviteCode.',
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _HeroAction extends StatelessWidget {
-  final VerbumIcons icon;
-  final String label;
-  final VoidCallback? onTap;
-  const _HeroAction({required this.icon, required this.label, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Material(
-        color: Colors.white.withValues(alpha: .12),
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                VIcon(icon, color: Colors.white, size: 16),
-                const SizedBox(width: 6),
-                Text(
-                  label,
-                  style: VerbumFonts.sans(
-                    color: Colors.white,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
       ),

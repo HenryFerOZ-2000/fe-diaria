@@ -73,7 +73,11 @@ class LiveComment {
 class LiveScreen extends StatefulWidget {
   final bool showAppBar;
 
-  const LiveScreen({super.key, this.showAppBar = true});
+  /// Portada a sangre (Comunidad) con el número de intenciones de la
+  /// semana. Si se da, la pantalla se muestra sin su propia barra.
+  final Widget Function(int weeklyCount)? coverBuilder;
+
+  const LiveScreen({super.key, this.showAppBar = true, this.coverBuilder});
 
   @override
   State<LiveScreen> createState() => _LiveScreenState();
@@ -326,6 +330,123 @@ class _LiveScreenState extends State<LiveScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    final feed = StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: _buildQuery().snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _LiveFeedSkeleton(
+            onCompose: _createPost,
+            cover: widget.coverBuilder?.call(0),
+          );
+        }
+        if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              'Error al cargar publicaciones: ${snapshot.error}',
+              textAlign: TextAlign.center,
+            ),
+          );
+        }
+        final docs = snapshot.data?.docs ?? [];
+        final now = DateTime.now();
+        final posts = docs.map((doc) {
+          final data = doc.data();
+          final ts = data['createdAt'] as Timestamp?;
+          return LivePost(
+            id: doc.id,
+            authorUid: data['authorUid'] as String? ?? '',
+            userName:
+                (data['authorUsername'] as String?) ??
+                (data['authorName'] as String?) ??
+                data['authorUid'] as String? ??
+                'Anónimo',
+            authorPhoto: data['authorPhoto'] as String?,
+            text: data['text'] as String? ?? '',
+            category: (data['category'] as String?) ?? 'Fortaleza',
+            status: (data['prayerStatus'] as String?) ?? 'active',
+            timeAgo: _formatTimeAgo(ts?.toDate(), now),
+            joinCount: (data['joinCount'] ?? 0) as int,
+            likes: (data['likeCount'] ?? 0) as int,
+            comments: (data['commentCount'] ?? 0) as int,
+            isLiked: false,
+          );
+        }).toList();
+
+        final weekAgo = now.subtract(const Duration(days: 7));
+        final weeklyCount = docs.where((doc) {
+          final ts = doc.data()['createdAt'] as Timestamp?;
+          return ts != null && ts.toDate().isAfter(weekAgo);
+        }).length;
+        final cover = widget.coverBuilder?.call(weeklyCount);
+        const gutter = EdgeInsets.symmetric(horizontal: VerbumSpace.gutter);
+
+        final visiblePosts = _selectedFeedCategory == 'Todas'
+            ? posts
+            : posts
+                  .where((post) => post.category == _selectedFeedCategory)
+                  .toList();
+
+        return RefreshIndicator(
+          onRefresh: _refreshFeed,
+          color: colorScheme.primary,
+          child: ListView.builder(
+            controller: _scrollController,
+            padding: EdgeInsets.only(top: cover == null ? 10 : 0, bottom: 28),
+            itemCount: visiblePosts.isEmpty ? 2 : visiblePosts.length + 1,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ?cover,
+                    Padding(
+                      padding: gutter,
+                      child: _LiveFeedHeader(
+                        selectedCategory: _selectedFeedCategory,
+                        onCategorySelected: (category) {
+                          setState(() => _selectedFeedCategory = category);
+                        },
+                        onCompose: _createPost,
+                      ),
+                    ),
+                  ],
+                );
+              }
+              if (visiblePosts.isEmpty) {
+                return Padding(
+                  padding: gutter,
+                  child: _LiveEmptyState(
+                    filtered: _selectedFeedCategory != 'Todas',
+                    onCompose: _createPost,
+                  ),
+                );
+              }
+              final post = visiblePosts[index - 1];
+              return Padding(
+                key: ValueKey(post.id),
+                padding: const EdgeInsets.fromLTRB(
+                  VerbumSpace.gutter,
+                  0,
+                  VerbumSpace.gutter,
+                  12,
+                ),
+                child: _FeedPostTile(
+                  postId: post.id,
+                  post: post,
+                  service: _livePostsService,
+                  currentUid: _uid ?? '',
+                  onComment: () => _openComments(post),
+                  onShare: () => _sharePost(post),
+                  onDelete: () => _deletePostFromLive(post),
+                  onAuthorTap: null, // Los perfiles ya no son públicos
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+    if (widget.coverBuilder != null) return feed;
     return AppScaffold(
       showBanner: false,
       showAppBar: widget.showAppBar,
@@ -340,94 +461,7 @@ class _LiveScreenState extends State<LiveScreen> {
       actions: const [VerbumHeaderActions()],
       centerTitle: false,
       resizeToAvoidBottomInset: true,
-      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: _buildQuery().snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return _LiveFeedSkeleton(onCompose: _createPost);
-          }
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Error al cargar publicaciones: ${snapshot.error}',
-                textAlign: TextAlign.center,
-              ),
-            );
-          }
-          final docs = snapshot.data?.docs ?? [];
-          final now = DateTime.now();
-          final posts = docs.map((doc) {
-            final data = doc.data();
-            final ts = data['createdAt'] as Timestamp?;
-            return LivePost(
-              id: doc.id,
-              authorUid: data['authorUid'] as String? ?? '',
-              userName:
-                  (data['authorUsername'] as String?) ??
-                  (data['authorName'] as String?) ??
-                  data['authorUid'] as String? ??
-                  'Anónimo',
-              authorPhoto: data['authorPhoto'] as String?,
-              text: data['text'] as String? ?? '',
-              category: (data['category'] as String?) ?? 'Fortaleza',
-              status: (data['prayerStatus'] as String?) ?? 'active',
-              timeAgo: _formatTimeAgo(ts?.toDate(), now),
-              joinCount: (data['joinCount'] ?? 0) as int,
-              likes: (data['likeCount'] ?? 0) as int,
-              comments: (data['commentCount'] ?? 0) as int,
-              isLiked: false,
-            );
-          }).toList();
-
-          final visiblePosts = _selectedFeedCategory == 'Todas'
-              ? posts
-              : posts
-                    .where((post) => post.category == _selectedFeedCategory)
-                    .toList();
-
-          return RefreshIndicator(
-            onRefresh: _refreshFeed,
-            color: colorScheme.primary,
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
-              itemCount: visiblePosts.isEmpty ? 2 : visiblePosts.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return _LiveFeedHeader(
-                    selectedCategory: _selectedFeedCategory,
-                    onCategorySelected: (category) {
-                      setState(() => _selectedFeedCategory = category);
-                    },
-                    onCompose: _createPost,
-                  );
-                }
-                if (visiblePosts.isEmpty) {
-                  return _LiveEmptyState(
-                    filtered: _selectedFeedCategory != 'Todas',
-                    onCompose: _createPost,
-                  );
-                }
-                final post = visiblePosts[index - 1];
-                return Padding(
-                  key: ValueKey(post.id),
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _FeedPostTile(
-                    postId: post.id,
-                    post: post,
-                    service: _livePostsService,
-                    currentUid: _uid ?? '',
-                    onComment: () => _openComments(post),
-                    onShare: () => _sharePost(post),
-                    onDelete: () => _deletePostFromLive(post),
-                    onAuthorTap: null, // Los perfiles ya no son públicos
-                  ),
-                );
-              },
-            ),
-          );
-        },
-      ),
+      body: feed,
     );
   }
 }
@@ -453,141 +487,115 @@ class _LiveFeedHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final dark = theme.brightness == Brightness.dark;
+    final p = context.palette;
+    final type = context.type;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(top: 8, bottom: 14),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            'INTENCIONES COMPARTIDAS',
-            style: VerbumFonts.sans(
-              color: scheme.secondary,
-              fontSize: 9.5,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.45,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            'Acompañarnos también es orar',
-            style: VerbumFonts.serif(
-              color: scheme.onSurface,
-              fontSize: 23,
-              height: 1.1,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'Escucha, comparte esperanza y hazle saber a alguien que no está solo.',
-            style: VerbumFonts.sans(
-              color: scheme.onSurfaceVariant,
-              fontSize: 12.5,
-              height: 1.45,
+          VSurfaceCard(
+            onTap: onCompose,
+            radius: VerbumRadius.card,
+            padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+            semanticLabel: 'Compartir una intención',
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: p.surfaceMuted,
+                    borderRadius: BorderRadius.circular(VerbumRadius.control),
+                  ),
+                  child: VIcon(VerbumIcons.handHeart, color: p.rubric),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '¿Por quién quieres orar?',
+                        style: type.bodyStrong.copyWith(fontSize: 15),
+                      ),
+                      Text('Comparte una intención', style: type.caption),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 13,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: p.butter,
+                    borderRadius: BorderRadius.circular(VerbumRadius.control),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      VIcon(VerbumIcons.plus, size: 15, color: p.onButter),
+                      const SizedBox(width: 5),
+                      Text(
+                        'Pedir',
+                        style: type.bodyStrong.copyWith(
+                          color: p.onButter,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 14),
-          Material(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(22),
-            child: InkWell(
-              onTap: onCompose,
-              borderRadius: BorderRadius.circular(22),
-              child: Ink(
-                padding: const EdgeInsets.fromLTRB(13, 12, 12, 12),
-                decoration: BoxDecoration(
-                  color: context.palette.surface,
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(
-                    color: scheme.primary.withValues(alpha: .15),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: dark ? .12 : .045),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: scheme.primary.withValues(alpha: .10),
-                        shape: BoxShape.circle,
-                      ),
-                      child: VIcon(VerbumIcons.handHeart,
-                        color: scheme.primary,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 11),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '¿Por quién quieres orar hoy?',
-                            style: VerbumFonts.sans(
-                              color: scheme.onSurface,
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Compartir una intención',
-                            style: VerbumFonts.sans(
-                              color: scheme.primary,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    VIcon(VerbumIcons.arrowRight,
-                      color: scheme.primary,
-                      size: 19,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 13),
           SizedBox(
-            height: 34,
+            height: 40,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: categories.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 7),
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final category = categories[index];
                 final selected = category == selectedCategory;
-                return ChoiceChip(
+                final icon = categoryIconFor(category);
+                return Semantics(
+                  button: true,
                   selected: selected,
-                  onSelected: (_) => onCategorySelected(category),
-                  label: Text(category),
-                  showCheckmark: false,
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  side: BorderSide(
-                    color: selected
-                        ? scheme.primary.withValues(alpha: .28)
-                        : scheme.outline.withValues(alpha: .16),
-                  ),
-                  backgroundColor: context.palette.surface,
-                  selectedColor: scheme.primary.withValues(alpha: .12),
-                  labelStyle: VerbumFonts.sans(
-                    color: selected ? scheme.primary : scheme.onSurfaceVariant,
-                    fontSize: 11,
-                    fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                  child: Material(
+                    color: selected ? p.emphasis : p.surfaceMuted,
+                    borderRadius: BorderRadius.circular(99),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(99),
+                      onTap: () => onCategorySelected(category),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (icon != null) ...[
+                              VIcon(
+                                icon,
+                                size: 14,
+                                color: selected ? p.onEmphasis : p.rubric,
+                              ),
+                              const SizedBox(width: 6),
+                            ],
+                            Text(
+                              category,
+                              style: type.bodyStrong.copyWith(
+                                fontSize: 13,
+                                color: selected ? p.onEmphasis : p.rubric,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 );
               },
@@ -599,6 +607,16 @@ class _LiveFeedHeader extends StatelessWidget {
   }
 }
 
+/// Icono de cada categoría de intención ("Todas" no lleva).
+VerbumIcons? categoryIconFor(String category) => switch (category) {
+  'Salud' => VerbumIcons.firstAid,
+  'Familia' => VerbumIcons.houseLine,
+  'Fortaleza' => VerbumIcons.mountains,
+  'Gratitud' => VerbumIcons.sparkle,
+  'Todas' => null,
+  _ => VerbumIcons.handHeart,
+};
+
 class _LiveEmptyState extends StatelessWidget {
   final bool filtered;
   final VoidCallback onCompose;
@@ -607,43 +625,16 @@ class _LiveEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: scheme.outline.withValues(alpha: .15)),
-      ),
-      child: Column(
-        children: [
-          VIcon(VerbumIcons.chatsCircle, color: scheme.primary, size: 32),
-          const SizedBox(height: 10),
-          Text(
-            filtered ? 'Aún no hay intenciones aquí' : 'Sé la primera voz',
-            style: VerbumFonts.serif(
-              color: scheme.onSurface,
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
+    return VSurfaceCard(
+      radius: VerbumRadius.card,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: VEmptyState(
+        icon: VerbumIcons.chatsCircle,
+        title: filtered ? 'Aún no hay intenciones aquí' : 'Sé la primera voz',
+        message:
             'Comparte algo que hoy quieras poner en manos de la comunidad.',
-            textAlign: TextAlign.center,
-            style: VerbumFonts.sans(
-              color: scheme.onSurfaceVariant,
-              fontSize: 12,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextButton.icon(
-            onPressed: onCompose,
-            icon: const VIcon(VerbumIcons.plus),
-            label: const Text('Compartir una intención'),
-          ),
-        ],
+        actionLabel: 'Compartir una intención',
+        onAction: onCompose,
       ),
     );
   }
@@ -651,30 +642,36 @@ class _LiveEmptyState extends StatelessWidget {
 
 class _LiveFeedSkeleton extends StatelessWidget {
   final VoidCallback onCompose;
+  final Widget? cover;
 
-  const _LiveFeedSkeleton({required this.onCompose});
+  const _LiveFeedSkeleton({required this.onCompose, this.cover});
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final p = context.palette;
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
+      padding: EdgeInsets.only(top: cover == null ? 10 : 0, bottom: 28),
       children: [
-        _LiveFeedHeader(
-          selectedCategory: 'Todas',
-          onCategorySelected: (_) {},
-          onCompose: onCompose,
-        ),
-        ...List.generate(
-          3,
-          (index) => Container(
-            height: 150,
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color: scheme.surface.withValues(alpha: .72),
-              borderRadius: BorderRadius.circular(23),
-              border: Border.all(color: scheme.outline.withValues(alpha: .10)),
-            ),
+        ?cover,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: VerbumSpace.gutter),
+          child: Column(
+            children: [
+              _LiveFeedHeader(
+                selectedCategory: 'Todas',
+                onCategorySelected: (_) {},
+                onCompose: onCompose,
+              ),
+              for (var i = 0; i < 3; i++)
+                Container(
+                  height: 150,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: p.surface.withValues(alpha: .7),
+                    borderRadius: BorderRadius.circular(VerbumRadius.card),
+                  ),
+                ),
+            ],
           ),
         ),
       ],
@@ -727,7 +724,15 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
   }
 
   Future<void> _toggleJoin() async {
-    if (_updating || widget.currentUid.isEmpty) return;
+    if (widget.currentUid.isEmpty) {
+      showTopNotice(
+        context,
+        message: 'Inicia sesión para orar con la comunidad.',
+        isError: true,
+      );
+      return;
+    }
+    if (_updating) return;
     final previousJoined = _joined;
     final previousCount = _joinCount;
     setState(() {
@@ -769,54 +774,6 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
     }
   }
 
-  String get _statusLabel {
-    switch (widget.post.status) {
-      case 'answered':
-        return 'ORACIÓN RESPONDIDA';
-      case 'gratitude':
-        return 'AGRADECIMIENTO';
-      default:
-        return 'SEGUIMOS ORANDO';
-    }
-  }
-
-  VerbumIcons get _statusIcon {
-    switch (widget.post.status) {
-      case 'answered':
-        return VerbumIcons.checkCircle;
-      case 'gratitude':
-        return VerbumIcons.sparkle;
-      default:
-        return VerbumIcons.heart;
-    }
-  }
-
-  Color _categoryColor(String category) {
-    switch (category) {
-      case 'Salud':
-        return const Color(0xFF5F8178);
-      case 'Familia':
-        return const Color(0xFF77649A);
-      case 'Gratitud':
-        return const Color(0xFFB5813E);
-      default:
-        return const Color(0xFF8A645D);
-    }
-  }
-
-  VerbumIcons _categoryIcon(String category) {
-    switch (category) {
-      case 'Salud':
-        return VerbumIcons.firstAid;
-      case 'Familia':
-        return VerbumIcons.usersThree;
-      case 'Gratitud':
-        return VerbumIcons.sparkle;
-      default:
-        return VerbumIcons.shield;
-    }
-  }
-
   String _authorLabel(bool isMine) {
     if (isMine) return 'Tú';
     final raw = widget.post.userName.trim();
@@ -828,15 +785,15 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final dark = theme.brightness == Brightness.dark;
+    final p = context.palette;
+    final type = context.type;
     final isMine =
         widget.currentUid.isNotEmpty &&
         widget.post.authorUid == widget.currentUid;
     final authorName = _authorLabel(isMine);
     final photo = widget.post.authorPhoto?.trim();
-    final accent = _categoryColor(widget.post.category);
+    final status = widget.post.status;
+    final categoryIcon = categoryIconFor(widget.post.category);
 
     return StreamBuilder<bool>(
       stream: widget.service.isPrayerJoinedStream(
@@ -852,243 +809,210 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
           });
         }
 
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          decoration: BoxDecoration(
-            color: context.palette.surface,
-            borderRadius: BorderRadius.circular(23),
-            border: Border.all(
-              color: _joined
-                  ? accent.withValues(alpha: .42)
-                  : scheme.outline.withValues(alpha: .14),
-              width: _joined ? 1.35 : 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: _joined
-                    ? accent.withValues(alpha: .10)
-                    : Colors.black.withValues(alpha: dark ? .12 : .045),
-                blurRadius: 20,
-                offset: const Offset(0, 9),
-              ),
-            ],
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Stack(
+        return VSurfaceCard(
+          radius: VerbumRadius.card,
+          padding: const EdgeInsets.fromLTRB(16, 14, 10, 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Positioned(
-                left: 0,
-                top: 18,
-                bottom: 18,
-                child: Container(
-                  width: 3,
-                  decoration: BoxDecoration(
-                    color: accent,
-                    borderRadius: const BorderRadius.horizontal(
-                      right: Radius.circular(8),
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(13),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      color: p.surfaceMuted,
+                      alignment: Alignment.center,
+                      child: photo != null && photo.isNotEmpty
+                          ? Image.network(
+                              photo,
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) => const SizedBox(),
+                            )
+                          : Text(
+                              authorName.characters.first.toUpperCase(),
+                              style: type.bodyStrong.copyWith(color: p.rubric),
+                            ),
                     ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          authorName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: type.bodyStrong,
+                        ),
+                        Text(widget.post.timeAgo, style: type.caption),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: p.surfaceMuted,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (categoryIcon != null) ...[
+                          VIcon(categoryIcon, size: 13, color: p.rubric),
+                          const SizedBox(width: 5),
+                        ],
+                        Text(
+                          widget.post.category,
+                          style: type.caption.copyWith(
+                            color: p.rubric,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (isMine && widget.onDelete != null)
+                    PopupMenuButton<String>(
+                      tooltip: 'Opciones',
+                      icon: VIcon(VerbumIcons.dotsThree, color: p.inkMuted),
+                      onSelected: (value) {
+                        if (value == 'delete') {
+                          widget.onDelete?.call();
+                        } else {
+                          _updateStatus(value);
+                        }
+                      },
+                      itemBuilder: (_) => const [
+                        PopupMenuItem(
+                          value: 'active',
+                          child: Text('Seguimos orando'),
+                        ),
+                        PopupMenuItem(
+                          value: 'answered',
+                          child: Text('Marcar como respondida'),
+                        ),
+                        PopupMenuItem(
+                          value: 'gratitude',
+                          child: Text('Convertir en agradecimiento'),
+                        ),
+                        PopupMenuDivider(),
+                        PopupMenuItem(
+                          value: 'delete',
+                          child: Text('Eliminar publicación'),
+                        ),
+                      ],
+                    )
+                  else
+                    const SizedBox(width: 6),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 12, right: 6),
+                child: Text(
+                  widget.post.text,
+                  style: VerbumFonts.serif(
+                    color: p.ink,
+                    fontSize: 19,
+                    height: 1.35,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 14, 11),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+              if (status == 'answered' || status == 'gratitude')
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: status == 'answered' ? p.sageSoft : p.goldSoft,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        CircleAvatar(
-                          radius: 19,
-                          backgroundColor: accent.withValues(alpha: .12),
-                          backgroundImage: photo != null && photo.isNotEmpty
-                              ? NetworkImage(photo)
-                              : null,
-                          child: photo == null || photo.isEmpty
-                              ? Text(
-                                  authorName.characters.first.toUpperCase(),
-                                  style: VerbumFonts.sans(
-                                    color: accent,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                )
-                              : null,
+                        VIcon(
+                          status == 'answered'
+                              ? VerbumIcons.sealCheck
+                              : VerbumIcons.sparkle,
+                          weight: VIconWeight.fill,
+                          size: 13,
+                          color: status == 'answered' ? p.sage : p.onButter,
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      authorName,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: VerbumFonts.sans(
-                                        color: scheme.onSurface,
-                                        fontSize: 13.5,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '· ${widget.post.timeAgo}',
-                                    style: VerbumFonts.sans(
-                                      color: scheme.onSurfaceVariant,
-                                      fontSize: 10.8,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 3),
-                              Row(
-                                children: [
-                                  VIcon(
-                                    _categoryIcon(widget.post.category),
-                                    color: accent,
-                                    size: 12,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    widget.post.category.toUpperCase(),
-                                    style: VerbumFonts.sans(
-                                      color: accent,
-                                      fontSize: 8.8,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: .7,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                        const SizedBox(width: 5),
+                        Text(
+                          status == 'answered'
+                              ? 'Oración respondida'
+                              : 'Agradecimiento',
+                          style: type.caption.copyWith(
+                            color: status == 'answered'
+                                ? p.sageInk
+                                : p.onButter,
+                            fontWeight: FontWeight.w800,
                           ),
-                        ),
-                        if (isMine && widget.onDelete != null)
-                          PopupMenuButton<String>(
-                            tooltip: 'Opciones',
-                            padding: EdgeInsets.zero,
-                            icon: VIcon(VerbumIcons.dotsThree,
-                              color: scheme.onSurfaceVariant,
-                            ),
-                            onSelected: (value) {
-                              if (value == 'delete') {
-                                widget.onDelete?.call();
-                              } else {
-                                _updateStatus(value);
-                              }
-                            },
-                            itemBuilder: (_) => const [
-                              PopupMenuItem(
-                                value: 'active',
-                                child: Text('Seguimos orando'),
-                              ),
-                              PopupMenuItem(
-                                value: 'answered',
-                                child: Text('Marcar como respondida'),
-                              ),
-                              PopupMenuItem(
-                                value: 'gratitude',
-                                child: Text('Convertir en agradecimiento'),
-                              ),
-                              PopupMenuDivider(),
-                              PopupMenuItem(
-                                value: 'delete',
-                                child: Text('Eliminar publicación'),
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 13),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 9,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: accent.withValues(alpha: .1),
-                        borderRadius: BorderRadius.circular(99),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          VIcon(_statusIcon, size: 12, color: accent),
-                          const SizedBox(width: 5),
-                          Text(
-                            _statusLabel,
-                            style: VerbumFonts.sans(
-                              color: accent,
-                              fontSize: 8,
-                              letterSpacing: .7,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 9),
-                    Text(
-                      widget.post.text,
-                      style: VerbumFonts.sans(
-                        color: scheme.onSurface.withValues(alpha: .92),
-                        fontSize: 14.2,
-                        height: 1.5,
-                      ),
-                    ),
-                    if (widget.post.mediaUrl != null &&
-                        widget.post.mediaUrl!.trim().isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: Image.network(
-                            widget.post.mediaUrl!,
-                            fit: BoxFit.cover,
-                            cacheWidth: 900,
-                            errorBuilder: (_, __, ___) => ColoredBox(
-                              color: scheme.surfaceContainerHighest,
-                              child: VIcon(VerbumIcons.imageBroken,
-                                color: scheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 13),
-                    Divider(
-                      height: 1,
-                      color: scheme.outline.withValues(alpha: .11),
-                    ),
-                    const SizedBox(height: 7),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _PrayerJoinButton(
-                            joined: _joined,
-                            count: _joinCount,
-                            color: accent,
-                            onTap: _toggleJoin,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        _ModernPostAction(
-                          icon: VerbumIcons.chatCircle,
-                          label: '${widget.post.comments}',
-                          onTap: widget.onComment,
-                        ),
-                        _ModernPostAction(
-                          icon: VerbumIcons.shareNetwork,
-                          tooltip: 'Compartir',
-                          onTap: widget.onShare,
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
+              if (widget.post.mediaUrl != null &&
+                  widget.post.mediaUrl!.trim().isNotEmpty) ...[
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(VerbumRadius.tile),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Image.network(
+                      widget.post.mediaUrl!,
+                      fit: BoxFit.cover,
+                      cacheWidth: 900,
+                      errorBuilder: (_, _, _) => ColoredBox(
+                        color: p.surfaceMuted,
+                        child: Center(
+                          child: VIcon(
+                            VerbumIcons.imageBroken,
+                            color: p.inkSubtle,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 12),
+              Divider(height: 1, color: p.lineSoft),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  _PrayerJoinButton(
+                    joined: _joined,
+                    count: _joinCount,
+                    answered: status != 'active',
+                    onTap: _toggleJoin,
+                  ),
+                  const Spacer(),
+                  _ModernPostAction(
+                    icon: VerbumIcons.chatCircle,
+                    label: '${widget.post.comments}',
+                    tooltip: 'Comentarios',
+                    onTap: widget.onComment,
+                  ),
+                  _ModernPostAction(
+                    icon: VerbumIcons.shareNetwork,
+                    tooltip: 'Compartir',
+                    onTap: widget.onShare,
+                  ),
+                ],
               ),
             ],
           ),
@@ -1098,56 +1022,65 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
   }
 }
 
+/// "Orar · 12": el gesto principal. Al unirse se ilumina en mantequilla.
 class _PrayerJoinButton extends StatelessWidget {
   final bool joined;
   final int count;
-  final Color color;
+
+  /// Respondida o de agradecimiento: se celebra en lugar de pedir.
+  final bool answered;
   final VoidCallback onTap;
 
   const _PrayerJoinButton({
     required this.joined,
     required this.count,
-    required this.color,
+    required this.answered,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: 39,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(
-          color: joined ? color.withValues(alpha: .13) : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            VIcon(
-              joined
-                  ? VerbumIcons.handHeart
-                  : VerbumIcons.handHeart,
-              color: color,
-              size: 18,
-            ),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                joined ? 'Acompañando · $count' : 'Me uno · $count',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: VerbumFonts.sans(
-                  color: color,
-                  fontSize: 11.2,
-                  fontWeight: FontWeight.w800,
+    final p = context.palette;
+    final label = answered
+        ? 'Gracias a Dios · $count'
+        : joined
+        ? 'Orando · $count'
+        : 'Orar · $count';
+    return Semantics(
+      button: true,
+      selected: joined,
+      label: joined
+          ? 'Dejar de acompañar, $count'
+          : 'Acompañar en oración, $count',
+      excludeSemantics: true,
+      child: Material(
+        color: joined ? p.butter : p.surfaceMuted,
+        borderRadius: BorderRadius.circular(99),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(99),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                VIcon(
+                  VerbumIcons.handsPraying,
+                  size: 16,
+                  weight: joined ? VIconWeight.fill : VIconWeight.regular,
+                  color: joined ? p.onButter : p.rubric,
                 ),
-              ),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: context.type.bodyStrong.copyWith(
+                    fontSize: 13,
+                    color: joined ? p.onButter : p.rubric,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -1169,26 +1102,25 @@ class _ModernPostAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.onSurfaceVariant;
+    final color = context.palette.inkMuted;
     return Tooltip(
       message: tooltip ?? '',
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(14),
         child: SizedBox(
-          height: 39,
+          height: 42,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 9),
             child: Row(
               children: [
-                VIcon(icon, color: color, size: 18),
+                VIcon(icon, color: color, size: 19),
                 if (label != null) ...[
                   const SizedBox(width: 4),
                   Text(
                     label!,
-                    style: VerbumFonts.sans(
+                    style: context.type.caption.copyWith(
                       color: color,
-                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -1299,7 +1231,8 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                         color: colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: VIcon(VerbumIcons.notePencil,
+                      child: VIcon(
+                        VerbumIcons.notePencil,
                         color: colorScheme.primary,
                         size: 24,
                       ),
@@ -1427,7 +1360,8 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.w500,
                         ),
-                        icon: VIcon(VerbumIcons.caretDown,
+                        icon: VIcon(
+                          VerbumIcons.caretDown,
                           color: colorScheme.primary,
                         ),
                         items: const [
@@ -1557,7 +1491,9 @@ class _CreatePostModalState extends State<_CreatePostModal> {
                                 ),
                               )
                             else ...[
-                              VIcon(VerbumIcons.paperPlaneRight, weight: VIconWeight.fill,
+                              VIcon(
+                                VerbumIcons.paperPlaneRight,
+                                weight: VIconWeight.fill,
                                 size: 20,
                                 color: canPost
                                     ? colorScheme.onPrimary

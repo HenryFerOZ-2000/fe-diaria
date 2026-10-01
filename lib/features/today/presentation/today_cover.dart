@@ -104,10 +104,10 @@ class TodayCover extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      _GlassButton(
+                      VGlassButton(
                         icon: VerbumIcons.user,
                         tooltip: 'Mi perfil',
-                        onTap: onProfile,
+                        onPressed: onProfile,
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -207,38 +207,6 @@ class TodayCover extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _GlassButton extends StatelessWidget {
-  const _GlassButton({
-    required this.icon,
-    required this.tooltip,
-    required this.onTap,
-  });
-
-  final VerbumIcons icon;
-  final String tooltip;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(VerbumRadius.control);
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: Colors.white.withValues(alpha: .2),
-        borderRadius: radius,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: radius,
-          child: SizedBox.square(
-            dimension: 46,
-            child: Center(child: VIcon(icon, color: Colors.white)),
-          ),
-        ),
       ),
     );
   }

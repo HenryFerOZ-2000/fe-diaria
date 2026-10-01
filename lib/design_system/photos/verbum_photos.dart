@@ -5,6 +5,8 @@ enum VerbumPhotos {
   candle,
   clouds,
   coffeeBible,
+  communityCandles,
+  communityGroup,
   coverMountains,
   elderReading,
   genesisLight,
