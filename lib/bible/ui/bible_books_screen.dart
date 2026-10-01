@@ -150,7 +150,7 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      titleWidget: Text('Biblia', style: context.type.display),
+      titleWidget: const SizedBox.shrink(),
       centerTitle: false,
       actions: const [VerbumHeaderActions()],
       showBanner: false,
@@ -179,73 +179,73 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
   }
 
+  /// Libros para empezar, con su foto y una línea que invita.
+  static const _starters = [
+    ('JHN', 'El amor hecho carne', VerbumPhotos.handsOnBible),
+    ('PSA', 'Oración y alabanza', VerbumPhotos.lake),
+    ('MAT', 'Las bienaventuranzas', VerbumPhotos.sunrisePrayer),
+    ('PRO', 'Sabiduría para el día', VerbumPhotos.journaling),
+    ('GEN', 'En el principio', VerbumPhotos.morning),
+    ('ROM', 'La fe que justifica', VerbumPhotos.windowReading),
+  ];
+
+  static const _gutter = EdgeInsets.symmetric(horizontal: VerbumSpace.gutter);
+
   Widget _buildContent(BuildContext context) {
+    final p = context.palette;
+    final type = context.type;
     final query = _searchController.text.trim();
     return ListView(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(
-        VerbumSpace.gutter,
-        4,
-        VerbumSpace.gutter,
-        28,
-      ),
+      padding: const EdgeInsets.only(top: 4, bottom: 28),
       children: [
-        VFeatureCard(
-          eyebrow: 'La Palabra',
-          title: 'Lee, escucha y permanece',
-          body: 'Toda la Escritura disponible para acompañarte donde estés.',
-          photo: VerbumPhotos.bibleHills,
-          footer: VMetaChip(
-            icon: VerbumIcons.checkCircle,
-            label: 'RV1909 · Sin conexión',
-            color: context.palette.butter,
+        const Padding(
+          padding: _gutter,
+          child: VTwoToneTitle('la Palabra', 'Abre', accentFirst: true),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            VerbumSpace.gutter,
+            6,
+            VerbumSpace.gutter,
+            16,
+          ),
+          child: Text(
+            'Reina-Valera 1909 · 66 libros · sin conexión',
+            style: type.body.copyWith(color: p.inkMuted),
           ),
         ),
-        const SizedBox(height: 14),
-        _buildSearch(context),
-        if (query.length >= 2) ...[
-          const SizedBox(height: 16),
-          _buildSearchResults(context),
-        ] else ...[
-          if (_lastPosition != null) ...[
-            const SizedBox(height: 14),
-            _buildContinueCard(_lastPosition!),
-          ],
-          const VSectionHeader(
-            'Accesos rápidos',
-            padding: EdgeInsets.fromLTRB(2, 24, 2, 10),
-          ),
-          VTileGrid(
-            children: [
-              for (final (id, icon) in const [
-                ('PSA', VerbumIcons.feather),
-                ('PRO', VerbumIcons.lightbulb),
-                ('JHN', VerbumIcons.bookOpenText),
-                ('MAT', VerbumIcons.cross),
-              ])
-                VCategoryTile(
-                  icon: icon,
-                  title: bibleBookById(id)!.name,
-                  iconColor: context.palette.gold,
-                  onTap: () => _openBook(bibleBookById(id)!),
-                ),
-            ],
-          ),
-          if (_recentBooks.isNotEmpty) ...[
-            const VSectionHeader(
-              'Recientes',
-              padding: EdgeInsets.fromLTRB(2, 22, 2, 10),
+        Padding(padding: _gutter, child: _buildSearch(context)),
+        if (query.length >= 2)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              VerbumSpace.gutter,
+              16,
+              VerbumSpace.gutter,
+              0,
             ),
+            child: _buildSearchResults(context),
+          )
+        else ...[
+          const SizedBox(height: 16),
+          Padding(padding: _gutter, child: _buildHero(context)),
+          if (_recentBooks.isNotEmpty) ...[
+            _header('Leíste hace poco'),
             SizedBox(
               height: 40,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
+                padding: _gutter,
                 itemCount: _recentBooks.length,
                 separatorBuilder: (_, _) => const SizedBox(width: 8),
                 itemBuilder: (context, index) {
                   final book = _recentBooks[index];
                   return ActionChip(
-                    avatar: VIcon(VerbumIcons.clock, size: 15),
+                    avatar: VIcon(
+                      VerbumIcons.clockCounterClockwise,
+                      size: 15,
+                      color: p.rubric,
+                    ),
                     label: Text(book.name),
                     onPressed: () => _openBook(book),
                   );
@@ -253,52 +253,142 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
               ),
             ),
           ],
-          const VSectionHeader(
-            'Todos los libros',
-            padding: EdgeInsets.fromLTRB(2, 24, 2, 10),
+          _header('Para empezar'),
+          SizedBox(
+            height: MediaQuery.textScalerOf(context).scale(52) + 172,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              clipBehavior: Clip.none,
+              padding: _gutter,
+              itemCount: _starters.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 14),
+              itemBuilder: (context, i) {
+                final (id, caption, photo) = _starters[i];
+                final book = bibleBookById(id)!;
+                return VPhotoCard(
+                  photo: photo,
+                  title: book.name,
+                  caption: caption,
+                  width: 132,
+                  onTap: () => _openBook(book),
+                );
+              },
+            ),
           ),
-          VSegmentedControl<BibleTestament>(
-            selected: _testament,
-            onChanged: (value) => setState(() => _testament = value),
-            segments: const [
-              VSegment(value: BibleTestament.old, label: 'Antiguo · 39'),
-              VSegment(value: BibleTestament.newTestament, label: 'Nuevo · 27'),
-            ],
-          ),
-          const SizedBox(height: 14),
-          for (final section in booksBySection(_testament).entries) ...[
-            VListGroup(
-              title: section.key,
-              children: [
-                for (final book in section.value)
-                  VListRow(title: book.name, onTap: () => _openBook(book)),
+          _header('Todos los libros'),
+          Padding(
+            padding: _gutter,
+            child: VSegmentedControl<BibleTestament>(
+              selected: _testament,
+              onChanged: (value) => setState(() => _testament = value),
+              segments: const [
+                VSegment(value: BibleTestament.old, label: 'Antiguo · 39'),
+                VSegment(
+                  value: BibleTestament.newTestament,
+                  label: 'Nuevo · 27',
+                ),
               ],
             ),
-            const SizedBox(height: 12),
-          ],
-          const VSectionHeader(
-            'Ediciones',
-            padding: EdgeInsets.fromLTRB(2, 14, 2, 10),
           ),
-          VListGroup(
-            children: [
-              VListRow(
-                leading: VerbumIcons.bookOpen,
-                title: 'Estás leyendo Reina-Valera 1909',
-                subtitle: '66 libros · Sin conexión · Edición protestante',
-                trailing: VerbumIcons.info,
-                onTap: () => _push(const ContentSourcesScreen()),
+          for (final section in booksBySection(_testament).entries)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                VerbumSpace.gutter,
+                18,
+                VerbumSpace.gutter,
+                0,
               ),
-              VListRow(
-                leading: VerbumIcons.globe,
-                title: 'Consultar la Biblia católica',
-                subtitle: '73 libros · El Libro del Pueblo de Dios · En línea',
-                onTap: () => _push(const CatholicBibleScreen()),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(section.key, style: type.rubric),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final book in section.value)
+                        _BookPill(book: book, onTap: () => _openBook(book)),
+                    ],
+                  ),
+                ],
               ),
-            ],
+            ),
+          _header('Ediciones'),
+          Padding(
+            padding: _gutter,
+            child: VListGroup(
+              children: [
+                VListRow(
+                  leading: VerbumIcons.bookOpen,
+                  title: 'Estás leyendo Reina-Valera 1909',
+                  subtitle: '66 libros · Sin conexión · Edición protestante',
+                  trailing: VerbumIcons.info,
+                  onTap: () => _push(const ContentSourcesScreen()),
+                ),
+                VListRow(
+                  leading: VerbumIcons.globe,
+                  title: 'Consultar la Biblia católica',
+                  subtitle:
+                      '73 libros · El Libro del Pueblo de Dios · En línea',
+                  onTap: () => _push(const CatholicBibleScreen()),
+                ),
+              ],
+            ),
           ),
         ],
       ],
+    );
+  }
+
+  Widget _header(String title) => VSectionHeader(
+    title,
+    padding: const EdgeInsets.fromLTRB(
+      VerbumSpace.gutter + 2,
+      26,
+      VerbumSpace.gutter + 2,
+      12,
+    ),
+  );
+
+  /// Tarjeta periwinkle: continuar donde quedaste o, la primera vez,
+  /// una invitación a comenzar por Juan.
+  Widget _buildHero(BuildContext context) {
+    final position = _lastPosition;
+    final book = position == null ? null : bibleBookById(position.bookId);
+    if (position == null || book == null) {
+      final john = bibleBookById('JHN')!;
+      return VFeatureCard(
+        eyebrow: 'Para comenzar',
+        title: 'El Evangelio de Juan',
+        body: 'Un buen lugar para conocer a Jesús, capítulo a capítulo.',
+        photo: VerbumPhotos.bibleHills,
+        onTap: () => _openChapter(john, 1),
+        footer: VButton(
+          label: 'Empezar a leer',
+          icon: VerbumIcons.arrowRight,
+          variant: VButtonVariant.inverse,
+          compact: true,
+          onPressed: () => _openChapter(john, 1),
+        ),
+      );
+    }
+    void open() =>
+        _openChapter(book, position.chapter, initialVerse: position.verse);
+    return VFeatureCard(
+      eyebrow: 'Continúa donde quedaste',
+      title: '${position.bookName} ${position.chapter}',
+      body: 'Versículo ${position.verse} · Reina-Valera 1909',
+      photo: VerbumPhotos.bibleHills,
+      onTap: open,
+      footer: VButton(
+        label: 'Seguir leyendo',
+        icon: VerbumIcons.bookmarkSimple,
+        iconLeading: true,
+        variant: VButtonVariant.inverse,
+        compact: true,
+        onPressed: open,
+      ),
     );
   }
 
@@ -390,18 +480,34 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
   }
 
   String _sanitize(String text) => sanitizeVerseText(text);
+}
 
-  Widget _buildContinueCard(BibleReadingPosition position) {
-    final book = bibleBookById(position.bookId);
-    if (book == null) return const SizedBox.shrink();
-    return VActionTile(
-      tone: VSurfaceTone.accent,
-      icon: VerbumIcons.bookmarkSimple,
-      overline: 'Continuar leyendo',
-      title: '${position.bookName} ${position.chapter}:${position.verse}',
-      iconColor: context.palette.accent,
-      onTap: () =>
-          _openChapter(book, position.chapter, initialVerse: position.verse),
+/// Un libro como píldora tocable.
+class _BookPill extends StatelessWidget {
+  const _BookPill({required this.book, required this.onTap});
+
+  final BibleBookInfo book;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Material(
+      color: p.surface,
+      elevation: 3,
+      shadowColor: p.ink.withValues(alpha: .14),
+      borderRadius: BorderRadius.circular(VerbumRadius.control),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(VerbumRadius.control),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+          child: Text(
+            book.name,
+            style: context.type.bodyStrong.copyWith(fontSize: 14),
+          ),
+        ),
+      ),
     );
   }
 }
