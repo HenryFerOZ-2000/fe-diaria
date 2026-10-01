@@ -27,16 +27,11 @@ class CommunityPostDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final social = CommunityPostsSocialService();
     final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
-    final colorScheme = Theme.of(context).colorScheme;
+    final p = context.palette;
+    final t = context.type;
 
     return Scaffold(
-      appBar: VAppBar(
-        title: Text(
-          'Publicación',
-          style: VerbumFonts.serif(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: false,
-      ),
+      appBar: VAppBar(title: Text('Publicación', style: t.heading)),
       resizeToAvoidBottomInset: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -50,17 +45,16 @@ class CommunityPostDetailScreen extends StatelessWidget {
                   .snapshots(),
               builder: (context, snap) {
                 if (snap.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                    child: VEmptyState(title: 'Cargando', loading: true),
+                  );
                 }
                 if (!snap.hasData || !snap.data!.exists) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text(
-                        'Publicación no disponible.',
-                        style: VerbumFonts.sans(),
-                        textAlign: TextAlign.center,
-                      ),
+                  return const Center(
+                    child: VEmptyState(
+                      icon: VerbumIcons.chatCircleText,
+                      title: 'Publicación no disponible',
+                      message: 'Puede que se haya eliminado.',
                     ),
                   );
                 }
@@ -74,95 +68,78 @@ class CommunityPostDetailScreen extends StatelessWidget {
                 final comments = firestoreIntCount(d['commentCount']);
 
                 return SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            radius: 22,
-                            backgroundColor: colorScheme.primary.withValues(
-                              alpha: 0.12,
+                  padding: const EdgeInsets.fromLTRB(
+                    VerbumSpace.gutter,
+                    4,
+                    VerbumSpace.gutter,
+                    8,
+                  ),
+                  child: VSurfaceCard(
+                    padding: const EdgeInsets.fromLTRB(18, 18, 18, 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            _Avatar(
+                              name: authorName,
+                              photo: authorPhotoUrl,
+                              size: 44,
                             ),
-                            backgroundImage:
-                                authorPhotoUrl != null &&
-                                    authorPhotoUrl.isNotEmpty
-                                ? NetworkImage(authorPhotoUrl)
-                                : null,
-                            child:
-                                authorPhotoUrl == null || authorPhotoUrl.isEmpty
-                                ? Text(
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
                                     authorName.isNotEmpty
-                                        ? authorName[0].toUpperCase()
-                                        : '?',
-                                    style: VerbumFonts.sans(
-                                      fontWeight: FontWeight.w700,
-                                      color: colorScheme.primary,
-                                    ),
-                                  )
-                                : null,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  authorName.isNotEmpty
-                                      ? authorName
-                                      : 'Miembro',
-                                  style: VerbumFonts.sans(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 16,
+                                        ? authorName
+                                        : 'Miembro',
+                                    style: t.bodyStrong.copyWith(fontSize: 16),
                                   ),
-                                ),
-                                Text(
-                                  _formatTimeAgo(ts?.toDate()),
-                                  style: VerbumFonts.sans(
-                                    fontSize: 12,
-                                    color: colorScheme.onSurface.withValues(
-                                      alpha: 0.6,
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    _formatTimeAgo(ts?.toDate()),
+                                    style: t.caption.copyWith(
+                                      color: p.inkSubtle,
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-                      Text(
-                        text,
-                        style: VerbumFonts.sans(fontSize: 15, height: 1.45),
-                      ),
-                      const SizedBox(height: 12),
-                      CommunityPostInteractionRow(
-                        postId: postId,
-                        currentUid: uid,
-                        service: social,
-                        seedLikeCount: likes,
-                        seedCommentCount: comments,
-                        onOpenComments: () {
-                          // El hilo ya está debajo; opcional: enfocar campo de comentario.
-                        },
-                      ),
-                    ],
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          text,
+                          style: t.body.copyWith(fontSize: 16, height: 1.5),
+                        ),
+                        const SizedBox(height: 12),
+                        CommunityPostInteractionRow(
+                          postId: postId,
+                          currentUid: uid,
+                          service: social,
+                          seedLikeCount: likes,
+                          seedCommentCount: comments,
+                          onOpenComments: () {
+                            // El hilo ya está debajo; opcional: enfocar campo de comentario.
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 6),
-            child: Text(
-              'Comentarios',
-              style: VerbumFonts.sans(
-                fontWeight: FontWeight.w700,
-                fontSize: 15,
-              ),
+            padding: const EdgeInsets.fromLTRB(
+              VerbumSpace.gutter + 2,
+              8,
+              VerbumSpace.gutter,
+              6,
             ),
+            child: Text('Comentarios', style: t.heading.copyWith(fontSize: 17)),
           ),
           Expanded(
             flex: 6,
@@ -176,4 +153,45 @@ class CommunityPostDetailScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Avatar: foto o inicial sobre lavanda.
+class _Avatar extends StatelessWidget {
+  const _Avatar({required this.name, this.photo, this.size = 40});
+
+  final String name;
+  final String? photo;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final url = photo?.trim();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(size * .34),
+      child: Container(
+        width: size,
+        height: size,
+        color: p.surfaceMuted,
+        alignment: Alignment.center,
+        child: url != null && url.isNotEmpty
+            ? Image.network(
+                url,
+                width: size,
+                height: size,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => _initial(context),
+              )
+            : _initial(context),
+      ),
+    );
+  }
+
+  Widget _initial(BuildContext context) => Text(
+    name.isNotEmpty ? name.characters.first.toUpperCase() : '?',
+    style: context.type.bodyStrong.copyWith(
+      color: context.palette.rubric,
+      fontSize: size * .38,
+    ),
+  );
 }

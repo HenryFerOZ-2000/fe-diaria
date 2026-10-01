@@ -74,127 +74,134 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
+    final t = context.type;
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: VAppBar(
-        title: Text(
-          'Eliminar cuenta',
-          style: VerbumFonts.serif(fontSize: 20, fontWeight: FontWeight.bold),
+      appBar: VAppBar(title: Text('Eliminar cuenta', style: t.heading)),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(
+          VerbumSpace.gutter,
+          8,
+          VerbumSpace.gutter,
+          40,
         ),
-        centerTitle: false,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.red[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.red[200]!),
-              ),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: scheme.errorContainer,
+              borderRadius: BorderRadius.circular(VerbumRadius.tile),
+            ),
+            child: Row(
+              children: [
+                VIcon(
+                  VerbumIcons.warning,
+                  weight: VIconWeight.fill,
+                  color: scheme.onErrorContainer,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Esta acción no se puede deshacer',
+                    style: t.bodyStrong.copyWith(
+                      color: scheme.onErrorContainer,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const VSectionHeader(
+            '¿Qué se eliminará?',
+            padding: EdgeInsets.fromLTRB(2, 24, 2, 10),
+          ),
+          VSurfaceCard(
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 8),
+            child: Column(
+              children: [
+                _buildListItem('Tu perfil y toda tu información personal'),
+                _buildListItem('Todas tus publicaciones y comentarios'),
+                _buildListItem('Tu historial de actividad'),
+                _buildListItem('Tus configuraciones y preferencias'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          VSurfaceCard(
+            padding: EdgeInsets.zero,
+            onTap: () => setState(() => _isConfirmed = !_isConfirmed),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 10, 16, 10),
               child: Row(
                 children: [
-                  VIcon(VerbumIcons.warning, color: Colors.red[700]),
-                  const SizedBox(width: 12),
+                  Checkbox(
+                    value: _isConfirmed,
+                    onChanged: (value) {
+                      setState(() => _isConfirmed = value ?? false);
+                    },
+                    activeColor: scheme.error,
+                    checkColor: scheme.onError,
+                    side: BorderSide(color: p.line, width: 1.5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      'Esta acción no se puede deshacer',
-                      style: VerbumFonts.sans(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.red[900],
-                      ),
+                      'Entiendo que esta acción es permanente e irreversible',
+                      style: t.bodyStrong,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-            Text(
-              '¿Qué se eliminará?',
-              style: VerbumFonts.sans(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
+          ),
+          const SizedBox(height: 28),
+          FilledButton(
+            onPressed: _isConfirmed && !_isDeleting ? _deleteAccount : null,
+            style: FilledButton.styleFrom(
+              backgroundColor: scheme.error,
+              foregroundColor: scheme.onError,
+              disabledBackgroundColor: p.surfaceMuted,
+              disabledForegroundColor: p.inkSubtle,
+              minimumSize: const Size.fromHeight(50),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(VerbumRadius.control),
               ),
             ),
-            const SizedBox(height: 12),
-            _buildListItem('Tu perfil y toda tu información personal'),
-            _buildListItem('Todas tus publicaciones y comentarios'),
-            _buildListItem('Tu historial de actividad'),
-            _buildListItem('Tus configuraciones y preferencias'),
-            const SizedBox(height: 32),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-              ),
-              child: CheckboxListTile(
-                title: Text(
-                  'Entiendo que esta acción es permanente e irreversible',
-                  style: VerbumFonts.sans(fontWeight: FontWeight.w600),
-                ),
-                value: _isConfirmed,
-                onChanged: (value) {
-                  setState(() => _isConfirmed = value ?? false);
-                },
-                controlAffinity: ListTileControlAffinity.leading,
-              ),
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _isConfirmed && !_isDeleting ? _deleteAccount : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: _isDeleting
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        ),
-                      )
-                    : Text(
-                        'Eliminar cuenta permanentemente',
-                        style: VerbumFonts.sans(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-              ),
-            ),
-          ],
-        ),
+            child: _isDeleting
+                ? SizedBox.square(
+                    dimension: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: scheme.onError,
+                    ),
+                  )
+                : const Text('Eliminar cuenta permanentemente'),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildListItem(String text) {
+    final p = context.palette;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          VIcon(VerbumIcons.minus, size: 16, color: Colors.grey[600]),
-          const SizedBox(width: 8),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: VIcon(VerbumIcons.minus, size: 16, color: p.inkSubtle),
+          ),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               text,
-              style: VerbumFonts.sans(fontSize: 14, color: Colors.grey[700]),
+              style: context.type.body.copyWith(color: p.inkMuted),
             ),
           ),
         ],

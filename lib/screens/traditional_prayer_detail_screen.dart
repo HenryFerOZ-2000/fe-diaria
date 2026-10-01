@@ -5,7 +5,6 @@ import '../widgets/prayer_reading_experience.dart';
 import '../faith/content_provenance.dart';
 import '../faith/biblical_prayer_passages.dart';
 import '../features/sharing/domain/share_content.dart';
-import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de detalle de una oración tradicional
 class TraditionalPrayerDetailScreen extends StatefulWidget {
@@ -30,7 +29,6 @@ class _TraditionalPrayerDetailScreenState
   final TraditionalPrayersService _service = TraditionalPrayersService();
   Map<String, dynamic>? _prayer;
   bool _isLoading = true;
-  bool _fadeIn = false;
 
   @override
   void initState() {
@@ -53,7 +51,6 @@ class _TraditionalPrayerDetailScreenState
       setState(() {
         _prayer = prayer;
         _isLoading = false;
-        _fadeIn = true;
       });
     } catch (e) {
       debugPrint('Error loading prayer: $e');
@@ -63,9 +60,6 @@ class _TraditionalPrayerDetailScreenState
       });
     }
   }
-
-  @override
-  void dispose() => super.dispose();
 
   void _share() {
     if (_prayer == null) return;
@@ -113,152 +107,6 @@ class _TraditionalPrayerDetailScreenState
       onBack: () => Navigator.pop(context),
       onRetry: _loadPrayer,
       onShare: _share,
-    );
-  }
-
-  // ignore: unused_element
-  Widget _buildLegacy(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF1E1C2A), Color(0xFF2D2347)],
-              ),
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withValues(alpha: 0.4),
-                  Colors.black.withValues(alpha: 0.1),
-                ],
-              ),
-            ),
-          ),
-          SafeArea(
-            child: _isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(color: Colors.white),
-                  )
-                : _prayer == null
-                ? _ErrorState(
-                    message: 'No se encontró contenido.',
-                    onRetry: _loadPrayer,
-                  )
-                : Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-                        child: Row(
-                          children: [
-                            const VBackButton(onColor: true),
-                            const Spacer(),
-                            IconButton(
-                              icon: const VIcon(
-                                VerbumIcons.close,
-                                color: Colors.white,
-                              ),
-                              onPressed: () => Navigator.of(context).pop(),
-                            ),
-                            IconButton(
-                              icon: const VIcon(
-                                VerbumIcons.shareNetwork,
-                                color: Colors.white,
-                              ),
-                              onPressed: _share,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: AnimatedOpacity(
-                          duration: const Duration(milliseconds: 350),
-                          opacity: _fadeIn ? 1.0 : 0.0,
-                          child: SingleChildScrollView(
-                            physics: const BouncingScrollPhysics(),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 10,
-                            ),
-                            child: Column(
-                              children: [
-                                Text(
-                                  _prayer!['titulo'] as String? ??
-                                      widget.prayerKey,
-                                  textAlign: TextAlign.center,
-                                  style: VerbumFonts.serif(
-                                    color: Colors.white,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                Text(
-                                  _prayer!['texto'] as String? ?? '',
-                                  textAlign: TextAlign.center,
-                                  style: VerbumFonts.sans(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    height: 1.55,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ErrorState extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-  const _ErrorState({required this.message, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const VIcon(
-              VerbumIcons.warningCircle,
-              color: Colors.white70,
-              size: 44,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: VerbumFonts.sans(color: Colors.white70, fontSize: 16),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton(
-              onPressed: onRetry,
-              style: OutlinedButton.styleFrom(foregroundColor: Colors.white),
-              child: const Text('Reintentar'),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

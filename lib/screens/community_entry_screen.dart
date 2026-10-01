@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../services/community_service.dart';
-import '../widgets/verbum_ambient_background.dart';
 import 'package:verbum/design_system/design_system.dart';
 
 enum CommunityEntryMode { landing, join, create, success }
@@ -63,108 +62,69 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
           },
         ),
       ),
-      body: VerbumAmbientBackground(
-        child: SafeArea(
-          top: false,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 320),
-            child: switch (_mode) {
-              CommunityEntryMode.landing => _landing(),
-              CommunityEntryMode.join => _join(),
-              CommunityEntryMode.create => _create(),
-              CommunityEntryMode.success => _success(),
-            },
-          ),
+      body: SafeArea(
+        top: false,
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 320),
+          child: switch (_mode) {
+            CommunityEntryMode.landing => _landing(),
+            CommunityEntryMode.join => _join(),
+            CommunityEntryMode.create => _create(),
+            CommunityEntryMode.success => _success(),
+          },
         ),
       ),
     );
   }
 
+  static const _padding = EdgeInsets.fromLTRB(
+    VerbumSpace.gutter + 4,
+    12,
+    VerbumSpace.gutter + 4,
+    32,
+  );
+
+  Widget _fieldIcon(VerbumIcons icon) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 12),
+    child: VIcon(icon, size: 20, color: context.palette.inkMuted),
+  );
+
+  static const _iconConstraints = BoxConstraints(minWidth: 44);
+
   Widget _landing() {
-    final scheme = Theme.of(context).colorScheme;
+    final t = context.type;
     return ListView(
       key: const ValueKey('landing'),
-      padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
+      padding: _padding,
       children: [
-        Container(
-          height: 210,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                context.palette.inverse,
-                Color.alphaBlend(
-                  context.palette.gold.withValues(alpha: .28),
-                  context.palette.inverse,
-                ),
-              ],
-            ),
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                right: -18,
-                top: -20,
-                child: VIcon(
-                  VerbumIcons.usersThree,
-                  weight: VIconWeight.fill,
-                  size: 190,
-                  color: Colors.white.withValues(alpha: .07),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(26),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'CRECER JUNTOS',
-                      style: VerbumFonts.sans(
-                        color: context.palette.gold,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 10,
-                        letterSpacing: 1.8,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'La fe se vive mejor\nen comunidad.',
-                      style: VerbumFonts.serif(
-                        color: Colors.white,
-                        fontSize: 30,
-                        height: 1.05,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+        const VFeatureCard(
+          eyebrow: 'Crecer juntos',
+          title: 'La fe se vive mejor\nen comunidad.',
+          watermark: VerbumIcons.usersThree,
+          photo: VerbumPhotos.communityGroup,
         ),
         const SizedBox(height: 22),
         Text(
-          'Conecta con tu iglesia, parroquia o grupo para compartir, orar y caminar acompañado.',
-          style: VerbumFonts.sans(
-            fontSize: 14,
-            height: 1.55,
-            color: scheme.onSurfaceVariant,
-          ),
+          'Conecta con tu iglesia, parroquia o grupo para compartir, orar y '
+          'caminar acompañado.',
+          style: t.body.copyWith(height: 1.55, color: context.palette.inkMuted),
         ),
         const SizedBox(height: 26),
-        FilledButton.icon(
+        VButton(
+          label: 'Unirme a una comunidad',
+          icon: VerbumIcons.link,
+          iconLeading: true,
+          expanded: true,
           onPressed: () => setState(() => _mode = CommunityEntryMode.join),
-          icon: const VIcon(VerbumIcons.link),
-          label: const Text('Unirme a una comunidad'),
         ),
         const SizedBox(height: 12),
-        OutlinedButton.icon(
+        VButton(
+          label: 'Crear una comunidad',
+          icon: VerbumIcons.plus,
+          iconLeading: true,
+          variant: VButtonVariant.outlined,
+          expanded: true,
           onPressed: () => setState(() => _mode = CommunityEntryMode.create),
-          icon: const VIcon(VerbumIcons.plus),
-          label: const Text('Crear una comunidad'),
         ),
         const SizedBox(height: 22),
         _note(
@@ -176,24 +136,18 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
   }
 
   Widget _join() {
-    final scheme = Theme.of(context).colorScheme;
+    final p = context.palette;
+    final t = context.type;
     return ListView(
       key: const ValueKey('join'),
-      padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+      padding: _padding,
       children: [
-        _eyebrow('INGRESAR'),
-        Text(
-          'Encuentra tu\ncomunidad',
-          style: VerbumFonts.serif(
-            fontSize: 36,
-            height: 1.05,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+        _eyebrow('Ingresar'),
+        Text('Encuentra tu\ncomunidad', style: t.display),
         const SizedBox(height: 12),
         Text(
           'Escribe el código que te compartió el administrador.',
-          style: TextStyle(color: scheme.onSurfaceVariant),
+          style: t.body.copyWith(color: p.inkMuted),
         ),
         const SizedBox(height: 28),
         TextField(
@@ -204,11 +158,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
             FilteringTextInputFormatter.allow(RegExp('[A-Za-z0-9]')),
             LengthLimitingTextInputFormatter(8),
           ],
-          style: VerbumFonts.sans(
-            fontSize: 25,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 5,
-          ),
+          style: t.heading.copyWith(fontSize: 25, letterSpacing: 5),
           textAlign: TextAlign.center,
           decoration: const InputDecoration(
             labelText: 'Código de invitación',
@@ -218,26 +168,35 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
         ),
         if (_error != null)
           Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Text(_error!, style: TextStyle(color: scheme.error)),
+            padding: const EdgeInsets.only(top: 12),
+            child: VNotice(_error!, tone: VNoticeTone.error),
           ),
         const SizedBox(height: 18),
         if (_preview == null)
-          FilledButton(
+          VButton(
+            label: 'Continuar',
+            icon: VerbumIcons.arrowRight,
+            expanded: true,
+            loading: _busy,
             onPressed: _busy ? null : _findCommunity,
-            child: _loadingLabel('Continuar'),
           )
         else ...[
           _previewCard(_preview!),
           const SizedBox(height: 16),
-          FilledButton.icon(
+          VButton(
+            label: 'Unirme ahora',
+            icon: VerbumIcons.signIn,
+            iconLeading: true,
+            expanded: true,
+            loading: _busy,
             onPressed: _busy ? null : _joinCommunity,
-            icon: const VIcon(VerbumIcons.signIn),
-            label: _loadingLabel('Unirme ahora'),
           ),
-          TextButton(
+          const SizedBox(height: 4),
+          VButton(
+            label: 'Usar otro código',
+            variant: VButtonVariant.text,
+            expanded: true,
             onPressed: _busy ? null : () => setState(() => _preview = null),
-            child: const Text('Usar otro código'),
           ),
         ],
       ],
@@ -245,26 +204,29 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
   }
 
   Widget _previewCard(Map<String, dynamic> data) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
+    final p = context.palette;
+    final t = context.type;
+    final city = data['city']?.toString() ?? '';
+    final description = data['description']?.toString() ?? '';
+    return VSurfaceCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: scheme.outlineVariant),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 24,
-                backgroundColor: scheme.primaryContainer,
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: p.surfaceMuted,
+                  borderRadius: BorderRadius.circular(VerbumRadius.control),
+                ),
+                alignment: Alignment.center,
                 child: VIcon(
                   VerbumIcons.church,
-                  weight: VIconWeight.fill,
-                  color: scheme.primary,
+                  weight: VIconWeight.duotone,
+                  color: p.rubric,
                 ),
               ),
               const SizedBox(width: 14),
@@ -274,25 +236,19 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
                   children: [
                     Text(
                       data['name']?.toString() ?? 'Comunidad',
-                      style: VerbumFonts.serif(
-                        fontSize: 21,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: t.heading,
                     ),
-                    Text(
-                      data['city']?.toString() ?? '',
-                      style: TextStyle(color: scheme.onSurfaceVariant),
-                    ),
+                    if (city.isNotEmpty)
+                      Text(city, style: t.caption.copyWith(color: p.inkMuted)),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Text(
-            data['description']?.toString() ?? '',
-            style: const TextStyle(height: 1.45),
-          ),
+          if (description.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Text(description, style: t.body.copyWith(height: 1.45)),
+          ],
           const SizedBox(height: 14),
           _note(
             VerbumIcons.shieldCheck,
@@ -304,78 +260,90 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
   }
 
   Widget _create() {
+    final t = context.type;
     return ListView(
       key: const ValueKey('create'),
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+      padding: _padding,
       children: [
-        _eyebrow('PASO ${_createStep + 1} DE 3'),
+        _eyebrow('Paso ${_createStep + 1} de 3'),
         Text(
           [
             'Dale una identidad',
             'Cuenta su historia',
             'Todo listo',
           ][_createStep],
-          style: VerbumFonts.serif(fontSize: 32, fontWeight: FontWeight.w700),
+          style: t.title,
         ),
-        const SizedBox(height: 8),
-        LinearProgressIndicator(
+        const SizedBox(height: 12),
+        VProgressBar(
           value: (_createStep + 1) / 3,
-          minHeight: 4,
-          borderRadius: BorderRadius.circular(9),
+          semanticLabel: 'Paso ${_createStep + 1} de 3',
         ),
         const SizedBox(height: 28),
         if (_createStep == 0) ...[
           TextField(
             controller: _name,
             textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(
+            style: t.body,
+            decoration: InputDecoration(
               labelText: 'Nombre de la comunidad',
-              prefixIcon: VIcon(
-                VerbumIcons.usersThree,
-                weight: VIconWeight.fill,
-              ),
+              prefixIcon: _fieldIcon(VerbumIcons.usersThree),
+              prefixIconConstraints: _iconConstraints,
             ),
           ),
           const SizedBox(height: 14),
           TextField(
             controller: _city,
             textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(
+            style: t.body,
+            decoration: InputDecoration(
               labelText: 'Ciudad',
-              prefixIcon: VIcon(VerbumIcons.mapPin),
+              prefixIcon: _fieldIcon(VerbumIcons.mapPin),
+              prefixIconConstraints: _iconConstraints,
             ),
           ),
         ] else if (_createStep == 1) ...[
           TextField(
             controller: _description,
             maxLines: 4,
+            style: t.body,
             decoration: const InputDecoration(
               labelText: 'Descripción (opcional)',
               hintText: '¿Qué encontrarán las personas aquí?',
+              alignLabelWithHint: true,
             ),
           ),
           const SizedBox(height: 14),
           TextField(
             controller: _leader,
             textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(
+            style: t.body,
+            decoration: InputDecoration(
               labelText: 'Responsable (opcional)',
-              prefixIcon: VIcon(VerbumIcons.user),
+              prefixIcon: _fieldIcon(VerbumIcons.user),
+              prefixIconConstraints: _iconConstraints,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 14),
           _note(
             VerbumIcons.sparkle,
             'Podrás añadir imagen, administradores y permisos después.',
           ),
         ] else ...[
-          _summaryRow(VerbumIcons.usersThree, _name.text),
-          _summaryRow(VerbumIcons.mapPin, _city.text),
-          _summaryRow(
-            VerbumIcons.lockSimpleOpen,
-            'Ingreso mediante invitación',
+          VSurfaceCard(
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 6),
+            child: Column(
+              children: [
+                _summaryRow(VerbumIcons.usersThree, _name.text),
+                _summaryRow(VerbumIcons.mapPin, _city.text),
+                _summaryRow(
+                  VerbumIcons.lockSimpleOpen,
+                  'Ingreso mediante invitación',
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           _note(
             VerbumIcons.info,
             'Serás el administrador principal de esta comunidad.',
@@ -384,29 +352,28 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
         if (_error != null)
           Padding(
             padding: const EdgeInsets.only(top: 14),
-            child: Text(
-              _error!,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
+            child: VNotice(_error!, tone: VNoticeTone.error),
           ),
         const SizedBox(height: 28),
         Row(
           children: [
             if (_createStep > 0)
               Expanded(
-                child: OutlinedButton(
+                child: VButton(
+                  label: 'Atrás',
+                  variant: VButtonVariant.outlined,
+                  expanded: true,
                   onPressed: _busy ? null : () => setState(() => _createStep--),
-                  child: const Text('Atrás'),
                 ),
               ),
             if (_createStep > 0) const SizedBox(width: 12),
             Expanded(
               flex: 2,
-              child: FilledButton(
+              child: VButton(
+                label: _createStep == 2 ? 'Crear comunidad' : 'Continuar',
+                expanded: true,
+                loading: _busy,
                 onPressed: _busy ? null : _nextCreate,
-                child: _loadingLabel(
-                  _createStep == 2 ? 'Crear comunidad' : 'Continuar',
-                ),
               ),
             ),
           ],
@@ -416,79 +383,76 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
   }
 
   Widget _success() {
+    final p = context.palette;
+    final t = context.type;
     final invitation =
         'Te invito a unirte a $_createdName en Verbum. Usa el código $_createdCode.';
     return ListView(
       key: const ValueKey('success'),
-      padding: const EdgeInsets.all(28),
+      padding: _padding,
       children: [
         const SizedBox(height: 30),
-        VIcon(
-          VerbumIcons.checkCircle,
-          weight: VIconWeight.fill,
-          size: 78,
-          color: Theme.of(context).colorScheme.tertiary,
+        Center(
+          child: Container(
+            width: 88,
+            height: 88,
+            decoration: BoxDecoration(
+              color: p.sageSoft,
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: VIcon(VerbumIcons.check, size: 42, color: p.sageInk),
+          ),
         ),
         const SizedBox(height: 18),
         Text(
           'Tu comunidad\nestá lista',
           textAlign: TextAlign.center,
-          style: VerbumFonts.serif(
-            fontSize: 36,
-            height: 1.05,
-            fontWeight: FontWeight.w700,
-          ),
+          style: t.display,
         ),
         const SizedBox(height: 26),
-        Container(
+        VSurfaceCard(
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(24),
-          ),
           child: Column(
             children: [
-              const Text(
-                'CÓDIGO DE INVITACIÓN',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.4,
-                ),
-              ),
+              Text('Código de invitación', style: t.rubric),
               const SizedBox(height: 8),
-              Text(
+              SelectableText(
                 _createdCode ?? '',
-                style: VerbumFonts.sans(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 5,
-                ),
+                style: t.title.copyWith(letterSpacing: 5),
               ),
             ],
           ),
         ),
         const SizedBox(height: 18),
-        FilledButton.icon(
+        VButton(
+          label: 'Compartir invitación',
+          icon: VerbumIcons.shareNetwork,
+          iconLeading: true,
+          expanded: true,
           onPressed: () =>
               SharePlus.instance.share(ShareParams(text: invitation)),
-          icon: const VIcon(VerbumIcons.shareNetwork),
-          label: const Text('Compartir invitación'),
         ),
         const SizedBox(height: 10),
-        OutlinedButton.icon(
+        VButton(
+          label: 'Copiar código',
+          icon: VerbumIcons.copy,
+          iconLeading: true,
+          variant: VButtonVariant.outlined,
+          expanded: true,
           onPressed: () {
             Clipboard.setData(ClipboardData(text: _createdCode ?? ''));
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(const SnackBar(content: Text('Código copiado')));
           },
-          icon: const VIcon(VerbumIcons.copy),
-          label: const Text('Copiar código'),
         ),
-        TextButton(
+        const SizedBox(height: 4),
+        VButton(
+          label: 'Ir a mi comunidad',
+          variant: VButtonVariant.text,
+          expanded: true,
           onPressed: () => Navigator.pop(context),
-          child: const Text('Ir a mi comunidad'),
         ),
       ],
     );
@@ -571,27 +535,19 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
 
   Widget _eyebrow(String text) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
-    child: Text(
-      text,
-      style: VerbumFonts.sans(
-        fontSize: 10,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 1.8,
-        color: Theme.of(context).colorScheme.secondary,
-      ),
-    ),
+    child: Text(text, style: context.type.rubric),
   );
   Widget _note(VerbumIcons icon, String text) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      VIcon(icon, size: 17, color: Theme.of(context).colorScheme.tertiary),
+      VIcon(icon, size: 17, color: context.palette.gold),
       const SizedBox(width: 9),
       Expanded(
         child: Text(
           text,
-          style: TextStyle(
-            fontSize: 12,
+          style: context.type.caption.copyWith(
             height: 1.35,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            color: context.palette.inkMuted,
           ),
         ),
       ),
@@ -601,21 +557,15 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
     padding: const EdgeInsets.only(bottom: 12),
     child: Row(
       children: [
-        VIcon(icon, color: Theme.of(context).colorScheme.primary),
+        VIcon(icon, color: context.palette.rubric),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            style: context.type.bodyStrong.copyWith(fontSize: 16),
           ),
         ),
       ],
     ),
   );
-  Widget _loadingLabel(String text) => _busy
-      ? const SizedBox.square(
-          dimension: 20,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        )
-      : Text(text);
 }

@@ -84,237 +84,160 @@ class _ReadingChatScreenState extends State<ReadingChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
+    final type = context.type;
+    final hasReference =
+        widget.reference != null && widget.reference!.isNotEmpty;
+
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF1E1C2A), Color(0xFF2D2347)],
+      backgroundColor: p.background,
+      appBar: const VAppBar(title: Text('Acompañamiento')),
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                VerbumSpace.gutter,
+                4,
+                VerbumSpace.gutter,
+                0,
+              ),
+              child: VSurfaceCard(
+                tone: VSurfaceTone.accent,
+                padding: const EdgeInsets.all(VerbumSpace.md),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Semantics(
+                        header: true,
+                        child: Text(widget.title, style: type.heading),
+                      ),
+                      const SizedBox(height: VerbumSpace.xs),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxHeight: 180),
+                        child: SingleChildScrollView(
+                          child: Text(widget.content, style: type.scripture),
+                        ),
+                      ),
+                      if (hasReference) ...[
+                        const SizedBox(height: VerbumSpace.xs),
+                        Text(widget.reference!, style: type.citation),
+                      ],
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withValues(alpha: 0.45),
-                  Colors.black.withValues(alpha: 0.15),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: VerbumSpace.gutter,
+                  vertical: VerbumSpace.sm,
+                ),
+                itemCount: _messages.length + (_loading ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (_loading && index == _messages.length) {
+                    return Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: p.surface,
+                          borderRadius: BorderRadius.circular(
+                            VerbumRadius.control,
+                          ),
+                          boxShadow: VerbumShadows.subtle(p),
+                        ),
+                        child: SizedBox(
+                          width: 38,
+                          child: LinearProgressIndicator(
+                            minHeight: 2,
+                            color: p.gold,
+                            backgroundColor: p.accentSoft,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  final msg = _messages[index];
+                  return Align(
+                    alignment: msg.isUser
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.sizeOf(context).width * .82,
+                      ),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: msg.isUser ? p.inverse : p.surface,
+                          borderRadius: BorderRadius.circular(
+                            VerbumRadius.control,
+                          ),
+                          boxShadow: msg.isUser
+                              ? null
+                              : VerbumShadows.subtle(p),
+                        ),
+                        child: Text(
+                          msg.text,
+                          style: type.body.copyWith(
+                            color: msg.isUser ? p.onInverse : p.ink,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                VerbumSpace.gutter,
+                0,
+                VerbumSpace.gutter,
+                VerbumSpace.md,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      textCapitalization: TextCapitalization.sentences,
+                      textInputAction: TextInputAction.send,
+                      decoration: const InputDecoration(
+                        hintText: 'Escribe tu mensaje…',
+                      ),
+                      onSubmitted: _sendMessage,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  VIconButton(
+                    icon: VerbumIcons.paperPlaneRight,
+                    weight: VIconWeight.fill,
+                    semanticLabel: 'Enviar',
+                    variant: VIconButtonVariant.solid,
+                    size: 46,
+                    onPressed: _loading
+                        ? null
+                        : () => _sendMessage(_controller.text),
+                  ),
                 ],
               ),
             ),
-          ),
-          SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-                  child: Row(
-                    children: [
-                      const VBackButton(onColor: true),
-                      const Spacer(),
-                      IconButton(
-                        icon: const VIcon(
-                          VerbumIcons.close,
-                          color: Colors.white,
-                        ),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        widget.title,
-                        textAlign: TextAlign.center,
-                        style: VerbumFonts.serif(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.18),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.content,
-                              style: VerbumFonts.sans(
-                                color: Colors.white,
-                                fontSize: 16,
-                                height: 1.45,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                            if (widget.reference != null &&
-                                widget.reference!.isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                widget.reference!,
-                                style: VerbumFonts.sans(
-                                  color: const Color(0xFFFFB74D),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    itemCount: _messages.length + (_loading ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (_loading && index == _messages.length) {
-                        return Align(
-                          alignment: Alignment.centerLeft,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(vertical: 6),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 11,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: .08),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: const SizedBox(
-                              width: 38,
-                              child: LinearProgressIndicator(minHeight: 2),
-                            ),
-                          ),
-                        );
-                      }
-                      final msg = _messages[index];
-                      final align = msg.isUser
-                          ? CrossAxisAlignment.end
-                          : CrossAxisAlignment.start;
-                      final bubbleColor = msg.isUser
-                          ? Colors.white.withValues(alpha: 0.18)
-                          : Colors.white.withValues(alpha: 0.08);
-                      return Column(
-                        crossAxisAlignment: align,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.symmetric(vertical: 4),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              color: bubbleColor,
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.15),
-                              ),
-                            ),
-                            child: Text(
-                              msg.text,
-                              style: VerbumFonts.sans(
-                                color: Colors.white,
-                                fontSize: 14,
-                                height: 1.45,
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.14),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.18),
-                            ),
-                          ),
-                          child: TextField(
-                            controller: _controller,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                            ),
-                            decoration: InputDecoration(
-                              hintText: 'Escribe tu mensaje...',
-                              hintStyle: TextStyle(color: Colors.white60),
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 14,
-                              ),
-                            ),
-                            onSubmitted: _sendMessage,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      GestureDetector(
-                        onTap: _loading
-                            ? null
-                            : () => _sendMessage(_controller.text),
-                        child: Container(
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: const Color(0xFF6C63FF),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 10,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: const VIcon(
-                            VerbumIcons.paperPlaneRight,
-                            weight: VIconWeight.fill,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

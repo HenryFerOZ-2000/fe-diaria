@@ -65,143 +65,88 @@ class HelpSupportScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void go(String route) => Navigator.of(context).pushNamed(route);
+
     return Scaffold(
       appBar: VAppBar(
-        title: Text(
-          'Ayuda y soporte',
-          style: VerbumFonts.serif(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: false,
+        title: Text('Ayuda y soporte', style: context.type.heading),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(
+          VerbumSpace.gutter,
+          0,
+          VerbumSpace.gutter,
+          32,
+        ),
         children: [
-          // FAQ
-          _buildSectionHeader('Ayuda'),
-          const SizedBox(height: 8),
-          _buildListTile(
-            context: context,
-            icon: VerbumIcons.question,
-            title: 'Preguntas frecuentes (FAQ)',
-            subtitle: 'Encuentra respuestas a las preguntas más comunes',
-            onTap: () => Navigator.of(context).pushNamed('/faq'),
+          const VSectionHeader(
+            'Ayuda',
+            padding: EdgeInsets.fromLTRB(2, 16, 2, 10),
           ),
-          const SizedBox(height: 24),
-          // Contacto
-          _buildSectionHeader('Contacto'),
-          const SizedBox(height: 8),
-          _buildListTile(
-            context: context,
-            icon: VerbumIcons.envelope,
-            title: 'Enviar email',
-            subtitle: AppConstants.supportEmail,
-            onTap: () => _openEmail(context),
+          VListGroup(
+            children: [
+              VListRow(
+                leading: VerbumIcons.question,
+                title: 'Preguntas frecuentes',
+                subtitle: 'Encuentra respuestas a las preguntas más comunes',
+                onTap: () => go('/faq'),
+              ),
+            ],
           ),
-          if (AppConstants.supportWhatsApp != null) ...[
-            const SizedBox(height: 8),
-            _buildListTile(
-              context: context,
-              icon: VerbumIcons.chatCircle,
-              title: 'WhatsApp',
-              subtitle: 'Chatea con nosotros',
-              onTap: () => _openWhatsApp(context),
-            ),
-          ],
-          const SizedBox(height: 24),
-          // Reportes
-          _buildSectionHeader('Reportes'),
-          const SizedBox(height: 8),
-          _buildListTile(
-            context: context,
-            icon: VerbumIcons.bug,
-            title: 'Reportar un problema',
-            subtitle: 'Reporta bugs, sugerencias o problemas',
-            onTap: () => Navigator.of(context).pushNamed('/report-problem'),
+          const VSectionHeader(
+            'Contacto',
+            padding: EdgeInsets.fromLTRB(2, 24, 2, 10),
           ),
-          const SizedBox(height: 24),
-          // Legal
-          _buildSectionHeader('Información legal'),
-          const SizedBox(height: 8),
-          _buildListTile(
-            context: context,
-            icon: VerbumIcons.fileText,
-            title: 'Términos y Privacidad',
-            subtitle: 'Lee nuestros términos y política de privacidad',
-            onTap: () {
-              // Reutilizar pantallas existentes
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Términos y Privacidad'),
-                  content: const Text('¿Qué deseas ver?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).pushNamed('/terms');
-                      },
-                      child: const Text('Términos'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).pushNamed('/privacy-policy');
-                      },
-                      child: const Text('Privacidad'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancelar'),
-                    ),
-                  ],
+          VListGroup(
+            children: [
+              VListRow(
+                leading: VerbumIcons.envelope,
+                title: 'Enviar correo',
+                subtitle: AppConstants.supportEmail,
+                onTap: () => _openEmail(context),
+              ),
+              if (AppConstants.supportWhatsApp != null)
+                VListRow(
+                  leading: VerbumIcons.chatCircle,
+                  title: 'WhatsApp',
+                  subtitle: 'Chatea con nosotros',
+                  onTap: () => _openWhatsApp(context),
                 ),
-              );
-            },
+            ],
           ),
-          const SizedBox(height: 32),
+          const VSectionHeader(
+            'Reportes',
+            padding: EdgeInsets.fromLTRB(2, 24, 2, 10),
+          ),
+          VListGroup(
+            children: [
+              VListRow(
+                leading: VerbumIcons.bug,
+                title: 'Reportar un problema',
+                subtitle: 'Reporta errores, sugerencias o problemas',
+                onTap: () => go('/report-problem'),
+              ),
+            ],
+          ),
+          const VSectionHeader(
+            'Información legal',
+            padding: EdgeInsets.fromLTRB(2, 24, 2, 10),
+          ),
+          VListGroup(
+            children: [
+              VListRow(
+                leading: VerbumIcons.fileText,
+                title: 'Términos de uso',
+                onTap: () => go('/terms'),
+              ),
+              VListRow(
+                leading: VerbumIcons.shieldCheck,
+                title: 'Política de privacidad',
+                onTap: () => go('/privacy-policy'),
+              ),
+            ],
+          ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(String title) {
-    return Text(
-      title,
-      style: VerbumFonts.sans(
-        fontSize: 14,
-        fontWeight: FontWeight.w700,
-        color: Colors.grey[600],
-        letterSpacing: 0.5,
-      ),
-    );
-  }
-
-  Widget _buildListTile({
-    required BuildContext context,
-    required VerbumIcons icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-      ),
-      child: ListTile(
-        leading: VIcon(icon),
-        title: Text(
-          title,
-          style: VerbumFonts.sans(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: VerbumFonts.sans(fontSize: 12, color: Colors.grey[600]),
-        ),
-        trailing: const VIcon(VerbumIcons.caretRight),
-        onTap: onTap,
       ),
     );
   }

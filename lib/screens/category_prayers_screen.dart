@@ -78,227 +78,60 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
 
     final service = CategoryPrayersService();
     final categories = service.categories;
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final p = context.palette;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: VAppBar(
-        title: Text(
-          'Oraciones para…',
-          style: VerbumFonts.serif(fontSize: 26, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
-              Theme.of(context).scaffoldBackgroundColor,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHeader(colorScheme),
-                      const SizedBox(height: 24),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 20,
-                              mainAxisSpacing: 20,
-                              childAspectRatio: 0.95,
-                            ),
-                        itemCount: categories.length,
-                        itemBuilder: (context, index) {
-                          final key = categories.keys.elementAt(index);
-                          final title = categories[key]!;
-                          return _buildCategoryButton(
-                            context: context,
-                            colorScheme: colorScheme,
-                            title: title,
+      backgroundColor: p.background,
+      appBar: const VAppBar(title: Text('Oraciones para…')),
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(
+                  VerbumSpace.gutter,
+                  4,
+                  VerbumSpace.gutter,
+                  VerbumSpace.xl,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const VSectionHeader(
+                      'Elige una categoría',
+                      eyebrow: 'INTENCIONES',
+                      padding: EdgeInsets.fromLTRB(2, 4, 2, 14),
+                    ),
+                    VTileGrid(
+                      children: [
+                        for (final entry in categories.entries)
+                          VCategoryTile(
+                            icon:
+                                _getCategoryIcon(entry.value) ??
+                                VerbumIcons.handsPraying,
+                            title: entry.value,
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) =>
                                       CategoryPrayerDetailScreen(
-                                        categoryKey: key,
+                                        categoryKey: entry.key,
                                       ),
                                 ),
                               );
                             },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Banner Ad fijo en la parte inferior
-              if (!_adsRemoved)
-                Container(
-                  alignment: Alignment.center,
-                  width: double.infinity,
-                  height: _bannerAd != null
-                      ? _bannerAd!.size.height.toDouble()
-                      : 50,
-                  decoration: BoxDecoration(
-                    color: isDark ? colorScheme.surface : Colors.white,
-                    border: Border(
-                      top: BorderSide(
-                        color: colorScheme.outline.withValues(alpha: 0.1),
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                  child: _bannerAd != null
-                      ? AdWidget(ad: _bannerAd!)
-                      : const SizedBox(
-                          height: 50,
-                          child: Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
                           ),
-                        ),
-                ),
-              // Botón de regreso al inicio
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed('/home');
-                    },
-                    icon: const VIcon(
-                      VerbumIcons.house,
-                      weight: VIconWeight.fill,
-                      size: 24,
+                      ],
                     ),
-                    label: Text(
-                      'Regresar al inicio',
-                      style: VerbumFonts.sans(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 2,
-                    ),
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(ColorScheme colorScheme) {
-    return Text(
-      'Elige una categoría',
-      style: VerbumFonts.sans(
-        fontSize: 22,
-        fontWeight: FontWeight.w700,
-        color: colorScheme.onSurface,
-      ),
-    );
-  }
-
-  Widget _buildCategoryButton({
-    required BuildContext context,
-    required ColorScheme colorScheme,
-    required String title,
-    required VoidCallback onTap,
-  }) {
-    // Obtener icono según la categoría
-    VerbumIcons? categoryIcon = _getCategoryIcon(title);
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(28),
-        splashColor: colorScheme.primary.withValues(alpha: 0.1),
-        highlightColor: colorScheme.primary.withValues(alpha: 0.05),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(
-              color: colorScheme.primary.withValues(alpha: 0.15),
-              width: 1.5,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.primary.withValues(alpha: 0.08),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-                spreadRadius: 0,
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-                spreadRadius: 0,
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (categoryIcon != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: VIcon(
-                    categoryIcon,
-                    size: 28,
-                    color: colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 12),
-              ],
-              Text(
-                title,
-                style: VerbumFonts.sans(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: colorScheme.onSurface,
-                  height: 1.4,
-                  letterSpacing: -0.2,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
+            if (!_adsRemoved) _BannerSlot(ad: _bannerAd),
+            const _HomeButton(),
+          ],
         ),
       ),
     );
@@ -389,117 +222,31 @@ class _CategoryPrayerDetailScreenState
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: VAppBar(
-        title: Text(
-          title,
-          style: VerbumFonts.serif(fontSize: 26, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-      ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Theme.of(context).scaffoldBackgroundColor,
-                  Theme.of(
-                    context,
-                  ).colorScheme.tertiary.withValues(alpha: 0.05),
-                  Theme.of(context).scaffoldBackgroundColor,
-                ],
-              ),
-            ),
-            child: SafeArea(
+      backgroundColor: context.palette.background,
+      appBar: VAppBar(title: Text(title)),
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildPrayerCard(
-                      context: context,
-                      title: title,
-                      prayerText: prayerText,
-                    ),
-                    const SizedBox(
-                      height: 90,
-                    ), // espacio para no tapar con banner flotante
-                  ],
+                padding: const EdgeInsets.fromLTRB(
+                  VerbumSpace.gutter,
+                  4,
+                  VerbumSpace.gutter,
+                  VerbumSpace.xl,
+                ),
+                child: _buildPrayerCard(
+                  context: context,
+                  title: title,
+                  prayerText: prayerText,
                 ),
               ),
             ),
-          ),
-          // Banner Ad fijo en la parte inferior
-          if (!_adsRemoved)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 80,
-              child: Container(
-                alignment: Alignment.center,
-                width: double.infinity,
-                height: _bannerAd != null
-                    ? _bannerAd!.size.height.toDouble()
-                    : 50,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  border: Border(
-                    top: BorderSide(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.outline.withValues(alpha: 0.1),
-                      width: 1,
-                    ),
-                  ),
-                ),
-                child: _bannerAd != null
-                    ? AdWidget(ad: _bannerAd!)
-                    : const SizedBox(
-                        height: 50,
-                        child: Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
-              ),
-            ),
-          // Botón de regreso al inicio
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 16,
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.of(context).pushNamed('/home');
-                },
-                icon: const VIcon(
-                  VerbumIcons.house,
-                  weight: VIconWeight.fill,
-                  size: 24,
-                ),
-                label: Text(
-                  'Regresar al inicio',
-                  style: VerbumFonts.sans(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 2,
-                ),
-              ),
-            ),
-          ),
-        ],
+            if (!_adsRemoved) _BannerSlot(ad: _bannerAd),
+            const _HomeButton(),
+          ],
+        ),
       ),
     );
   }
@@ -514,7 +261,6 @@ class _CategoryPrayerDetailScreenState
       title: title,
       text: prayerText,
       icon: VerbumIcons.bookOpenText,
-      accentColor: Theme.of(context).colorScheme.primary,
       onShare: () => ShareService.openComposer(
         context,
         ShareContent(
@@ -523,6 +269,62 @@ class _CategoryPrayerDetailScreenState
           reference: title,
           kind: ShareContentKind.prayer,
         ),
+      ),
+    );
+  }
+}
+
+/// Espacio fijo del banner publicitario (con indicador mientras carga).
+class _BannerSlot extends StatelessWidget {
+  const _BannerSlot({required this.ad});
+
+  final BannerAd? ad;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Container(
+      alignment: Alignment.center,
+      width: double.infinity,
+      height: ad != null ? ad!.size.height.toDouble() : 50,
+      decoration: BoxDecoration(
+        color: p.surface,
+        border: Border(top: BorderSide(color: p.line)),
+      ),
+      child: ad != null
+          ? AdWidget(ad: ad!)
+          : SizedBox(
+              height: 50,
+              child: Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: p.rubric,
+                ),
+              ),
+            ),
+    );
+  }
+}
+
+/// Botón inferior para volver a la pantalla de inicio.
+class _HomeButton extends StatelessWidget {
+  const _HomeButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        VerbumSpace.gutter,
+        VerbumSpace.sm,
+        VerbumSpace.gutter,
+        VerbumSpace.md,
+      ),
+      child: VButton(
+        label: 'Regresar al inicio',
+        icon: VerbumIcons.house,
+        iconLeading: true,
+        expanded: true,
+        onPressed: () => Navigator.of(context).pushNamed('/home'),
       ),
     );
   }

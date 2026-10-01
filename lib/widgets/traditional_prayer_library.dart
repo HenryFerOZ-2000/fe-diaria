@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:verbum/design_system/design_system.dart';
 
+/// Cabecera de la biblioteca de oraciones: superficie invertida (periwinkle
+/// de día, índigo elevado de noche) con rúbrica, título y descripción.
 class PrayerLibraryHero extends StatelessWidget {
   const PrayerLibraryHero({
     super.key,
@@ -17,46 +19,39 @@ class PrayerLibraryHero extends StatelessWidget {
   final String title;
   final String description;
   final VerbumIcons icon;
+
+  /// Se conserva por compatibilidad; la cabecera usa los tonos invertidos.
   final Color accent;
   final String? badge;
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
+    final type = context.type;
+    final fg = p.onInverse;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(22, 22, 22, 23),
+      clipBehavior: Clip.antiAlias,
+      padding: const EdgeInsets.fromLTRB(22, 22, 22, 24),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF251D3D),
-            Color.alphaBlend(
-              accent.withValues(alpha: .55),
-              const Color(0xFF39294B),
-            ),
-            const Color(0xFF674B3D),
-          ],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF261E45).withValues(alpha: .24),
-            blurRadius: 28,
-            offset: const Offset(0, 14),
-          ),
-        ],
+        color: p.inverse,
+        borderRadius: BorderRadius.circular(VerbumRadius.card),
+        boxShadow: VerbumShadows.soft(p),
       ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           Positioned(
-            right: -22,
-            top: -28,
-            child: VIcon(
-              icon,
-              size: 132,
-              color: Colors.white.withValues(alpha: .055),
+            right: -26,
+            top: -30,
+            child: ExcludeSemantics(
+              child: VIcon(
+                icon,
+                weight: VIconWeight.duotone,
+                size: 132,
+                color: fg.withValues(alpha: .1),
+              ),
             ),
           ),
           Column(
@@ -71,64 +66,56 @@ class PrayerLibraryHero extends StatelessWidget {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: accent.withValues(alpha: .18),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: accent.withValues(alpha: .34)),
+                      color: fg.withValues(alpha: .16),
+                      borderRadius: BorderRadius.circular(VerbumRadius.control),
                     ),
-                    child: VIcon(icon, color: const Color(0xFFF1D79C), size: 21),
+                    child: Center(
+                      child: VIcon(
+                        icon,
+                        weight: VIconWeight.duotone,
+                        color: fg,
+                        size: 22,
+                      ),
+                    ),
                   ),
                   if (badge != null)
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 11,
-                        vertical: 7,
+                        vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: .09),
+                        color: fg.withValues(alpha: .14),
                         borderRadius: BorderRadius.circular(99),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: .12),
-                        ),
                       ),
                       child: Text(
                         badge!,
-                        style: VerbumFonts.sans(
-                          color: Colors.white.withValues(alpha: .78),
-                          fontSize: 9,
+                        style: type.caption.copyWith(
+                          color: fg,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
                 ],
               ),
-              const SizedBox(height: 17),
+              const SizedBox(height: 18),
               Text(
                 kicker,
-                style: VerbumFonts.sans(
-                  color: const Color(0xFFE6C57F),
-                  fontSize: 9.5,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.55,
+                style: type.rubric.copyWith(
+                  color: p.butter,
+                  fontSize: 11,
+                  letterSpacing: 1.4,
                 ),
               ),
-              const SizedBox(height: 7),
-              Text(
-                title,
-                style: VerbumFonts.serif(
-                  color: Colors.white,
-                  fontSize: 28,
-                  height: 1.08,
-                  fontWeight: FontWeight.w700,
-                ),
+              const SizedBox(height: 6),
+              Semantics(
+                header: true,
+                child: Text(title, style: type.title.copyWith(color: fg)),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               Text(
                 description,
-                style: VerbumFonts.sans(
-                  color: Colors.white.withValues(alpha: .76),
-                  fontSize: 12,
-                  height: 1.5,
-                ),
+                style: type.body.copyWith(color: fg.withValues(alpha: .88)),
               ),
             ],
           ),
@@ -138,7 +125,9 @@ class PrayerLibraryHero extends StatelessWidget {
   }
 }
 
-class PrayerLibraryCard extends StatefulWidget {
+/// Fila de la biblioteca: tarjeta de papel con icono tintado, rúbrica,
+/// título y descripción breve.
+class PrayerLibraryCard extends StatelessWidget {
   const PrayerLibraryCard({
     super.key,
     required this.title,
@@ -157,166 +146,63 @@ class PrayerLibraryCard extends StatefulWidget {
   final VoidCallback onTap;
 
   @override
-  State<PrayerLibraryCard> createState() => _PrayerLibraryCardState();
-}
-
-class _PrayerLibraryCardState extends State<PrayerLibraryCard> {
-  bool _pressed = false;
-
-  @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final surface = dark ? const Color(0xFF292431) : const Color(0xFFFFFCF7);
+    final p = context.palette;
+    final type = context.type;
 
-    return Semantics(
-      button: true,
-      label: '${widget.title}. ${widget.subtitle}',
-      child: AnimatedScale(
-        scale: _pressed ? .982 : 1,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeOutCubic,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              widget.onTap();
-            },
-            onHighlightChanged: (value) => setState(() => _pressed = value),
-            borderRadius: BorderRadius.circular(24),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              padding: const EdgeInsets.fromLTRB(15, 15, 13, 15),
+    return VSurfaceCard(
+      radius: VerbumRadius.tile + 2,
+      padding: const EdgeInsets.fromLTRB(14, 14, 12, 14),
+      semanticLabel: '$title. $subtitle',
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
+      child: ExcludeSemantics(
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color.alphaBlend(
-                      widget.accent.withValues(alpha: dark ? .15 : .08),
-                      surface,
-                    ),
-                    surface,
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: widget.accent.withValues(alpha: dark ? .28 : .18),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: widget.accent.withValues(alpha: dark ? .12 : .10),
-                    blurRadius: _pressed ? 12 : 22,
-                    offset: Offset(0, _pressed ? 5 : 10),
-                  ),
-                ],
+                color: accent.withValues(alpha: .12),
+                borderRadius: BorderRadius.circular(VerbumRadius.control),
               ),
-              child: Stack(
-                alignment: Alignment.center,
+              child: Center(
+                child: VIcon(
+                  icon,
+                  weight: VIconWeight.duotone,
+                  color: accent,
+                  size: 24,
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Positioned(
-                    right: -11,
-                    top: -25,
-                    child: VIcon(
-                      widget.icon,
-                      size: 92,
-                      color: widget.accent.withValues(alpha: .045),
-                    ),
+                  Text(eyebrow, style: type.rubric.copyWith(color: accent)),
+                  const SizedBox(height: 3),
+                  Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: type.heading.copyWith(fontSize: 16),
                   ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              widget.accent,
-                              Color.lerp(
-                                widget.accent,
-                                const Color(0xFF261E45),
-                                .46,
-                              )!,
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: widget.accent.withValues(alpha: .22),
-                              blurRadius: 11,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: VIcon(widget.icon, color: Colors.white, size: 21),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.eyebrow.toUpperCase(),
-                              style: VerbumFonts.sans(
-                                color: widget.accent,
-                                fontSize: 8.5,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.1,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              widget.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: VerbumFonts.serif(
-                                color: scheme.onSurface,
-                                fontSize: 17,
-                                height: 1.14,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              widget.subtitle,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: VerbumFonts.sans(
-                                color: scheme.onSurfaceVariant,
-                                fontSize: 10.5,
-                                height: 1.35,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      AnimatedSlide(
-                        offset: _pressed ? const Offset(.15, 0) : Offset.zero,
-                        duration: const Duration(milliseconds: 150),
-                        child: Container(
-                          width: 34,
-                          height: 34,
-                          decoration: BoxDecoration(
-                            color: widget.accent.withValues(alpha: .10),
-                            shape: BoxShape.circle,
-                          ),
-                          child: VIcon(VerbumIcons.arrowRight,
-                            color: widget.accent,
-                            size: 17,
-                          ),
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: type.caption,
                   ),
                 ],
               ),
             ),
-          ),
+            const SizedBox(width: 8),
+            VIcon(VerbumIcons.caretRight, color: p.inkSubtle, size: 16),
+          ],
         ),
       ),
     );
@@ -335,48 +221,26 @@ class PrayerLibraryEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: scheme.primary.withValues(alpha: .10),
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: VIcon(VerbumIcons.bookOpen,
-                color: scheme.primary,
-                size: 28,
-              ),
-            ),
-            const SizedBox(height: 17),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: VerbumFonts.serif(
-                color: scheme.onSurface,
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: VerbumFonts.sans(
-                color: scheme.onSurfaceVariant,
-                fontSize: 12,
-                height: 1.45,
-              ),
-            ),
-          ],
-        ),
+      child: VEmptyState(
+        icon: VerbumIcons.bookOpen,
+        title: title,
+        message: message,
       ),
     );
   }
+}
+
+/// Tonos de acento de la biblioteca, resueltos desde la paleta para que
+/// funcionen en modo claro y oscuro.
+enum PrayerLibraryTone {
+  indigo,
+  periwinkle,
+  sage;
+
+  Color resolve(VerbumPalette p) => switch (this) {
+    PrayerLibraryTone.indigo => p.rubric,
+    PrayerLibraryTone.periwinkle => p.gold,
+    PrayerLibraryTone.sage => p.sageInk,
+  };
 }

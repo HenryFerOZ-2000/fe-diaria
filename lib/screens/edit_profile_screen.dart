@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../services/profile_service.dart';
 import '../services/social_service.dart';
-import '../widgets/verbum_ambient_background.dart';
+import '../widgets/sign_in_prompt.dart';
 import 'package:verbum/design_system/design_system.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -108,9 +108,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _pickAndUpload() async {
@@ -146,240 +146,217 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
+    final t = context.type;
+    final appBar = VAppBar(title: Text('Editar perfil', style: t.heading));
+
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(
+        appBar: appBar,
+        body: const Center(
+          child: VEmptyState(title: 'Cargando tu perfil', loading: true),
+        ),
+      );
     }
     if (_error != null) {
       return Scaffold(
-        appBar: VAppBar(),
-        body: Center(child: Text(_error!)),
+        appBar: appBar,
+        body: _auth.currentUser == null
+            ? ListView(
+                padding: const EdgeInsets.fromLTRB(
+                  VerbumSpace.gutter,
+                  16,
+                  VerbumSpace.gutter,
+                  32,
+                ),
+                children: [
+                  SignInPrompt(
+                    title: _error!,
+                    message:
+                        'Con tu cuenta puedes elegir cómo apareces en la '
+                        'comunidad.',
+                  ),
+                ],
+              )
+            : Center(
+                child: VEmptyState(
+                  icon: VerbumIcons.warningCircle,
+                  title: _error!,
+                  message: 'Revisa tu conexión e inténtalo de nuevo.',
+                ),
+              ),
       );
     }
 
-    final scheme = Theme.of(context).colorScheme;
     final ImageProvider? image = _pickedFile != null
         ? FileImage(File(_pickedFile!.path))
         : (_photoUrl?.isNotEmpty == true ? NetworkImage(_photoUrl!) : null);
     final username = _usernameController.text.trim().toLowerCase();
     final usernameValid = username.isEmpty || _validUsername(username);
 
+    Widget fieldIcon(VerbumIcons icon) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: VIcon(icon, size: 20, color: p.inkMuted),
+    );
+    const iconConstraints = BoxConstraints(minWidth: 44);
+
     return Scaffold(
-      body: VerbumAmbientBackground(
-        child: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              VAppBar(
-                title: Text(
-                  'Editar perfil',
-                  style: VerbumFonts.serif(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: EdgeInsets.fromLTRB(
-                    16,
-                    8,
-                    16,
-                    MediaQuery.paddingOf(context).bottom + 24,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Column(
-                          children: [
-                            Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: scheme.secondary,
-                                      width: 1.5,
-                                    ),
-                                  ),
-                                  child: CircleAvatar(
-                                    radius: 51,
-                                    backgroundColor: scheme.primaryContainer,
-                                    backgroundImage: image,
-                                    child: image == null
-                                        ? VIcon(
-                                            VerbumIcons.user,
-                                            size: 42,
-                                            color: scheme.primary,
-                                          )
-                                        : null,
-                                  ),
-                                ),
-                                Positioned(
-                                  right: -3,
-                                  bottom: 2,
-                                  child: IconButton.filled(
-                                    tooltip: 'Cambiar foto',
-                                    onPressed: _uploadingPhoto
-                                        ? null
-                                        : _pickAndUpload,
-                                    style: IconButton.styleFrom(
-                                      backgroundColor: scheme.primary,
-                                      foregroundColor: scheme.onPrimary,
-                                      side: BorderSide(
-                                        color: scheme.surface,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    icon: _uploadingPhoto
-                                        ? const SizedBox(
-                                            width: 17,
-                                            height: 17,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color: Colors.white,
-                                            ),
-                                          )
-                                        : const VIcon(
-                                            VerbumIcons.camera,
-                                            size: 19,
-                                          ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 13),
-                            Text(
-                              'Tu rostro en la comunidad',
-                              style: VerbumFonts.sans(
-                                fontSize: 12,
-                                color: scheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      Text(
-                        'CÓMO QUIERES APARECER',
-                        style: VerbumFonts.sans(
-                          fontSize: 10,
-                          letterSpacing: 1.5,
-                          fontWeight: FontWeight.w700,
-                          color: scheme.secondary,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Tu identidad en Verbum',
-                        style: VerbumFonts.serif(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 13),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: scheme.surface.withValues(alpha: .92),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: scheme.outlineVariant),
-                        ),
-                        child: Column(
-                          children: [
-                            TextField(
-                              controller: _displayController,
-                              textCapitalization: TextCapitalization.words,
-                              textInputAction: TextInputAction.next,
-                              decoration: const InputDecoration(
-                                labelText: 'Nombre visible',
-                                hintText: '¿Cómo quieres que te llamemos?',
-                                prefixIcon: VIcon(
-                                  VerbumIcons.identificationBadge,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            TextField(
-                              controller: _usernameController,
-                              autocorrect: false,
-                              textCapitalization: TextCapitalization.none,
-                              decoration: InputDecoration(
-                                labelText: 'Nombre de usuario',
-                                hintText: 'tu.usuario',
-                                prefixText: '@',
-                                prefixIcon: const VIcon(VerbumIcons.at),
-                                errorText: usernameValid
-                                    ? null
-                                    : 'Usa entre 3 y 20 letras, números, punto o _',
-                              ),
-                              onChanged: (_) => setState(() {}),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                VIcon(
-                                  VerbumIcons.info,
-                                  size: 15,
-                                  color: scheme.onSurfaceVariant,
-                                ),
-                                const SizedBox(width: 7),
-                                Expanded(
-                                  child: Text(
-                                    'Tu usuario ayuda a que otros puedan reconocerte cuando compartes en Comunidad.',
-                                    style: VerbumFonts.sans(
-                                      fontSize: 11,
-                                      height: 1.45,
-                                      color: scheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton.icon(
-                          onPressed: _saving || !usernameValid ? null : _save,
-                          icon: _saving
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const VIcon(VerbumIcons.check),
-                          label: Text(
-                            _saving ? 'Guardando…' : 'Guardar cambios',
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Center(
-                        child: Text(
-                          'Puedes cambiar estos datos cuando quieras',
-                          style: VerbumFonts.sans(
-                            fontSize: 11,
-                            color: scheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+      appBar: appBar,
+      body: ListView(
+        padding: EdgeInsets.fromLTRB(
+          VerbumSpace.gutter,
+          8,
+          VerbumSpace.gutter,
+          MediaQuery.paddingOf(context).bottom + 24,
         ),
+        children: [
+          Center(
+            child: Column(
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: p.surface,
+                        boxShadow: VerbumShadows.soft(p),
+                      ),
+                      child: CircleAvatar(
+                        radius: 51,
+                        backgroundColor: p.surfaceMuted,
+                        backgroundImage: image,
+                        child: image == null
+                            ? VIcon(VerbumIcons.user, size: 42, color: p.rubric)
+                            : null,
+                      ),
+                    ),
+                    Positioned(
+                      right: -3,
+                      bottom: 2,
+                      child: Tooltip(
+                        message: 'Cambiar foto',
+                        child: Material(
+                          color: p.emphasis,
+                          shape: CircleBorder(
+                            side: BorderSide(color: p.background, width: 3),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
+                            onTap: _uploadingPhoto ? null : _pickAndUpload,
+                            child: SizedBox.square(
+                              dimension: 42,
+                              child: Center(
+                                child: _uploadingPhoto
+                                    ? SizedBox.square(
+                                        dimension: 17,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: p.onEmphasis,
+                                        ),
+                                      )
+                                    : VIcon(
+                                        VerbumIcons.camera,
+                                        size: 19,
+                                        color: p.onEmphasis,
+                                        semanticLabel: 'Cambiar foto',
+                                      ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 13),
+                Text(
+                  'Tu rostro en la comunidad',
+                  style: t.caption.copyWith(color: p.inkMuted),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+          const VSectionHeader(
+            'Tu identidad en Verbum',
+            eyebrow: 'Cómo quieres aparecer',
+          ),
+          VSurfaceCard(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _displayController,
+                  textCapitalization: TextCapitalization.words,
+                  textInputAction: TextInputAction.next,
+                  style: t.body,
+                  decoration: InputDecoration(
+                    labelText: 'Nombre visible',
+                    hintText: '¿Cómo quieres que te llamemos?',
+                    prefixIcon: fieldIcon(VerbumIcons.identificationBadge),
+                    prefixIconConstraints: iconConstraints,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _usernameController,
+                  autocorrect: false,
+                  textCapitalization: TextCapitalization.none,
+                  style: t.body,
+                  decoration: InputDecoration(
+                    labelText: 'Nombre de usuario',
+                    hintText: 'tu.usuario',
+                    prefixIcon: fieldIcon(VerbumIcons.at),
+                    prefixIconConstraints: iconConstraints,
+                    errorText: usernameValid
+                        ? null
+                        : 'Usa entre 3 y 20 letras, números, punto o _',
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 1),
+                      child: VIcon(VerbumIcons.info, size: 15, color: p.gold),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Tu usuario ayuda a que otros puedan reconocerte '
+                        'cuando compartes en Comunidad.',
+                        style: t.caption.copyWith(
+                          color: p.inkMuted,
+                          height: 1.45,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          VButton(
+            label: _saving ? 'Guardando…' : 'Guardar cambios',
+            icon: VerbumIcons.check,
+            iconLeading: true,
+            expanded: true,
+            loading: _saving,
+            onPressed: _saving || !usernameValid ? null : _save,
+          ),
+          const SizedBox(height: 12),
+          Center(
+            child: Text(
+              'Puedes cambiar estos datos cuando quieras',
+              style: t.caption.copyWith(color: p.inkSubtle),
+            ),
+          ),
+        ],
       ),
     );
   }

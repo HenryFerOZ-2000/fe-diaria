@@ -97,18 +97,7 @@ class _TraditionalPrayersCategoriesScreenState
       showBanner: !_adsRemoved,
       bannerAd: _bannerAd,
       centerTitle: false,
-      titleWidget: FittedBox(
-        alignment: Alignment.centerLeft,
-        fit: BoxFit.scaleDown,
-        child: Text(
-          'Oraciones tradicionales',
-          maxLines: 1,
-          style: VerbumFonts.serif(
-            fontSize: 23,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
+      titleWidget: Text('Oraciones tradicionales'),
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 12),
@@ -129,9 +118,7 @@ class _TraditionalPrayersCategoriesScreenState
       ],
       body: _isLoading
           ? Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).colorScheme.primary,
-              ),
+              child: CircularProgressIndicator(color: context.palette.rubric),
             )
           : _categories.isEmpty
           ? const PrayerLibraryEmptyState(
@@ -141,7 +128,12 @@ class _TraditionalPrayersCategoriesScreenState
             )
           : ListView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
+              padding: const EdgeInsets.fromLTRB(
+                VerbumSpace.gutter,
+                8,
+                VerbumSpace.gutter,
+                28,
+              ),
               children: [
                 PrayerLibraryHero(
                   kicker: 'TU BIBLIOTECA DE ORACIÓN',
@@ -149,7 +141,7 @@ class _TraditionalPrayersCategoriesScreenState
                   description:
                       'Explora palabras recibidas por la tradición y encuentra una oración para este momento.',
                   icon: VerbumIcons.bookOpen,
-                  accent: const Color(0xFFB58A45),
+                  accent: context.palette.gold,
                   badge: traditionName,
                 ),
                 const SizedBox(height: 24),
@@ -170,7 +162,7 @@ class _TraditionalPrayersCategoriesScreenState
       eyebrow: presentation.eyebrow,
       subtitle: presentation.subtitle,
       icon: presentation.icon,
-      accent: presentation.accent,
+      accent: presentation.accent.resolve(context.palette),
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => TraditionalPrayersListScreen(
@@ -219,49 +211,49 @@ _CategoryCardPresentation _categoryPresentation(String category) {
         eyebrow: 'Ora con la Palabra',
         subtitle: 'Padre Nuestro, salmos y oraciones inspiradas en la Biblia',
         icon: VerbumIcons.bookOpenText,
-        accent: Color(0xFF77649A),
+        accent: PrayerLibraryTone.indigo,
       );
     case 'promesas':
       return const _CategoryCardPresentation(
         eyebrow: 'Recuerda su fidelidad',
         subtitle: 'Promesas bíblicas para fortalecer la esperanza',
         icon: VerbumIcons.sparkle,
-        accent: Color(0xFFB58A45),
+        accent: PrayerLibraryTone.periwinkle,
       );
     case 'otras':
       return const _CategoryCardPresentation(
         eyebrow: 'Para cada momento',
         subtitle: 'Oraciones para entregar tu vida cotidiana a Dios',
         icon: VerbumIcons.heart,
-        accent: Color(0xFF5F8178),
+        accent: PrayerLibraryTone.sage,
       );
     case 'basicas':
       return const _CategoryCardPresentation(
         eyebrow: 'Palabras esenciales',
         subtitle: 'Oraciones fundamentales de la tradición cristiana',
         icon: VerbumIcons.handHeart,
-        accent: Color(0xFF77649A),
+        accent: PrayerLibraryTone.indigo,
       );
     case 'arcangeles':
       return const _CategoryCardPresentation(
         eyebrow: 'Pide protección',
         subtitle: 'Oraciones tradicionales a los arcángeles',
         icon: VerbumIcons.shield,
-        accent: Color(0xFF536C91),
+        accent: PrayerLibraryTone.indigo,
       );
     case 'del_dia':
       return const _CategoryCardPresentation(
         eyebrow: 'Acompaña tu jornada',
         subtitle: 'Oraciones para comenzar y terminar el día',
         icon: VerbumIcons.sun,
-        accent: Color(0xFFB58A45),
+        accent: PrayerLibraryTone.periwinkle,
       );
     default:
       return const _CategoryCardPresentation(
         eyebrow: 'Tu momento de oración',
         subtitle: 'Una colección para detenerte y encontrarte con Dios',
         icon: VerbumIcons.bookOpen,
-        accent: Color(0xFF77649A),
+        accent: PrayerLibraryTone.indigo,
       );
   }
 }
@@ -277,5 +269,5 @@ class _CategoryCardPresentation {
   final String eyebrow;
   final String subtitle;
   final VerbumIcons icon;
-  final Color accent;
+  final PrayerLibraryTone accent;
 }
