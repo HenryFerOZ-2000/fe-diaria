@@ -348,13 +348,16 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                           ],
                         ),
                         const SizedBox(height: 26),
-                        VIcon(
-                          isCarol
-                              ? VerbumIcons.musicNote
-                              : VerbumIcons.bookOpenText,
-                          weight: VIconWeight.duotone,
-                          size: 32,
-                          color: p.gold,
+                        Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: VIcon(
+                            isCarol
+                                ? VerbumIcons.musicNote
+                                : VerbumIcons.bookOpenText,
+                            weight: VIconWeight.duotone,
+                            size: 32,
+                            color: p.gold,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         VRubricLabel('Paso $_currentStep de $_totalSteps'),

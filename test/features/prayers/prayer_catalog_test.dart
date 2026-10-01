@@ -9,12 +9,11 @@ void main() {
 
   test('católicos ven las oraciones tradicionales', () {
     expect(keys(FaithTradition.catholic, 'traditional'), contains('ave_maria'));
-    expect(
-      prayerSectionsFor(
-        FaithTradition.catholic,
-      ).last.entries.map((e) => e.destination),
-      everyElement(PrayerDestination.traditionalPrayer),
-    );
+    final destinations = prayerSectionsFor(
+      FaithTradition.catholic,
+    ).last.entries.map((e) => e.destination).toSet();
+    expect(destinations, contains(PrayerDestination.traditionalPrayer));
+    expect(destinations, isNot(contains(PrayerDestination.traditionalList)));
   });
 
   test(
@@ -40,6 +39,22 @@ void main() {
         final k = s.entries.map((e) => e.key).toList();
         expect(k.toSet().length, k.length, reason: '${t.name}/${s.id}');
       }
+    }
+  });
+
+  test('rosario y novena solo para católicos', () {
+    expect(
+      keys(FaithTradition.catholic, 'traditional'),
+      containsAll(['rosario', 'novena_navidad']),
+    );
+    for (final t in [
+      FaithTradition.evangelical,
+      FaithTradition.general,
+      FaithTradition.unset,
+    ]) {
+      final k = keys(t, 'traditional');
+      expect(k, isNot(contains('rosario')), reason: t.name);
+      expect(k, isNot(contains('novena_navidad')), reason: t.name);
     }
   });
 }

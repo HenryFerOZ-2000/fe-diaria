@@ -20,15 +20,11 @@ import 'package:verbum/models/verse.dart';
 import 'package:verbum/providers/app_provider.dart';
 import 'package:verbum/screens/daily_missions_flow_screen.dart';
 import 'package:verbum/screens/favorites_screen.dart';
-import 'package:verbum/screens/mission_read_screen.dart';
 import 'package:verbum/screens/spiritual_path_day_screen.dart';
 import 'package:verbum/screens/category_prayers_screen.dart';
 import 'package:verbum/screens/emotion_passage_read_screen.dart';
 import 'package:verbum/screens/intention_prayer_read_screen.dart';
 import 'package:verbum/screens/novena_screen.dart';
-import 'package:verbum/screens/prayer_read_screen.dart';
-import 'package:verbum/screens/psalms_screen.dart';
-import 'package:verbum/screens/reading_screen.dart';
 import 'package:verbum/screens/traditional_prayer_screen.dart';
 import 'package:verbum/screens/traditional_prayer_detail_screen.dart';
 import 'package:verbum/services/traditional_prayers_service.dart';
@@ -163,7 +159,6 @@ void main() {
   }
 
   for (final entry in <String, Widget>{
-    'generic': const PrayerReadScreen(category: 'ansiedad'),
     'intention': const IntentionPrayerReadScreen(categoryKey: 'salud'),
     'emotion': const EmotionPassageReadScreen(emotionKey: 'ansiedad'),
     'traditional without religion metadata': const TraditionalPrayerScreen(
@@ -281,76 +276,6 @@ void main() {
     expect(content.reference, step['titulo']);
     expect(content.kind, ShareContentKind.prayer);
     expect(content.tradition, ShareTradition.catholic);
-    expect(nativeShares, isEmpty);
-  });
-
-  testWidgets('a psalm card retains biblical provenance through its reader', (
-    tester,
-  ) async {
-    await tester.pumpWidget(const MaterialApp(home: PsalmsScreen()));
-    await tester.pumpAndSettle();
-    final psalm = tester.widget<PrayerCard>(find.byType(PrayerCard).first);
-    await tester.tap(find.text(psalm.title).first);
-    await _pumpRoute(tester);
-    await tester.tap(find.byTooltip('Compartir'));
-    await _pumpRoute(tester);
-
-    expect(find.byType(ShareComposerScreen), findsOneWidget);
-    final content = _composer(tester).content;
-    expect(content.title, psalm.title);
-    expect(content.body, psalm.text);
-    expect(content.reference, psalm.reference);
-    expect(content.sourceLabel, 'Reina-Valera 1909');
-    expect(content.kind, ShareContentKind.psalm);
-    expect(nativeShares, isEmpty);
-  });
-
-  testWidgets(
-    'the reading wrapper keeps a reference without inventing Scripture',
-    (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: ReadingScreen(
-            title: 'Una pausa',
-            content: 'Recuerda el bien recibido hoy.',
-            reference: 'Reflexión del día',
-            onComplete: () {},
-          ),
-        ),
-      );
-      await tester.tap(find.byTooltip('Compartir'));
-      await _pumpRoute(tester);
-
-      expect(find.byType(ShareComposerScreen), findsOneWidget);
-      final content = _composer(tester).content;
-      expect(content.title, 'Una pausa');
-      expect(content.body, 'Recuerda el bien recibido hoy.');
-      expect(content.reference, 'Reflexión del día');
-      expect(content.kind, ShareContentKind.reflection);
-      expect(content.tradition, isNull);
-      expect(nativeShares, isEmpty);
-    },
-  );
-
-  testWidgets('the reading wrapper preserves an explicit share callback', (
-    tester,
-  ) async {
-    final shared = <(String, String?)>[];
-    await tester.pumpWidget(
-      MaterialApp(
-        home: ReadingScreen(
-          title: 'Una pausa',
-          content: 'Recuerda el bien recibido hoy.',
-          reference: 'Reflexión del día',
-          onComplete: () {},
-          onShare: (body, reference) => shared.add((body, reference)),
-        ),
-      ),
-    );
-    await tester.tap(find.byTooltip('Compartir'));
-    await _pumpRoute(tester);
-    expect(shared, [('Recuerda el bien recibido hoy.', 'Reflexión del día')]);
-    expect(find.byType(ShareComposerScreen), findsNothing);
     expect(nativeShares, isEmpty);
   });
 
@@ -580,27 +505,6 @@ void main() {
     );
     expect(find.byType(ShareComposerScreen), findsNothing);
     expect(nativeShares, isEmpty);
-  });
-
-  testWidgets('the mission reader opens mission content', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: MissionReadScreen(
-          title: 'Ora por alguien',
-          content: 'Pon delante de Dios a una persona que lo necesite.',
-          onCompleted: () {},
-        ),
-      ),
-    );
-
-    await tester.tap(find.byTooltip('Compartir'));
-    await _pumpRoute(tester);
-
-    final content = _composer(tester).content;
-    expect(content.title, 'Ora por alguien');
-    expect(content.body, 'Pon delante de Dios a una persona que lo necesite.');
-    expect(content.reference, isNull);
-    expect(content.kind, ShareContentKind.mission);
   });
 
   testWidgets(

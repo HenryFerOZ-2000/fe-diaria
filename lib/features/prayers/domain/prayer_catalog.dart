@@ -14,6 +14,12 @@ enum PrayerDestination {
 
   /// Lista de oraciones de una categoría (`TraditionalPrayersListScreen`).
   traditionalList,
+
+  /// Guía del Santo Rosario (`RosaryGuideScreen`).
+  rosaryGuide,
+
+  /// Novena de Navidad (`NovenaScreen`).
+  novena,
 }
 
 final class PrayerEntry {
@@ -191,15 +197,36 @@ bool usesBiblicalPrayers(FaithTradition tradition) =>
     tradition == FaithTradition.evangelical ||
     tradition == FaithTradition.general;
 
+const _rosary = PrayerEntry(
+  key: 'rosario',
+  title: 'Santo Rosario',
+  subtitle: 'Misterios de hoy',
+  destination: PrayerDestination.rosaryGuide,
+);
+
+const _novena = PrayerEntry(
+  key: 'novena_navidad',
+  title: 'Novena de Navidad',
+  subtitle: 'Nueve días',
+  destination: PrayerDestination.novena,
+);
+
 /// Secciones de la pantalla de Oraciones para una tradición.
-List<PrayerSection> prayerSectionsFor(FaithTradition tradition) => [
-  _emotions,
-  _intentions,
-  PrayerSection(
-    id: 'traditional',
-    title: TraditionUiStrings.prayersTraditionalSectionTitle(tradition),
-    entries: usesBiblicalPrayers(tradition)
-        ? _christianLists
-        : _catholicPrayers,
-  ),
-];
+List<PrayerSection> prayerSectionsFor(FaithTradition tradition) {
+  final caps = TraditionCapabilities.forTradition(tradition);
+  return [
+    _emotions,
+    _intentions,
+    PrayerSection(
+      id: 'traditional',
+      title: TraditionUiStrings.prayersTraditionalSectionTitle(tradition),
+      entries: usesBiblicalPrayers(tradition)
+          ? _christianLists
+          : [
+              if (caps.showRosaryGuide) _rosary,
+              if (caps.showNovena) _novena,
+              ..._catholicPrayers,
+            ],
+    ),
+  ];
+}

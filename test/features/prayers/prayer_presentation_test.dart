@@ -6,6 +6,8 @@ import 'package:verbum/features/prayers/presentation/prayer_entry_icons.dart';
 import 'package:verbum/features/prayers/presentation/prayer_routes.dart';
 import 'package:verbum/screens/emotion_passage_read_screen.dart';
 import 'package:verbum/screens/intention_prayer_read_screen.dart';
+import 'package:verbum/screens/novena_screen.dart';
+import 'package:verbum/screens/rosary_guide_screen.dart';
 import 'package:verbum/screens/traditional_prayer_screen.dart';
 import 'package:verbum/screens/traditional_prayers_list_screen.dart';
 
@@ -39,6 +41,10 @@ void main() {
           final list = screen as TraditionalPrayersListScreen;
           expect(list.category, e.key);
           expect(list.religion, 'cristiana');
+        case PrayerDestination.rosaryGuide:
+          expect(screen, isA<RosaryGuideScreen>());
+        case PrayerDestination.novena:
+          expect(screen, isA<NovenaScreen>());
       }
     }
   });
