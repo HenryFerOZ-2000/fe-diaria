@@ -4,22 +4,16 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
 import 'dart:async';
 import '../providers/app_provider.dart';
-import '../providers/auth_provider.dart';
 import '../design_system/design_system.dart';
-import '../features/today/application/constancy_progress.dart';
 import '../features/today/application/today_schedule.dart';
-import '../features/today/presentation/constancy_card.dart';
-import '../features/today/presentation/today_header.dart';
-import '../features/today/presentation/today_journey_section.dart';
+import '../features/today/presentation/today_hero.dart';
 import '../controllers/missions_controller.dart';
 import '../controllers/streak_controller.dart';
 import 'daily_missions_flow_screen.dart';
 import '../widgets/racha_celebration_dialog.dart';
 import '../services/spiritual_stats_service.dart';
 import '../services/daily_progress_service.dart';
-import '../widgets/verbum_header_actions.dart';
 import '../widgets/spiritual_path_today_card.dart';
-import '../widgets/home_today_sections.dart';
 import '../features/liturgy/presentation/today_liturgy_section.dart';
 import '../features/today/domain/daily_practice_catalog.dart';
 
@@ -221,114 +215,78 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
     final p = context.palette;
     return Scaffold(
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [p.surfaceMuted, p.background],
-            stops: const [0, 0.5],
-          ),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  VerbumSpace.gutter,
-                  14,
-                  VerbumSpace.gutter,
-                  8,
-                ),
-                child: TodayHeader(
-                  now: DateTime.now(),
-                  userName: auth.firebaseUser?.displayName,
-                  actions: const VerbumHeaderActions(padding: EdgeInsets.zero),
+      backgroundColor: p.inverse,
+      body: Consumer<AppProvider>(
+        builder: (context, provider, child) => FadeTransition(
+          opacity: _fadeAnimation,
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverSafeArea(
+                bottom: false,
+                sliver: SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 12, bottom: 28),
+                    child: ChangeNotifierProvider<StreakController>.value(
+                      value: _streakController,
+                      child: Consumer<StreakController>(
+                        builder: (context, streak, _) {
+                          _maybeShowStreakCelebration(streak);
+                          return TodayHero(
+                            now: DateTime.now(),
+                            missions: _missionsController.missions,
+                            streakDays: streak.totalDays,
+                            verseText: provider.todayVerse?.text,
+                            onOpen: (mission) =>
+                                _openMissionRead(context, mission, provider),
+                            onProfile: () =>
+                                Navigator.of(context).pushNamed('/profile'),
+                            onStreak: () =>
+                                Navigator.of(context).pushNamed('/streak'),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              Expanded(child: _buildVerseTab(context)),
+              // Hoja clara con el resto del día.
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: p.background,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(VerbumRadius.sheet),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      VerbumSpace.gutter,
+                      22,
+                      VerbumSpace.gutter,
+                      24,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (provider.isLoading) ...[
+                          const VProgressBar(value: 0.35, height: 3),
+                          const SizedBox(height: 12),
+                        ],
+                        const SpiritualPathTodayCard(),
+                        const TodayLiturgySection(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildVerseTab(BuildContext context) {
-    return Consumer<AppProvider>(
-      builder: (context, provider, child) {
-        return FadeTransition(
-          opacity: _fadeAnimation,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(
-              VerbumSpace.gutter,
-              6,
-              VerbumSpace.gutter,
-              24,
-            ),
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (provider.isLoading) ...[
-                  const VProgressBar(value: 0.35, height: 3),
-                  const SizedBox(height: 12),
-                ],
-                HomeTodaySections(
-                  missions: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      TodayJourneySection(
-                        missions: _missionsController.missions,
-                        nightAvailable: isNightPrayerAvailable(DateTime.now()),
-                        verseText: provider.todayVerse?.text,
-                        verseReference: provider.todayVerse?.reference,
-                        onOpen: (mission) =>
-                            _openMissionRead(context, mission, provider),
-                      ),
-                      const SizedBox(height: 8),
-                      ChangeNotifierProvider<StreakController>.value(
-                        value: _streakController,
-                        child: Consumer<StreakController>(
-                          builder: (context, streak, _) {
-                            _maybeShowStreakCelebration(streak);
-                            return ConstancyCard(
-                              progress: ConstancyProgress.from(
-                                totalDays: streak.totalDays,
-                                completedMoments:
-                                    _missionsController.completedEssentialCount,
-                                totalMoments: _missionsController
-                                    .essentialMissions
-                                    .length,
-                              ),
-                              weekLabels: [
-                                for (final d in streak.days) d.label,
-                              ],
-                              weekCompleted: [
-                                for (final d in streak.days) d.completed,
-                              ],
-                              todayIndex: DateTime.now().weekday - 1,
-                              celebrate: streak.playAnimation,
-                              onTap: () =>
-                                  Navigator.of(context).pushNamed('/streak'),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  spiritualPath: const SpiritualPathTodayCard(),
-                  liturgy: const TodayLiturgySection(),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 

@@ -57,3 +57,17 @@ const _months = [
 /// Fecha corta en español sin depender de datos de locale: "Mié 30 sep".
 String shortSpanishDate(DateTime date) =>
     '${_weekdays[date.weekday - 1]} ${date.day} ${_months[date.month - 1]}';
+
+const _longWeekdays = [
+  'Lunes',
+  'Martes',
+  'Miércoles',
+  'Jueves',
+  'Viernes',
+  'Sábado',
+  'Domingo',
+];
+
+/// Fecha con el día completo: "Miércoles 30 sep".
+String longSpanishDate(DateTime date) =>
+    '${_longWeekdays[date.weekday - 1]} ${date.day} ${_months[date.month - 1]}';

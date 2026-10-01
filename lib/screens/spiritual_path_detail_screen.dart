@@ -27,7 +27,9 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
     _reload();
   }
 
-  void _reload() => _progress = _service.progressFor(widget.path.id);
+  void _reload() {
+    _progress = _service.progressFor(widget.path.id);
+  }
 
   Future<void> _openDay(int number) async {
     await _service.start(widget.path.id, pathTitle: widget.path.title);

@@ -5,25 +5,21 @@ import '../application/day_moments.dart';
 import '../application/today_schedule.dart';
 import 'mission_visuals.dart';
 
-/// Los momentos del día como un abanico de tarjetas que se desliza.
+/// Los momentos del día como un abanico de cartas sobre fondo periwinkle.
 ///
-/// Abre centrado en el siguiente momento pendiente; las vecinas asoman
-/// giradas, como cartas en la mano.
+/// Abre centrado en el siguiente momento pendiente; las vecinas asoman a
+/// los lados, giradas y en lavanda. Debajo, puntos de página.
 class MomentsFan extends StatefulWidget {
   const MomentsFan({
     super.key,
     required this.moments,
     required this.nightAvailable,
     required this.onOpen,
-    this.verseText,
-    this.verseReference,
   });
 
   final List<DayMoment> moments;
   final bool nightAvailable;
   final ValueChanged<DayMoment> onOpen;
-  final String? verseText;
-  final String? verseReference;
 
   @override
   State<MomentsFan> createState() => _MomentsFanState();
@@ -33,7 +29,7 @@ class _MomentsFanState extends State<MomentsFan> {
   // Las misiones se mutan en sitio, así que se recuerda el último índice.
   late int _next = initialMomentIndex(widget.moments);
   late final PageController _controller = PageController(
-    viewportFraction: 0.8,
+    viewportFraction: 0.58,
     initialPage: _next,
   );
 
@@ -59,51 +55,60 @@ class _MomentsFanState extends State<MomentsFan> {
     super.dispose();
   }
 
+  double get _page =>
+      _controller.hasClients && _controller.position.hasContentDimensions
+      ? _controller.page!
+      : _next.toDouble();
+
   @override
   Widget build(BuildContext context) {
-    final next = initialMomentIndex(widget.moments);
     // El alto crece con el texto ampliado para no recortar contenido.
     final height = MediaQuery.textScalerOf(
       context,
-    ).scale(318).clamp(318.0, 520.0);
+    ).scale(330).clamp(330.0, 520.0);
 
-    return SizedBox(
-      height: height,
-      child: PageView.builder(
-        controller: _controller,
-        clipBehavior: Clip.none,
-        itemCount: widget.moments.length,
-        itemBuilder: (context, i) => AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            final page =
-                _controller.hasClients &&
-                    _controller.position.hasContentDimensions
-                ? _controller.page!
-                : next.toDouble();
-            final d = (i - page).clamp(-1.5, 1.5);
-            return Transform(
-              alignment: Alignment.bottomCenter,
-              transform: Matrix4.identity()
-                ..translateByDouble(0, d.abs() * 14, 0, 1)
-                ..rotateZ(d * 0.07)
-                ..scaleByDouble(1 - d.abs() * 0.08, 1 - d.abs() * 0.08, 1, 1),
-              child: child,
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(6, 8, 6, 18),
-            child: _MomentCard(
-              moment: widget.moments[i],
-              isNext: i == next && !widget.moments[i].done,
-              locked: _locked(widget.moments[i]),
-              verseText: widget.verseText,
-              verseReference: widget.verseReference,
-              onOpen: () => widget.onOpen(widget.moments[i]),
+    return Column(
+      children: [
+        SizedBox(
+          height: height,
+          child: PageView.builder(
+            controller: _controller,
+            clipBehavior: Clip.none,
+            itemCount: widget.moments.length,
+            itemBuilder: (context, i) => AnimatedBuilder(
+              animation: _controller,
+              builder: (context, _) {
+                final d = (i - _page).clamp(-1.5, 1.5);
+                final focus = (1 - d.abs()).clamp(0.0, 1.0);
+                return Transform(
+                  alignment: Alignment.bottomCenter,
+                  transform: Matrix4.identity()
+                    ..translateByDouble(0, d.abs() * 26, 0, 1)
+                    ..rotateZ(d * 0.16)
+                    ..scaleByDouble(1 - d.abs() * 0.1, 1 - d.abs() * 0.1, 1, 1),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(4, 6, 4, 30),
+                    child: _MomentCard(
+                      moment: widget.moments[i],
+                      focus: focus,
+                      locked: _locked(widget.moments[i]),
+                      onOpen: () => widget.onOpen(widget.moments[i]),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),
-      ),
+        const SizedBox(height: 4),
+        ExcludeSemantics(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, _) =>
+                _Dots(count: widget.moments.length, page: _page),
+          ),
+        ),
+      ],
     );
   }
 
@@ -114,143 +119,102 @@ class _MomentsFanState extends State<MomentsFan> {
 class _MomentCard extends StatelessWidget {
   const _MomentCard({
     required this.moment,
-    required this.isNext,
+    required this.focus,
     required this.locked,
     required this.onOpen,
-    this.verseText,
-    this.verseReference,
   });
 
   final DayMoment moment;
-  final bool isNext;
+
+  /// 1 = carta al centro (blanca), 0 = carta lateral (lavanda).
+  final double focus;
   final bool locked;
   final VoidCallback onOpen;
-  final String? verseText;
-  final String? verseReference;
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
     final type = context.type;
     final mission = moment.mission;
-    final bg = isNext ? p.inverse : p.surface;
-    final fg = isNext ? p.onInverse : p.ink;
-    final muted = isNext ? p.onInverse.withValues(alpha: 0.78) : p.inkMuted;
-    final verse =
-        mission.id == 'verse' && (verseText?.trim().isNotEmpty ?? false);
+    final side = Color.alphaBlend(
+      p.onInverse.withValues(alpha: 0.62),
+      p.inverse,
+    );
+    final caption = locked
+        ? 'Desde las $nightPrayerStartHour:00'
+        : moment.done
+        ? '${shortLabelForMission(mission)} · Hecho'
+        : '${shortLabelForMission(mission)} · ${mission.durationMinutes} min';
 
-    return Material(
-      color: bg,
-      elevation: isNext ? 10 : 4,
-      shadowColor: p.ink.withValues(alpha: 0.22),
-      borderRadius: BorderRadius.circular(VerbumRadius.card),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: locked ? null : onOpen,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Semantics(
+      button: !locked,
+      label: '${moment.time}, ${mission.title}, $caption',
+      excludeSemantics: true,
+      child: Material(
+        color: Color.lerp(side, p.surface, focus),
+        elevation: 4 + focus * 10,
+        shadowColor: p.ink.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(VerbumRadius.sheet),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: locked ? null : onOpen,
+          child: Stack(
             children: [
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                spacing: 8,
-                runSpacing: 6,
-                children: [
-                  _Pill(
-                    label: moment.time,
-                    bg: isNext
-                        ? p.onInverse.withValues(alpha: 0.16)
-                        : p.surfaceMuted,
-                    fg: isNext ? p.onInverse : p.rubric,
-                  ),
-                  if (moment.done)
-                    _Pill(
-                      label: 'Hecho',
-                      icon: VerbumIcons.check,
-                      bg: p.accentSoft,
-                      fg: p.rubric,
-                    )
-                  else if (isNext)
-                    _Pill(label: 'Ahora', bg: p.butter, fg: p.onButter)
-                  else if (locked)
-                    VIcon(VerbumIcons.lockSimple, size: 18, color: p.inkSubtle),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Container(
-                width: 58,
-                height: 58,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: isNext ? p.butter : p.accentSoft,
-                  borderRadius: BorderRadius.circular(VerbumRadius.tile),
-                ),
-                child: VIcon(
-                  iconForMission(mission),
-                  weight: VIconWeight.duotone,
-                  size: 32,
-                  color: isNext ? p.onButter : p.rubric,
-                ),
-              ),
-              const SizedBox(height: 14),
-              Text(
-                shortLabelForMission(mission),
-                style: type.rubric.copyWith(
-                  color: isNext ? p.butter : p.rubric,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                mission.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: type.heading.copyWith(color: fg),
-              ),
-              const SizedBox(height: 6),
-              Expanded(
-                child: Text(
-                  verse
-                      ? '«${verseText!.trim()}» ${verseReference ?? ''}'.trim()
-                      : locked
-                      ? 'Disponible desde las $nightPrayerStartHour:00'
-                      : mission.description,
-                  overflow: TextOverflow.fade,
-                  style: (verse ? type.scripture : type.body).copyWith(
-                    color: muted,
-                    fontSize: verse ? 16 : null,
+              if (moment.done)
+                Positioned(
+                  top: 14,
+                  left: 14,
+                  child: CircleAvatar(
+                    radius: 13,
+                    backgroundColor: p.accentSoft,
+                    child: VIcon(VerbumIcons.check, size: 14, color: p.rubric),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      VIcon(VerbumIcons.clock, size: 16, color: muted),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${mission.durationMinutes} min',
-                        style: type.caption.copyWith(color: muted),
-                      ),
-                    ],
+              if (locked)
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: VIcon(
+                    VerbumIcons.lockSimple,
+                    size: 18,
+                    color: p.inkSubtle,
                   ),
-                  if (!locked)
-                    VButton(
-                      label: moment.done ? 'Volver' : 'Comenzar',
-                      icon: VerbumIcons.arrowRight,
-                      compact: true,
-                      variant: isNext
-                          ? VButtonVariant.inverse
-                          : VButtonVariant.solid,
-                      onPressed: onOpen,
+                ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 22, 16, 22),
+                child: Column(
+                  children: [
+                    Text(
+                      moment.time,
+                      style: type.title.copyWith(color: p.rubric, fontSize: 26),
                     ),
-                ],
+                    Expanded(
+                      child: Center(
+                        child: FittedBox(
+                          child: VIcon(
+                            iconForMission(mission),
+                            size: 92,
+                            color: p.rubric,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      mission.title,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: type.heading.copyWith(color: p.rubric),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      caption,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      style: type.caption.copyWith(color: p.inkMuted),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -260,43 +224,34 @@ class _MomentCard extends StatelessWidget {
   }
 }
 
-class _Pill extends StatelessWidget {
-  const _Pill({
-    required this.label,
-    required this.bg,
-    required this.fg,
-    this.icon,
-  });
+class _Dots extends StatelessWidget {
+  const _Dots({required this.count, required this.page});
 
-  final String label;
-  final Color bg;
-  final Color fg;
-  final VerbumIcons? icon;
+  final int count;
+  final double page;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            VIcon(icon!, size: 13, color: fg),
-            const SizedBox(width: 4),
-          ],
-          Text(
-            label,
-            style: context.type.caption.copyWith(
-              color: fg,
-              fontWeight: FontWeight.w700,
-            ),
+    final p = context.palette;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        for (var i = 0; i < count; i++)
+          Builder(
+            builder: (context) {
+              final t = (1 - (i - page).abs()).clamp(0.0, 1.0);
+              return Container(
+                width: 7 + 17 * t,
+                height: 7,
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                decoration: BoxDecoration(
+                  color: p.onInverse.withValues(alpha: 0.4 + 0.6 * t),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+              );
+            },
           ),
-        ],
-      ),
+      ],
     );
   }
 }

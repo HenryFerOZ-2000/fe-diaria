@@ -28,5 +28,6 @@ void main() {
   test('fecha corta en español', () {
     expect(shortSpanishDate(DateTime(2026, 9, 30)), 'Mié 30 sep');
     expect(shortSpanishDate(DateTime(2026, 1, 4)), 'Dom 4 ene');
+    expect(longSpanishDate(DateTime(2026, 9, 30)), 'Miércoles 30 sep');
   });
 }
