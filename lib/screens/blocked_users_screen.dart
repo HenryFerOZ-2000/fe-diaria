@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/privacy_security_service.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class BlockedUsersScreen extends StatefulWidget {
   const BlockedUsersScreen({super.key});
@@ -92,81 +92,60 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.type;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Usuarios bloqueados',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
+      appBar: VAppBar(title: Text('Usuarios bloqueados', style: t.heading)),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: VEmptyState(title: 'Cargando', loading: true))
           : _blockedUsers.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.block_outlined, size: 64, color: Colors.grey[400]),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No hay usuarios bloqueados',
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
+          ? const Center(
+              child: VEmptyState(
+                icon: VerbumIcons.prohibit,
+                title: 'No hay usuarios bloqueados',
+                message:
+                    'Cuando bloquees a alguien, aparecerá aquí y podrás '
+                    'desbloquearlo cuando quieras.',
               ),
             )
           : RefreshIndicator(
               onRefresh: _loadBlockedUsers,
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+              child: ListView.separated(
+                padding: const EdgeInsets.fromLTRB(
+                  VerbumSpace.gutter,
+                  12,
+                  VerbumSpace.gutter,
+                  32,
+                ),
                 itemCount: _blockedUsers.length,
+                separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   final user = _blockedUsers[index];
                   final displayName = user['displayName'] ?? 'Usuario';
                   final photoUrl = user['photoUrl'] as String?;
 
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.grey.withValues(alpha: 0.1),
-                      ),
-                    ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: photoUrl != null
-                            ? NetworkImage(photoUrl)
-                            : null,
-                        child: photoUrl == null
-                            ? Text(
-                                displayName.isNotEmpty
-                                    ? displayName[0].toUpperCase()
-                                    : '?',
-                                style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )
-                            : null,
-                      ),
-                      title: Text(
-                        displayName,
-                        style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-                      ),
-                      trailing: TextButton(
-                        onPressed: () => _unblockUser(user['id'], displayName),
-                        child: const Text('Desbloquear'),
-                      ),
+                  return VSurfaceCard(
+                    radius: VerbumRadius.tile,
+                    padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
+                    child: Row(
+                      children: [
+                        _Avatar(name: displayName, photo: photoUrl, size: 42),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            displayName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: t.bodyStrong,
+                          ),
+                        ),
+                        VButton(
+                          label: 'Desbloquear',
+                          variant: VButtonVariant.text,
+                          compact: true,
+                          onPressed: () =>
+                              _unblockUser(user['id'], displayName),
+                        ),
+                      ],
                     ),
                   );
                 },
@@ -174,4 +153,45 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
             ),
     );
   }
+}
+
+/// Avatar: foto o inicial sobre lavanda.
+class _Avatar extends StatelessWidget {
+  const _Avatar({required this.name, this.photo, this.size = 40});
+
+  final String name;
+  final String? photo;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final url = photo?.trim();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(size * .34),
+      child: Container(
+        width: size,
+        height: size,
+        color: p.surfaceMuted,
+        alignment: Alignment.center,
+        child: url != null && url.isNotEmpty
+            ? Image.network(
+                url,
+                width: size,
+                height: size,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => _initial(context),
+              )
+            : _initial(context),
+      ),
+    );
+  }
+
+  Widget _initial(BuildContext context) => Text(
+    name.isNotEmpty ? name.characters.first.toUpperCase() : '?',
+    style: context.type.bodyStrong.copyWith(
+      color: context.palette.rubric,
+      fontSize: size * .38,
+    ),
+  );
 }

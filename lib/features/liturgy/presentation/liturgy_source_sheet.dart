@@ -4,6 +4,7 @@ import '../../../widgets/source_link.dart';
 import '../domain/calendar_selection.dart';
 import '../domain/liturgical_day.dart';
 import '../domain/liturgical_source.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 Future<void> showLiturgySourceSheet(
   BuildContext context, {
@@ -81,7 +82,7 @@ class _LiturgySourceContent extends StatelessWidget {
             const SizedBox(height: 12),
             OutlinedButton.icon(
               onPressed: () => openSource(context, source.url),
-              icon: const Icon(Icons.open_in_new_rounded),
+              icon: const VIcon(VerbumIcons.arrowSquareOut),
               label: const Text('Consultar la fuente'),
             ),
           ],

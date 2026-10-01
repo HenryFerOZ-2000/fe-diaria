@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:verbum/design_system/design_system.dart';
 import 'package:verbum/faith/content_provenance.dart';
 import 'package:verbum/features/sharing/domain/share_content.dart';
 import 'package:verbum/features/sharing/presentation/share_composer_screen.dart';
@@ -24,7 +25,6 @@ void main() {
           home: PrayerTextReadingScreen(
             title: 'Oración de esperanza',
             text: body,
-            accent: Colors.purple,
             provenance: provenance,
           ),
         ),
@@ -56,7 +56,6 @@ void main() {
           title: 'La paz de Jesús',
           text: 'La paz os dejo, mi paz os doy.',
           reference: 'Juan 14:27',
-          accent: Colors.purple,
           provenance: ContentProvenance.bible,
         ),
       ),
@@ -91,13 +90,12 @@ void main() {
           text:
               'Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito.',
           verseReference: 'Juan 3:16',
-          accent: const Color(0xFF77649A),
           onBack: () {},
           onComplete: () {},
           onNext: () {},
           primaryActionLabel: 'He recibido la Palabra',
           secondaryActionLabel: 'Conversar sobre este versículo',
-          secondaryActionIcon: Icons.forum_outlined,
+          secondaryActionIcon: VerbumIcons.chatsCircle,
           onSecondaryAction: () {},
         ),
       ),
@@ -135,5 +133,29 @@ void main() {
 
     expect(find.text('Juan 3:16'), findsOneWidget);
     expect(find.text('RV1909'), findsOneWidget);
+  });
+
+  testWidgets('la oración de la noche se lee en paleta nocturna con vela', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildVerbumTheme(brightness: Brightness.light),
+        home: PrayerReadingExperience(
+          loading: false,
+          nocturne: true,
+          category: 'Cierre opcional',
+          title: 'Cierra tu día con Dios',
+          text: 'En tus manos, Señor, encomiendo mi espíritu.',
+          onBack: () {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(VCandle), findsOneWidget);
+    expect(find.text('Antes de dormir'), findsOneWidget);
+    final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(scaffold.backgroundColor, VerbumPalette.dark.background);
   });
 }

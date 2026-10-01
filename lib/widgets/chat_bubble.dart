@@ -1,6 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
+import '../design_system/design_system.dart';
+
+/// Avatar del acompañante: una paloma sobre mantequilla.
+class CompanionAvatar extends StatelessWidget {
+  const CompanionAvatar({super.key, this.size = 32});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return ExcludeSemantics(
+      child: Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: p.butter,
+          borderRadius: BorderRadius.circular(size * .36),
+        ),
+        child: VIcon(
+          VerbumIcons.bird,
+          weight: VIconWeight.fill,
+          size: size * .56,
+          color: p.onButter,
+        ),
+      ),
+    );
+  }
+}
+
+/// Burbuja de conversación: el acompañante en tarjeta blanca con su avatar;
+/// la persona en índigo, alineada a la derecha.
 class ChatBubble extends StatelessWidget {
   final String text;
   final bool isUser;
@@ -9,49 +41,50 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final bubbleColor = isUser
-        ? colorScheme.primary.withValues(alpha: 0.15)
-        : colorScheme.surface.withValues(alpha: 0.95);
-    final align = isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
-
-    return Column(
-      crossAxisAlignment: align,
-      children: [
-        Container(
-          margin: EdgeInsets.only(
-            left: isUser ? 40 : 0,
-            right: isUser ? 0 : 40,
-            bottom: 10,
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            color: bubbleColor,
-            borderRadius: BorderRadius.circular(16).copyWith(
-              bottomRight: Radius.circular(isUser ? 0 : 16),
-              bottomLeft: Radius.circular(isUser ? 16 : 0),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: colorScheme.primary.withValues(alpha: 0.08),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
-            border: Border.all(
-              color: colorScheme.primary.withValues(alpha: 0.08),
-            ),
-          ),
-          child: Text(
-            text,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              height: 1.5,
-              color: colorScheme.onSurface,
-            ),
-          ),
+    final p = context.palette;
+    const r = Radius.circular(20);
+    final bubble = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+      decoration: BoxDecoration(
+        color: isUser ? p.emphasis : p.surface,
+        borderRadius: BorderRadius.only(
+          topLeft: isUser ? r : const Radius.circular(6),
+          topRight: r,
+          bottomLeft: r,
+          bottomRight: isUser ? const Radius.circular(6) : r,
         ),
-      ],
+        boxShadow: isUser ? null : VerbumShadows.subtle(p),
+      ),
+      child: SelectableText(
+        text,
+        style: context.type.body.copyWith(
+          color: isUser ? p.onEmphasis : p.ink,
+          fontSize: 15,
+          height: 1.5,
+        ),
+      ),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!isUser) ...[const CompanionAvatar(), const SizedBox(width: 8)],
+          Flexible(
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: isUser ? 56 : 0,
+                right: isUser ? 0 : 24,
+              ),
+              child: bubble,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

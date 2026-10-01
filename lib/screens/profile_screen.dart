@@ -2,11 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../services/profile_service.dart';
 import '../widgets/verbum_ambient_background.dart';
 import 'welcome_auth_screen.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class MySocialProfileScreen extends StatefulWidget {
   final int? initialTabIndex;
@@ -44,10 +44,10 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen> {
           bottom: false,
           child: Column(
             children: [
-              AppBar(
+              VAppBar(
                 title: Text(
                   'Mis publicaciones',
-                  style: GoogleFonts.playfairDisplay(
+                  style: VerbumFonts.serif(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                   ),
@@ -57,7 +57,7 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen> {
                     tooltip: 'Editar perfil',
                     onPressed: () =>
                         Navigator.pushNamed(context, '/edit-profile'),
-                    icon: const Icon(Icons.edit_outlined),
+                    icon: const VIcon(VerbumIcons.pencilSimple),
                   ),
                   const SizedBox(width: 5),
                 ],
@@ -112,10 +112,10 @@ class _PostsListState extends State<_PostsList> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        icon: Icon(Icons.delete_outline_rounded, color: scheme.error),
+        icon: VIcon(VerbumIcons.trash, color: scheme.error),
         title: Text(
           'Eliminar publicación',
-          style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.w700),
+          style: VerbumFonts.serif(fontWeight: FontWeight.w700),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -123,7 +123,7 @@ class _PostsListState extends State<_PostsList> {
             Text(
               'Esta publicación desaparecerá de la comunidad y no podrás recuperarla.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 13),
+              style: VerbumFonts.sans(fontSize: 13),
             ),
             const SizedBox(height: 14),
             Container(
@@ -139,7 +139,7 @@ class _PostsListState extends State<_PostsList> {
                     : postText,
                 maxLines: 4,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.inter(
+                style: VerbumFonts.sans(
                   fontSize: 12,
                   color: scheme.onSurfaceVariant,
                 ),
@@ -197,7 +197,7 @@ class _PostsListState extends State<_PostsList> {
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return _MessageState(
-            icon: Icons.cloud_off_outlined,
+            icon: VerbumIcons.cloudSlash,
             title: 'No pudimos cargar tus publicaciones',
             message: 'Revisa tu conexión e inténtalo nuevamente.',
           );
@@ -209,7 +209,7 @@ class _PostsListState extends State<_PostsList> {
         }
         if (docs.isEmpty) {
           return const _MessageState(
-            icon: Icons.forum_outlined,
+            icon: VerbumIcons.chatsCircle,
             title: 'Tu voz aún tiene espacio',
             message:
                 'Cuando compartas una oración o reflexión en Comunidad, aparecerá aquí.',
@@ -264,7 +264,7 @@ class _PostsListState extends State<_PostsList> {
                             ? null
                             : Text(
                                 _initial,
-                                style: GoogleFonts.inter(
+                                style: VerbumFonts.sans(
                                   fontWeight: FontWeight.w700,
                                   color: scheme.primary,
                                 ),
@@ -281,7 +281,7 @@ class _PostsListState extends State<_PostsList> {
                                   : widget.displayName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -290,7 +290,7 @@ class _PostsListState extends State<_PostsList> {
                               created == null
                                   ? 'En Comunidad'
                                   : _formatDate(created),
-                              style: GoogleFonts.inter(
+                              style: VerbumFonts.sans(
                                 fontSize: 10.5,
                                 color: scheme.onSurfaceVariant,
                               ),
@@ -301,8 +301,8 @@ class _PostsListState extends State<_PostsList> {
                       IconButton(
                         tooltip: 'Eliminar publicación',
                         onPressed: () => _deletePost(doc.id, text),
-                        icon: Icon(
-                          Icons.more_horiz_rounded,
+                        icon: VIcon(
+                          VerbumIcons.dotsThree,
                           color: scheme.onSurfaceVariant,
                         ),
                       ),
@@ -311,7 +311,7 @@ class _PostsListState extends State<_PostsList> {
                   const SizedBox(height: 13),
                   Text(
                     text,
-                    style: GoogleFonts.inter(
+                    style: VerbumFonts.sans(
                       fontSize: 14.5,
                       height: 1.55,
                       color: scheme.onSurface,
@@ -320,15 +320,15 @@ class _PostsListState extends State<_PostsList> {
                   const SizedBox(height: 14),
                   Row(
                     children: [
-                      Icon(
-                        Icons.public_rounded,
+                      VIcon(
+                        VerbumIcons.globe,
                         size: 14,
                         color: scheme.onSurfaceVariant,
                       ),
                       const SizedBox(width: 5),
                       Text(
                         'Compartida en Comunidad',
-                        style: GoogleFonts.inter(
+                        style: VerbumFonts.sans(
                           fontSize: 10.5,
                           color: scheme.onSurfaceVariant,
                         ),
@@ -376,7 +376,7 @@ class _CollectionIntro extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.auto_stories_outlined, color: scheme.primary),
+          VIcon(VerbumIcons.bookOpen, color: scheme.primary),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -384,14 +384,14 @@ class _CollectionIntro extends StatelessWidget {
               children: [
                 Text(
                   '$count ${count == 1 ? 'publicación' : 'publicaciones'}',
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     fontWeight: FontWeight.w700,
                     color: scheme.primary,
                   ),
                 ),
                 Text(
                   'Una memoria de lo que has compartido',
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     fontSize: 11,
                     color: scheme.onSurfaceVariant,
                   ),
@@ -406,7 +406,7 @@ class _CollectionIntro extends StatelessWidget {
 }
 
 class _MessageState extends StatelessWidget {
-  final IconData icon;
+  final VerbumIcons icon;
   final String title;
   final String message;
   const _MessageState({
@@ -429,13 +429,13 @@ class _MessageState extends StatelessWidget {
                 color: scheme.primaryContainer.withValues(alpha: .7),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 31, color: scheme.primary),
+              child: VIcon(icon, size: 31, color: scheme.primary),
             ),
             const SizedBox(height: 18),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: GoogleFonts.playfairDisplay(
+              style: VerbumFonts.serif(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
               ),
@@ -444,7 +444,7 @@ class _MessageState extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 13,
                 height: 1.5,
                 color: scheme.onSurfaceVariant,

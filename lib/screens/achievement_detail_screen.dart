@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/achievement.dart';
 import '../models/spiritual_stats.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class AchievementDetailScreen extends StatelessWidget {
   final Achievement achievement;
@@ -16,7 +16,7 @@ class AchievementDetailScreen extends StatelessWidget {
   String _getHowToUnlockText() {
     switch (achievement.type) {
       case AchievementType.streak:
-        return 'Mantén una racha de ${achievement.target} días consecutivos';
+        return 'Mantén tu constancia ${achievement.target} días seguidos';
       case AchievementType.verses:
         return 'Lee ${achievement.target} versículos';
       case AchievementType.prayers:
@@ -26,322 +26,113 @@ class AchievementDetailScreen extends StatelessWidget {
     }
   }
 
-  String _getRewardText() {
-    // Placeholder: recompensa basada en el tipo de logro
-    switch (achievement.type) {
-      case AchievementType.streak:
-        return '+50 XP';
-      case AchievementType.verses:
-        return '+30 XP';
-      case AchievementType.prayers:
-        return '+40 XP';
-      case AchievementType.posts:
-        return '+20 XP';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final isUnlocked = achievement.isUnlocked(stats);
+    final p = context.palette;
+    final type = context.type;
+    final unlocked = achievement.isUnlocked(stats);
     final progress = achievement.getProgress(stats);
-    final progressPercent = (progress / achievement.target).clamp(0.0, 1.0);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final remaining = (achievement.target - progress).clamp(
+      0,
+      achievement.target,
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Detalle del logro',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+      appBar: VAppBar(title: Text('Logro', style: context.type.heading)),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(
+          VerbumSpace.gutter,
+          12,
+          VerbumSpace.gutter,
+          32,
         ),
-        centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Ícono grande con Hero animation
-            Hero(
-              tag: 'achievement_icon_${achievement.id}',
-              child: Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: isUnlocked
-                      ? (isDark
-                            ? Colors.amber[900]?.withValues(alpha: 0.3)
-                            : Colors.amber[50])
-                      : (isDark ? Colors.grey[850] : Colors.grey[100]),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: isUnlocked ? Colors.amber : Colors.grey[300]!,
-                    width: isUnlocked ? 3 : 2,
-                  ),
-                  boxShadow: isUnlocked
-                      ? [
-                          BoxShadow(
-                            color: Colors.amber.withValues(alpha: 0.3),
-                            blurRadius: 20,
-                            spreadRadius: 5,
-                          ),
-                        ]
-                      : null,
-                ),
-                child: Icon(
-                  achievement.icon,
-                  size: 64,
-                  color: isUnlocked ? Colors.amber[700] : Colors.grey[400],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            // Título
-            Text(
-              achievement.title,
-              style: GoogleFonts.inter(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            // Descripción
-            Text(
-              achievement.description,
-              style: GoogleFonts.inter(fontSize: 16, color: Colors.grey[600]),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            // Card de estado
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
+        children: [
+          Center(
+            child: Container(
+              width: 128,
+              height: 128,
               decoration: BoxDecoration(
-                color: isDark ? Colors.grey[850] : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                shape: BoxShape.circle,
+                color: unlocked ? p.goldSoft : p.surfaceMuted,
                 border: Border.all(
-                  color: isUnlocked
-                      ? Colors.amber
-                      : Colors.grey.withValues(alpha: 0.2),
-                  width: isUnlocked ? 2 : 1,
+                  color: unlocked ? p.gold : p.line,
+                  width: unlocked ? 2 : 1,
                 ),
               ),
-              child: Column(
-                children: [
-                  // Estado
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        isUnlocked ? Icons.check_circle : Icons.lock,
-                        color: isUnlocked
-                            ? Colors.amber[700]
-                            : Colors.grey[600],
-                        size: 24,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        isUnlocked ? '¡Logro desbloqueado!' : 'Bloqueado',
-                        style: GoogleFonts.inter(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: isUnlocked
-                              ? Colors.amber[900]
-                              : Colors.grey[700],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  // Progreso
-                  Text(
-                    '$progress / ${achievement.target}',
-                    style: GoogleFonts.inter(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: isUnlocked ? Colors.amber[700] : Colors.grey[800],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Barra de progreso
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: LinearProgressIndicator(
-                      value: progressPercent,
-                      minHeight: 12,
-                      backgroundColor: Colors.grey[300],
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        isUnlocked ? Colors.amber[700]! : Colors.amber[400]!,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${(progressPercent * 100).toStringAsFixed(0)}% completado',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
+              alignment: Alignment.center,
+              child: Hero(
+                tag: 'achievement_icon_${achievement.id}',
+                child: VIcon(
+                  achievement.icon,
+                  weight: unlocked ? VIconWeight.fill : VIconWeight.duotone,
+                  size: 60,
+                  color: unlocked ? p.gold : p.inkSubtle,
+                ),
               ),
             ),
-            const SizedBox(height: 24),
-            // Cómo desbloquear
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey[850] : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        color: Colors.blue[600],
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Cómo desbloquear',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    _getHowToUnlockText(),
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                ],
-              ),
+          ),
+          const SizedBox(height: 18),
+          Center(
+            child: VRubricLabel(
+              unlocked ? 'Logro alcanzado' : 'En camino',
+              color: unlocked ? p.gold : null,
             ),
-            const SizedBox(height: 24),
-            // Recompensa
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey[850] : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.stars, color: Colors.amber[700], size: 20),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Recompensa',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    _getRewardText(),
-                    style: GoogleFonts.inter(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.amber[700],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            achievement.title,
+            textAlign: TextAlign.center,
+            style: type.display.copyWith(fontSize: 34),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            achievement.description,
+            textAlign: TextAlign.center,
+            style: type.body.copyWith(fontSize: 15),
+          ),
+          const SizedBox(height: 24),
+          VSurfaceCard(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: Text('Progreso', style: type.bodyStrong)),
+                    Text(
+                      '$progress / ${achievement.target}',
+                      style: type.bodyStrong.copyWith(color: p.rubric),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                VProgressBar(
+                  value: progress / achievement.target,
+                  height: 6,
+                  semanticLabel: 'Progreso del logro',
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  unlocked
+                      ? 'Lo alcanzaste. Sigue cultivando tu camino.'
+                      : remaining == 1
+                      ? 'Te falta 1 para alcanzarlo.'
+                      : 'Te faltan $remaining para alcanzarlo.',
+                  style: type.caption,
+                ),
+              ],
             ),
-            const SizedBox(height: 24),
-            // Fecha de desbloqueo (placeholder)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey[850] : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today,
-                        color: Colors.grey[600],
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Fecha de desbloqueo',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    isUnlocked ? '—' : 'Aún no desbloqueado',
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-          ],
-        ),
+          ),
+          const SizedBox(height: 12),
+          VActionTile(
+            tone: VSurfaceTone.muted,
+            icon: VerbumIcons.path,
+            overline: 'Cómo alcanzarlo',
+            title: _getHowToUnlockText(),
+            iconColor: p.gold,
+            trailingIcon: null,
+          ),
+        ],
       ),
     );
   }

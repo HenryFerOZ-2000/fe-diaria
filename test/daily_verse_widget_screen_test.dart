@@ -179,7 +179,7 @@ void main() {
     );
 
     expect(find.text('VERBUM'), findsOneWidget);
-    expect(find.text('PALABRA DEL D\u00cdA'), findsOneWidget);
+    expect(find.text('Palabra del día'), findsOneWidget);
     expect(find.text('Abrir'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

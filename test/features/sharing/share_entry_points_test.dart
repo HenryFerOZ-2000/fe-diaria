@@ -20,15 +20,11 @@ import 'package:verbum/models/verse.dart';
 import 'package:verbum/providers/app_provider.dart';
 import 'package:verbum/screens/daily_missions_flow_screen.dart';
 import 'package:verbum/screens/favorites_screen.dart';
-import 'package:verbum/screens/mission_read_screen.dart';
 import 'package:verbum/screens/spiritual_path_day_screen.dart';
 import 'package:verbum/screens/category_prayers_screen.dart';
 import 'package:verbum/screens/emotion_passage_read_screen.dart';
 import 'package:verbum/screens/intention_prayer_read_screen.dart';
 import 'package:verbum/screens/novena_screen.dart';
-import 'package:verbum/screens/prayer_read_screen.dart';
-import 'package:verbum/screens/psalms_screen.dart';
-import 'package:verbum/screens/reading_screen.dart';
 import 'package:verbum/screens/traditional_prayer_screen.dart';
 import 'package:verbum/screens/traditional_prayer_detail_screen.dart';
 import 'package:verbum/services/traditional_prayers_service.dart';
@@ -38,6 +34,7 @@ import 'package:verbum/services/daily_progress_service.dart';
 import 'package:verbum/services/language_service.dart';
 import 'package:verbum/services/share_service.dart';
 import 'package:verbum/services/spiritual_stats_service.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -162,7 +159,6 @@ void main() {
   }
 
   for (final entry in <String, Widget>{
-    'generic': const PrayerReadScreen(category: 'ansiedad'),
     'intention': const IntentionPrayerReadScreen(categoryKey: 'salud'),
     'emotion': const EmotionPassageReadScreen(emotionKey: 'ansiedad'),
     'traditional without religion metadata': const TraditionalPrayerScreen(
@@ -242,7 +238,11 @@ void main() {
       ),
     );
     final prayer = tester.widget<PrayerCard>(find.byType(PrayerCard));
-    await tester.tap(find.byIcon(Icons.share_outlined));
+    await tester.tap(
+      find.byWidgetPredicate(
+        (w) => w is VIcon && w.icon == VerbumIcons.shareNetwork,
+      ),
+    );
     await _pumpRoute(tester);
 
     expect(find.byType(ShareComposerScreen), findsOneWidget);
@@ -266,8 +266,7 @@ void main() {
     final step = TraditionalPrayersService().getNovenaStep(1, 1)!;
     await tester.pumpWidget(const MaterialApp(home: NovenaDayScreen(day: 1)));
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(find.text('Compartir'), 300);
-    await tester.tap(find.text('Compartir'));
+    await tester.tap(find.byTooltip('Compartir'));
     await _pumpRoute(tester);
 
     expect(find.byType(ShareComposerScreen), findsOneWidget);
@@ -277,76 +276,6 @@ void main() {
     expect(content.reference, step['titulo']);
     expect(content.kind, ShareContentKind.prayer);
     expect(content.tradition, ShareTradition.catholic);
-    expect(nativeShares, isEmpty);
-  });
-
-  testWidgets('a psalm card retains biblical provenance through its reader', (
-    tester,
-  ) async {
-    await tester.pumpWidget(const MaterialApp(home: PsalmsScreen()));
-    await tester.pumpAndSettle();
-    final psalm = tester.widget<PrayerCard>(find.byType(PrayerCard).first);
-    await tester.tap(find.text(psalm.title).first);
-    await _pumpRoute(tester);
-    await tester.tap(find.byTooltip('Compartir'));
-    await _pumpRoute(tester);
-
-    expect(find.byType(ShareComposerScreen), findsOneWidget);
-    final content = _composer(tester).content;
-    expect(content.title, psalm.title);
-    expect(content.body, psalm.text);
-    expect(content.reference, psalm.reference);
-    expect(content.sourceLabel, 'Reina-Valera 1909');
-    expect(content.kind, ShareContentKind.psalm);
-    expect(nativeShares, isEmpty);
-  });
-
-  testWidgets(
-    'the reading wrapper keeps a reference without inventing Scripture',
-    (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: ReadingScreen(
-            title: 'Una pausa',
-            content: 'Recuerda el bien recibido hoy.',
-            reference: 'Reflexión del día',
-            onComplete: () {},
-          ),
-        ),
-      );
-      await tester.tap(find.byTooltip('Compartir'));
-      await _pumpRoute(tester);
-
-      expect(find.byType(ShareComposerScreen), findsOneWidget);
-      final content = _composer(tester).content;
-      expect(content.title, 'Una pausa');
-      expect(content.body, 'Recuerda el bien recibido hoy.');
-      expect(content.reference, 'Reflexión del día');
-      expect(content.kind, ShareContentKind.reflection);
-      expect(content.tradition, isNull);
-      expect(nativeShares, isEmpty);
-    },
-  );
-
-  testWidgets('the reading wrapper preserves an explicit share callback', (
-    tester,
-  ) async {
-    final shared = <(String, String?)>[];
-    await tester.pumpWidget(
-      MaterialApp(
-        home: ReadingScreen(
-          title: 'Una pausa',
-          content: 'Recuerda el bien recibido hoy.',
-          reference: 'Reflexión del día',
-          onComplete: () {},
-          onShare: (body, reference) => shared.add((body, reference)),
-        ),
-      ),
-    );
-    await tester.tap(find.byTooltip('Compartir'));
-    await _pumpRoute(tester);
-    expect(shared, [('Recuerda el bien recibido hoy.', 'Reflexión del día')]);
-    expect(find.byType(ShareComposerScreen), findsNothing);
     expect(nativeShares, isEmpty);
   });
 
@@ -399,13 +328,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    await tester.tap(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is Text &&
-            widget.textSpan?.toPlainText() == '16  $verseText',
-      ),
-    );
+    await tester.tapOnText(find.textRange.ofSubstring(verseText));
     await tester.pump();
     await tester.tap(find.byTooltip('Compartir'));
     await _pumpRoute(tester);
@@ -466,7 +389,7 @@ void main() {
       id: 'verse',
       title: 'Recibe la Palabra',
       description: 'Lee la Palabra de hoy.',
-      icon: Icons.menu_book_rounded,
+      icon: VerbumIcons.bookOpenText,
     );
 
     await tester.pumpWidget(
@@ -505,7 +428,7 @@ void main() {
         title: 'Un gesto de bondad',
         description: 'Lleva la fe a lo cotidiano.',
         content: 'Ayuda hoy a una persona sin esperar nada a cambio.',
-        icon: Icons.volunteer_activism_outlined,
+        icon: VerbumIcons.handHeart,
       );
 
       await tester.pumpWidget(
@@ -544,7 +467,7 @@ void main() {
       id: 'verse',
       title: 'Recibe la Palabra',
       description: 'Lee la Palabra de hoy.',
-      icon: Icons.menu_book_rounded,
+      icon: VerbumIcons.bookOpenText,
     );
     await tester.pumpWidget(
       MaterialApp(
@@ -578,27 +501,6 @@ void main() {
     expect(nativeShares, isEmpty);
   });
 
-  testWidgets('the mission reader opens mission content', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: MissionReadScreen(
-          title: 'Ora por alguien',
-          content: 'Pon delante de Dios a una persona que lo necesite.',
-          onCompleted: () {},
-        ),
-      ),
-    );
-
-    await tester.tap(find.byTooltip('Compartir'));
-    await _pumpRoute(tester);
-
-    final content = _composer(tester).content;
-    expect(content.title, 'Ora por alguien');
-    expect(content.body, 'Pon delante de Dios a una persona que lo necesite.');
-    expect(content.reference, isNull);
-    expect(content.kind, ShareContentKind.mission);
-  });
-
   testWidgets(
     'spiritual-path Scripture opens verse content, not an invitation',
     (tester) async {
@@ -629,8 +531,7 @@ void main() {
         description: 'Dos días de prueba.',
         category: 'Esperanza',
         minutesPerDay: 5,
-        icon: Icons.spa_outlined,
-        accent: Color(0xFF6B7398),
+        icon: VerbumIcons.flowerLotus,
         days: [day, secondDay],
       );
 

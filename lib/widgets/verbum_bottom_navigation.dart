@@ -1,6 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'dart:ui';
 
+import 'package:flutter/material.dart';
+
+import '../design_system/design_system.dart';
+
+/// Barra inferior "vidrio nocturno": una cápsula en tinta translúcida que
+/// flota sobre el contenido, con iconos claros y un punto mantequilla bajo
+/// la pestaña activa. Oraciones sobresale al centro en un círculo
+/// mantequilla, siempre.
+///
+/// Los nombres van en tooltip y semántica.
 class VerbumBottomNavigation extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onDestinationSelected;
@@ -11,145 +20,235 @@ class VerbumBottomNavigation extends StatelessWidget {
     required this.onDestinationSelected,
   });
 
-  static const _destinations = <NavigationDestination>[
-    NavigationDestination(
-      tooltip: 'Abrir chat',
-      icon: Icon(Icons.chat_bubble_outline_rounded),
-      selectedIcon: Icon(Icons.chat_bubble_rounded),
-      label: 'Chat',
-    ),
-    NavigationDestination(
-      tooltip: 'Abrir comunidad',
-      icon: Icon(Icons.groups_2_outlined),
-      selectedIcon: Icon(Icons.groups_2_rounded),
-      label: 'Comunidad',
-    ),
-    NavigationDestination(
-      tooltip: 'Abrir hoy',
-      icon: Icon(Icons.auto_awesome_outlined),
-      selectedIcon: Icon(Icons.auto_awesome_rounded),
-      label: 'Hoy',
-    ),
-    NavigationDestination(
-      tooltip: 'Abrir oraciones',
-      icon: Icon(Icons.favorite_border_rounded),
-      selectedIcon: Icon(Icons.favorite_rounded),
-      label: 'Oraciones',
-    ),
-    NavigationDestination(
-      tooltip: 'Abrir Biblia',
-      icon: Icon(Icons.menu_book_outlined),
-      selectedIcon: Icon(Icons.menu_book_rounded),
-      label: 'Biblia',
-    ),
+  static const _destinations = [
+    (VerbumIcons.house, 'Hoy'),
+    (VerbumIcons.bookOpenText, 'Biblia'),
+    (VerbumIcons.handsPraying, 'Oraciones'),
+    (VerbumIcons.usersThree, 'Comunidad'),
+    (VerbumIcons.chatsCircle, 'Chat'),
   ];
+
+  /// Índice de Oraciones, el botón central.
+  static const _center = 2;
+
+  static const _barHeight = 66.0;
+  static const _centerSize = 58.0;
+
+  /// Cuánto sobresale el botón central por encima de la cápsula.
+  static const _rise = 22.0;
+
+  // Tinta de la paleta: igual en modo claro y oscuro.
+  static const _tinta = Color(0xFF22245A);
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final dark = theme.brightness == Brightness.dark;
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final compact = constraints.maxWidth < 360;
-        final veryCompact = constraints.maxWidth < 330;
-        final horizontalMargin = veryCompact
-            ? 5.0
-            : compact
-            ? 8.0
-            : 12.0;
-        final barHeight = veryCompact
-            ? 59.0
-            : compact
-            ? 61.0
-            : 64.0;
-        final iconSize = veryCompact
-            ? 19.0
-            : compact
-            ? 20.0
-            : 21.5;
-        final labelSize = veryCompact
-            ? 8.4
-            : compact
-            ? 9.2
-            : 10.4;
-
-        final navigationTheme = NavigationBarThemeData(
-          height: barHeight,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          indicatorColor: scheme.primary.withValues(alpha: dark ? .24 : .12),
-          indicatorShape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          iconTheme: WidgetStateProperty.resolveWith((states) {
-            return IconThemeData(
-              size: iconSize,
-              color: states.contains(WidgetState.selected)
-                  ? scheme.primary
-                  : scheme.onSurfaceVariant.withValues(alpha: .86),
-            );
-          }),
-          labelTextStyle: WidgetStateProperty.resolveWith((states) {
-            final selected = states.contains(WidgetState.selected);
-            return GoogleFonts.inter(
-              fontSize: labelSize,
-              height: 1.05,
-              letterSpacing: veryCompact ? -.24 : -.12,
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-              color: selected
-                  ? scheme.primary
-                  : scheme.onSurfaceVariant.withValues(alpha: .9),
-            );
-          }),
-        );
-
-        return SafeArea(
-          minimum: EdgeInsets.fromLTRB(
-            horizontalMargin,
-            3,
-            horizontalMargin,
-            8,
-          ),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: dark
-                  ? const Color(0xFF262130).withValues(alpha: .98)
-                  : const Color(0xFFFFFCF7).withValues(alpha: .99),
-              borderRadius: BorderRadius.circular(compact ? 20 : 23),
-              border: Border.all(
-                color: scheme.outline.withValues(alpha: dark ? .18 : .12),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: dark ? .26 : .1),
-                  blurRadius: compact ? 18 : 24,
-                  offset: const Offset(0, 8),
+    final p = context.palette;
+    // De noche la tinta se perdería en el fondo: un tono más claro y un
+    // filete la despegan.
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final capsule = dark ? p.surfaceMuted : _tinta;
+    return SafeArea(
+      top: false,
+      minimum: const EdgeInsets.only(bottom: 10),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
+        child: SizedBox(
+          height: _barHeight + _rise,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.bottomCenter,
+            children: [
+              // La cápsula de vidrio.
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: _barHeight,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(_barHeight / 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: VerbumShadows.tint(p, .35),
+                        blurRadius: 28,
+                        offset: const Offset(0, 14),
+                        spreadRadius: -10,
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(_barHeight / 2),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: capsule.withValues(alpha: dark ? .94 : .84),
+                          borderRadius: BorderRadius.circular(_barHeight / 2),
+                          border: dark
+                              ? Border.all(
+                                  color: Colors.white.withValues(alpha: .08),
+                                )
+                              : null,
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Row(
+                          children: [
+                            for (var i = 0; i < _destinations.length; i++)
+                              Expanded(
+                                child: i == _center
+                                    // Hueco para el botón que sobresale.
+                                    ? const SizedBox()
+                                    : _NavButton(
+                                        icon: _destinations[i].$1,
+                                        label: _destinations[i].$2,
+                                        selected: i == selectedIndex,
+                                        dot: p.butter,
+                                        onTap: () => onDestinationSelected(i),
+                                      ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
+              ),
+              // Oraciones: círculo mantequilla que sobresale, con un aro del
+              // color de la página para despegarlo de la cápsula.
+              Positioned(
+                top: 0,
+                child: _PrayButton(
+                  size: _centerSize,
+                  selected: selectedIndex == _center,
+                  ring: p.background,
+                  butter: p.butter,
+                  onButter: p.onButter,
+                  onTap: () => onDestinationSelected(_center),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavButton extends StatelessWidget {
+  const _NavButton({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.dot,
+    required this.onTap,
+  });
+
+  final VerbumIcons icon;
+  final String label;
+  final bool selected;
+  final Color dot;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      excludeSemantics: true,
+      child: Tooltip(
+        message: label,
+        child: InkResponse(
+          onTap: onTap,
+          radius: 28,
+          highlightColor: Colors.transparent,
+          splashColor: Colors.white.withValues(alpha: .12),
+          child: SizedBox(
+            height: 56,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                VIcon(
+                  icon,
+                  size: 24,
+                  weight: selected ? VIconWeight.fill : VIconWeight.regular,
+                  color: selected
+                      ? Colors.white
+                      : Colors.white.withValues(alpha: .55),
+                ),
+                if (selected)
+                  Positioned(
+                    bottom: 6,
+                    child: Container(
+                      width: 5,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: dot,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
               ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(compact ? 19 : 22),
-              child: NavigationBarTheme(
-                data: navigationTheme,
-                child: MediaQuery.withClampedTextScaling(
-                  minScaleFactor: 1,
-                  maxScaleFactor: 1.15,
-                  child: NavigationBar(
-                    selectedIndex: selectedIndex,
-                    onDestinationSelected: onDestinationSelected,
-                    animationDuration: const Duration(milliseconds: 260),
-                    labelBehavior:
-                        NavigationDestinationLabelBehavior.alwaysShow,
-                    destinations: _destinations,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PrayButton extends StatelessWidget {
+  const _PrayButton({
+    required this.size,
+    required this.selected,
+    required this.ring,
+    required this.butter,
+    required this.onButter,
+    required this.onTap,
+  });
+
+  final double size;
+  final bool selected;
+  final Color ring;
+  final Color butter;
+  final Color onButter;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: 'Oraciones',
+      excludeSemantics: true,
+      child: Tooltip(
+        message: 'Oraciones',
+        child: Container(
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(color: ring, shape: BoxShape.circle),
+          child: Material(
+            color: butter,
+            shape: const CircleBorder(),
+            elevation: 6,
+            shadowColor: const Color(0xFF3A2F05).withValues(alpha: .5),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: onTap,
+              child: SizedBox.square(
+                dimension: size,
+                child: Center(
+                  child: VIcon(
+                    VerbumIcons.handsPraying,
+                    size: 28,
+                    weight: VIconWeight.fill,
+                    color: onButter,
                   ),
                 ),
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

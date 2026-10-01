@@ -4,10 +4,7 @@ import '../services/rosary_service.dart';
 import '../services/ads_service.dart';
 import '../services/storage_service.dart';
 import '../faith/tradition_guard.dart';
-import '../widgets/app_scaffold.dart';
-import '../widgets/main_card.dart';
-import '../widgets/custom_button.dart';
-import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de guía del rosario
 class RosaryGuideScreen extends StatefulWidget {
@@ -80,202 +77,184 @@ class _RosaryGuideScreenState extends State<RosaryGuideScreen> {
     if (_blockedByTradition) {
       return const SizedBox.shrink();
     }
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
+    final p = context.palette;
+    final type = context.type;
     final guide = _service.getGuide();
     final todayMysteries = _service.getTodayMysteries();
     final steps = _service.getAllSteps();
+    final step = steps.isNotEmpty && _currentStep < steps.length
+        ? steps[_currentStep]
+        : null;
+    final isLast = _currentStep >= steps.length - 1;
 
-    return AppScaffold(
-      title: 'Guía del Rosario',
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
-          : guide == null
-          ? Center(
-              child: Text(
-                'No se pudo cargar la guía',
-                style: theme.textTheme.bodyLarge,
-              ),
-            )
-          : Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      appBar: VAppBar(title: Text('Santo Rosario', style: type.heading)),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: VEmptyState(loading: true, title: 'Cargando…'),
+                    )
+                  : guide == null
+                  ? const Center(
+                      child: VEmptyState(
+                        icon: VerbumIcons.warningCircle,
+                        title: 'No se pudo cargar la guía',
+                      ),
+                    )
+                  : ListView(
+                      padding: const EdgeInsets.fromLTRB(
+                        VerbumSpace.gutter,
+                        4,
+                        VerbumSpace.gutter,
+                        24,
+                      ),
                       children: [
-                        MainCard(
-                          padding: const EdgeInsets.all(AppSpacing.lg),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                guide.title,
-                                style: theme.textTheme.titleLarge,
-                              ),
-                              const SizedBox(height: AppSpacing.sm),
-                              Text(
-                                guide.description,
-                                style: theme.textTheme.bodyMedium,
-                              ),
-                            ],
-                          ),
+                        VFeatureCard(
+                          eyebrow: 'Con María',
+                          title: guide.title,
+                          body: guide.description,
+                          photo: VerbumPhotos.rosary,
                         ),
-                        const SizedBox(height: AppSpacing.lg),
                         if (todayMysteries != null) ...[
-                          Text(
-                            'Misterios de Hoy (${todayMysteries.day})',
-                            style: theme.textTheme.titleMedium,
+                          VSectionHeader(
+                            todayMysteries.name,
+                            eyebrow: 'Misterios de hoy · ${todayMysteries.day}',
+                            padding: const EdgeInsets.fromLTRB(2, 24, 2, 10),
                           ),
-                          const SizedBox(height: AppSpacing.md),
-                          MainCard(
-                            padding: const EdgeInsets.all(AppSpacing.lg),
+                          VSurfaceCard(
+                            padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                            child: Column(
+                              children: [
+                                for (final (i, mystery)
+                                    in todayMysteries.mysteries.indexed)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          width: 28,
+                                          child: Text(
+                                            '${i + 1}',
+                                            style: type.heading.copyWith(
+                                              color: p.rubric,
+                                              fontSize: 19,
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            mystery,
+                                            style: type.body.copyWith(
+                                              color: p.ink,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                        if (step != null) ...[
+                          const VSectionHeader(
+                            'Paso a paso',
+                            eyebrow: 'Reza el Rosario',
+                            padding: EdgeInsets.fromLTRB(2, 24, 2, 10),
+                          ),
+                          VSurfaceCard(
+                            framed: true,
+                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  todayMysteries.name,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    color: colorScheme.primary,
-                                  ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: VRubricLabel(
+                                        'Paso ${_currentStep + 1} de ${steps.length}',
+                                      ),
+                                    ),
+                                    if (step.repetitions != null)
+                                      VMetaChip(
+                                        icon: VerbumIcons.arrowsClockwise,
+                                        label: '${step.repetitions} veces',
+                                      ),
+                                  ],
                                 ),
-                                const SizedBox(height: AppSpacing.md),
-                                ...todayMysteries.mysteries.asMap().entries.map(
-                                  (entry) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(
-                                        bottom: AppSpacing.sm,
-                                      ),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '${entry.key + 1}.',
-                                            style: theme.textTheme.bodyMedium
-                                                ?.copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: colorScheme.primary,
-                                                ),
-                                          ),
-                                          const SizedBox(width: AppSpacing.sm),
-                                          Expanded(
-                                            child: Text(
-                                              entry.value,
-                                              style: theme.textTheme.bodyMedium,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
+                                const SizedBox(height: 10),
+                                VProgressBar(
+                                  value: (_currentStep + 1) / steps.length,
+                                  height: 3,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(step.title, style: type.title),
+                                const SizedBox(height: 12),
+                                Text(
+                                  step.prayer,
+                                  style: type.scripture.copyWith(fontSize: 18),
                                 ),
                               ],
                             ),
                           ),
                         ],
-                        const SizedBox(height: AppSpacing.lg),
-                        Text(
-                          'Pasos del Rosario',
-                          style: theme.textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        if (steps.isNotEmpty && _currentStep < steps.length)
-                          MainCard(
-                            padding: const EdgeInsets.all(AppSpacing.lg),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  steps[_currentStep].title,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    color: colorScheme.primary,
-                                  ),
-                                ),
-                                if (steps[_currentStep].repetitions !=
-                                    null) ...[
-                                  const SizedBox(height: AppSpacing.xs),
-                                  Text(
-                                    'Repetir ${steps[_currentStep].repetitions} veces',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                                const SizedBox(height: AppSpacing.md),
-                                Text(
-                                  steps[_currentStep].prayer,
-                                  style: theme.textTheme.bodyLarge?.copyWith(
-                                    height: 1.7,
-                                  ),
-                                ),
-                                const SizedBox(height: AppSpacing.lg),
-                                Row(
-                                  children: [
-                                    if (_currentStep > 0)
-                                      Expanded(
-                                        child: CustomButton(
-                                          text: 'Anterior',
-                                          icon: Icons.arrow_back,
-                                          onPressed: () {
-                                            setState(() => _currentStep--);
-                                          },
-                                        ),
-                                      ),
-                                    if (_currentStep > 0)
-                                      const SizedBox(width: AppSpacing.sm),
-                                    Expanded(
-                                      child: CustomButton(
-                                        text: _currentStep < steps.length - 1
-                                            ? 'Siguiente'
-                                            : 'Finalizar',
-                                        icon: Icons.arrow_forward,
-                                        onPressed:
-                                            _currentStep < steps.length - 1
-                                            ? () {
-                                                setState(() => _currentStep++);
-                                              }
-                                            : null,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
                       ],
                     ),
-                  ),
-                ),
-                if (!_adsRemoved)
-                  Container(
-                    alignment: Alignment.center,
-                    width: double.infinity,
-                    height: _bannerAd != null
-                        ? _bannerAd!.size.height.toDouble()
-                        : 50,
-                    decoration: BoxDecoration(
-                      color: isDark ? colorScheme.surface : AppColors.surface,
-                      border: Border(
-                        top: BorderSide(
-                          color: colorScheme.outline.withValues(alpha: 0.1),
-                          width: 1,
-                        ),
+            ),
+            if (step != null)
+              VBottomBar(
+                child: Row(
+                  children: [
+                    if (_currentStep > 0) ...[
+                      VIconButton(
+                        icon: VerbumIcons.arrowLeft,
+                        semanticLabel: 'Paso anterior',
+                        size: 50,
+                        onPressed: () => setState(() => _currentStep--),
+                      ),
+                      const SizedBox(width: 10),
+                    ],
+                    Expanded(
+                      child: VButton(
+                        label: isLast ? 'Rosario completado' : 'Siguiente',
+                        icon: isLast
+                            ? VerbumIcons.check
+                            : VerbumIcons.arrowRight,
+                        expanded: true,
+                        onPressed: isLast
+                            ? null
+                            : () => setState(() => _currentStep++),
                       ),
                     ),
-                    child: _bannerAd != null
-                        ? AdWidget(ad: _bannerAd!)
-                        : const SizedBox(
-                            height: 50,
-                            child: Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          ),
-                  ),
-              ],
-            ),
+                  ],
+                ),
+              ),
+            if (!_adsRemoved)
+              Container(
+                alignment: Alignment.center,
+                width: double.infinity,
+                height: _bannerAd != null
+                    ? _bannerAd!.size.height.toDouble()
+                    : 50,
+                color: p.surface,
+                child: _bannerAd != null
+                    ? AdWidget(ad: _bannerAd!)
+                    : const SizedBox(
+                        height: 50,
+                        child: Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

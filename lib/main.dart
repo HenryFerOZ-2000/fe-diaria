@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -55,7 +56,7 @@ import 'screens/traditional_prayers_religion_selection_screen.dart';
 // import 'services/purchase_service.dart'; // Deshabilitado - opción de pago único removida
 import 'services/content_validator.dart';
 import 'services/daily_content_service.dart';
-import 'theme/app_theme.dart';
+import 'design_system/design_system.dart';
 import 'widgets/verbum_bottom_navigation.dart';
 import 'screens/welcome_auth_screen.dart';
 import 'bible/ui/bible_books_screen.dart';
@@ -196,12 +197,27 @@ class MyApp extends StatelessWidget {
             navigatorKey: _navigatorKey,
             title: 'Verbum',
             debugShowCheckedModeBanner: false,
-            theme: lightTheme,
-            darkTheme: darkTheme,
+            theme: buildVerbumTheme(
+              brightness: Brightness.light,
+              pageTransitionsTheme: verbumPageTransitions,
+            ),
+            darkTheme: buildVerbumTheme(
+              brightness: Brightness.dark,
+              pageTransitionsTheme: verbumPageTransitions,
+            ),
             themeMode: provider.darkMode ? ThemeMode.dark : ThemeMode.light,
             builder: (context, child) {
               SystemUiService.applyFromContext(context);
-              return child ?? const SizedBox.shrink();
+              // Barra de estado por defecto según el tema; las portadas con
+              // foto la sobrescriben con la suya. Sin esto, una pantalla sin
+              // región propia heredaba la de la anterior (hora blanca sobre
+              // fondo claro).
+              return AnnotatedRegion<SystemUiOverlayStyle>(
+                value: SystemUiService.overlayForBrightness(
+                  Theme.of(context).brightness,
+                ),
+                child: child ?? const SizedBox.shrink(),
+              );
             },
             home: startScreen,
             routes: {
@@ -309,7 +325,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
-  int _currentIndex = 2; // Default en "Hoy"
+  int _currentIndex = 0; // Default en "Hoy"
   int? _homeTabIndex;
   late List<AnimationController> _animationControllers;
   late List<Animation<double>> _fadeAnimations;
@@ -338,11 +354,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   List<Widget> get _screens => [
-    const ChatScreen(),
-    const CommunityScreen(),
-    HomeScreen(initialTabIndex: _homeTabIndex), // Hoy
-    const PrayersScreen(),
+    HomeScreen(initialTabIndex: _homeTabIndex),
     const BibleScreen(),
+    const PrayersScreen(),
+    const CommunityScreen(),
+    const ChatScreen(),
   ];
 
   @override
@@ -382,6 +398,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // La barra flota sobre el contenido.
+      extendBody: true,
       body: IndexedStack(
         index: _currentIndex,
         children: List.generate(

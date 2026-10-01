@@ -6,10 +6,8 @@ import '../services/personalization_service.dart';
 import '../services/ads_service.dart';
 import '../services/storage_service.dart';
 import '../widgets/app_scaffold.dart';
-import '../widgets/custom_button.dart';
-import '../widgets/main_card.dart';
 import 'emotion_detail_screen.dart';
-import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla simple para seleccionar emoción - Diseñada para adultos mayores
 class EmotionSelectionScreen extends StatefulWidget {
@@ -63,54 +61,14 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
 
   // 8 emociones simplificadas
   final List<Map<String, dynamic>> _emotions = [
-    {
-      'id': 'ansioso',
-      'name': 'Ansioso',
-      'icon': Icons.psychology,
-      'color': Color(0xFFFF9800),
-    },
-    {
-      'id': 'triste',
-      'name': 'Triste',
-      'icon': Icons.sentiment_very_dissatisfied,
-      'color': Color(0xFF2196F3),
-    },
-    {
-      'id': 'cansado',
-      'name': 'Cansado',
-      'icon': Icons.bedtime,
-      'color': Color(0xFF9E9E9E),
-    },
-    {
-      'id': 'preocupado',
-      'name': 'Preocupado',
-      'icon': Icons.warning,
-      'color': Color(0xFFFFC107),
-    },
-    {
-      'id': 'agradecido',
-      'name': 'Agradecido',
-      'icon': Icons.favorite,
-      'color': Color(0xFF4CAF50),
-    },
-    {
-      'id': 'feliz',
-      'name': 'Feliz',
-      'icon': Icons.sentiment_very_satisfied,
-      'color': Color(0xFFFFEB3B),
-    },
-    {
-      'id': 'confundido',
-      'name': 'Confundido',
-      'icon': Icons.help,
-      'color': Color(0xFF9C27B0),
-    },
-    {
-      'id': 'miedo',
-      'name': 'Con miedo',
-      'icon': Icons.visibility_off,
-      'color': Color(0xFFF44336),
-    },
+    {'id': 'ansioso', 'name': 'Ansioso', 'icon': VerbumIcons.brain},
+    {'id': 'triste', 'name': 'Triste', 'icon': VerbumIcons.smileySad},
+    {'id': 'cansado', 'name': 'Cansado', 'icon': VerbumIcons.moonStars},
+    {'id': 'preocupado', 'name': 'Preocupado', 'icon': VerbumIcons.warning},
+    {'id': 'agradecido', 'name': 'Agradecido', 'icon': VerbumIcons.heart},
+    {'id': 'feliz', 'name': 'Feliz', 'icon': VerbumIcons.smiley},
+    {'id': 'confundido', 'name': 'Confundido', 'icon': VerbumIcons.question},
+    {'id': 'miedo', 'name': 'Con miedo', 'icon': VerbumIcons.eyeSlash},
   ];
 
   Future<void> _selectEmotion(String emotion) async {
@@ -155,10 +113,7 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error al guardar. Intenta nuevamente.'),
-          backgroundColor: Colors.red,
-        ),
+        const SnackBar(content: Text('Error al guardar. Intenta nuevamente.')),
       );
     }
   }
@@ -183,53 +138,52 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
       });
     }
 
-    final colorScheme = Theme.of(context).colorScheme;
+    final p = context.palette;
+    final type = context.type;
     final userName = _personalizationService.getUserName();
     final displayName = userName.isNotEmpty ? userName : 'Amigo';
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final theme = Theme.of(context);
 
     return AppScaffold(
       title: '¿Cómo te sientes hoy?',
+      centerTitle: false,
       body: Column(
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.lg),
+              padding: const EdgeInsets.fromLTRB(
+                VerbumSpace.gutter,
+                VerbumSpace.xs,
+                VerbumSpace.gutter,
+                VerbumSpace.xl,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Saludo personalizado
-                  Text(
-                    '¿Cómo te sientes hoy, $displayName?',
-                    style: theme.textTheme.displayMedium?.copyWith(
-                      color: colorScheme.primary,
-                      height: 1.3,
+                  Semantics(
+                    header: true,
+                    child: Text(
+                      '¿Cómo te sientes hoy, $displayName?',
+                      style: type.display,
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: VerbumSpace.xs),
                   Text(
                     'Selecciona cómo te sientes y recibirás una oración y versículo especiales para ti',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      height: 1.5,
-                    ),
-                    textAlign: TextAlign.center,
+                    style: type.body,
                   ),
-                  const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: VerbumSpace.xl),
 
-                  // Grid de emociones (botones grandes)
+                  // Cuadrícula de emociones
                   if (_isLoading)
-                    const Center(
+                    Center(
                       child: Padding(
-                        padding: EdgeInsets.all(AppSpacing.xxl),
-                        child: CircularProgressIndicator(),
+                        padding: const EdgeInsets.all(VerbumSpace.xxl),
+                        child: CircularProgressIndicator(color: p.rubric),
                       ),
                     )
                   else
-                    _buildEmotionGrid(colorScheme, theme.textTheme),
+                    _buildEmotionGrid(),
                 ],
               ),
             ),
@@ -243,33 +197,37 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
                   ? _bannerAd!.size.height.toDouble()
                   : 50,
               decoration: BoxDecoration(
-                color: isDark ? colorScheme.surface : AppColors.surface,
-                border: Border(
-                  top: BorderSide(
-                    color: colorScheme.outline.withValues(alpha: 0.1),
-                    width: 1,
-                  ),
-                ),
+                color: p.surface,
+                border: Border(top: BorderSide(color: p.line)),
               ),
               child: _bannerAd != null
                   ? AdWidget(ad: _bannerAd!)
-                  : const SizedBox(
+                  : SizedBox(
                       height: 50,
                       child: Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: p.rubric,
+                        ),
                       ),
                     ),
             ),
           // Botón de regreso al inicio
           Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: CustomButton(
-              text: 'Regresar al inicio',
-              icon: Icons.home,
+            padding: const EdgeInsets.fromLTRB(
+              VerbumSpace.gutter,
+              VerbumSpace.sm,
+              VerbumSpace.gutter,
+              VerbumSpace.md,
+            ),
+            child: VButton(
+              label: 'Regresar al inicio',
+              icon: VerbumIcons.house,
+              iconLeading: true,
+              expanded: true,
               onPressed: () {
                 Navigator.of(context).pushNamed('/home');
               },
-              width: double.infinity,
             ),
           ),
         ],
@@ -277,91 +235,16 @@ class _EmotionSelectionScreenState extends State<EmotionSelectionScreen> {
     );
   }
 
-  Widget _buildEmotionGrid(ColorScheme colorScheme, TextTheme textTheme) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 20,
-        mainAxisSpacing: 20,
-        childAspectRatio: 0.95,
-      ),
-      itemCount: _emotions.length,
-      itemBuilder: (context, index) {
-        final emotion = _emotions[index];
-        return _buildEmotionButton(
-          emotion: emotion,
-          colorScheme: colorScheme,
-          onTap: () => _selectEmotion(emotion['id'] as String),
-          textTheme: textTheme,
-        );
-      },
-    );
-  }
-
-  Widget _buildEmotionButton({
-    required Map<String, dynamic> emotion,
-    required ColorScheme colorScheme,
-    required VoidCallback onTap,
-    required TextTheme textTheme,
-  }) {
-    final emotionColor = emotion['color'] as Color;
-
-    return MainCard(
-      onTap: onTap,
-      borderRadius: AppRadius.xxl,
-      border: Border.all(
-        color: emotionColor.withValues(alpha: 0.2),
-        width: 1.5,
-      ),
-      customShadows: [
-        BoxShadow(
-          color: emotionColor.withValues(alpha: 0.12),
-          blurRadius: 16,
-          offset: const Offset(0, 4),
-          spreadRadius: 0,
-        ),
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.02),
-          blurRadius: 8,
-          offset: const Offset(0, 2),
-          spreadRadius: 0,
-        ),
+  Widget _buildEmotionGrid() {
+    return VTileGrid(
+      children: [
+        for (final emotion in _emotions)
+          VCategoryTile(
+            icon: emotion['icon'] as VerbumIcons,
+            title: emotion['name'] as String,
+            onTap: () => _selectEmotion(emotion['id'] as String),
+          ),
       ],
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.lg,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: emotionColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(AppRadius.md),
-            ),
-            child: Icon(
-              emotion['icon'] as IconData,
-              size: 40,
-              color: emotionColor,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            emotion['name'] as String,
-            style: textTheme.titleMedium?.copyWith(
-              color: colorScheme.onSurface,
-              height: 1.3,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
     );
   }
 }

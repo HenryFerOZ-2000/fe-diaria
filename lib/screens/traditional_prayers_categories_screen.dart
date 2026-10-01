@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../services/ads_service.dart';
@@ -10,6 +9,7 @@ import '../widgets/traditional_prayer_library.dart';
 import '../widgets/verbum_header_actions.dart';
 import 'traditional_prayers_list_screen.dart';
 import 'traditional_prayers_religion_selection_screen.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Biblioteca de categorías según la tradición elegida por la persona.
 class TraditionalPrayersCategoriesScreen extends StatefulWidget {
@@ -94,27 +94,15 @@ class _TraditionalPrayersCategoriesScreenState
     final traditionName = _traditionName(_religion);
 
     return AppScaffold(
-      showGuestNotice: false,
       showBanner: !_adsRemoved,
       bannerAd: _bannerAd,
       centerTitle: false,
-      titleWidget: FittedBox(
-        alignment: Alignment.centerLeft,
-        fit: BoxFit.scaleDown,
-        child: Text(
-          'Oraciones tradicionales',
-          maxLines: 1,
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 23,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
+      titleWidget: Text('Oraciones tradicionales'),
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 12),
           child: VerbumHeaderButton(
-            icon: Icons.tune_rounded,
+            icon: VerbumIcons.slidersHorizontal,
             tooltip: 'Cambiar tradición',
             onPressed: () async {
               await Navigator.of(context).push(
@@ -130,9 +118,7 @@ class _TraditionalPrayersCategoriesScreenState
       ],
       body: _isLoading
           ? Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).colorScheme.primary,
-              ),
+              child: CircularProgressIndicator(color: context.palette.rubric),
             )
           : _categories.isEmpty
           ? const PrayerLibraryEmptyState(
@@ -142,15 +128,20 @@ class _TraditionalPrayersCategoriesScreenState
             )
           : ListView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
+              padding: const EdgeInsets.fromLTRB(
+                VerbumSpace.gutter,
+                8,
+                VerbumSpace.gutter,
+                28,
+              ),
               children: [
                 PrayerLibraryHero(
                   kicker: 'TU BIBLIOTECA DE ORACIÓN',
                   title: 'Elige cómo quieres orar',
                   description:
                       'Explora palabras recibidas por la tradición y encuentra una oración para este momento.',
-                  icon: Icons.auto_stories_rounded,
-                  accent: const Color(0xFFB58A45),
+                  icon: VerbumIcons.bookOpen,
+                  accent: context.palette.gold,
                   badge: traditionName,
                 ),
                 const SizedBox(height: 24),
@@ -171,7 +162,7 @@ class _TraditionalPrayersCategoriesScreenState
       eyebrow: presentation.eyebrow,
       subtitle: presentation.subtitle,
       icon: presentation.icon,
-      accent: presentation.accent,
+      accent: presentation.accent.resolve(context.palette),
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => TraditionalPrayersListScreen(
@@ -219,50 +210,50 @@ _CategoryCardPresentation _categoryPresentation(String category) {
       return const _CategoryCardPresentation(
         eyebrow: 'Ora con la Palabra',
         subtitle: 'Padre Nuestro, salmos y oraciones inspiradas en la Biblia',
-        icon: Icons.menu_book_rounded,
-        accent: Color(0xFF77649A),
+        icon: VerbumIcons.bookOpenText,
+        accent: PrayerLibraryTone.indigo,
       );
     case 'promesas':
       return const _CategoryCardPresentation(
         eyebrow: 'Recuerda su fidelidad',
         subtitle: 'Promesas bíblicas para fortalecer la esperanza',
-        icon: Icons.auto_awesome_rounded,
-        accent: Color(0xFFB58A45),
+        icon: VerbumIcons.sparkle,
+        accent: PrayerLibraryTone.periwinkle,
       );
     case 'otras':
       return const _CategoryCardPresentation(
         eyebrow: 'Para cada momento',
         subtitle: 'Oraciones para entregar tu vida cotidiana a Dios',
-        icon: Icons.favorite_outline_rounded,
-        accent: Color(0xFF5F8178),
+        icon: VerbumIcons.heart,
+        accent: PrayerLibraryTone.sage,
       );
     case 'basicas':
       return const _CategoryCardPresentation(
         eyebrow: 'Palabras esenciales',
         subtitle: 'Oraciones fundamentales de la tradición cristiana',
-        icon: Icons.volunteer_activism_rounded,
-        accent: Color(0xFF77649A),
+        icon: VerbumIcons.handHeart,
+        accent: PrayerLibraryTone.indigo,
       );
     case 'arcangeles':
       return const _CategoryCardPresentation(
         eyebrow: 'Pide protección',
         subtitle: 'Oraciones tradicionales a los arcángeles',
-        icon: Icons.shield_outlined,
-        accent: Color(0xFF536C91),
+        icon: VerbumIcons.shield,
+        accent: PrayerLibraryTone.indigo,
       );
     case 'del_dia':
       return const _CategoryCardPresentation(
         eyebrow: 'Acompaña tu jornada',
         subtitle: 'Oraciones para comenzar y terminar el día',
-        icon: Icons.wb_sunny_outlined,
-        accent: Color(0xFFB58A45),
+        icon: VerbumIcons.sun,
+        accent: PrayerLibraryTone.periwinkle,
       );
     default:
       return const _CategoryCardPresentation(
         eyebrow: 'Tu momento de oración',
         subtitle: 'Una colección para detenerte y encontrarte con Dios',
-        icon: Icons.auto_stories_rounded,
-        accent: Color(0xFF77649A),
+        icon: VerbumIcons.bookOpen,
+        accent: PrayerLibraryTone.indigo,
       );
   }
 }
@@ -277,6 +268,6 @@ class _CategoryCardPresentation {
 
   final String eyebrow;
   final String subtitle;
-  final IconData icon;
-  final Color accent;
+  final VerbumIcons icon;
+  final PrayerLibraryTone accent;
 }

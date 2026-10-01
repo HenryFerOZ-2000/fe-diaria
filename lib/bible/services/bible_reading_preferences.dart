@@ -23,6 +23,7 @@ class BibleReadingPreferences {
   static const _fontSizeKey = 'bible_reader_font_size';
   static const _lineHeightKey = 'bible_reader_line_height';
   static const _toneKey = 'bible_reader_tone';
+  static const _justifyKey = 'reader_justify_text';
   static const _highlightsKey = 'bible_highlights';
 
   Future<BibleReadingPosition?> getLastPosition() async {
@@ -90,6 +91,18 @@ class BibleReadingPreferences {
   Future<void> setTone(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_toneKey, value);
+  }
+
+  /// Texto justificado en los lectores (Biblia y oraciones). Por defecto
+  /// no: en columnas angostas y sin guiones deja huecos que cansan la vista.
+  Future<bool> getJustify() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_justifyKey) ?? false;
+  }
+
+  Future<void> setJustify(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_justifyKey, value);
   }
 
   String highlightKey(String bookId, int chapter, int verse) =>

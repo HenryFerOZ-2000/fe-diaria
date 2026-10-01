@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../models/spiritual_stats.dart';
 import '../models/achievement.dart';
 import '../services/spiritual_stats_service.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class SpiritualStatsScreen extends StatefulWidget {
   const SpiritualStatsScreen({super.key});
@@ -17,90 +17,6 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
   SpiritualStats _stats = SpiritualStats.empty();
   bool _isLoading = true;
   StreamSubscription<SpiritualStats>? _statsSubscription;
-
-  // Definición de logros
-  static final List<Achievement> _achievements = [
-    Achievement(
-      id: 'streak_7',
-      title: 'Racha de 7 días',
-      description: 'Mantén tu racha por 7 días consecutivos',
-      type: AchievementType.streak,
-      target: 7,
-      icon: Icons.local_fire_department,
-    ),
-    Achievement(
-      id: 'streak_30',
-      title: 'Racha de 30 días',
-      description: 'Mantén tu racha por 30 días consecutivos',
-      type: AchievementType.streak,
-      target: 30,
-      icon: Icons.local_fire_department,
-    ),
-    Achievement(
-      id: 'streak_100',
-      title: 'Racha de 100 días',
-      description: 'Mantén tu racha por 100 días consecutivos',
-      type: AchievementType.streak,
-      target: 100,
-      icon: Icons.local_fire_department,
-    ),
-    Achievement(
-      id: 'verses_10',
-      title: '10 Versículos',
-      description: 'Lee 10 versículos',
-      type: AchievementType.verses,
-      target: 10,
-      icon: Icons.book,
-    ),
-    Achievement(
-      id: 'verses_100',
-      title: '100 Versículos',
-      description: 'Lee 100 versículos',
-      type: AchievementType.verses,
-      target: 100,
-      icon: Icons.book,
-    ),
-    Achievement(
-      id: 'verses_500',
-      title: '500 Versículos',
-      description: 'Lee 500 versículos',
-      type: AchievementType.verses,
-      target: 500,
-      icon: Icons.book,
-    ),
-    Achievement(
-      id: 'prayers_10',
-      title: '10 Oraciones',
-      description: 'Completa 10 oraciones',
-      type: AchievementType.prayers,
-      target: 10,
-      icon: Icons.favorite,
-    ),
-    Achievement(
-      id: 'prayers_100',
-      title: '100 Oraciones',
-      description: 'Completa 100 oraciones',
-      type: AchievementType.prayers,
-      target: 100,
-      icon: Icons.favorite,
-    ),
-    Achievement(
-      id: 'posts_10',
-      title: '10 Publicaciones',
-      description: 'Crea 10 publicaciones',
-      type: AchievementType.posts,
-      target: 10,
-      icon: Icons.chat_bubble,
-    ),
-    Achievement(
-      id: 'posts_50',
-      title: '50 Publicaciones',
-      description: 'Crea 50 publicaciones',
-      type: AchievementType.posts,
-      target: 50,
-      icon: Icons.chat_bubble,
-    ),
-  ];
 
   @override
   void initState() {
@@ -164,322 +80,163 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Datos espirituales',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
+      appBar: VAppBar(
+        title: Text('Datos espirituales', style: context.type.heading),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: VEmptyState(loading: true, title: 'Cargando…'))
           : RefreshIndicator(
               onRefresh: _loadStats,
-              child: SingleChildScrollView(
+              child: ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.only(
-                  left: 16,
-                  right: 16,
-                  top: 16,
-                  bottom: MediaQuery.of(context).padding.bottom + 16,
+                padding: EdgeInsets.fromLTRB(
+                  VerbumSpace.gutter,
+                  0,
+                  VerbumSpace.gutter,
+                  MediaQuery.paddingOf(context).bottom + 24,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Métricas principales
-                    Text(
-                      'Métricas',
-                      style: GoogleFonts.inter(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
+                children: [
+                  const VSectionHeader(
+                    'Lo que has vivido',
+                    eyebrow: 'Métricas',
+                    padding: EdgeInsets.fromLTRB(2, 16, 2, 12),
+                  ),
+                  VTileGrid(
+                    children: [
+                      VStatTile(
+                        value: '${_stats.activeDaysLast30}',
+                        label: 'Días activos · 30 días',
+                        icon: VerbumIcons.calendarBlank,
+                        iconColor: p.accent,
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildMetricsGrid(),
-                    const SizedBox(height: 32),
-                    // Logros
-                    Text(
-                      'Logros',
-                      style: GoogleFonts.inter(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
+                      VStatTile(
+                        value: '${_stats.prayersCompleted}',
+                        label: 'Oraciones completadas',
+                        icon: VerbumIcons.handsPraying,
+                        iconColor: p.rubric,
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildAchievementsGrid(),
-                    // Espacio adicional al final para evitar overflow
-                    const SizedBox(height: 24),
-                  ],
-                ),
+                      VStatTile(
+                        value: '${_stats.versesRead}',
+                        label: 'Versículos leídos',
+                        icon: VerbumIcons.bookOpenText,
+                      ),
+                      VStatTile(
+                        value: '${_stats.postsCreated}',
+                        label: 'Publicaciones',
+                        icon: VerbumIcons.chatsCircle,
+                        iconColor: p.accent,
+                      ),
+                      VStatTile(
+                        value: '${_stats.currentStreak}',
+                        label: 'Constancia actual',
+                        icon: VerbumIcons.flame,
+                        iconColor: p.rubric,
+                      ),
+                      VStatTile(
+                        value: '${_stats.bestStreak}',
+                        label: 'Mejor constancia',
+                        icon: VerbumIcons.trophy,
+                      ),
+                    ],
+                  ),
+                  const VSectionHeader(
+                    'Hitos del camino',
+                    eyebrow: 'Logros',
+                    padding: EdgeInsets.fromLTRB(2, 28, 2, 12),
+                  ),
+                  VTileGrid(
+                    minTileWidth: 104,
+                    children: [
+                      for (final achievement in achievementCatalog)
+                        _AchievementTile(
+                          achievement: achievement,
+                          stats: _stats,
+                          onTap: () => Navigator.of(context).pushNamed(
+                            '/achievement-detail',
+                            arguments: {
+                              'achievement': achievement,
+                              'stats': _stats,
+                            },
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
               ),
             ),
     );
   }
-
-  Widget _buildMetricsGrid() {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio:
-          1.15, // Aumentado ligeramente para dar más espacio vertical
-      children: [
-        _StatsCard(
-          title: 'Días activos',
-          subtitle: 'Últimos 30 días',
-          value: '${_stats.activeDaysLast30}',
-          icon: Icons.calendar_today,
-          color: Colors.blue,
-        ),
-        _StatsCard(
-          title: 'Oraciones',
-          subtitle: 'Completadas',
-          value: '${_stats.prayersCompleted}',
-          icon: Icons.favorite,
-          color: Colors.red,
-        ),
-        _StatsCard(
-          title: 'Versículos',
-          subtitle: 'Leídos',
-          value: '${_stats.versesRead}',
-          icon: Icons.book,
-          color: Colors.purple,
-        ),
-        _StatsCard(
-          title: 'Publicaciones',
-          subtitle: 'Creadas',
-          value: '${_stats.postsCreated}',
-          icon: Icons.chat_bubble,
-          color: Colors.orange,
-        ),
-        _StatsCard(
-          title: 'Racha actual',
-          subtitle: 'Días consecutivos',
-          value: '${_stats.currentStreak}',
-          icon: Icons.local_fire_department,
-          color: Colors.deepOrange,
-        ),
-        _StatsCard(
-          title: 'Mejor racha',
-          subtitle: 'Récord personal',
-          value: '${_stats.bestStreak}',
-          icon: Icons.emoji_events,
-          color: Colors.amber,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAchievementsGrid() {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 0.9, // Aumentado para dar más espacio vertical
-      ),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: _achievements.length,
-      itemBuilder: (context, index) {
-        final achievement = _achievements[index];
-        return InkWell(
-          onTap: () {
-            Navigator.of(context).pushNamed(
-              '/achievement-detail',
-              arguments: {'achievement': achievement, 'stats': _stats},
-            );
-          },
-          borderRadius: BorderRadius.circular(12),
-          child: _AchievementCard(achievement: achievement, stats: _stats),
-        );
-      },
-    );
-  }
 }
 
-class _StatsCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String value;
-  final IconData icon;
-  final Color color;
-
-  const _StatsCard({
-    required this.title,
-    required this.subtitle,
-    required this.value,
-    required this.icon,
-    required this.color,
+class _AchievementTile extends StatelessWidget {
+  const _AchievementTile({
+    required this.achievement,
+    required this.stats,
+    required this.onTap,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? Colors.grey[850] : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    value,
-                    style: GoogleFonts.inter(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  title,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    color: Colors.grey[600],
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AchievementCard extends StatelessWidget {
   final Achievement achievement;
   final SpiritualStats stats;
-
-  const _AchievementCard({required this.achievement, required this.stats});
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final isUnlocked = achievement.isUnlocked(stats);
+    final p = context.palette;
+    final type = context.type;
+    final unlocked = achievement.isUnlocked(stats);
     final progress = achievement.getProgress(stats);
-    final progressPercent = (progress / achievement.target).clamp(0.0, 1.0);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: isUnlocked
-            ? (isDark
-                  ? Colors.amber[900]?.withValues(alpha: 0.3)
-                  : Colors.amber[50])
-            : (isDark ? Colors.grey[850] : Colors.white),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isUnlocked ? Colors.amber : Colors.grey.withValues(alpha: 0.3),
-          width: isUnlocked ? 2 : 1,
-        ),
-        boxShadow: isUnlocked
-            ? [
-                BoxShadow(
-                  color: Colors.amber.withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ]
-            : null,
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Hero(
-            tag: 'achievement_icon_${achievement.id}',
-            child: Icon(
-              achievement.icon,
-              size: 28,
-              color: isUnlocked ? Colors.amber[700] : Colors.grey[400],
-            ),
-          ),
-          const SizedBox(height: 6),
-          Flexible(
-            child: Text(
-              achievement.title,
-              style: GoogleFonts.inter(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: isUnlocked ? Colors.amber[900] : Colors.grey[600],
+    return VSurfaceCard(
+      tone: unlocked ? VSurfaceTone.accent : VSurfaceTone.paper,
+      borderColor: unlocked ? p.gold : null,
+      radius: VerbumRadius.tile,
+      padding: const EdgeInsets.fromLTRB(10, 14, 10, 12),
+      onTap: onTap,
+      semanticLabel: unlocked
+          ? '${achievement.title}, logrado'
+          : '${achievement.title}, $progress de ${achievement.target}',
+      child: ExcludeSemantics(
+        child: Column(
+          children: [
+            Hero(
+              tag: 'achievement_icon_${achievement.id}',
+              child: VIcon(
+                achievement.icon,
+                weight: unlocked ? VIconWeight.fill : VIconWeight.duotone,
+                size: 30,
+                color: unlocked ? p.gold : p.inkSubtle,
               ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              achievement.title,
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
+              style: type.caption.copyWith(
+                color: unlocked ? p.ink : p.inkMuted,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-          ),
-          if (!isUnlocked) ...[
-            const SizedBox(height: 4),
-            LinearProgressIndicator(
-              value: progressPercent,
-              backgroundColor: Colors.grey[300],
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.amber[700]!),
-              minHeight: 3,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '$progress/${achievement.target}',
-              style: GoogleFonts.inter(fontSize: 8, color: Colors.grey[600]),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ] else ...[
-            const SizedBox(height: 2),
-            Icon(Icons.check_circle, size: 14, color: Colors.amber[700]),
+            const SizedBox(height: 8),
+            if (unlocked)
+              VIcon(
+                VerbumIcons.sealCheck,
+                weight: VIconWeight.fill,
+                size: 16,
+                color: p.gold,
+              )
+            else ...[
+              VProgressBar(value: progress / achievement.target, height: 3),
+              const SizedBox(height: 4),
+              Text(
+                '$progress/${achievement.target}',
+                style: type.caption.copyWith(fontSize: 10),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

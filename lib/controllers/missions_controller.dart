@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+import '../design_system/icons/verbum_icons.dart';
 
 class Mission {
   final String id;
   final String title;
   final String description;
-  final IconData icon;
+  final VerbumIcons icon;
   final int durationMinutes;
   final bool isOptional;
   final String? content;

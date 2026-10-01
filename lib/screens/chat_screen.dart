@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../widgets/app_scaffold.dart';
 import '../widgets/chat_bubble.dart';
-import '../widgets/verbum_header_actions.dart';
 import '../services/groq_chat_service.dart' as groq;
 import '../providers/auth_provider.dart';
+import '../widgets/sign_in_prompt.dart';
+import '../widgets/cover_scroll_frame.dart';
+import '../design_system/design_system.dart';
 
 class ChatMessage {
   final String text;
@@ -121,239 +121,327 @@ class _ChatScreenState extends State<ChatScreen> {
     super.dispose();
   }
 
+  /// Para empezar con un toque.
+  static const _suggestions = [
+    (VerbumIcons.wind, 'Me siento ansioso y necesito calma'),
+    (VerbumIcons.handHeart, 'Quiero orar por alguien'),
+    (VerbumIcons.bookOpenText, 'Explícame un versículo'),
+    (VerbumIcons.sun, 'Necesito esperanza hoy'),
+  ];
+
+  /// Para medir la portada (franja bajo la hora).
+  final _coverKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
-      centerTitle: false,
-      titleWidget: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF493878), Color(0xFFB58A45)],
-              ),
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: const Icon(
-              Icons.auto_awesome,
-              color: Colors.white,
-              size: 19,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Acompañamiento',
-                style: GoogleFonts.playfairDisplay(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              Text(
-                'UN ESPACIO SEGURO PARA HABLAR',
-                style: GoogleFonts.inter(
-                  fontSize: 8,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.1,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      actions: const [VerbumHeaderActions()],
-      showBanner: false,
+    final p = context.palette;
+    final type = context.type;
+    final signedIn = context.watch<AuthProvider>().isSignedIn;
+    final started = _messages.any((m) => m.isUser);
+
+    return Scaffold(
+      backgroundColor: p.background,
+      resizeToAvoidBottomInset: true,
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              reverse: false,
-              itemCount: _messages.length + (_isLoading ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (_isLoading && index == _messages.length) {
-                  return _buildTypingIndicator(context);
-                }
-                final msg = _messages[index];
-                return TweenAnimationBuilder<double>(
-                  key: ValueKey('msg_$index'),
-                  tween: Tween(begin: 0.0, end: 1.0),
-                  duration: const Duration(milliseconds: 260),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, value, child) {
-                    return Opacity(
-                      opacity: value,
-                      child: Transform.translate(
-                        offset: Offset(0, (1 - value) * 12),
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: ChatBubble(text: msg.text, isUser: msg.isUser),
-                );
-              },
-            ),
-          ),
-          _buildInput(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTypingIndicator(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.only(right: 40, bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: colorScheme.surface.withValues(alpha: 0.95),
-          borderRadius: BorderRadius.circular(
-            16,
-          ).copyWith(bottomLeft: const Radius.circular(0)),
-          border: Border.all(
-            color: colorScheme.primary.withValues(alpha: 0.08),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: colorScheme.primary,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'Pensando...',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: colorScheme.onSurface.withValues(alpha: 0.7),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInput(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.primary.withValues(alpha: 0.08),
-            blurRadius: 10,
-            offset: const Offset(0, -4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _controller,
-              decoration: InputDecoration(
-                hintText: 'Escribe tu mensaje',
-                hintStyle: GoogleFonts.inter(
-                  color: colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-                filled: true,
-                fillColor: colorScheme.surface.withValues(alpha: 0.9),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(
-                    color: colorScheme.outline.withValues(alpha: 0.3),
+            child: CoverScrollFrame(
+              coverKey: _coverKey,
+              child: ListView(
+                controller: _scrollController,
+                padding: const EdgeInsets.only(bottom: 16),
+                children: [
+                  VPhotoCover(
+                    key: _coverKey,
+                    image: AssetImage(VerbumPhotos.chatBench.asset),
+                    // La banca queda arriba del título.
+                    alignment: const Alignment(0, .85),
+                    minHeight: started ? 300 : 360,
+                    bottomPadding: 28,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            VGlassButton(
+                              icon: VerbumIcons.slidersHorizontal,
+                              tooltip: 'Configuración',
+                              onPressed: () =>
+                                  Navigator.of(context).pushNamed('/settings'),
+                            ),
+                            const Spacer(),
+                            VGlassButton(
+                              icon: VerbumIcons.user,
+                              tooltip: 'Mi perfil',
+                              onPressed: () =>
+                                  Navigator.of(context).pushNamed('/profile'),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: started ? 70 : 96),
+                        Text(
+                          'ACOMPAÑAMIENTO',
+                          style: type.rubric.copyWith(
+                            color: p.butter,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Semantics(
+                          header: true,
+                          child: Text(
+                            'Un espacio seguro para hablar',
+                            style: type.display.copyWith(
+                              color: Colors.white,
+                              fontSize: 30,
+                              height: 1.1,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Cuéntame lo que llevas hoy en el corazón.',
+                          style: type.body.copyWith(
+                            color: Colors.white.withValues(alpha: .9),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: VerbumSpace.gutter,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        for (var i = 0; i < _messages.length; i++)
+                          TweenAnimationBuilder<double>(
+                            key: ValueKey('msg_$i'),
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            duration: const Duration(milliseconds: 260),
+                            curve: Curves.easeOutCubic,
+                            builder: (context, value, child) => Opacity(
+                              opacity: value,
+                              child: Transform.translate(
+                                offset: Offset(0, (1 - value) * 12),
+                                child: child,
+                              ),
+                            ),
+                            child: ChatBubble(
+                              text: _messages[i].text,
+                              isUser: _messages[i].isUser,
+                            ),
+                          ),
+                        if (_isLoading) const _TypingIndicator(),
+                        if (!started) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            'Puedes empezar por aquí',
+                            style: type.caption.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          for (final (icon, text) in _suggestions)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: VSurfaceCard(
+                                radius: VerbumRadius.tile,
+                                padding: const EdgeInsets.fromLTRB(
+                                  12,
+                                  10,
+                                  12,
+                                  10,
+                                ),
+                                onTap: signedIn && !_isLoading
+                                    ? () => _sendMessage(text)
+                                    : null,
+                                semanticLabel: text,
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 34,
+                                      height: 34,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: p.surfaceMuted,
+                                        borderRadius: BorderRadius.circular(11),
+                                      ),
+                                      child: VIcon(
+                                        icon,
+                                        size: 18,
+                                        color: p.rubric,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(text, style: type.bodyStrong),
+                                    ),
+                                    VIcon(
+                                      VerbumIcons.arrowUpRight,
+                                      size: 16,
+                                      color: p.inkSubtle,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Soy una guía con inteligencia artificial: '
+                            'te acompaño, pero no sustituyo a un '
+                            'sacerdote, pastor o profesional.',
+                            textAlign: TextAlign.center,
+                            style: type.caption,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              onSubmitted: _sendMessage,
             ),
           ),
-          const SizedBox(width: 8),
-          _SendButton(
-            onPressed: () => _sendMessage(_controller.text),
-            color: colorScheme.primary,
-          ),
+          _buildInput(context, signedIn: signedIn),
         ],
+      ),
+    );
+  }
+
+  Widget _buildInput(BuildContext context, {required bool signedIn}) {
+    final p = context.palette;
+    // El campo queda por encima de la barra flotante (o del teclado).
+    final bottom = MediaQuery.viewInsetsOf(context).bottom > 0
+        ? 10.0
+        : MediaQuery.paddingOf(context).bottom + 6;
+    return Material(
+      color: p.surface,
+      elevation: 8,
+      shadowColor: VerbumShadows.tint(p, .2),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          VerbumSpace.gutter,
+          10,
+          VerbumSpace.gutter,
+          bottom,
+        ),
+        child: signedIn
+            ? Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      minLines: 1,
+                      maxLines: 4,
+                      textCapitalization: TextCapitalization.sentences,
+                      textInputAction: TextInputAction.send,
+                      decoration: const InputDecoration(
+                        hintText: 'Escribe tu mensaje…',
+                      ),
+                      onSubmitted: _isLoading ? null : _sendMessage,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Material(
+                    color: _isLoading ? p.surfaceMuted : p.emphasis,
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: _isLoading
+                          ? null
+                          : () => _sendMessage(_controller.text),
+                      child: SizedBox.square(
+                        dimension: 48,
+                        child: Center(
+                          child: Semantics(
+                            label: 'Enviar mensaje',
+                            button: true,
+                            child: VIcon(
+                              VerbumIcons.paperPlaneRight,
+                              weight: VIconWeight.fill,
+                              size: 20,
+                              color: _isLoading ? p.inkSubtle : p.onEmphasis,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : const SignInPrompt.bar(title: 'Inicia sesión para conversar'),
       ),
     );
   }
 }
 
-/// Botón de envío circular con gradiente y animación de presión.
-class _SendButton extends StatefulWidget {
-  final VoidCallback onPressed;
-  final Color color;
-
-  const _SendButton({required this.onPressed, required this.color});
+/// Indicador de respuesta en curso: tres puntos que respiran.
+class _TypingIndicator extends StatefulWidget {
+  const _TypingIndicator();
 
   @override
-  State<_SendButton> createState() => _SendButtonState();
+  State<_TypingIndicator> createState() => _TypingIndicatorState();
 }
 
-class _SendButtonState extends State<_SendButton>
+class _TypingIndicatorState extends State<_TypingIndicator>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    duration: const Duration(milliseconds: 120),
+  late final AnimationController _c = AnimationController(
     vsync: this,
-  );
-  late final Animation<double> _scale = Tween<double>(
-    begin: 1.0,
-    end: 0.88,
-  ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    duration: const Duration(milliseconds: 1100),
+  )..repeat();
 
   @override
   void dispose() {
-    _controller.dispose();
+    _c.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => _controller.forward(),
-      onTapUp: (_) => _controller.reverse(),
-      onTapCancel: () => _controller.reverse(),
-      onTap: widget.onPressed,
-      child: ScaleTransition(
-        scale: _scale,
-        child: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [widget.color, widget.color.withValues(alpha: 0.75)],
-            ),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: widget.color.withValues(alpha: 0.35),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+    final p = context.palette;
+    return Semantics(
+      label: 'El acompañante está escribiendo',
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(
+          children: [
+            const CompanionAvatar(),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: p.surface,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: VerbumShadows.subtle(p),
               ),
-            ],
-          ),
-          child: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+              child: AnimatedBuilder(
+                animation: _c,
+                builder: (context, _) => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (var i = 0; i < 3; i++) ...[
+                      if (i > 0) const SizedBox(width: 5),
+                      Opacity(
+                        opacity:
+                            0.3 +
+                            0.7 *
+                                (1 - ((_c.value * 3 - i) % 3).clamp(0.0, 1.0)),
+                        child: Container(
+                          width: 7,
+                          height: 7,
+                          decoration: BoxDecoration(
+                            color: p.gold,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

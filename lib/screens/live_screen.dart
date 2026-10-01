@@ -5,16 +5,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/top_notice.dart';
+import '../widgets/sign_in_prompt.dart';
 import '../widgets/verbum_header_actions.dart';
 import '../services/social_service.dart';
 import '../services/live_posts_service.dart';
 import '../services/profile_service.dart';
 import '../services/spiritual_stats_service.dart';
 import 'comments_screen.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class LivePost {
   final String id;
@@ -73,7 +74,11 @@ class LiveComment {
 class LiveScreen extends StatefulWidget {
   final bool showAppBar;
 
-  const LiveScreen({super.key, this.showAppBar = true});
+  /// Portada a sangre (Comunidad) con el número de intenciones de la
+  /// semana. Si se da, la pantalla se muestra sin su propia barra.
+  final Widget Function(int weeklyCount)? coverBuilder;
+
+  const LiveScreen({super.key, this.showAppBar = true, this.coverBuilder});
 
   @override
   State<LiveScreen> createState() => _LiveScreenState();
@@ -302,6 +307,13 @@ class _LiveScreenState extends State<LiveScreen> {
   }
 
   Future<void> _createPost() async {
+    if (_auth.currentUser == null) {
+      await SignInPrompt.ask(
+        context,
+        title: 'Inicia sesión para pedir oración',
+      );
+      return;
+    }
     final didPublish = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -326,12 +338,132 @@ class _LiveScreenState extends State<LiveScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    final feed = StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: _buildQuery().snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _LiveFeedSkeleton(
+            onCompose: _createPost,
+            cover: widget.coverBuilder?.call(0),
+          );
+        }
+        if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              'Error al cargar publicaciones: ${snapshot.error}',
+              textAlign: TextAlign.center,
+            ),
+          );
+        }
+        final docs = snapshot.data?.docs ?? [];
+        final now = DateTime.now();
+        final posts = docs.map((doc) {
+          final data = doc.data();
+          final ts = data['createdAt'] as Timestamp?;
+          return LivePost(
+            id: doc.id,
+            authorUid: data['authorUid'] as String? ?? '',
+            userName:
+                (data['authorUsername'] as String?) ??
+                (data['authorName'] as String?) ??
+                data['authorUid'] as String? ??
+                'Anónimo',
+            authorPhoto: data['authorPhoto'] as String?,
+            text: data['text'] as String? ?? '',
+            category: (data['category'] as String?) ?? 'Fortaleza',
+            status: (data['prayerStatus'] as String?) ?? 'active',
+            timeAgo: _formatTimeAgo(ts?.toDate(), now),
+            joinCount: (data['joinCount'] ?? 0) as int,
+            likes: (data['likeCount'] ?? 0) as int,
+            comments: (data['commentCount'] ?? 0) as int,
+            isLiked: false,
+          );
+        }).toList();
+
+        final weekAgo = now.subtract(const Duration(days: 7));
+        final weeklyCount = docs.where((doc) {
+          final ts = doc.data()['createdAt'] as Timestamp?;
+          return ts != null && ts.toDate().isAfter(weekAgo);
+        }).length;
+        final cover = widget.coverBuilder?.call(weeklyCount);
+        const gutter = EdgeInsets.symmetric(horizontal: VerbumSpace.gutter);
+
+        final visiblePosts = _selectedFeedCategory == 'Todas'
+            ? posts
+            : posts
+                  .where((post) => post.category == _selectedFeedCategory)
+                  .toList();
+
+        return RefreshIndicator(
+          onRefresh: _refreshFeed,
+          color: colorScheme.primary,
+          child: ListView.builder(
+            controller: _scrollController,
+            padding: EdgeInsets.only(
+              top: cover == null ? 10 : 0,
+              bottom: 28 + MediaQuery.paddingOf(context).bottom,
+            ),
+            itemCount: visiblePosts.isEmpty ? 2 : visiblePosts.length + 1,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ?cover,
+                    Padding(
+                      padding: gutter,
+                      child: _LiveFeedHeader(
+                        selectedCategory: _selectedFeedCategory,
+                        onCategorySelected: (category) {
+                          setState(() => _selectedFeedCategory = category);
+                        },
+                        onCompose: _createPost,
+                      ),
+                    ),
+                  ],
+                );
+              }
+              if (visiblePosts.isEmpty) {
+                return Padding(
+                  padding: gutter,
+                  child: _LiveEmptyState(
+                    filtered: _selectedFeedCategory != 'Todas',
+                    onCompose: _createPost,
+                  ),
+                );
+              }
+              final post = visiblePosts[index - 1];
+              return Padding(
+                key: ValueKey(post.id),
+                padding: const EdgeInsets.fromLTRB(
+                  VerbumSpace.gutter,
+                  0,
+                  VerbumSpace.gutter,
+                  12,
+                ),
+                child: _FeedPostTile(
+                  postId: post.id,
+                  post: post,
+                  service: _livePostsService,
+                  currentUid: _uid ?? '',
+                  onComment: () => _openComments(post),
+                  onShare: () => _sharePost(post),
+                  onDelete: () => _deletePostFromLive(post),
+                  onAuthorTap: null, // Los perfiles ya no son públicos
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+    if (widget.coverBuilder != null) return feed;
     return AppScaffold(
       showBanner: false,
       showAppBar: widget.showAppBar,
       titleWidget: Text(
         'En Vivo',
-        style: GoogleFonts.playfairDisplay(
+        style: VerbumFonts.serif(
           fontSize: 24,
           fontWeight: FontWeight.bold,
           color: colorScheme.onSurface,
@@ -340,94 +472,7 @@ class _LiveScreenState extends State<LiveScreen> {
       actions: const [VerbumHeaderActions()],
       centerTitle: false,
       resizeToAvoidBottomInset: true,
-      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: _buildQuery().snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return _LiveFeedSkeleton(onCompose: _createPost);
-          }
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Error al cargar publicaciones: ${snapshot.error}',
-                textAlign: TextAlign.center,
-              ),
-            );
-          }
-          final docs = snapshot.data?.docs ?? [];
-          final now = DateTime.now();
-          final posts = docs.map((doc) {
-            final data = doc.data();
-            final ts = data['createdAt'] as Timestamp?;
-            return LivePost(
-              id: doc.id,
-              authorUid: data['authorUid'] as String? ?? '',
-              userName:
-                  (data['authorUsername'] as String?) ??
-                  (data['authorName'] as String?) ??
-                  data['authorUid'] as String? ??
-                  'Anónimo',
-              authorPhoto: data['authorPhoto'] as String?,
-              text: data['text'] as String? ?? '',
-              category: (data['category'] as String?) ?? 'Fortaleza',
-              status: (data['prayerStatus'] as String?) ?? 'active',
-              timeAgo: _formatTimeAgo(ts?.toDate(), now),
-              joinCount: (data['joinCount'] ?? 0) as int,
-              likes: (data['likeCount'] ?? 0) as int,
-              comments: (data['commentCount'] ?? 0) as int,
-              isLiked: false,
-            );
-          }).toList();
-
-          final visiblePosts = _selectedFeedCategory == 'Todas'
-              ? posts
-              : posts
-                    .where((post) => post.category == _selectedFeedCategory)
-                    .toList();
-
-          return RefreshIndicator(
-            onRefresh: _refreshFeed,
-            color: colorScheme.primary,
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
-              itemCount: visiblePosts.isEmpty ? 2 : visiblePosts.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return _LiveFeedHeader(
-                    selectedCategory: _selectedFeedCategory,
-                    onCategorySelected: (category) {
-                      setState(() => _selectedFeedCategory = category);
-                    },
-                    onCompose: _createPost,
-                  );
-                }
-                if (visiblePosts.isEmpty) {
-                  return _LiveEmptyState(
-                    filtered: _selectedFeedCategory != 'Todas',
-                    onCompose: _createPost,
-                  );
-                }
-                final post = visiblePosts[index - 1];
-                return Padding(
-                  key: ValueKey(post.id),
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _FeedPostTile(
-                    postId: post.id,
-                    post: post,
-                    service: _livePostsService,
-                    currentUid: _uid ?? '',
-                    onComment: () => _openComments(post),
-                    onShare: () => _sharePost(post),
-                    onDelete: () => _deletePostFromLive(post),
-                    onAuthorTap: null, // Los perfiles ya no son públicos
-                  ),
-                );
-              },
-            ),
-          );
-        },
-      ),
+      body: feed,
     );
   }
 }
@@ -453,147 +498,115 @@ class _LiveFeedHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final dark = theme.brightness == Brightness.dark;
+    final p = context.palette;
+    final type = context.type;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(top: 8, bottom: 14),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            'INTENCIONES COMPARTIDAS',
-            style: GoogleFonts.inter(
-              color: scheme.secondary,
-              fontSize: 9.5,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.45,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            'Acompañarnos también es orar',
-            style: GoogleFonts.playfairDisplay(
-              color: scheme.onSurface,
-              fontSize: 23,
-              height: 1.1,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'Escucha, comparte esperanza y hazle saber a alguien que no está solo.',
-            style: GoogleFonts.inter(
-              color: scheme.onSurfaceVariant,
-              fontSize: 12.5,
-              height: 1.45,
+          VSurfaceCard(
+            onTap: onCompose,
+            radius: VerbumRadius.card,
+            padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+            semanticLabel: 'Compartir una intención',
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: p.surfaceMuted,
+                    borderRadius: BorderRadius.circular(VerbumRadius.control),
+                  ),
+                  child: VIcon(VerbumIcons.handHeart, color: p.rubric),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '¿Por quién quieres orar?',
+                        style: type.bodyStrong.copyWith(fontSize: 15),
+                      ),
+                      Text('Comparte una intención', style: type.caption),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 13,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: p.butter,
+                    borderRadius: BorderRadius.circular(VerbumRadius.control),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      VIcon(VerbumIcons.plus, size: 15, color: p.onButter),
+                      const SizedBox(width: 5),
+                      Text(
+                        'Pedir',
+                        style: type.bodyStrong.copyWith(
+                          color: p.onButter,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 14),
-          Material(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(22),
-            child: InkWell(
-              onTap: onCompose,
-              borderRadius: BorderRadius.circular(22),
-              child: Ink(
-                padding: const EdgeInsets.fromLTRB(13, 12, 12, 12),
-                decoration: BoxDecoration(
-                  color: dark
-                      ? const Color(0xFF292431)
-                      : const Color(0xFFFFFCF7),
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(
-                    color: scheme.primary.withValues(alpha: .15),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: dark ? .12 : .045),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: scheme.primary.withValues(alpha: .10),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.volunteer_activism_outlined,
-                        color: scheme.primary,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 11),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '¿Por quién quieres orar hoy?',
-                            style: GoogleFonts.inter(
-                              color: scheme.onSurface,
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Compartir una intención',
-                            style: GoogleFonts.inter(
-                              color: scheme.primary,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_rounded,
-                      color: scheme.primary,
-                      size: 19,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 13),
           SizedBox(
-            height: 34,
+            height: 40,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: categories.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 7),
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final category = categories[index];
                 final selected = category == selectedCategory;
-                return ChoiceChip(
+                final icon = categoryIconFor(category);
+                return Semantics(
+                  button: true,
                   selected: selected,
-                  onSelected: (_) => onCategorySelected(category),
-                  label: Text(category),
-                  showCheckmark: false,
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  side: BorderSide(
-                    color: selected
-                        ? scheme.primary.withValues(alpha: .28)
-                        : scheme.outline.withValues(alpha: .16),
-                  ),
-                  backgroundColor: dark
-                      ? const Color(0xFF292431)
-                      : const Color(0xFFFFFCF7),
-                  selectedColor: scheme.primary.withValues(alpha: .12),
-                  labelStyle: GoogleFonts.inter(
-                    color: selected ? scheme.primary : scheme.onSurfaceVariant,
-                    fontSize: 11,
-                    fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                  child: Material(
+                    color: selected ? p.emphasis : p.surfaceMuted,
+                    borderRadius: BorderRadius.circular(99),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(99),
+                      onTap: () => onCategorySelected(category),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (icon != null) ...[
+                              VIcon(
+                                icon,
+                                size: 14,
+                                color: selected ? p.onEmphasis : p.rubric,
+                              ),
+                              const SizedBox(width: 6),
+                            ],
+                            Text(
+                              category,
+                              style: type.bodyStrong.copyWith(
+                                fontSize: 13,
+                                color: selected ? p.onEmphasis : p.rubric,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 );
               },
@@ -605,6 +618,16 @@ class _LiveFeedHeader extends StatelessWidget {
   }
 }
 
+/// Icono de cada categoría de intención ("Todas" no lleva).
+VerbumIcons? categoryIconFor(String category) => switch (category) {
+  'Salud' => VerbumIcons.firstAid,
+  'Familia' => VerbumIcons.houseLine,
+  'Fortaleza' => VerbumIcons.mountains,
+  'Gratitud' => VerbumIcons.sparkle,
+  'Todas' => null,
+  _ => VerbumIcons.handHeart,
+};
+
 class _LiveEmptyState extends StatelessWidget {
   final bool filtered;
   final VoidCallback onCompose;
@@ -613,43 +636,16 @@ class _LiveEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: scheme.outline.withValues(alpha: .15)),
-      ),
-      child: Column(
-        children: [
-          Icon(Icons.forum_outlined, color: scheme.primary, size: 32),
-          const SizedBox(height: 10),
-          Text(
-            filtered ? 'Aún no hay intenciones aquí' : 'Sé la primera voz',
-            style: GoogleFonts.playfairDisplay(
-              color: scheme.onSurface,
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
+    return VSurfaceCard(
+      radius: VerbumRadius.card,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: VEmptyState(
+        icon: VerbumIcons.chatsCircle,
+        title: filtered ? 'Aún no hay intenciones aquí' : 'Sé la primera voz',
+        message:
             'Comparte algo que hoy quieras poner en manos de la comunidad.',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              color: scheme.onSurfaceVariant,
-              fontSize: 12,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextButton.icon(
-            onPressed: onCompose,
-            icon: const Icon(Icons.add_rounded),
-            label: const Text('Compartir una intención'),
-          ),
-        ],
+        actionLabel: 'Compartir una intención',
+        onAction: onCompose,
       ),
     );
   }
@@ -657,30 +653,36 @@ class _LiveEmptyState extends StatelessWidget {
 
 class _LiveFeedSkeleton extends StatelessWidget {
   final VoidCallback onCompose;
+  final Widget? cover;
 
-  const _LiveFeedSkeleton({required this.onCompose});
+  const _LiveFeedSkeleton({required this.onCompose, this.cover});
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final p = context.palette;
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
+      padding: EdgeInsets.only(top: cover == null ? 10 : 0, bottom: 28),
       children: [
-        _LiveFeedHeader(
-          selectedCategory: 'Todas',
-          onCategorySelected: (_) {},
-          onCompose: onCompose,
-        ),
-        ...List.generate(
-          3,
-          (index) => Container(
-            height: 150,
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color: scheme.surface.withValues(alpha: .72),
-              borderRadius: BorderRadius.circular(23),
-              border: Border.all(color: scheme.outline.withValues(alpha: .10)),
-            ),
+        ?cover,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: VerbumSpace.gutter),
+          child: Column(
+            children: [
+              _LiveFeedHeader(
+                selectedCategory: 'Todas',
+                onCategorySelected: (_) {},
+                onCompose: onCompose,
+              ),
+              for (var i = 0; i < 3; i++)
+                Container(
+                  height: 150,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: p.surface.withValues(alpha: .7),
+                    borderRadius: BorderRadius.circular(VerbumRadius.card),
+                  ),
+                ),
+            ],
           ),
         ),
       ],
@@ -733,7 +735,14 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
   }
 
   Future<void> _toggleJoin() async {
-    if (_updating || widget.currentUid.isEmpty) return;
+    if (widget.currentUid.isEmpty) {
+      SignInPrompt.ask(
+        context,
+        title: 'Inicia sesión para orar con la comunidad',
+      );
+      return;
+    }
+    if (_updating) return;
     final previousJoined = _joined;
     final previousCount = _joinCount;
     setState(() {
@@ -775,54 +784,6 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
     }
   }
 
-  String get _statusLabel {
-    switch (widget.post.status) {
-      case 'answered':
-        return 'ORACIÓN RESPONDIDA';
-      case 'gratitude':
-        return 'AGRADECIMIENTO';
-      default:
-        return 'SEGUIMOS ORANDO';
-    }
-  }
-
-  IconData get _statusIcon {
-    switch (widget.post.status) {
-      case 'answered':
-        return Icons.check_circle_outline_rounded;
-      case 'gratitude':
-        return Icons.auto_awesome_rounded;
-      default:
-        return Icons.favorite_outline_rounded;
-    }
-  }
-
-  Color _categoryColor(String category) {
-    switch (category) {
-      case 'Salud':
-        return const Color(0xFF5F8178);
-      case 'Familia':
-        return const Color(0xFF77649A);
-      case 'Gratitud':
-        return const Color(0xFFB5813E);
-      default:
-        return const Color(0xFF8A645D);
-    }
-  }
-
-  IconData _categoryIcon(String category) {
-    switch (category) {
-      case 'Salud':
-        return Icons.healing_outlined;
-      case 'Familia':
-        return Icons.family_restroom_rounded;
-      case 'Gratitud':
-        return Icons.auto_awesome_outlined;
-      default:
-        return Icons.shield_outlined;
-    }
-  }
-
   String _authorLabel(bool isMine) {
     if (isMine) return 'Tú';
     final raw = widget.post.userName.trim();
@@ -834,15 +795,15 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final dark = theme.brightness == Brightness.dark;
+    final p = context.palette;
+    final type = context.type;
     final isMine =
         widget.currentUid.isNotEmpty &&
         widget.post.authorUid == widget.currentUid;
     final authorName = _authorLabel(isMine);
     final photo = widget.post.authorPhoto?.trim();
-    final accent = _categoryColor(widget.post.category);
+    final status = widget.post.status;
+    final categoryIcon = categoryIconFor(widget.post.category);
 
     return StreamBuilder<bool>(
       stream: widget.service.isPrayerJoinedStream(
@@ -858,245 +819,210 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
           });
         }
 
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          decoration: BoxDecoration(
-            color: dark ? const Color(0xFF292431) : const Color(0xFFFFFCF7),
-            borderRadius: BorderRadius.circular(23),
-            border: Border.all(
-              color: _joined
-                  ? accent.withValues(alpha: .42)
-                  : scheme.outline.withValues(alpha: .14),
-              width: _joined ? 1.35 : 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: _joined
-                    ? accent.withValues(alpha: .10)
-                    : Colors.black.withValues(alpha: dark ? .12 : .045),
-                blurRadius: 20,
-                offset: const Offset(0, 9),
-              ),
-            ],
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Stack(
+        return VSurfaceCard(
+          radius: VerbumRadius.card,
+          padding: const EdgeInsets.fromLTRB(16, 14, 10, 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Positioned(
-                left: 0,
-                top: 18,
-                bottom: 18,
-                child: Container(
-                  width: 3,
-                  decoration: BoxDecoration(
-                    color: accent,
-                    borderRadius: const BorderRadius.horizontal(
-                      right: Radius.circular(8),
+              Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(13),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      color: p.surfaceMuted,
+                      alignment: Alignment.center,
+                      child: photo != null && photo.isNotEmpty
+                          ? Image.network(
+                              photo,
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) => const SizedBox(),
+                            )
+                          : Text(
+                              authorName.characters.first.toUpperCase(),
+                              style: type.bodyStrong.copyWith(color: p.rubric),
+                            ),
                     ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          authorName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: type.bodyStrong,
+                        ),
+                        Text(widget.post.timeAgo, style: type.caption),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: p.surfaceMuted,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (categoryIcon != null) ...[
+                          VIcon(categoryIcon, size: 13, color: p.rubric),
+                          const SizedBox(width: 5),
+                        ],
+                        Text(
+                          widget.post.category,
+                          style: type.caption.copyWith(
+                            color: p.rubric,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (isMine && widget.onDelete != null)
+                    PopupMenuButton<String>(
+                      tooltip: 'Opciones',
+                      icon: VIcon(VerbumIcons.dotsThree, color: p.inkMuted),
+                      onSelected: (value) {
+                        if (value == 'delete') {
+                          widget.onDelete?.call();
+                        } else {
+                          _updateStatus(value);
+                        }
+                      },
+                      itemBuilder: (_) => const [
+                        PopupMenuItem(
+                          value: 'active',
+                          child: Text('Seguimos orando'),
+                        ),
+                        PopupMenuItem(
+                          value: 'answered',
+                          child: Text('Marcar como respondida'),
+                        ),
+                        PopupMenuItem(
+                          value: 'gratitude',
+                          child: Text('Convertir en agradecimiento'),
+                        ),
+                        PopupMenuDivider(),
+                        PopupMenuItem(
+                          value: 'delete',
+                          child: Text('Eliminar publicación'),
+                        ),
+                      ],
+                    )
+                  else
+                    const SizedBox(width: 6),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 12, right: 6),
+                child: Text(
+                  widget.post.text,
+                  style: VerbumFonts.serif(
+                    color: p.ink,
+                    fontSize: 19,
+                    height: 1.35,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 14, 11),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+              if (status == 'answered' || status == 'gratitude')
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: status == 'answered' ? p.sageSoft : p.goldSoft,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        CircleAvatar(
-                          radius: 19,
-                          backgroundColor: accent.withValues(alpha: .12),
-                          backgroundImage: photo != null && photo.isNotEmpty
-                              ? NetworkImage(photo)
-                              : null,
-                          child: photo == null || photo.isEmpty
-                              ? Text(
-                                  authorName.characters.first.toUpperCase(),
-                                  style: GoogleFonts.inter(
-                                    color: accent,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                )
-                              : null,
+                        VIcon(
+                          status == 'answered'
+                              ? VerbumIcons.sealCheck
+                              : VerbumIcons.sparkle,
+                          weight: VIconWeight.fill,
+                          size: 13,
+                          color: status == 'answered' ? p.sage : p.onButter,
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      authorName,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.inter(
-                                        color: scheme.onSurface,
-                                        fontSize: 13.5,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '· ${widget.post.timeAgo}',
-                                    style: GoogleFonts.inter(
-                                      color: scheme.onSurfaceVariant,
-                                      fontSize: 10.8,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 3),
-                              Row(
-                                children: [
-                                  Icon(
-                                    _categoryIcon(widget.post.category),
-                                    color: accent,
-                                    size: 12,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    widget.post.category.toUpperCase(),
-                                    style: GoogleFonts.inter(
-                                      color: accent,
-                                      fontSize: 8.8,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: .7,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                        const SizedBox(width: 5),
+                        Text(
+                          status == 'answered'
+                              ? 'Oración respondida'
+                              : 'Agradecimiento',
+                          style: type.caption.copyWith(
+                            color: status == 'answered'
+                                ? p.sageInk
+                                : p.onButter,
+                            fontWeight: FontWeight.w800,
                           ),
-                        ),
-                        if (isMine && widget.onDelete != null)
-                          PopupMenuButton<String>(
-                            tooltip: 'Opciones',
-                            padding: EdgeInsets.zero,
-                            icon: Icon(
-                              Icons.more_horiz_rounded,
-                              color: scheme.onSurfaceVariant,
-                            ),
-                            onSelected: (value) {
-                              if (value == 'delete') {
-                                widget.onDelete?.call();
-                              } else {
-                                _updateStatus(value);
-                              }
-                            },
-                            itemBuilder: (_) => const [
-                              PopupMenuItem(
-                                value: 'active',
-                                child: Text('Seguimos orando'),
-                              ),
-                              PopupMenuItem(
-                                value: 'answered',
-                                child: Text('Marcar como respondida'),
-                              ),
-                              PopupMenuItem(
-                                value: 'gratitude',
-                                child: Text('Convertir en agradecimiento'),
-                              ),
-                              PopupMenuDivider(),
-                              PopupMenuItem(
-                                value: 'delete',
-                                child: Text('Eliminar publicación'),
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 13),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 9,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: accent.withValues(alpha: .1),
-                        borderRadius: BorderRadius.circular(99),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(_statusIcon, size: 12, color: accent),
-                          const SizedBox(width: 5),
-                          Text(
-                            _statusLabel,
-                            style: GoogleFonts.inter(
-                              color: accent,
-                              fontSize: 8,
-                              letterSpacing: .7,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 9),
-                    Text(
-                      widget.post.text,
-                      style: GoogleFonts.inter(
-                        color: scheme.onSurface.withValues(alpha: .92),
-                        fontSize: 14.2,
-                        height: 1.5,
-                      ),
-                    ),
-                    if (widget.post.mediaUrl != null &&
-                        widget.post.mediaUrl!.trim().isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: Image.network(
-                            widget.post.mediaUrl!,
-                            fit: BoxFit.cover,
-                            cacheWidth: 900,
-                            errorBuilder: (_, __, ___) => ColoredBox(
-                              color: scheme.surfaceContainerHighest,
-                              child: Icon(
-                                Icons.image_not_supported_outlined,
-                                color: scheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 13),
-                    Divider(
-                      height: 1,
-                      color: scheme.outline.withValues(alpha: .11),
-                    ),
-                    const SizedBox(height: 7),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _PrayerJoinButton(
-                            joined: _joined,
-                            count: _joinCount,
-                            color: accent,
-                            onTap: _toggleJoin,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        _ModernPostAction(
-                          icon: Icons.mode_comment_outlined,
-                          label: '${widget.post.comments}',
-                          onTap: widget.onComment,
-                        ),
-                        _ModernPostAction(
-                          icon: Icons.ios_share_outlined,
-                          tooltip: 'Compartir',
-                          onTap: widget.onShare,
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
+              if (widget.post.mediaUrl != null &&
+                  widget.post.mediaUrl!.trim().isNotEmpty) ...[
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(VerbumRadius.tile),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Image.network(
+                      widget.post.mediaUrl!,
+                      fit: BoxFit.cover,
+                      cacheWidth: 900,
+                      errorBuilder: (_, _, _) => ColoredBox(
+                        color: p.surfaceMuted,
+                        child: Center(
+                          child: VIcon(
+                            VerbumIcons.imageBroken,
+                            color: p.inkSubtle,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 12),
+              Divider(height: 1, color: p.lineSoft),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  _PrayerJoinButton(
+                    joined: _joined,
+                    count: _joinCount,
+                    answered: status != 'active',
+                    onTap: _toggleJoin,
+                  ),
+                  const Spacer(),
+                  _ModernPostAction(
+                    icon: VerbumIcons.chatCircle,
+                    label: '${widget.post.comments}',
+                    tooltip: 'Comentarios',
+                    onTap: widget.onComment,
+                  ),
+                  _ModernPostAction(
+                    icon: VerbumIcons.shareNetwork,
+                    tooltip: 'Compartir',
+                    onTap: widget.onShare,
+                  ),
+                ],
               ),
             ],
           ),
@@ -1106,56 +1032,65 @@ class _ModernFeedPostTileState extends State<_FeedPostTile> {
   }
 }
 
+/// "Orar · 12": el gesto principal. Al unirse se ilumina en mantequilla.
 class _PrayerJoinButton extends StatelessWidget {
   final bool joined;
   final int count;
-  final Color color;
+
+  /// Respondida o de agradecimiento: se celebra en lugar de pedir.
+  final bool answered;
   final VoidCallback onTap;
 
   const _PrayerJoinButton({
     required this.joined,
     required this.count,
-    required this.color,
+    required this.answered,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: 39,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(
-          color: joined ? color.withValues(alpha: .13) : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              joined
-                  ? Icons.volunteer_activism
-                  : Icons.volunteer_activism_outlined,
-              color: color,
-              size: 18,
-            ),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                joined ? 'Acompañando · $count' : 'Me uno · $count',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.inter(
-                  color: color,
-                  fontSize: 11.2,
-                  fontWeight: FontWeight.w800,
+    final p = context.palette;
+    final label = answered
+        ? 'Gracias a Dios · $count'
+        : joined
+        ? 'Orando · $count'
+        : 'Orar · $count';
+    return Semantics(
+      button: true,
+      selected: joined,
+      label: joined
+          ? 'Dejar de acompañar, $count'
+          : 'Acompañar en oración, $count',
+      excludeSemantics: true,
+      child: Material(
+        color: joined ? p.butter : p.surfaceMuted,
+        borderRadius: BorderRadius.circular(99),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(99),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                VIcon(
+                  VerbumIcons.handsPraying,
+                  size: 16,
+                  weight: joined ? VIconWeight.fill : VIconWeight.regular,
+                  color: joined ? p.onButter : p.rubric,
                 ),
-              ),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: context.type.bodyStrong.copyWith(
+                    fontSize: 13,
+                    color: joined ? p.onButter : p.rubric,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -1163,7 +1098,7 @@ class _PrayerJoinButton extends StatelessWidget {
 }
 
 class _ModernPostAction extends StatelessWidget {
-  final IconData icon;
+  final VerbumIcons icon;
   final String? label;
   final String? tooltip;
   final VoidCallback onTap;
@@ -1177,26 +1112,25 @@ class _ModernPostAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.onSurfaceVariant;
+    final color = context.palette.inkMuted;
     return Tooltip(
       message: tooltip ?? '',
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(14),
         child: SizedBox(
-          height: 39,
+          height: 42,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 9),
             child: Row(
               children: [
-                Icon(icon, color: color, size: 18),
+                VIcon(icon, color: color, size: 19),
                 if (label != null) ...[
                   const SizedBox(width: 4),
                   Text(
                     label!,
-                    style: GoogleFonts.inter(
+                    style: context.type.caption.copyWith(
                       color: color,
-                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -1210,384 +1144,7 @@ class _ModernPostAction extends StatelessWidget {
   }
 }
 
-// TODO: retirar tras verificar la migración visual en todos los dispositivos.
-// ignore: unused_element
-class _LegacyFeedPostTileState extends State<_FeedPostTile> {
-  bool _optimisticLiked = false;
-  int _optimisticLikeCount = 0;
-  bool _isUpdating = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _optimisticLiked = widget.post.isLiked;
-    _optimisticLikeCount = widget.post.likes;
-  }
-
-  @override
-  void didUpdateWidget(_FeedPostTile oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Solo actualizar si el post cambió y no estamos en medio de una actualización
-    if (!_isUpdating && oldWidget.postId != widget.postId) {
-      _optimisticLiked = widget.post.isLiked;
-      _optimisticLikeCount = widget.post.likes;
-    }
-  }
-
-  Future<void> _handleLike() async {
-    if (_isUpdating || widget.currentUid.isEmpty) return;
-
-    final wasLiked = _optimisticLiked;
-    final oldCount = _optimisticLikeCount;
-
-    setState(() {
-      _isUpdating = true;
-      _optimisticLiked = !_optimisticLiked;
-      // Si estaba liked, ahora no lo está, entonces restamos 1
-      // Si no estaba liked, ahora lo está, entonces sumamos 1
-      _optimisticLikeCount = _optimisticLiked ? oldCount + 1 : oldCount - 1;
-    });
-
-    try {
-      await widget.service.togglePostLike(widget.postId, widget.currentUid);
-    } catch (e) {
-      // Revertir en caso de error
-      if (mounted) {
-        setState(() {
-          _optimisticLiked = wasLiked;
-          _optimisticLikeCount = oldCount;
-        });
-      }
-      debugPrint('Error toggling like: $e');
-    } finally {
-      if (mounted) {
-        setState(() => _isUpdating = false);
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 14,
-            offset: const Offset(0, 8),
-          ),
-        ],
-        border: Border.all(color: Colors.black12.withValues(alpha: 0.05)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                    stream: widget.post.authorUid.isNotEmpty
-                        ? FirebaseFirestore.instance
-                              .collection('users')
-                              .doc(widget.post.authorUid)
-                              .snapshots()
-                        : null,
-                    builder: (context, profileSnapshot) {
-                      final profileData = profileSnapshot.data?.data();
-                      final displayName =
-                          ((profileData?['displayName'] as String?) ??
-                                  widget.post.userName)
-                              .trim();
-                      final username =
-                          ((profileData?['username'] as String?) ?? '').trim();
-                      final authorPhoto =
-                          (profileData?['photoURL'] as String?) ??
-                          widget.post.authorPhoto;
-                      final isMine =
-                          widget.currentUid.isNotEmpty &&
-                          widget.post.authorUid == widget.currentUid;
-
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            radius: 20,
-                            backgroundColor: Colors.deepPurple.withValues(
-                              alpha: 0.12,
-                            ),
-                            backgroundImage: authorPhoto != null
-                                ? NetworkImage(authorPhoto)
-                                : null,
-                            child: authorPhoto == null
-                                ? Text(
-                                    displayName.isNotEmpty
-                                        ? displayName[0].toUpperCase()
-                                        : '?',
-                                    style: GoogleFonts.inter(
-                                      color: Colors.deepPurple,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  )
-                                : null,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        displayName.isNotEmpty
-                                            ? displayName
-                                            : 'Anónimo',
-                                        style: GoogleFonts.inter(
-                                          fontSize: 14.5,
-                                          fontWeight: FontWeight.w800,
-                                          color: const Color(0xFF1F1F1F),
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    if (isMine) ...[
-                                      const SizedBox(width: 6),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary
-                                              .withValues(alpha: 0.12),
-                                          borderRadius: BorderRadius.circular(
-                                            999,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          'Tú',
-                                          style: GoogleFonts.inter(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w700,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      '· ${widget.post.timeAgo}',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '@${username.isNotEmpty ? username : 'sin-username'}',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 12,
-                                    color: Colors.grey[600],
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  widget.post.text,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 14.5,
-                                    height: 1.45,
-                                    color: const Color(0xFF1F1F1F),
-                                  ),
-                                ),
-                                if (widget.post.mediaUrl != null) ...[
-                                  const SizedBox(height: 10),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(14),
-                                    child: AspectRatio(
-                                      aspectRatio: 16 / 9,
-                                      child: Image.network(
-                                        widget.post.mediaUrl!,
-                                        fit: BoxFit.cover,
-                                        loadingBuilder: (context, child, loadingProgress) {
-                                          if (loadingProgress == null) {
-                                            return child;
-                                          }
-                                          return Container(
-                                            color: Colors.grey.shade200,
-                                            child: Center(
-                                              child: CircularProgressIndicator(
-                                                value:
-                                                    loadingProgress
-                                                            .expectedTotalBytes !=
-                                                        null
-                                                    ? loadingProgress
-                                                              .cumulativeBytesLoaded /
-                                                          loadingProgress
-                                                              .expectedTotalBytes!
-                                                    : null,
-                                                strokeWidth: 2,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        errorBuilder: (_, __, ___) => Container(
-                                          color: Colors.grey.shade200,
-                                          child: const Center(
-                                            child: Icon(
-                                              Icons
-                                                  .image_not_supported_outlined,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ),
-                                        cacheWidth: 800,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                                const SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    StreamBuilder<int>(
-                                      stream: widget.service
-                                          .getPostLikeCountStream(
-                                            widget.postId,
-                                          ),
-                                      builder: (context, countSnapshot) {
-                                        if (!_isUpdating &&
-                                            countSnapshot.hasData) {
-                                          final realCount = countSnapshot.data!;
-                                          if (_optimisticLikeCount !=
-                                              realCount) {
-                                            WidgetsBinding.instance
-                                                .addPostFrameCallback((_) {
-                                                  if (mounted && !_isUpdating) {
-                                                    setState(() {
-                                                      _optimisticLikeCount =
-                                                          realCount;
-                                                    });
-                                                  }
-                                                });
-                                          }
-                                        }
-
-                                        final displayCount = _isUpdating
-                                            ? _optimisticLikeCount
-                                            : (countSnapshot.data ??
-                                                  _optimisticLikeCount);
-
-                                        return StreamBuilder<bool>(
-                                          stream: widget.currentUid.isNotEmpty
-                                              ? widget.service
-                                                    .isPostLikedStream(
-                                                      widget.postId,
-                                                      widget.currentUid,
-                                                    )
-                                              : Stream.value(false),
-                                          builder: (context, likedSnapshot) {
-                                            if (!_isUpdating &&
-                                                likedSnapshot.hasData) {
-                                              final streamLiked =
-                                                  likedSnapshot.data!;
-                                              if (_optimisticLiked !=
-                                                  streamLiked) {
-                                                WidgetsBinding.instance
-                                                    .addPostFrameCallback((_) {
-                                                      if (mounted &&
-                                                          !_isUpdating) {
-                                                        setState(() {
-                                                          _optimisticLiked =
-                                                              streamLiked;
-                                                        });
-                                                      }
-                                                    });
-                                              }
-                                            }
-
-                                            final isLiked = _isUpdating
-                                                ? _optimisticLiked
-                                                : (likedSnapshot.data ??
-                                                      _optimisticLiked);
-
-                                            return _ActionButton(
-                                              icon: isLiked
-                                                  ? Icons.favorite
-                                                  : Icons.favorite_border,
-                                              label: '$displayCount',
-                                              color: isLiked
-                                                  ? Colors.redAccent
-                                                  : Colors.grey[700]!,
-                                              onTap: _handleLike,
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                    const SizedBox(width: 8),
-                                    _ActionButton(
-                                      icon: Icons.mode_comment_outlined,
-                                      label: '${widget.post.comments}',
-                                      color: Colors.grey[700]!,
-                                      onTap: widget.onComment,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    _ActionButton(
-                                      icon: Icons.share_outlined,
-                                      label: 'Compartir',
-                                      color: Colors.grey[700]!,
-                                      onTap: widget.onShare,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (isMine && widget.onDelete != null)
-                            PopupMenuButton<String>(
-                              tooltip: 'Opciones',
-                              onSelected: (value) {
-                                if (value == 'delete') {
-                                  widget.onDelete?.call();
-                                }
-                              },
-                              itemBuilder: (context) => const [
-                                PopupMenuItem<String>(
-                                  value: 'delete',
-                                  child: Text('Eliminar publicación'),
-                                ),
-                              ],
-                              icon: Icon(
-                                Icons.more_vert,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
+/// Hoja para pedir oración a la comunidad.
 class _CreatePostModal extends StatefulWidget {
   final Future<bool> Function(String text, String category) onPost;
 
@@ -1627,348 +1184,223 @@ class _CreatePostModalState extends State<_CreatePostModal> {
     super.dispose();
   }
 
+  static const _categories = ['Salud', 'Familia', 'Fortaleza', 'Gratitud'];
+  static const _minChars = 10;
+
+  Future<void> _submit() async {
+    setState(() => _isSubmitting = true);
+    final didPublish = await widget.onPost(
+      _textController.text.trim(),
+      _selectedCategory,
+    );
+    if (!mounted) return;
+    if (didPublish) {
+      Navigator.of(context).pop(true);
+    } else {
+      setState(() => _isSubmitting = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final mediaQuery = MediaQuery.of(context);
-    final bottomInset = mediaQuery.viewInsets.bottom;
-    final bottomSafeArea = mediaQuery.viewPadding.bottom;
-    final modalBottomPadding = bottomInset > 0
-        ? bottomInset + 8
-        : bottomSafeArea + 8;
-    final text = _textController.text.trim();
-    final canPost = text.length >= 10 && !_isSubmitting;
+    final p = context.palette;
+    final type = context.type;
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    final ready = _textController.text.trim().length >= _minChars;
+    final canPost = ready && !_isSubmitting;
 
     return AnimatedPadding(
       duration: const Duration(milliseconds: 180),
       curve: Curves.easeOut,
-      padding: EdgeInsets.only(bottom: modalBottomPadding),
-      child: SingleChildScrollView(
-        child: Container(
-          decoration: BoxDecoration(
-            color: isDark ? colorScheme.surface : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 20,
-                offset: const Offset(0, -5),
-              ),
-            ],
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: Container(
+        decoration: BoxDecoration(
+          color: p.background,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(VerbumRadius.sheet),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Handle bar
-              Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 8),
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: colorScheme.outline.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(2),
+        ),
+        child: SafeArea(
+          top: false,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(
+              VerbumSpace.gutter,
+              10,
+              VerbumSpace.gutter,
+              16,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: p.line,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
                   ),
                 ),
-              ),
-              // Header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
-                child: Row(
+                const SizedBox(height: 18),
+                Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      width: 48,
+                      height: 48,
+                      alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        color: p.butter,
+                        borderRadius: BorderRadius.circular(
+                          VerbumRadius.control,
+                        ),
                       ),
-                      child: Icon(
-                        Icons.edit_note_rounded,
-                        color: colorScheme.primary,
-                        size: 24,
+                      child: VIcon(
+                        VerbumIcons.handsPraying,
+                        weight: VIconWeight.fill,
+                        color: p.onButter,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Nueva oración',
-                            style: GoogleFonts.inter(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onSurface,
+                          Semantics(
+                            header: true,
+                            child: Text(
+                              'Pide oración',
+                              style: type.title.copyWith(fontSize: 22),
                             ),
                           ),
-                          const SizedBox(height: 2),
                           Text(
-                            'Comparte tu petición con la comunidad',
-                            style: GoogleFonts.inter(
-                              fontSize: 13,
-                              color: colorScheme.onSurface.withValues(
-                                alpha: 0.6,
-                              ),
-                            ),
+                            'La comunidad orará contigo.',
+                            style: type.body.copyWith(color: p.inkMuted),
                           ),
                         ],
                       ),
                     ),
+                    IconButton(
+                      tooltip: 'Cerrar',
+                      onPressed: () => Navigator.pop(context, false),
+                      icon: VIcon(VerbumIcons.close, color: p.inkMuted),
+                    ),
                   ],
                 ),
-              ),
-              // Content
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 20),
+                Text('¿Por qué oramos?', style: type.bodyStrong),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
-                    // Text Field
-                    Container(
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? colorScheme.surfaceContainerHighest
-                            : Colors.grey[50],
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: _focusNode.hasFocus
-                              ? colorScheme.primary
-                              : colorScheme.outline.withValues(alpha: 0.2),
-                          width: _focusNode.hasFocus ? 2 : 1,
-                        ),
+                    for (final category in _categories)
+                      _CategoryChip(
+                        label: category,
+                        icon: categoryIconFor(category)!,
+                        selected: category == _selectedCategory,
+                        onTap: () =>
+                            setState(() => _selectedCategory = category),
                       ),
-                      child: TextField(
+                  ],
+                ),
+                const SizedBox(height: 18),
+                VSurfaceCard(
+                  radius: VerbumRadius.card,
+                  padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextField(
                         controller: _textController,
                         focusNode: _focusNode,
-                        decoration: InputDecoration(
-                          hintText: 'Escribe tu petición aquí...',
-                          hintStyle: GoogleFonts.inter(
-                            color: colorScheme.onSurface.withValues(alpha: 0.4),
-                            fontSize: 15,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.all(16),
-                        ),
-                        style: GoogleFonts.inter(
-                          fontSize: 15,
-                          height: 1.5,
-                          color: colorScheme.onSurface,
-                        ),
-                        maxLines: 5,
-                        minLines: 3,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    // Character counter
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          '$_charCount / 10 caracteres mínimos',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: canPost
-                                ? Colors.green[600]
-                                : colorScheme.onSurface.withValues(alpha: 0.5),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    // Category selector
-                    Text(
-                      'Categoría',
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.onSurface.withValues(alpha: 0.8),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? colorScheme.surfaceContainerHighest
-                            : Colors.grey[50],
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: colorScheme.outline.withValues(alpha: 0.2),
-                        ),
-                      ),
-                      child: DropdownButtonFormField<String>(
-                        initialValue: _selectedCategory,
-                        isExpanded: true,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                        ),
-                        style: GoogleFonts.inter(
-                          fontSize: 15,
-                          color: colorScheme.onSurface,
+                        autofocus: true,
+                        minLines: 4,
+                        maxLines: 7,
+                        maxLength: 500,
+                        textCapitalization: TextCapitalization.sentences,
+                        style: VerbumFonts.serif(
+                          color: p.ink,
+                          fontSize: 19,
+                          height: 1.35,
                           fontWeight: FontWeight.w500,
                         ),
-                        icon: Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          color: colorScheme.primary,
+                        decoration: InputDecoration(
+                          hintText:
+                              'Por la salud de mi mamá, por un trabajo, '
+                              'por paz en mi familia…',
+                          hintStyle: VerbumFonts.serif(
+                            color: p.inkSubtle,
+                            fontSize: 18,
+                          ),
+                          filled: false,
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                          ),
+                          counterText: '',
                         ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'Salud',
-                            child: Row(
-                              children: [
-                                Text('🏥'),
-                                SizedBox(width: 12),
-                                Text('Salud'),
-                              ],
+                      ),
+                      Divider(height: 1, color: p.lineSoft),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          VIcon(
+                            ready ? VerbumIcons.checkCircle : VerbumIcons.info,
+                            size: 15,
+                            weight: ready
+                                ? VIconWeight.fill
+                                : VIconWeight.regular,
+                            color: ready ? p.sage : p.inkSubtle,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              ready
+                                  ? 'Lista para compartir'
+                                  : 'Escribe al menos $_minChars caracteres',
+                              style: type.caption.copyWith(
+                                color: ready ? p.sageInk : null,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
-                          DropdownMenuItem(
-                            value: 'Familia',
-                            child: Row(
-                              children: [
-                                Text('👨‍👩‍👧‍👦'),
-                                SizedBox(width: 12),
-                                Text('Familia'),
-                              ],
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'Fortaleza',
-                            child: Row(
-                              children: [
-                                Text('🚨'),
-                                SizedBox(width: 12),
-                                Text('Fortaleza'),
-                              ],
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'Gratitud',
-                            child: Row(
-                              children: [
-                                Text('🙏'),
-                                SizedBox(width: 12),
-                                Text('Gratitud'),
-                              ],
-                            ),
-                          ),
+                          Text('$_charCount/500', style: type.caption),
                         ],
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              _selectedCategory = value;
-                            });
-                          }
-                        },
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              // Action buttons
-              Container(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                child: Row(
+                const SizedBox(height: 10),
+                Row(
                   children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          side: BorderSide(
-                            color: colorScheme.outline.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Text(
-                          'Cancelar',
-                          style: GoogleFonts.inter(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
+                    VIcon(
+                      VerbumIcons.shieldCheck,
+                      size: 15,
+                      color: p.inkSubtle,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 6),
                     Expanded(
-                      flex: 2,
-                      child: ElevatedButton(
-                        onPressed: canPost
-                            ? () async {
-                                setState(() => _isSubmitting = true);
-                                final didPublish = await widget.onPost(
-                                  text,
-                                  _selectedCategory,
-                                );
-                                if (!context.mounted) return;
-                                if (didPublish) {
-                                  Navigator.of(context).pop(true);
-                                } else {
-                                  setState(() => _isSubmitting = false);
-                                }
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                          disabledBackgroundColor:
-                              colorScheme.surfaceContainerHighest,
-                          disabledForegroundColor: colorScheme.onSurface
-                              .withValues(alpha: 0.4),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          elevation: canPost ? 2 : 0,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (_isSubmitting)
-                              SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: colorScheme.onPrimary,
-                                ),
-                              )
-                            else ...[
-                              Icon(
-                                Icons.send_rounded,
-                                size: 20,
-                                color: canPost
-                                    ? colorScheme.onPrimary
-                                    : colorScheme.onSurface.withValues(
-                                        alpha: 0.4,
-                                      ),
-                              ),
-                              const SizedBox(width: 8),
-                            ],
-                            Text(
-                              _isSubmitting ? 'Publicando...' : 'Publicar',
-                              style: GoogleFonts.inter(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
+                      child: Text(
+                        'Se publica con tu nombre. Evita datos privados de otras personas.',
+                        style: type.caption,
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 18),
+                VButton(
+                  label: 'Pedir oración',
+                  icon: VerbumIcons.paperPlaneRight,
+                  expanded: true,
+                  loading: _isSubmitting,
+                  onPressed: canPost ? _submit : null,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1976,40 +1408,49 @@ class _CreatePostModalState extends State<_CreatePostModal> {
   }
 }
 
-class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _ActionButton({
-    required this.icon,
+class _CategoryChip extends StatelessWidget {
+  const _CategoryChip({
     required this.label,
-    required this.color,
+    required this.icon,
+    required this.selected,
     required this.onTap,
   });
 
+  final String label;
+  final VerbumIcons icon;
+  final bool selected;
+  final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                color: color,
-              ),
+    final p = context.palette;
+    final fg = selected ? p.onEmphasis : p.rubric;
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: Material(
+        color: selected ? p.emphasis : p.surfaceMuted,
+        borderRadius: BorderRadius.circular(99),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(99),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                VIcon(icon, size: 15, color: fg),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: context.type.bodyStrong.copyWith(
+                    color: fg,
+                    fontSize: 13.5,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import '../faith/content_provenance.dart';
-import '../theme/app_theme.dart';
-import 'main_card.dart';
 import 'prayer_reading_experience.dart';
+import 'package:verbum/design_system/design_system.dart';
 
-/// Tarjeta reutilizable para mostrar oraciones con diseño elegante
+/// Tarjeta reutilizable para mostrar oraciones sobre papel.
 class PrayerCard extends StatelessWidget {
   final String title;
   final String text;
   final String? reference;
-  final IconData? icon;
+  final VerbumIcons? icon;
   final VoidCallback? onShare;
   final VoidCallback? onFavorite;
   final bool isFavorite;
@@ -33,11 +32,11 @@ class PrayerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final accent = accentColor ?? colorScheme.primary;
+    final p = context.palette;
+    final type = context.type;
+    final accent = accentColor ?? p.rubric;
 
-    return MainCard(
+    return VSurfaceCard(
       onTap: openReaderOnTap
           ? () => Navigator.of(context).push(
               MaterialPageRoute<void>(
@@ -46,111 +45,74 @@ class PrayerCard extends StatelessWidget {
                   text: text,
                   reference: reference,
                   provenance: provenance,
-                  accent: accent,
                 ),
               ),
             )
           : null,
-      padding: const EdgeInsets.all(AppSpacing.xl),
+      padding: const EdgeInsets.all(VerbumSpace.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header con icono y acciones
           Row(
             children: [
               if (icon != null) ...[
                 Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
+                  padding: const EdgeInsets.all(VerbumSpace.sm),
                   decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    color: p.accentSoft,
+                    borderRadius: BorderRadius.circular(VerbumRadius.control),
                   ),
-                  child: Icon(icon, color: accent, size: 28),
-                ),
-                const SizedBox(width: AppSpacing.md),
-              ],
-              Expanded(
-                child: Text(
-                  title,
-                  style: theme.textTheme.titleLarge?.copyWith(
+                  child: VIcon(
+                    icon!,
+                    weight: VIconWeight.duotone,
                     color: accent,
-                    fontWeight: FontWeight.bold,
+                    size: 26,
                   ),
                 ),
-              ),
+                const SizedBox(width: VerbumSpace.sm),
+              ],
+              Expanded(child: Text(title, style: type.heading)),
               if (onShare != null)
-                IconButton(
-                  icon: const Icon(Icons.share_outlined),
+                VIconButton(
+                  icon: VerbumIcons.shareNetwork,
+                  semanticLabel: 'Compartir',
+                  variant: VIconButtonVariant.ghost,
+                  color: p.rubric,
                   onPressed: onShare,
-                  color: colorScheme.primary,
                 ),
               if (onFavorite != null)
-                IconButton(
-                  icon: Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: isFavorite ? Colors.red : colorScheme.primary,
-                  ),
+                VIconButton(
+                  icon: VerbumIcons.heart,
+                  weight: isFavorite ? VIconWeight.fill : VIconWeight.regular,
+                  semanticLabel: isFavorite
+                      ? 'Quitar de favoritos'
+                      : 'Añadir a favoritos',
+                  variant: VIconButtonVariant.ghost,
+                  color: p.rubric,
                   onPressed: onFavorite,
                 ),
             ],
           ),
-          const SizedBox(height: AppSpacing.lg),
-          // Texto de la oración
+          const SizedBox(height: VerbumSpace.md),
           Text(
             text,
             maxLines: openReaderOnTap ? 4 : null,
             overflow: openReaderOnTap ? TextOverflow.ellipsis : null,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontSize: 17,
-              height: 1.7,
-            ),
-            textAlign: TextAlign.justify,
+            style: type.scripture,
           ),
           if (openReaderOnTap) ...[
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: VerbumSpace.sm),
             Row(
               children: [
-                Text(
-                  'ABRIR MODO ORACIÓN',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: accent,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1,
-                  ),
-                ),
+                Text('Abrir modo oración', style: type.rubric),
                 const Spacer(),
-                Icon(Icons.arrow_outward_rounded, size: 18, color: accent),
+                VIcon(VerbumIcons.arrowUpRight, size: 18, color: p.rubric),
               ],
             ),
           ],
-          // Referencia si existe
           if (reference != null) ...[
-            const SizedBox(height: AppSpacing.md),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.sm,
-              ),
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppRadius.sm),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.format_quote, size: 16, color: accent),
-                  const SizedBox(width: AppSpacing.xs),
-                  Text(
-                    reference!,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: accent,
-                      fontWeight: FontWeight.w600,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            const SizedBox(height: VerbumSpace.sm),
+            VMetaChip(label: reference!, icon: VerbumIcons.quotes),
           ],
         ],
       ),

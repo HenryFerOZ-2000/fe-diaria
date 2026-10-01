@@ -22,6 +22,24 @@ Aplicación móvil Flutter con versículos bíblicos, oraciones, devocionales, c
 - 🔔 **Notificaciones**: Recordatorios diarios personalizables
 - 🎨 **Diseño Moderno**: Interfaz elegante y profesional
 
+## 📸 Capturas
+
+Diseño **"Camino claro"**: lavanda, periwinkle, índigo y mantequilla, con fotografía real y modo oscuro.
+
+| Hoy | Biblia | Oraciones | Comunidad | Acompañamiento |
+|:---:|:---:|:---:|:---:|:---:|
+| <img src="docs/screenshots/hoy.png" width="180"> | <img src="docs/screenshots/biblia.png" width="180"> | <img src="docs/screenshots/oraciones.png" width="180"> | <img src="docs/screenshots/comunidad.png" width="180"> | <img src="docs/screenshots/acompanamiento.png" width="180"> |
+
+| Capítulos | Lector | Camino espiritual | Novena | Día de novena |
+|:---:|:---:|:---:|:---:|:---:|
+| <img src="docs/screenshots/capitulos.png" width="180"> | <img src="docs/screenshots/lector.png" width="180"> | <img src="docs/screenshots/camino.png" width="180"> | <img src="docs/screenshots/novena.png" width="180"> | <img src="docs/screenshots/novena-dia.png" width="180"> |
+
+**Modo oscuro**
+
+| Hoy | Oraciones | Biblia |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/hoy-oscuro.png" width="180"> | <img src="docs/screenshots/oraciones-oscuro.png" width="180"> | <img src="docs/screenshots/biblia-oscuro.png" width="180"> |
+
 ## 🔧 Tecnologías usadas
 
 - **Flutter** - Framework multiplataforma

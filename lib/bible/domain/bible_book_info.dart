@@ -419,3 +419,21 @@ BibleBookInfo? bibleBookById(String id) {
   }
   return null;
 }
+
+/// Una línea que presenta cada sección de la Biblia.
+String sectionBlurb(String section) => switch (section) {
+  'Pentateuco' => 'Los orígenes: creación, promesa, éxodo y ley.',
+  'Libros históricos' =>
+    'La historia de Israel en su tierra y en el destierro.',
+  'Poéticos y sapienciales' => 'Oración, poesía y sabiduría para la vida.',
+  'Profetas mayores' =>
+    'Voces que llaman a volver a Dios y anuncian esperanza.',
+  'Profetas menores' => 'Doce mensajes breves de justicia y misericordia.',
+  'Evangelios' => 'La vida, muerte y resurrección de Jesús.',
+  'Historia de la Iglesia' =>
+    'Los primeros pasos de la Iglesia con el Espíritu.',
+  'Cartas de Pablo' => 'Cartas a comunidades que aprendían a vivir la fe.',
+  'Cartas generales' => 'Consejos para perseverar en el amor y la fe.',
+  'Profecía' => 'La victoria final de Dios sobre el mal.',
+  _ => 'Parte de la Sagrada Escritura.',
+};

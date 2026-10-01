@@ -76,7 +76,6 @@ class _TraditionalPrayerScreenState extends State<TraditionalPrayerScreen> {
     category: 'Oración tradicional',
     title: _prayer?.title,
     text: _text,
-    accent: const Color(0xFF8D7BC2),
     onBack: () => Navigator.pop(context),
     onRetry: _load,
     onShare: _share,

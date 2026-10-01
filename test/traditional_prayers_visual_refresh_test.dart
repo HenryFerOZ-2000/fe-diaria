@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:verbum/design_system/design_system.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -6,7 +7,6 @@ import 'package:hive/hive.dart';
 import 'package:verbum/screens/traditional_prayer_detail_screen.dart';
 import 'package:verbum/screens/traditional_prayers_categories_screen.dart';
 import 'package:verbum/screens/traditional_prayers_list_screen.dart';
-import 'package:verbum/theme/app_theme.dart';
 import 'package:verbum/features/sharing/domain/share_content.dart';
 import 'package:verbum/features/sharing/presentation/share_composer_screen.dart';
 
@@ -48,7 +48,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        theme: lightTheme,
+        theme: buildVerbumTheme(brightness: Brightness.light),
         builder: (context, child) => MediaQuery(
           data: MediaQuery.of(
             context,
@@ -81,7 +81,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        theme: lightTheme,
+        theme: buildVerbumTheme(brightness: Brightness.light),
         builder: (context, child) => MediaQuery(
           data: MediaQuery.of(
             context,
@@ -108,7 +108,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        theme: lightTheme,
+        theme: buildVerbumTheme(brightness: Brightness.light),
         home: const TraditionalPrayerDetailScreen(
           religion: 'cristiana',
           category: 'otras',

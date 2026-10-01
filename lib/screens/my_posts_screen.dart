@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class MyPostsScreen extends StatefulWidget {
   const MyPostsScreen({super.key});
@@ -76,7 +76,7 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis oraciones')),
+      appBar: VAppBar(title: const Text('Mis oraciones')),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: _firestore
             .collection('live_posts')
@@ -88,7 +88,7 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
             return Center(
               child: Text(
                 'Error: ${snapshot.error}',
-                style: GoogleFonts.inter(),
+                style: VerbumFonts.sans(),
               ),
             );
           }
@@ -118,7 +118,7 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
                   ),
                   subtitle: Text('Estado: $status'),
                   trailing: IconButton(
-                    icon: const Icon(Icons.delete_outline),
+                    icon: const VIcon(VerbumIcons.trash),
                     color: colorScheme.error,
                     onPressed: () => _deletePost(id),
                   ),

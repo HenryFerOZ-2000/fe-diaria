@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../features/sharing/domain/share_content.dart';
 import '../models/spiritual_path.dart';
@@ -7,6 +6,7 @@ import '../services/read_aloud_service.dart';
 import '../services/share_service.dart';
 import '../services/spiritual_path_service.dart';
 import 'reading_chat_screen.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class SpiritualPathDayScreen extends StatefulWidget {
   final SpiritualPath path;
@@ -108,23 +108,18 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
   @override
   Widget build(BuildContext context) {
     final path = widget.path;
+    final p = context.palette;
     return Scaffold(
-      backgroundColor: const Color(0xFF241C38),
+      backgroundColor: p.background,
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
               child: Row(
                 children: [
-                  IconButton(
-                    tooltip: 'Volver',
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(
-                      Icons.arrow_back_rounded,
-                      color: Colors.white,
-                    ),
-                  ),
+                  const VBackButton(),
                   Expanded(
                     child: Column(
                       children: [
@@ -132,36 +127,27 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                           path.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                          ),
+                          style: context.type.bodyStrong,
                         ),
                         Text(
                           'DÍA ${widget.dayNumber} DE ${path.days.length}',
-                          style: GoogleFonts.inter(
-                            color: Colors.white60,
-                            fontSize: 8,
-                            letterSpacing: 1.2,
-                            fontWeight: FontWeight.w700,
-                          ),
+                          style: context.type.rubric.copyWith(fontSize: 9),
                         ),
                       ],
                     ),
                   ),
-                  IconButton(
-                    tooltip: _speaking ? 'Detener audio' : 'Escuchar el día',
+                  VIconButton(
+                    icon: _speaking ? VerbumIcons.stop : VerbumIcons.headphones,
+                    semanticLabel: _speaking
+                        ? 'Detener audio'
+                        : 'Escuchar el día',
+                    variant: VIconButtonVariant.ghost,
                     onPressed: _toggleNarration,
-                    icon: Icon(
-                      _speaking
-                          ? Icons.stop_circle_outlined
-                          : Icons.headphones_rounded,
-                      color: Colors.white,
-                    ),
                   ),
-                  IconButton(
-                    tooltip: 'Conversar sobre este día',
+                  VIconButton(
+                    icon: VerbumIcons.sparkle,
+                    semanticLabel: 'Conversar sobre este día',
+                    variant: VIconButtonVariant.ghost,
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => ReadingChatScreen(
@@ -171,10 +157,6 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
                         ),
                       ),
                     ),
-                    icon: const Icon(
-                      Icons.auto_awesome_outlined,
-                      color: Colors.white,
-                    ),
                   ),
                 ],
               ),
@@ -182,112 +164,86 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
-                children: List.generate(
-                  4,
-                  (index) => Expanded(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 250),
-                      height: 3,
-                      margin: EdgeInsets.only(right: index == 3 ? 0 : 6),
-                      decoration: BoxDecoration(
-                        color: index <= _page
-                            ? const Color(0xFFE6C77D)
-                            : Colors.white.withValues(alpha: .15),
-                        borderRadius: BorderRadius.circular(99),
+                children: [
+                  for (var i = 0; i < 4; i++) ...[
+                    if (i > 0) const SizedBox(width: 6),
+                    Expanded(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        height: 3,
+                        decoration: BoxDecoration(
+                          color: i <= _page ? p.gold : p.lineSoft,
+                          borderRadius: BorderRadius.circular(99),
+                        ),
                       ),
                     ),
-                  ),
-                ),
+                  ],
+                ],
               ),
             ),
-            const SizedBox(height: 10),
             Expanded(
               child: PageView(
                 controller: _pageController,
                 onPageChanged: (page) => setState(() => _page = page),
                 children: [
                   _ReadingPage(
-                    eyebrow: 'RECIBE LA PALABRA',
+                    eyebrow: 'Recibe la Palabra',
                     title: _day.title,
                     subtitle: _day.subtitle,
                     body: _day.scripture,
                     footer: _day.scriptureReference,
-                    icon: Icons.menu_book_rounded,
-                    accent: path.accent,
+                    icon: VerbumIcons.bookOpenText,
                     serifBody: true,
                   ),
                   _ReadingPage(
-                    eyebrow: 'MEDITA',
+                    eyebrow: 'Medita',
                     title: 'Deja que la Palabra repose',
                     subtitle: 'Lee sin prisa. No tienes que resolver nada.',
                     body: _day.reflection,
-                    icon: Icons.auto_awesome_outlined,
-                    accent: path.accent,
+                    icon: VerbumIcons.flowerLotus,
                   ),
                   _ReadingPage(
-                    eyebrow: 'HABLA CON DIOS',
+                    eyebrow: 'Habla con Dios',
                     title: 'Tu oración de hoy',
                     subtitle: 'Puedes leerla o hacerla tuya en silencio.',
                     body: _day.prayer,
-                    icon: Icons.favorite_outline_rounded,
-                    accent: path.accent,
+                    icon: VerbumIcons.handsPraying,
                     serifBody: true,
                   ),
                   _ReadingPage(
-                    eyebrow: 'LLÉVALO A TU VIDA',
+                    eyebrow: 'Llévalo a tu vida',
                     title: 'Un paso pequeño y concreto',
                     subtitle: 'La fe también crece en lo cotidiano.',
                     body: _day.practice,
-                    icon: Icons.directions_walk_rounded,
-                    accent: path.accent,
+                    icon: VerbumIcons.personSimpleWalk,
                   ),
                 ],
               ),
             ),
-            Container(
-              padding: EdgeInsets.fromLTRB(
-                18,
-                12,
-                18,
-                MediaQuery.paddingOf(context).bottom + 12,
-              ),
+            VBottomBar(
               child: Row(
                 children: [
                   if (_page > 0) ...[
-                    IconButton.filledTonal(
+                    VIconButton(
+                      icon: VerbumIcons.arrowLeft,
+                      semanticLabel: 'Página anterior',
+                      size: 50,
                       onPressed: () => _pageController.previousPage(
                         duration: const Duration(milliseconds: 320),
                         curve: Curves.easeOutCubic,
                       ),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.white.withValues(alpha: .12),
-                        foregroundColor: Colors.white,
-                      ),
-                      icon: const Icon(Icons.arrow_back_rounded),
                     ),
                     const SizedBox(width: 10),
                   ],
                   Expanded(
-                    child: FilledButton.icon(
-                      onPressed: _completing ? null : _next,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: const Color(0xFFF7F1E7),
-                        foregroundColor: const Color(0xFF302443),
-                      ),
-                      icon: _completing
-                          ? const SizedBox(
-                              width: 17,
-                              height: 17,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Icon(
-                              _page == 3
-                                  ? Icons.check_rounded
-                                  : Icons.arrow_forward_rounded,
-                            ),
-                      label: Text(
-                        _page == 3 ? 'Completar este día' : 'Continuar',
-                      ),
+                    child: VButton(
+                      label: _page == 3 ? 'Completar este día' : 'Continuar',
+                      icon: _page == 3
+                          ? VerbumIcons.check
+                          : VerbumIcons.arrowRight,
+                      expanded: true,
+                      loading: _completing,
+                      onPressed: _next,
                     ),
                   ),
                 ],
@@ -306,8 +262,7 @@ class _ReadingPage extends StatelessWidget {
   final String subtitle;
   final String body;
   final String? footer;
-  final IconData icon;
-  final Color accent;
+  final VerbumIcons icon;
   final bool serifBody;
 
   const _ReadingPage({
@@ -317,102 +272,39 @@ class _ReadingPage extends StatelessWidget {
     required this.body,
     this.footer,
     required this.icon,
-    required this.accent,
     this.serifBody = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    final p = context.palette;
+    final type = context.type;
+    final bodyStyle = serifBody
+        ? type.scripture.copyWith(fontSize: 19, height: 1.62)
+        : type.body.copyWith(fontSize: 16, height: 1.65, color: p.ink);
+    return ListView(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(18, 8, 18, 18),
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 500),
-        padding: const EdgeInsets.fromLTRB(24, 25, 24, 28),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFFFFDF7), Color(0xFFF2EADC)],
-          ),
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: .12),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Icon(icon, color: accent),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              eyebrow,
-              style: GoogleFonts.inter(
-                color: accent,
-                fontSize: 9,
-                letterSpacing: 1.5,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 7),
-            Text(
-              title,
-              style: GoogleFonts.playfairDisplay(
-                color: const Color(0xFF282034),
-                fontSize: 27,
-                fontWeight: FontWeight.w700,
-                height: 1.15,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              style: GoogleFonts.inter(
-                color: const Color(0xFF716879),
-                fontSize: 11.5,
-                height: 1.45,
-              ),
-            ),
-            const SizedBox(height: 27),
-            Text(
-              body,
-              style: serifBody
-                  ? GoogleFonts.merriweather(
-                      color: const Color(0xFF30283A),
-                      fontSize: 18,
-                      height: 1.8,
-                    )
-                  : GoogleFonts.inter(
-                      color: const Color(0xFF30283A),
-                      fontSize: 16,
-                      height: 1.75,
-                    ),
-            ),
-            if (footer != null) ...[
-              const SizedBox(height: 24),
-              Container(
-                width: 38,
-                height: 1,
-                color: accent.withValues(alpha: .55),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                footer!,
-                style: GoogleFonts.inter(
-                  color: accent,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
+      padding: const EdgeInsets.fromLTRB(24, 22, 24, 28),
+      children: [
+        VIcon(icon, weight: VIconWeight.duotone, size: 34, color: p.gold),
+        const SizedBox(height: 16),
+        VRubricLabel(eyebrow),
+        const SizedBox(height: 6),
+        Text(title, style: type.display.copyWith(fontSize: 32, height: 1.1)),
+        const SizedBox(height: 8),
+        Text(subtitle, style: type.body),
+        const SizedBox(height: 24),
+        if (serifBody && body.length >= 120)
+          VDropCapText(body, style: bodyStyle)
+        else
+          Text(body, style: bodyStyle),
+        if (footer != null) ...[
+          const SizedBox(height: 20),
+          Container(width: 38, height: 1, color: p.gold),
+          const SizedBox(height: 10),
+          Text(footer!, style: type.citation),
+        ],
+      ],
     );
   }
 }
@@ -429,39 +321,33 @@ class _CompletionDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
     final finished = day.number == path.days.length;
     return AlertDialog(
-      icon: Container(
-        width: 65,
-        height: 65,
-        decoration: BoxDecoration(
-          color: path.accent.withValues(alpha: .12),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          finished ? Icons.celebration_rounded : Icons.auto_awesome_rounded,
-          color: path.accent,
-          size: 31,
-        ),
+      icon: VIcon(
+        finished ? VerbumIcons.sealCheck : VerbumIcons.sparkle,
+        weight: VIconWeight.duotone,
+        size: 44,
+        color: p.gold,
       ),
       title: Text(
         finished ? 'Has completado el camino' : 'Tu paso de hoy está completo',
         textAlign: TextAlign.center,
-        style: GoogleFonts.playfairDisplay(
-          fontSize: 23,
-          fontWeight: FontWeight.w700,
-        ),
+        style: context.type.title.copyWith(fontSize: 26),
       ),
       content: Text(
         finished
             ? 'Lo recorrido no termina aquí: llévalo contigo y vuelve cuando lo necesites.'
             : 'No necesitas hacer más. Permite que este momento te acompañe durante el día.',
         textAlign: TextAlign.center,
-        style: GoogleFonts.inter(fontSize: 13, height: 1.5),
+        style: context.type.body,
       ),
       actionsAlignment: MainAxisAlignment.center,
       actions: [
-        TextButton(
+        VButton(
+          label: 'Compartir',
+          variant: VButtonVariant.text,
+          compact: true,
           onPressed: () => ShareService.openComposer(
             context,
             ShareContent(
@@ -472,11 +358,11 @@ class _CompletionDialog extends StatelessWidget {
               kind: ShareContentKind.verse,
             ),
           ),
-          child: const Text('Compartir'),
         ),
-        FilledButton(
+        VButton(
+          label: 'Guardar este momento',
+          compact: true,
           onPressed: onClose,
-          child: const Text('Guardar este momento'),
         ),
       ],
     );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../services/help_support_service.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class FaqScreen extends StatefulWidget {
   const FaqScreen({super.key});
@@ -131,104 +131,114 @@ class _FaqScreenState extends State<FaqScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
+    final t = context.type;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Preguntas frecuentes',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
+      appBar: VAppBar(title: Text('Preguntas frecuentes', style: t.heading)),
       body: Column(
         children: [
           // Barra de búsqueda
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(
+              VerbumSpace.gutter,
+              8,
+              VerbumSpace.gutter,
+              12,
+            ),
             child: TextField(
               controller: _searchController,
+              style: t.body,
               decoration: InputDecoration(
-                hintText: 'Buscar en FAQ...',
-                prefixIcon: const Icon(Icons.search),
+                hintText: 'Buscar en las preguntas…',
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: VIcon(
+                    VerbumIcons.magnifyingGlass,
+                    size: 20,
+                    color: p.inkMuted,
+                  ),
+                ),
+                prefixIconConstraints: const BoxConstraints(minWidth: 44),
                 suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
+                    ? VIconButton(
+                        icon: VerbumIcons.close,
+                        semanticLabel: 'Borrar búsqueda',
+                        variant: VIconButtonVariant.ghost,
                         onPressed: () {
                           _searchController.clear();
                         },
                       )
                     : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Theme.of(context).cardColor,
               ),
             ),
           ),
           // Lista de FAQ
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _filteredItems.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.search_off,
-                          size: 64,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No se encontraron resultados',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
+                ? const Center(
+                    child: VEmptyState(
+                      title: 'Cargando preguntas',
+                      loading: true,
                     ),
                   )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                : _filteredItems.isEmpty
+                ? const Center(
+                    child: VEmptyState(
+                      icon: VerbumIcons.magnifyingGlassMinus,
+                      title: 'No se encontraron resultados',
+                      message: 'Prueba con otras palabras.',
+                    ),
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(
+                      VerbumSpace.gutter,
+                      0,
+                      VerbumSpace.gutter,
+                      32,
+                    ),
                     itemCount: _filteredItems.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final item = _filteredItems[index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.grey.withValues(alpha: 0.1),
-                          ),
-                        ),
-                        child: ExpansionTile(
-                          title: Text(
-                            item['question'] ?? '',
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w600,
+                      return VSurfaceCard(
+                        padding: EdgeInsets.zero,
+                        radius: VerbumRadius.tile,
+                        child: Theme(
+                          data: Theme.of(
+                            context,
+                          ).copyWith(dividerColor: Colors.transparent),
+                          child: ExpansionTile(
+                            shape: const Border(),
+                            collapsedShape: const Border(),
+                            iconColor: p.rubric,
+                            collapsedIconColor: p.inkSubtle,
+                            tilePadding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 4,
                             ),
-                          ),
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Text(
-                                item['answer'] ?? '',
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  height: 1.6,
-                                  color: Colors.grey[700],
+                            childrenPadding: const EdgeInsets.fromLTRB(
+                              18,
+                              0,
+                              18,
+                              18,
+                            ),
+                            title: Text(
+                              item['question'] ?? '',
+                              style: t.bodyStrong,
+                            ),
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  item['answer'] ?? '',
+                                  style: t.body.copyWith(
+                                    color: p.inkMuted,
+                                    height: 1.6,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       );
                     },

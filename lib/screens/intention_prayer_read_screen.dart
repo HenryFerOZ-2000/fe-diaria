@@ -71,23 +71,6 @@ class _IntentionPrayerReadScreenState extends State<IntentionPrayerReadScreen> {
     );
   }
 
-  Color get _accent {
-    switch (widget.categoryKey) {
-      case 'salud':
-        return const Color(0xFF5F8178);
-      case 'familia':
-      case 'pareja':
-      case 'hijos':
-        return const Color(0xFFA65F69);
-      case 'proteccion':
-        return const Color(0xFF536C91);
-      case 'prosperidad':
-        return const Color(0xFFB58A45);
-      default:
-        return const Color(0xFF77649A);
-    }
-  }
-
   @override
   Widget build(BuildContext context) => PrayerReadingExperience(
     provenance: ContentProvenance.aiGenerated,
@@ -98,7 +81,6 @@ class _IntentionPrayerReadScreenState extends State<IntentionPrayerReadScreen> {
     text: _current?.text,
     verseReference: _current?.verseRef,
     tags: _current?.tags ?? const [],
-    accent: _accent,
     onBack: () => Navigator.pop(context),
     onRetry: _load,
     onShare: _share,

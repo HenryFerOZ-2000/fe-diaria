@@ -10,13 +10,13 @@ class DailyVerseWidgetPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final text = dark ? const Color(0xFFFFF8EE) : const Color(0xFF2A2030);
-    final muted = dark ? const Color(0xFFC7BBC8) : const Color(0xFF746A72);
-    final primary = dark ? const Color(0xFFE4D3F4) : const Color(0xFF493878);
-    final gold = dark ? const Color(0xFFE5BD7B) : const Color(0xFFB58A45);
+    final text = dark ? const Color(0xFFEEF0FB) : const Color(0xFF22245A);
+    final muted = dark ? const Color(0xFFA9ACD6) : const Color(0xFF5F6290);
+    final primary = dark ? const Color(0xFFA9ADF7) : const Color(0xFF4A4EBB);
+    final gold = dark ? const Color(0xFFF4DF7A) : const Color(0xFF6F72D3);
     final gradient = dark
-        ? const [Color(0xFF1B1623), Color(0xFF251D30), Color(0xFF332438)]
-        : const [Color(0xFFFFFCF7), Color(0xFFF8F1E7), Color(0xFFF0E5D8)];
+        ? const [Color(0xFF10122A), Color(0xFF1A1D3A), Color(0xFF24284A)]
+        : const [Color(0xFFFFFFFF), Color(0xFFF1F2FC), Color(0xFFE5E7F8)];
 
     return Semantics(
       container: true,
@@ -41,7 +41,7 @@ class DailyVerseWidgetPreview extends StatelessWidget {
                 border: Border.all(color: gold.withValues(alpha: .28)),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF2A2030).withValues(alpha: .14),
+                    color: const Color(0xFF22245A).withValues(alpha: .14),
                     blurRadius: 30,
                     offset: const Offset(0, 14),
                   ),
@@ -156,8 +156,8 @@ class DailyVerseWidgetPreview extends StatelessWidget {
                               'Abrir',
                               style: TextStyle(
                                 color: dark
-                                    ? const Color(0xFF241A2B)
-                                    : const Color(0xFFFFFCF7),
+                                    ? const Color(0xFF1A1D3A)
+                                    : const Color(0xFFFFFFFF),
                                 fontSize: 10,
                                 fontWeight: FontWeight.w800,
                               ),
@@ -212,7 +212,7 @@ class _PreviewHeader extends StatelessWidget {
               ),
               const SizedBox(height: 1),
               Text(
-                'PALABRA DEL DÍA',
+                'Palabra del día',
                 maxLines: 1,
                 style: TextStyle(
                   color: gold,

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import '../theme/app_theme.dart';
-import '../providers/auth_provider.dart';
+import '../design_system/design_system.dart';
 import 'verbum_ambient_background.dart';
 
 /// Scaffold personalizado con diseño consistente y gradientes
@@ -10,6 +8,9 @@ class AppScaffold extends StatelessWidget {
   final Widget body;
   final String? title;
   final Widget? titleWidget;
+
+  /// A la izquierda de la barra (p. ej. [VerbumSettingsButton]).
+  final Widget? leading;
   final List<Widget>? actions;
   final bool centerTitle;
   final bool resizeToAvoidBottomInset;
@@ -23,7 +24,6 @@ class AppScaffold extends StatelessWidget {
   final bool showAppBar;
   final PreferredSizeWidget? bottom;
   final double? appBarElevation;
-  final bool showGuestNotice;
   final BannerAd? bannerAd;
   final bool showBanner;
 
@@ -32,6 +32,7 @@ class AppScaffold extends StatelessWidget {
     required this.body,
     this.title,
     this.titleWidget,
+    this.leading,
     this.actions,
     this.centerTitle = true,
     this.resizeToAvoidBottomInset = true,
@@ -45,7 +46,6 @@ class AppScaffold extends StatelessWidget {
     this.showAppBar = true,
     this.bottom,
     this.appBarElevation,
-    this.showGuestNotice = true,
     this.bannerAd,
     this.showBanner = false,
   });
@@ -54,125 +54,21 @@ class AppScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
-
-    final bgGradient =
-        gradient ??
-        LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  AppColors.backgroundDark,
-                  AppColors.surfaceDark,
-                  AppColors.backgroundDark,
-                ]
-              : [
-                  AppColors.background,
-                  colorScheme.tertiary.withValues(alpha: 0.05),
-                  AppColors.background,
-                ],
-        );
 
     // Guest notice (only when not signed in)
-    Widget? guestNotice;
-    if (showGuestNotice) {
-      final auth = Provider.of<AuthProvider?>(context, listen: true);
-      final isGuest = auth == null || !auth.isSignedIn;
-      if (isGuest) {
-        guestNotice = Container(
-          width: double.infinity,
-          margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: BoxDecoration(
-            color: colorScheme.primary.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: colorScheme.primary.withValues(alpha: 0.12),
-            ),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.info_outline, size: 18, color: colorScheme.primary),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Modo invitado: inicia sesión para sincronizar rachas, favoritos y progreso.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              TextButton(
-                onPressed: () async {
-                  final authProv = Provider.of<AuthProvider?>(
-                    context,
-                    listen: false,
-                  );
-                  if (authProv == null) {
-                    Navigator.of(context).pushNamed('/welcome');
-                    return;
-                  }
-                  try {
-                    await authProv.signIn();
-                    if (context.mounted && authProv.isSignedIn) {
-                      Navigator.of(
-                        context,
-                      ).pushNamedAndRemoveUntil('/home', (route) => false);
-                    }
-                  } catch (e) {
-                    final err = e.toString().replaceFirst('Exception: ', '');
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            err.length > 120
-                                ? '${err.substring(0, 120)}...'
-                                : err,
-                          ),
-                          duration: const Duration(seconds: 4),
-                        ),
-                      );
-                    }
-                  }
-                },
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
-                  minimumSize: const Size(0, 0),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  'Iniciar sesión',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      }
-    }
-
     return Scaffold(
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+      // Con degradado propio, el fondo continúa bajo la barra superior.
+      extendBodyBehindAppBar: gradient != null,
       appBar: showAppBar
-          ? AppBar(
+          ? VAppBar(
+              leading: leading,
               title:
                   titleWidget ??
                   (title != null
                       ? Text(title!, style: theme.textTheme.titleLarge)
                       : null),
               centerTitle: centerTitle,
-              backgroundColor: Colors.transparent,
-              elevation: appBarElevation ?? 0,
-              scrolledUnderElevation: 0,
               actions: actions,
               bottom: bottom,
             )
@@ -183,12 +79,11 @@ class AppScaffold extends StatelessWidget {
       floatingActionButtonLocation: floatingActionButtonLocation,
       bottomNavigationBar: bottomNavigationBar,
       body: VerbumAmbientBackground(
-        gradient: gradient == null ? null : bgGradient,
+        gradient: gradient,
         color: backgroundColor,
         child: SafeArea(
           child: Column(
             children: [
-              if (guestNotice != null) guestNotice,
               Expanded(child: body),
               // Banner Ad flotante - siempre visible en la parte inferior
               if (showBanner && bannerAd != null)
@@ -197,7 +92,7 @@ class AppScaffold extends StatelessWidget {
                   width: double.infinity,
                   height: bannerAd!.size.height.toDouble(),
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    color: context.palette.surface,
                     border: Border(
                       top: BorderSide(
                         color: colorScheme.outline.withValues(alpha: 0.1),
@@ -213,7 +108,7 @@ class AppScaffold extends StatelessWidget {
                   width: double.infinity,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    color: context.palette.surface,
                     border: Border(
                       top: BorderSide(
                         color: colorScheme.outline.withValues(alpha: 0.1),

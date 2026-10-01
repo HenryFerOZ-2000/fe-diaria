@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 OverlayEntry? _activeTopNotice;
 Timer? _activeTopNoticeTimer;
@@ -77,10 +77,10 @@ void showTopNotice(
                     ),
                     child: Row(
                       children: [
-                        Icon(
+                        VIcon(
                           isError
-                              ? Icons.error_outline_rounded
-                              : Icons.check_circle_outline_rounded,
+                              ? VerbumIcons.warningCircle
+                              : VerbumIcons.checkCircle,
                           color: foregroundColor,
                           size: 20,
                         ),
@@ -90,7 +90,7 @@ void showTopNotice(
                             message,
                             maxLines: 3,
                             overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               color: foregroundColor,
                               fontSize: 13.5,
                               fontWeight: FontWeight.w600,

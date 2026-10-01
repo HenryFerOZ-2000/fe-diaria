@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../design_system/design_system.dart';
 import '../domain/liturgical_day.dart';
 import 'liturgical_palette.dart';
 
@@ -11,12 +12,9 @@ class TodayLiturgyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final p = context.palette;
+    final type = context.type;
     final color = day.primary.colors.firstOrNull;
-    final accent = color == null
-        ? colorScheme.outline
-        : LiturgicalPalette.accent(color, theme.brightness);
     final colorLabel = color == null
         ? 'Sin color indicado'
         : 'Color ${LiturgicalPalette.label(color)}';
@@ -26,104 +24,91 @@ class TodayLiturgyCard extends StatelessWidget {
       label: 'Hoy en la Iglesia. ${day.primary.name}. $colorLabel',
       excludeSemantics: true,
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOutCubic,
-        decoration: BoxDecoration(
-          color: Color.alphaBlend(
-            accent.withValues(
-              alpha: theme.brightness == Brightness.dark ? 0.10 : 0.07,
-            ),
-            colorScheme.surface,
-          ),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: accent.withValues(alpha: 0.34)),
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.shadow.withValues(alpha: 0.07),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(18),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              child: IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Container(
+      child: VSurfaceCard(
+        onTap: onTap,
+        radius: VerbumRadius.card,
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            // Cuadro lavanda con la iglesia y, en la esquina, el color
+            // litúrgico del día como único detalle de color.
+            SizedBox(
+              width: 58,
+              height: 58,
+              child: Stack(
+                children: [
+                  Container(
+                    width: 54,
+                    height: 54,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: p.surfaceMuted,
+                      borderRadius: BorderRadius.circular(VerbumRadius.control),
+                    ),
+                    child: VIcon(
+                      VerbumIcons.church,
+                      weight: VIconWeight.duotone,
+                      size: 28,
+                      color: p.rubric,
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
                       key: const Key('liturgical_color_marker'),
-                      width: 4,
+                      width: 18,
+                      height: 18,
                       decoration: BoxDecoration(
-                        color: accent,
-                        borderRadius: BorderRadius.circular(99),
-                        border: color == LiturgicalColor.white
-                            ? Border.all(color: colorScheme.outline, width: 1)
-                            : null,
+                        color: color == null
+                            ? p.line
+                            : LiturgicalPalette.swatch(color),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          // El blanco litúrgico necesita contorno.
+                          color: color == LiturgicalColor.white
+                              ? p.line
+                              : p.surface,
+                          width: 3,
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'HOY EN LA IGLESIA',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: accent,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.8,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            day.primary.name,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: colorScheme.onSurface,
-                              fontWeight: FontWeight.w700,
-                              height: 1.25,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Row(
-                            children: [
-                              Icon(Icons.circle, size: 7, color: accent),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  colorLabel,
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Center(
-                      child: Icon(
-                        Icons.chevron_right_rounded,
-                        color: colorScheme.onSurfaceVariant,
-                        size: 20,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Hoy en la Iglesia',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: type.caption.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    day.primary.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: type.heading.copyWith(fontSize: 16, height: 1.2),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    colorLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: type.caption,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            VIcon(VerbumIcons.caretRight, size: 18, color: p.inkSubtle),
+          ],
         ),
       ),
     );

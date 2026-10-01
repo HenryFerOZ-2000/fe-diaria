@@ -5,9 +5,11 @@
 *.swp
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
+.swiftpm/
 migrate_working_dir/
 
 # IntelliJ related
@@ -116,6 +118,7 @@ lib/generated_plugin_registrant.dart
 # Firebase
 **/ios/firebase_app_id_file.json
 **/ios/GoogleService-Info.plist
+**/ios/Runner/GoogleService-Info.plist
 **/android/app/google-services.json
 
 # Environment variables
@@ -138,3 +141,4 @@ lib/generated_plugin_registrant.dart
 
 # Secrets
 **/api/src/secrets/*
+test/**/failures/

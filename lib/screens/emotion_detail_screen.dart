@@ -6,9 +6,7 @@ import '../services/ads_service.dart';
 import '../services/storage_service.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/prayer_card.dart';
-import '../widgets/custom_button.dart';
-import '../widgets/main_card.dart';
-import '../theme/app_theme.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla que muestra oración y versículo para una emoción específica
 class EmotionDetailScreen extends StatefulWidget {
@@ -77,110 +75,89 @@ class _EmotionDetailScreenState extends State<EmotionDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
+    final p = context.palette;
+    final type = context.type;
 
     return AppScaffold(
       title: 'Dios está contigo',
+      centerTitle: false,
       body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
+          ? Center(child: CircularProgressIndicator(color: p.rubric))
           : _prayerData == null
           ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 64, color: colorScheme.error),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'No se pudo cargar la oración',
-                    style: theme.textTheme.bodyLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  CustomButton(
-                    text: 'Reintentar',
-                    icon: Icons.refresh,
-                    onPressed: _loadData,
-                  ),
-                ],
+              child: VEmptyState(
+                icon: VerbumIcons.warningCircle,
+                title: 'No se pudo cargar la oración',
+                actionLabel: 'Reintentar',
+                onAction: _loadData,
               ),
             )
           : Column(
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    padding: const EdgeInsets.fromLTRB(
+                      VerbumSpace.gutter,
+                      VerbumSpace.xs,
+                      VerbumSpace.gutter,
+                      VerbumSpace.xl,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Título principal
-                        Text(
-                          'Dios está contigo en este momento de ${widget.emotionName.toLowerCase()}',
-                          style: theme.textTheme.displaySmall?.copyWith(
-                            color: colorScheme.primary,
+                        Semantics(
+                          header: true,
+                          child: Text(
+                            'Dios está contigo en este momento de ${widget.emotionName.toLowerCase()}',
+                            style: type.title,
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: AppSpacing.xl),
+                        const SizedBox(height: VerbumSpace.lg),
                         // Oración
                         PrayerCard(
                           provenance: ContentProvenance.aiGenerated,
                           title: _prayerData!['title'] as String,
                           text: _prayerData!['text'] as String,
-                          icon: Icons.favorite_rounded,
+                          icon: VerbumIcons.heart,
                         ),
-                        const SizedBox(height: AppSpacing.lg),
+                        const SizedBox(height: VerbumSpace.md),
                         // Versículo motivador
                         if (_prayerData!['verse'] != null)
-                          MainCard(
-                            padding: const EdgeInsets.all(AppSpacing.lg),
-                            backgroundColor: colorScheme.tertiary.withValues(
-                              alpha: 0.1,
-                            ),
-                            border: Border.all(
-                              color: colorScheme.tertiary.withValues(
-                                alpha: 0.3,
-                              ),
-                              width: 2,
-                            ),
+                          VSurfaceCard(
+                            tone: VSurfaceTone.accent,
+                            padding: const EdgeInsets.all(VerbumSpace.lg),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
                                   children: [
-                                    Icon(
-                                      Icons.book_rounded,
-                                      color: colorScheme.tertiary,
+                                    VIcon(
+                                      VerbumIcons.bookOpenText,
+                                      weight: VIconWeight.duotone,
+                                      size: 20,
+                                      color: p.rubric,
                                     ),
-                                    const SizedBox(width: AppSpacing.sm),
+                                    const SizedBox(width: VerbumSpace.xs),
                                     Text(
                                       'Versículo para ti',
-                                      style: theme.textTheme.titleMedium
-                                          ?.copyWith(
-                                            color: colorScheme.tertiary,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                      style: type.rubric,
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: AppSpacing.md),
+                                const SizedBox(height: VerbumSpace.sm),
                                 Text(
                                   _prayerData!['verse'] as String,
-                                  style: theme.textTheme.bodyLarge?.copyWith(
-                                    fontSize: 18,
-                                    height: 1.7,
-                                    fontStyle: FontStyle.italic,
-                                  ),
+                                  style: type.scriptureLarge,
                                 ),
                                 if (_prayerData!['verseReference'] != null) ...[
-                                  const SizedBox(height: AppSpacing.sm),
-                                  Text(
-                                    _prayerData!['verseReference'] as String,
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.tertiary,
-                                      fontWeight: FontWeight.bold,
+                                  const SizedBox(height: VerbumSpace.xs),
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Text(
+                                      _prayerData!['verseReference'] as String,
+                                      style: type.citation,
                                     ),
-                                    textAlign: TextAlign.right,
                                   ),
                                 ],
                               ],
@@ -191,12 +168,19 @@ class _EmotionDetailScreenState extends State<EmotionDetailScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: CustomButton(
-                    text: 'Regresar',
-                    icon: Icons.arrow_back,
+                  padding: const EdgeInsets.fromLTRB(
+                    VerbumSpace.gutter,
+                    VerbumSpace.sm,
+                    VerbumSpace.gutter,
+                    VerbumSpace.md,
+                  ),
+                  child: VButton(
+                    label: 'Regresar',
+                    icon: VerbumIcons.arrowLeft,
+                    iconLeading: true,
+                    variant: VButtonVariant.outlined,
+                    expanded: true,
                     onPressed: () => Navigator.of(context).pop(),
-                    width: double.infinity,
                   ),
                 ),
                 if (!_adsRemoved)
@@ -207,20 +191,18 @@ class _EmotionDetailScreenState extends State<EmotionDetailScreen> {
                         ? _bannerAd!.size.height.toDouble()
                         : 50,
                     decoration: BoxDecoration(
-                      color: isDark ? colorScheme.surface : AppColors.surface,
-                      border: Border(
-                        top: BorderSide(
-                          color: colorScheme.outline.withValues(alpha: 0.1),
-                          width: 1,
-                        ),
-                      ),
+                      color: p.surface,
+                      border: Border(top: BorderSide(color: p.line)),
                     ),
                     child: _bannerAd != null
                         ? AdWidget(ad: _bannerAd!)
-                        : const SizedBox(
+                        : SizedBox(
                             height: 50,
                             child: Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: p.rubric,
+                              ),
                             ),
                           ),
                   ),

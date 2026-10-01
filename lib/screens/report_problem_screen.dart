@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../design_system/design_system.dart';
 import '../services/help_support_service.dart';
 
 class ReportProblemScreen extends StatefulWidget {
@@ -48,7 +48,6 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
             content: Text(
               'Reporte enviado correctamente. Gracias por tu feedback.',
             ),
-            backgroundColor: Colors.green,
           ),
         );
         Navigator.of(context).pop();
@@ -68,83 +67,45 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Reportar un problema',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
+      appBar: VAppBar(
+        title: Text('Reportar un problema', style: context.type.heading),
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(
+            VerbumSpace.gutter,
+            12,
+            VerbumSpace.gutter,
+            40,
+          ),
           children: [
-            // Categoría
-            Text(
-              'Categoría',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-              ),
-              child: DropdownButtonFormField<String>(
-                initialValue: _selectedCategory,
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  border: InputBorder.none,
-                ),
-                items: _categories.map((category) {
-                  return DropdownMenuItem(
-                    value: category,
-                    child: Text(category),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _selectedCategory = value);
-                  }
-                },
-              ),
+            const _FieldLabel('Categoría'),
+            DropdownButtonFormField<String>(
+              initialValue: _selectedCategory,
+              dropdownColor: p.surface,
+              borderRadius: BorderRadius.circular(VerbumRadius.control),
+              icon: VIcon(VerbumIcons.caretDown, size: 18, color: p.inkMuted),
+              style: context.type.body,
+              items: _categories.map((category) {
+                return DropdownMenuItem(value: category, child: Text(category));
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() => _selectedCategory = value);
+                }
+              },
             ),
             const SizedBox(height: 24),
-            // Descripción
-            Text(
-              'Descripción del problema',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
+            const _FieldLabel('Descripción del problema'),
             TextFormField(
               controller: _descriptionController,
               maxLines: 8,
-              decoration: InputDecoration(
+              style: context.type.body,
+              decoration: const InputDecoration(
                 hintText: 'Describe el problema o sugerencia en detalle...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Theme.of(context).cardColor,
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
@@ -156,36 +117,37 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Nota: Adjuntar captura de pantalla próximamente',
-              style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
-            ),
-            const SizedBox(height: 32),
-            // Botón enviar
-            ElevatedButton(
+            const SizedBox(height: 12),
+            const VNotice('Pronto podrás adjuntar una captura de pantalla.'),
+            const SizedBox(height: 28),
+            VButton(
+              label: 'Enviar reporte',
+              icon: VerbumIcons.paperPlaneRight,
+              expanded: true,
+              loading: _isSubmitting,
               onPressed: _isSubmitting ? null : _submitReport,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: _isSubmitting
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(
-                      'Enviar reporte',
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FieldLabel extends StatelessWidget {
+  const _FieldLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 2, bottom: 8),
+      child: Text(
+        text,
+        style: context.type.bodyStrong.copyWith(
+          fontSize: 13,
+          color: context.palette.inkMuted,
         ),
       ),
     );

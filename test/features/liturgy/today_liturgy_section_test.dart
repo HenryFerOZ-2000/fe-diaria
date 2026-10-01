@@ -70,7 +70,7 @@ void main() {
     );
     await tester.pump();
     expect(service.calls, 0);
-    expect(find.text('HOY EN LA IGLESIA'), findsNothing);
+    expect(find.text('Hoy en la Iglesia'), findsNothing);
   });
 
   testWidgets('un fallo del repositorio no rompe la pantalla', (tester) async {
@@ -91,7 +91,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Hoy sigue visible'), findsOneWidget);
-    expect(find.text('HOY EN LA IGLESIA'), findsNothing);
+    expect(find.text('Hoy en la Iglesia'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
@@ -110,7 +110,7 @@ void main() {
     );
     await tester.pump();
     expect(service.calls, 1);
-    expect(find.text('HOY EN LA IGLESIA'), findsOneWidget);
+    expect(find.text('Hoy en la Iglesia'), findsOneWidget);
 
     await tester.pump(const Duration(hours: 12));
     await tester.pump();
@@ -130,7 +130,7 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.tap(find.text('HOY EN LA IGLESIA'));
+    await tester.tap(find.text('Hoy en la Iglesia'));
     await tester.pumpAndSettle();
     final screen = tester.widget<LiturgyDayScreen>(
       find.byType(LiturgyDayScreen),

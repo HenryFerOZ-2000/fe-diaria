@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../services/post_social_service.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Fila like + comentarios para publicaciones de comunidad (misma idea que En Vivo).
 class CommunityPostInteractionRow extends StatefulWidget {
@@ -126,7 +126,7 @@ class _CommunityPostInteractionRowState
                     : (likedSnapshot.data ?? _optimisticLiked);
 
                 return _MiniAction(
-                  icon: isLiked ? Icons.favorite : Icons.favorite_border,
+                  icon: isLiked ? VerbumIcons.heart : VerbumIcons.heart,
                   label: '$displayCount',
                   color: isLiked ? scheme.primary : neutral,
                   onTap: _handleLike,
@@ -141,7 +141,7 @@ class _CommunityPostInteractionRowState
           builder: (context, snap) {
             final n = snap.data ?? widget.seedCommentCount;
             return _MiniAction(
-              icon: Icons.mode_comment_outlined,
+              icon: VerbumIcons.chatCircle,
               label: '$n',
               color: neutral,
               onTap: widget.onOpenComments,
@@ -154,7 +154,7 @@ class _CommunityPostInteractionRowState
 }
 
 class _MiniAction extends StatelessWidget {
-  final IconData icon;
+  final VerbumIcons icon;
   final String label;
   final Color color;
   final VoidCallback onTap;
@@ -176,11 +176,11 @@ class _MiniAction extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: color, size: 20),
+            VIcon(icon, color: color, size: 20),
             const SizedBox(width: 4),
             Text(
               label,
-              style: GoogleFonts.inter(
+              style: VerbumFonts.sans(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
                 color: color,

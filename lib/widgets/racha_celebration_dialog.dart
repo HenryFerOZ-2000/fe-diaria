@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:verbum/design_system/design_system.dart';
+
+import '../features/today/application/constancy_progress.dart';
 
 class RachaCelebrationDialog extends StatefulWidget {
   final int totalDays;
@@ -17,7 +19,7 @@ class _RachaCelebrationDialogState extends State<RachaCelebrationDialog>
   late final Animation<double> _scale;
 
   bool get _isMilestone =>
-      const [3, 7, 14, 30, 50, 100, 365].contains(widget.totalDays);
+      ConstancyProgress.milestones.contains(widget.totalDays);
 
   @override
   void initState() {
@@ -62,167 +64,65 @@ class _RachaCelebrationDialogState extends State<RachaCelebrationDialog>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final dark = theme.brightness == Brightness.dark;
-    final surface = dark ? const Color(0xFF251F2D) : const Color(0xFFFFFCF7);
+    final p = context.palette;
+    final type = context.type;
 
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: p.surface,
+      surfaceTintColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 24),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(VerbumRadius.sheet),
+        side: BorderSide(color: p.line),
+      ),
       child: FadeTransition(
         opacity: _fade,
         child: ScaleTransition(
           scale: _scale,
-          child: Container(
+          child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 430),
-            decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: scheme.outline.withValues(alpha: .14)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: dark ? .35 : .18),
-                  blurRadius: 38,
-                  offset: const Offset(0, 18),
-                ),
-              ],
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Stack(
-              children: [
-                Positioned(
-                  right: -62,
-                  top: -72,
-                  child: Container(
-                    width: 210,
-                    height: 210,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          const Color(0xFFE3AF59).withValues(alpha: .22),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 18),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const VCandle(size: 46),
+                  VRubricLabel(
+                    _isMilestone
+                        ? 'Un hito en tu camino'
+                        : 'Tu día está a salvo',
+                    color: p.gold,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 28, 24, 22),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            width: 92,
-                            height: 92,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: const Color(
-                                0xFFE1B467,
-                              ).withValues(alpha: .12),
-                              border: Border.all(
-                                color: const Color(
-                                  0xFFE1B467,
-                                ).withValues(alpha: .30),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 66,
-                            height: 66,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [Color(0xFFF1C77E), Color(0xFFC98243)],
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(
-                                    0xFFE0A857,
-                                  ).withValues(alpha: .28),
-                                  blurRadius: 22,
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.local_fire_department_rounded,
-                              color: Color(0xFF2A2030),
-                              size: 34,
-                            ),
-                          ),
-                          Positioned(
-                            top: 3,
-                            right: 3,
-                            child: Icon(
-                              Icons.auto_awesome_rounded,
-                              color: const Color(0xFFD29A45),
-                              size: 19,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 18),
-                      Text(
-                        _isMilestone
-                            ? 'UN HITO EN TU CAMINO'
-                            : 'TU DÍA ESTÁ A SALVO',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
-                          color: const Color(0xFFB27A34),
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.45,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _isMilestone
-                            ? '${widget.totalDays} días de constancia'
-                            : 'Un día más caminando con Dios',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.playfairDisplay(
-                          color: scheme.onSurface,
-                          fontSize: 27,
-                          height: 1.08,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        _isMilestone
-                            ? 'Cada uno de estos días comenzó con una pequeña decisión: hacer espacio para Dios.'
-                            : 'Hoy hiciste espacio para detenerte, escuchar y volver a lo esencial.',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
-                          color: scheme.onSurfaceVariant,
-                          fontSize: 13,
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 22),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: FilledButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Continuar mi camino'),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      TextButton(
-                        onPressed: _openJourney,
-                        child: const Text('Ver mi recorrido'),
-                      ),
-                    ],
+                  const SizedBox(height: 8),
+                  Text(
+                    _isMilestone
+                        ? '${widget.totalDays} días de constancia'
+                        : 'Un día más caminando con Dios',
+                    textAlign: TextAlign.center,
+                    style: type.display.copyWith(fontSize: 30),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 10),
+                  Text(
+                    _isMilestone
+                        ? 'Cada uno de estos días comenzó con una pequeña decisión: hacer espacio para Dios.'
+                        : 'Hoy hiciste espacio para detenerte, escuchar y volver a lo esencial.',
+                    textAlign: TextAlign.center,
+                    style: type.body.copyWith(fontSize: 14),
+                  ),
+                  const SizedBox(height: 22),
+                  VButton(
+                    label: 'Continuar mi camino',
+                    expanded: true,
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  const SizedBox(height: 4),
+                  VButton(
+                    label: 'Ver mi recorrido',
+                    variant: VButtonVariant.text,
+                    onPressed: _openJourney,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
-/// Fondo ambiental de Verbum: luz, profundidad y geometría contemplativa.
+import '../design_system/design_system.dart';
+
+/// Fondo de Verbum: blanco que se funde en lavanda.
+///
+/// [glowAlignment] se conserva por compatibilidad; ya no hay resplandor.
 class VerbumAmbientBackground extends StatelessWidget {
   final Widget child;
   final Alignment glowAlignment;
@@ -17,67 +21,24 @@ class VerbumAmbientBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final p = context.palette;
     final dark = Theme.of(context).brightness == Brightness.dark;
+    // Lavanda que se hace más profunda hacia abajo (de noche, índigo profundo uniforme).
+    final fallback = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: dark
+          ? [p.background, p.background]
+          // Empieza en el mismo lavanda del Scaffold: sin corte bajo la barra.
+          : [p.background, p.background, p.surfaceMuted],
+      stops: dark ? null : const [0, .55, 1],
+    );
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color,
-        gradient:
-            gradient ??
-            LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: dark
-                  ? const [
-                      Color(0xFF15121D),
-                      Color(0xFF211B2C),
-                      Color(0xFF17141F),
-                    ]
-                  : const [
-                      Color(0xFFFBF8F1),
-                      Color(0xFFF3EEE5),
-                      Color(0xFFF8F5EF),
-                    ],
-            ),
+        gradient: color == null ? (gradient ?? fallback) : null,
       ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Align(
-            alignment: glowAlignment,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    scheme.secondary.withValues(alpha: dark ? .16 : .19),
-                    scheme.secondary.withValues(alpha: 0),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Align(
-            alignment: const Alignment(-1.35, .55),
-            child: Container(
-              width: 260,
-              height: 260,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    scheme.tertiary.withValues(alpha: dark ? .10 : .13),
-                    scheme.tertiary.withValues(alpha: 0),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          child,
-        ],
-      ),
+      child: child,
     );
   }
 }

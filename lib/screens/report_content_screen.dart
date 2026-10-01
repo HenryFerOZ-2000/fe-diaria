@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../design_system/design_system.dart';
 import '../services/privacy_security_service.dart';
 
 class ReportContentScreen extends StatefulWidget {
@@ -61,10 +61,7 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Reporte enviado correctamente'),
-            backgroundColor: Colors.green,
-          ),
+          const SnackBar(content: Text('Reporte enviado correctamente')),
         );
         Navigator.of(context).pop();
       }
@@ -83,79 +80,53 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
+    final t = context.type;
+    Widget dropdown(
+      String value,
+      List<String> options,
+      ValueChanged<String> onSelected,
+    ) {
+      return DropdownButtonFormField<String>(
+        initialValue: value,
+        dropdownColor: p.surface,
+        borderRadius: BorderRadius.circular(VerbumRadius.control),
+        icon: VIcon(VerbumIcons.caretDown, size: 18, color: p.inkMuted),
+        style: t.body,
+        items: options.map((option) {
+          return DropdownMenuItem(value: option, child: Text(option));
+        }).toList(),
+        onChanged: (value) {
+          if (value != null) onSelected(value);
+        },
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Reportar contenido',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
+      appBar: VAppBar(title: Text('Reportar contenido', style: t.heading)),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(
+            VerbumSpace.gutter,
+            12,
+            VerbumSpace.gutter,
+            40,
+          ),
           children: [
-            // Tipo
-            Text(
-              'Tipo de contenido',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-              ),
-              child: DropdownButtonFormField<String>(
-                initialValue: _selectedType,
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  border: InputBorder.none,
-                ),
-                items: _types.map((type) {
-                  return DropdownMenuItem(value: type, child: Text(type));
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _selectedType = value);
-                  }
-                },
-              ),
+            const _FieldLabel('Tipo de contenido'),
+            dropdown(
+              _selectedType,
+              _types,
+              (value) => setState(() => _selectedType = value),
             ),
             const SizedBox(height: 24),
-            // ID o enlace
-            Text(
-              'ID o enlace',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
+            const _FieldLabel('ID o enlace'),
             TextFormField(
               controller: _targetIdController,
-              decoration: InputDecoration(
+              style: t.body,
+              decoration: const InputDecoration(
                 hintText: 'Ingresa el ID o enlace del contenido',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Theme.of(context).cardColor,
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
@@ -165,89 +136,51 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
               },
             ),
             const SizedBox(height: 24),
-            // Motivo
-            Text(
-              'Motivo',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-              ),
-              child: DropdownButtonFormField<String>(
-                initialValue: _selectedReason,
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  border: InputBorder.none,
-                ),
-                items: _reasons.map((reason) {
-                  return DropdownMenuItem(value: reason, child: Text(reason));
-                }).toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _selectedReason = value);
-                  }
-                },
-              ),
+            const _FieldLabel('Motivo'),
+            dropdown(
+              _selectedReason,
+              _reasons,
+              (value) => setState(() => _selectedReason = value),
             ),
             const SizedBox(height: 24),
-            // Descripción
-            Text(
-              'Descripción adicional',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 8),
+            const _FieldLabel('Descripción adicional'),
             TextFormField(
               controller: _descriptionController,
               maxLines: 5,
-              decoration: InputDecoration(
+              style: t.body,
+              decoration: const InputDecoration(
                 hintText: 'Describe el problema...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Theme.of(context).cardColor,
               ),
             ),
-            const SizedBox(height: 32),
-            // Botón enviar
-            ElevatedButton(
+            const SizedBox(height: 28),
+            VButton(
+              label: 'Enviar reporte',
+              icon: VerbumIcons.flag,
+              expanded: true,
+              loading: _isSubmitting,
               onPressed: _isSubmitting ? null : _submitReport,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: _isSubmitting
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(
-                      'Enviar reporte',
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FieldLabel extends StatelessWidget {
+  const _FieldLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 2, bottom: 8),
+      child: Text(
+        text,
+        style: context.type.bodyStrong.copyWith(
+          fontSize: 13,
+          color: context.palette.inkMuted,
         ),
       ),
     );

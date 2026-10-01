@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../features/paths/presentation/path_photos.dart';
 import '../models/spiritual_path.dart';
 import '../services/spiritual_path_service.dart';
 import '../widgets/verbum_ambient_background.dart';
 import 'spiritual_path_day_screen.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class SpiritualPathDetailScreen extends StatefulWidget {
   final SpiritualPath path;
@@ -26,7 +27,9 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
     _reload();
   }
 
-  void _reload() => _progress = _service.progressFor(widget.path.id);
+  void _reload() {
+    _progress = _service.progressFor(widget.path.id);
+  }
 
   Future<void> _openDay(int number) async {
     await _service.start(widget.path.id, pathTitle: widget.path.title);
@@ -70,103 +73,124 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
               final next = progress.nextDay(path.days.length);
               final started = progress.startedAt != null;
               final complete = progress.isComplete(path.days.length);
+              final p = context.palette;
+              String status(int day) {
+                if (progress.completedDays.contains(day)) return 'hecho';
+                if (day == next && !complete) return 'hoy';
+                if (day == next + 1 && !complete) return 'mañana';
+                return 'pronto';
+              }
+
+              Widget badge(String s) => switch (s) {
+                'hecho' => _Badge(
+                  label: 'Hecho',
+                  icon: VerbumIcons.check,
+                  bg: p.sageSoft,
+                  fg: p.sageInk,
+                ),
+                'hoy' => _Badge(
+                  label: 'Hoy',
+                  icon: VerbumIcons.play,
+                  bg: p.butter,
+                  fg: p.onButter,
+                ),
+                _ => Text(
+                  s == 'mañana' ? 'Mañana' : 'Pronto',
+                  style: context.type.caption,
+                ),
+              };
+
               return Column(
                 children: [
-                  AppBar(
-                    title: const Text('Camino espiritual'),
+                  VAppBar(
                     actions: [
-                      IconButton(
-                        tooltip: 'Invitar a alguien',
-                        onPressed: _share,
-                        icon: const Icon(Icons.ios_share_rounded),
+                      _Badge(
+                        label:
+                            '${path.days.length} días · ${path.minutesPerDay} min',
+                        icon: VerbumIcons.calendarBlank,
+                        bg: p.surfaceMuted,
+                        fg: p.rubric,
+                        large: true,
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
+                      VIconButton(
+                        icon: VerbumIcons.shareNetwork,
+                        semanticLabel: 'Invitar a alguien',
+                        onPressed: _share,
+                      ),
+                      const SizedBox(width: 12),
                     ],
                   ),
                   Expanded(
                     child: ListView(
                       physics: const BouncingScrollPhysics(),
-                      padding: EdgeInsets.fromLTRB(
-                        16,
-                        6,
-                        16,
-                        MediaQuery.paddingOf(context).bottom + 105,
+                      padding: const EdgeInsets.fromLTRB(
+                        VerbumSpace.gutter,
+                        4,
+                        VerbumSpace.gutter,
+                        24,
                       ),
                       children: [
-                        _PathHero(path: path, progress: progress),
-                        const SizedBox(height: 26),
-                        Text(
-                          'LO QUE VAS A RECORRER',
-                          style: GoogleFonts.inter(
-                            fontSize: 9,
-                            letterSpacing: 1.4,
-                            fontWeight: FontWeight.w800,
-                            color: Theme.of(context).colorScheme.secondary,
-                          ),
+                        VTwoToneTitle(
+                          path.title,
+                          'Camino ·',
+                          accentFirst: true,
                         ),
-                        const SizedBox(height: 5),
+                        const SizedBox(height: 8),
                         Text(
-                          'Siete pasos, a tu propio ritmo',
-                          style: GoogleFonts.playfairDisplay(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w700,
-                          ),
+                          path.description,
+                          style: context.type.body.copyWith(color: p.inkMuted),
                         ),
-                        const SizedBox(height: 13),
-                        ...path.days.map((day) {
-                          final done = progress.completedDays.contains(
-                            day.number,
-                          );
-                          final available =
-                              day.number <= next || done || complete;
-                          return _DayTile(
-                            day: day,
-                            done: done,
-                            current: day.number == next && !complete,
-                            available: available,
-                            accent: path.accent,
-                            onTap: available
-                                ? () => _openDay(day.number)
-                                : null,
-                          );
-                        }),
+                        if (progress.completedDays.isNotEmpty) ...[
+                          const SizedBox(height: 14),
+                          VProgressBar(
+                            value: progress.progressFor(path.days.length),
+                            semanticLabel: 'Avance del camino',
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            '${progress.completedDays.length} de ${path.days.length} días completados',
+                            style: context.type.caption,
+                          ),
+                        ],
+                        const SizedBox(height: 22),
+                        VWindingPath(
+                          steps: [
+                            for (final day in path.days)
+                              VWindingStep(
+                                photo: photoForPathDay(day.number),
+                                title: 'Día ${day.number} · ${day.title}',
+                                semanticLabel:
+                                    'Día ${day.number}, ${day.title}, ${status(day.number)}',
+                                badge: badge(status(day.number)),
+                                onTap:
+                                    day.number <= next ||
+                                        progress.completedDays.contains(
+                                          day.number,
+                                        ) ||
+                                        complete
+                                    ? () => _openDay(day.number)
+                                    : null,
+                              ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(
-                      16,
-                      12,
-                      16,
-                      MediaQuery.paddingOf(context).bottom + 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      border: Border(
-                        top: BorderSide(
-                          color: Theme.of(context).colorScheme.outlineVariant,
-                        ),
-                      ),
-                    ),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        onPressed: () => _openDay(complete ? 1 : next),
-                        icon: Icon(
-                          complete
-                              ? Icons.replay_rounded
-                              : started
-                              ? Icons.play_arrow_rounded
-                              : Icons.route_rounded,
-                        ),
-                        label: Text(
-                          complete
-                              ? 'Recorrer de nuevo'
-                              : started
-                              ? 'Continuar con el día $next'
-                              : 'Comenzar este camino',
-                        ),
-                      ),
+                  VBottomBar(
+                    child: VButton(
+                      label: complete
+                          ? 'Recorrer de nuevo'
+                          : started
+                          ? 'Continuar con el día $next'
+                          : 'Comenzar este camino',
+                      icon: complete
+                          ? VerbumIcons.arrowCounterClockwise
+                          : started
+                          ? VerbumIcons.play
+                          : VerbumIcons.arrowRight,
+                      expanded: true,
+                      onPressed: () => _openDay(complete ? 1 : next),
                     ),
                   ),
                 ],
@@ -179,218 +203,45 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
   }
 }
 
-class _PathHero extends StatelessWidget {
-  final SpiritualPath path;
-  final SpiritualPathProgress progress;
-  const _PathHero({required this.path, required this.progress});
+class _Badge extends StatelessWidget {
+  const _Badge({
+    required this.label,
+    required this.icon,
+    required this.bg,
+    required this.fg,
+    this.large = false,
+  });
+
+  final String label;
+  final VerbumIcons icon;
+  final Color bg;
+  final Color fg;
+  final bool large;
 
   @override
   Widget build(BuildContext context) {
-    final value = progress.progressFor(path.days.length);
     return Container(
-      padding: const EdgeInsets.all(23),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [const Color(0xFF29213F), path.accent.withValues(alpha: .92)],
-        ),
-        borderRadius: BorderRadius.circular(29),
+      padding: EdgeInsets.symmetric(
+        horizontal: large ? 14 : 10,
+        vertical: large ? 10 : 5,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(large ? 16 : 99),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 49,
-            height: 49,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: .13),
-              borderRadius: BorderRadius.circular(17),
-            ),
-            child: Icon(path.icon, color: Colors.white),
-          ),
-          const SizedBox(height: 22),
+          VIcon(icon, size: large ? 16 : 12, color: fg),
+          const SizedBox(width: 6),
           Text(
-            path.category.toUpperCase(),
-            style: GoogleFonts.inter(
-              color: const Color(0xFFF0D9A1),
-              fontSize: 9,
-              letterSpacing: 1.3,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            path.title,
-            style: GoogleFonts.playfairDisplay(
-              color: Colors.white,
-              fontSize: 30,
+            label,
+            style: context.type.caption.copyWith(
+              color: fg,
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 9),
-          Text(
-            path.description,
-            style: GoogleFonts.inter(
-              color: Colors.white.withValues(alpha: .78),
-              fontSize: 12.5,
-              height: 1.55,
-            ),
-          ),
-          const SizedBox(height: 18),
-          Row(
-            children: [
-              const Icon(
-                Icons.calendar_today_outlined,
-                color: Colors.white70,
-                size: 16,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                '${path.days.length} días',
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(width: 17),
-              const Icon(
-                Icons.schedule_rounded,
-                color: Colors.white70,
-                size: 16,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                '${path.minutesPerDay} min diarios',
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          if (value > 0) ...[
-            const SizedBox(height: 19),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(99),
-              child: LinearProgressIndicator(
-                value: value,
-                minHeight: 5,
-                color: const Color(0xFFF0D9A1),
-                backgroundColor: Colors.white.withValues(alpha: .15),
-              ),
-            ),
-            const SizedBox(height: 7),
-            Text(
-              '${progress.completedDays.length} de ${path.days.length} días completados',
-              style: GoogleFonts.inter(color: Colors.white70, fontSize: 10.5),
-            ),
-          ],
         ],
-      ),
-    );
-  }
-}
-
-class _DayTile extends StatelessWidget {
-  final SpiritualPathDay day;
-  final bool done;
-  final bool current;
-  final bool available;
-  final Color accent;
-  final VoidCallback? onTap;
-  const _DayTile({
-    required this.day,
-    required this.done,
-    required this.current,
-    required this.available,
-    required this.accent,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
-          child: Ink(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: scheme.surface.withValues(alpha: available ? .92 : .55),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: current
-                    ? accent.withValues(alpha: .55)
-                    : scheme.outlineVariant,
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: done ? accent : accent.withValues(alpha: .1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: done
-                      ? const Icon(
-                          Icons.check_rounded,
-                          color: Colors.white,
-                          size: 19,
-                        )
-                      : Text(
-                          '${day.number}',
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w800,
-                            color: available ? accent : scheme.outline,
-                          ),
-                        ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        day.title,
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: available
-                              ? scheme.onSurface
-                              : scheme.onSurfaceVariant,
-                        ),
-                      ),
-                      Text(
-                        day.subtitle,
-                        style: GoogleFonts.inter(
-                          fontSize: 10.5,
-                          color: scheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  available
-                      ? Icons.chevron_right_rounded
-                      : Icons.lock_outline_rounded,
-                  size: 19,
-                  color: scheme.outline,
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

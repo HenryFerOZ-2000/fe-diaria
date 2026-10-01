@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:verbum/design_system/design_system.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:verbum/theme/app_theme.dart';
 import 'package:verbum/widgets/community_members_sheet.dart';
 
 void main() {
@@ -31,7 +31,7 @@ void main() {
     ValueChanged<CommunityMemberActionSelection>? onActionSelected,
   }) {
     return MaterialApp(
-      theme: lightTheme,
+      theme: buildVerbumTheme(brightness: Brightness.light),
       home: Scaffold(
         body: CommunityMembersPanel(
           members: members,

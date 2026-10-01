@@ -71,21 +71,6 @@ class _EmotionPassageReadScreenState extends State<EmotionPassageReadScreen> {
     );
   }
 
-  Color get _accent {
-    switch (widget.emotionKey) {
-      case 'paz_interior':
-        return const Color(0xFF5F8178);
-      case 'gratitud':
-        return const Color(0xFFB58A45);
-      case 'fortaleza':
-        return const Color(0xFF536C91);
-      case 'perdon':
-        return const Color(0xFF9A7054);
-      default:
-        return const Color(0xFF77649A);
-    }
-  }
-
   String get _category => widget.emotionKey.replaceAll('_', ' ');
 
   @override
@@ -98,7 +83,6 @@ class _EmotionPassageReadScreenState extends State<EmotionPassageReadScreen> {
     text: _prayer?.text,
     verseReference: _prayer?.verseRef,
     tags: _prayer?.tags ?? const [],
-    accent: _accent,
     onBack: () => Navigator.pop(context),
     onRetry: _load,
     onShare: _share,

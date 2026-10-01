@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../theme/app_theme.dart';
 import '../application/share_card_layout.dart';
 import '../domain/share_card_format.dart';
 import '../domain/share_content.dart';
@@ -257,27 +256,40 @@ class _CardPalette {
   final Color accent;
   final Color halo;
 
+  // Valores fijos de la tarjeta exportada (cubiertos por goldens). No usan
+  // la paleta del tema para que un cambio del tema no altere las imágenes
+  // compartidas sin querer.
+  // Paleta "Camino claro": lavanda, tinta, índigo, periwinkle y mantequilla.
+  static const _white = Color(0xFFFFFFFF);
+  static const _lavender = Color(0xFFF1F2FC);
+  static const _lavender2 = Color(0xFFE5E7F8);
+  static const _ink = Color(0xFF22245A);
+  static const _indigo = Color(0xFF3A3C8E);
+  static const _periwinkle = Color(0xFF6F72D3);
+  static const _butter = Color(0xFFF4DF7A);
+  static const _night = Color(0xFF10122A);
+
   static _CardPalette forStyle(ShareVisualStyle style) => switch (style) {
     ShareVisualStyle.sereneLight => const _CardPalette(
-      background: [AppColors.surface, Color(0xFFF3EEE5), Color(0xFFEAE4F0)],
-      ink: AppColors.primaryDark,
-      metadata: AppColors.primary,
-      accent: AppColors.secondary,
-      halo: AppColors.secondary,
+      background: [_white, _lavender, _lavender2],
+      ink: _ink,
+      metadata: _indigo,
+      accent: _periwinkle,
+      halo: _periwinkle,
     ),
     ShareVisualStyle.contemplativeNight => const _CardPalette(
-      background: [Color(0xFF15121D), AppColors.primaryDark, Color(0xFF17141F)],
-      ink: AppColors.surface,
-      metadata: Color(0xFFE2C998),
-      accent: Color(0xFFD8B875),
-      halo: AppColors.secondary,
+      background: [_night, Color(0xFF1A1D3A), _night],
+      ink: _lavender,
+      metadata: _butter,
+      accent: _butter,
+      halo: _periwinkle,
     ),
     ShareVisualStyle.livingTradition => const _CardPalette(
-      background: [AppColors.primaryDark, AppColors.primary, Color(0xFF60475B)],
-      ink: AppColors.surface,
-      metadata: Color(0xFFF0D8A7),
-      accent: Color(0xFFD8B875),
-      halo: AppColors.secondary,
+      background: [_indigo, _periwinkle, Color(0xFF5D60C4)],
+      ink: _white,
+      metadata: _butter,
+      accent: _butter,
+      halo: _butter,
     ),
   };
 }

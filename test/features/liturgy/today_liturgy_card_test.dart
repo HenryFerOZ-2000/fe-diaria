@@ -67,7 +67,7 @@ void main() {
     );
 
     expect(tester.takeException(), isNull);
-    expect(find.text('HOY EN LA IGLESIA'), findsOneWidget);
+    expect(find.text('Hoy en la Iglesia'), findsOneWidget);
     expect(
       tester.getSize(find.byType(TodayLiturgyCard)).height,
       lessThanOrEqualTo(240),
@@ -231,6 +231,11 @@ void main() {
       ),
     );
     await tester.pump();
+    expect(tester.takeException(), isNull);
+    await tester.scrollUntilVisible(
+      find.text('Oración devocional sugerida para hoy'),
+      300,
+    );
     expect(tester.takeException(), isNull);
     expect(find.text('Oración devocional sugerida para hoy'), findsOneWidget);
   });

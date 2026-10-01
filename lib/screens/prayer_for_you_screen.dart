@@ -8,10 +8,8 @@ import '../services/ads_service.dart';
 import '../services/storage_service.dart';
 import '../models/verse.dart';
 import '../widgets/app_scaffold.dart';
-import '../widgets/custom_button.dart';
-import '../widgets/main_card.dart';
-import '../theme/app_theme.dart';
 import '../widgets/prayer_reading_experience.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla dedicada "Oración para ti" - Mostrando oración y versículo personalizados
 class PrayerForYouScreen extends StatefulWidget {
@@ -93,45 +91,46 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
 
         // Obtener versículo personalizado (si hay emoción)
         final verse = provider.todayVerse;
-        final colorScheme = Theme.of(context).colorScheme;
-        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final p = context.palette;
 
         return AppScaffold(
           title: 'Oración para ti',
+          centerTitle: false,
           actions: [
-            IconButton(
-              icon: const Icon(Icons.refresh),
+            VIconButton(
+              icon: VerbumIcons.arrowClockwise,
+              semanticLabel: 'Actualizar',
               onPressed: () async {
                 await provider.loadTodayVerse();
                 await provider.loadTodayPrayers();
               },
-              tooltip: 'Actualizar',
             ),
           ],
           body: Column(
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  padding: const EdgeInsets.fromLTRB(
+                    VerbumSpace.gutter,
+                    VerbumSpace.xs,
+                    VerbumSpace.gutter,
+                    VerbumSpace.xl,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Botón grande para cambiar emoción
-                      CustomButton(
-                        text: '¿Cómo te sientes ahora?',
-                        icon: Icons.emoji_emotions_outlined,
-                        onPressed: () {
+                      // Acción para cambiar emoción
+                      VActionTile(
+                        icon: VerbumIcons.smiley,
+                        title: '¿Cómo te sientes ahora?',
+                        subtitle: 'Elige otra emoción para tu oración',
+                        onTap: () {
                           Navigator.of(
                             context,
                           ).pushReplacementNamed('/emotion-selection');
                         },
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppSpacing.lg,
-                        ),
-                        fontSize: 18,
                       ),
-                      const SizedBox(height: AppSpacing.xl),
+                      const SizedBox(height: VerbumSpace.lg),
 
                       // Oración personalizada
                       _buildPrayerCard(
@@ -140,7 +139,7 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
                         userName: userName,
                       ),
 
-                      const SizedBox(height: AppSpacing.xl),
+                      const SizedBox(height: VerbumSpace.md),
 
                       // Versículo relacionado
                       if (verse != null)
@@ -158,33 +157,37 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
                       ? _bannerAd!.size.height.toDouble()
                       : 50,
                   decoration: BoxDecoration(
-                    color: isDark ? colorScheme.surface : AppColors.surface,
-                    border: Border(
-                      top: BorderSide(
-                        color: colorScheme.outline.withValues(alpha: 0.1),
-                        width: 1,
-                      ),
-                    ),
+                    color: p.surface,
+                    border: Border(top: BorderSide(color: p.line)),
                   ),
                   child: _bannerAd != null
                       ? AdWidget(ad: _bannerAd!)
-                      : const SizedBox(
+                      : SizedBox(
                           height: 50,
                           child: Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: p.rubric,
+                            ),
                           ),
                         ),
                 ),
               // Botón de regreso al inicio
               Padding(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: CustomButton(
-                  text: 'Regresar al inicio',
-                  icon: Icons.home,
+                padding: const EdgeInsets.fromLTRB(
+                  VerbumSpace.gutter,
+                  VerbumSpace.sm,
+                  VerbumSpace.gutter,
+                  VerbumSpace.md,
+                ),
+                child: VButton(
+                  label: 'Regresar al inicio',
+                  icon: VerbumIcons.house,
+                  iconLeading: true,
+                  expanded: true,
                   onPressed: () {
                     Navigator.of(context).pushNamed('/home');
                   },
-                  width: double.infinity,
                 ),
               ),
             ],
@@ -199,85 +202,48 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
     required String prayerText,
     required String userName,
   }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final p = context.palette;
+    final type = context.type;
+    final title = userName.isNotEmpty
+        ? 'Oración para $userName'
+        : 'Tu oración personalizada';
 
-    return MainCard(
+    return VSurfaceCard(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => PrayerTextReadingScreen(
             provenance: ContentProvenance.aiGenerated,
-            title: userName.isNotEmpty
-                ? 'Oración para $userName'
-                : 'Tu oración personalizada',
+            title: title,
             text: prayerText,
-            accent: const Color(0xFFA65F69),
             category: 'Oración para ti',
           ),
         ),
       ),
-      padding: const EdgeInsets.all(AppSpacing.xl),
-      child: Stack(
+      padding: const EdgeInsets.all(VerbumSpace.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Positioned(
-            top: -30,
-            right: -30,
-            child: Opacity(
-              opacity: 0.05,
-              child: Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [colorScheme.primary, colorScheme.tertiary],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: colorScheme.secondary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                    ),
-                    child: Icon(
-                      Icons.favorite,
-                      color: colorScheme.secondary,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Text(
-                      userName.isNotEmpty
-                          ? 'Oración para $userName'
-                          : 'Tu Oración Personalizada',
-                      style: theme.textTheme.displaySmall?.copyWith(
-                        color: colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                prayerText,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontSize: 18,
-                  height: 1.8,
+              Container(
+                padding: const EdgeInsets.all(VerbumSpace.sm),
+                decoration: BoxDecoration(
+                  color: p.accentSoft,
+                  borderRadius: BorderRadius.circular(VerbumRadius.control),
                 ),
-                softWrap: true,
-                overflow: TextOverflow.visible,
+                child: VIcon(
+                  VerbumIcons.heart,
+                  weight: VIconWeight.duotone,
+                  color: p.rubric,
+                  size: 26,
+                ),
               ),
+              const SizedBox(width: VerbumSpace.sm),
+              Expanded(child: Text(title, style: type.heading)),
             ],
           ),
+          const SizedBox(height: VerbumSpace.md),
+          Text(prayerText, style: type.scripture),
         ],
       ),
     );
@@ -287,73 +253,33 @@ class _PrayerForYouScreenState extends State<PrayerForYouScreen> {
     required BuildContext context,
     required Verse verse,
   }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final p = context.palette;
+    final type = context.type;
 
-    return MainCard(
-      padding: const EdgeInsets.all(AppSpacing.xl),
-      backgroundColor: colorScheme.tertiary.withValues(alpha: 0.1),
-      border: Border.all(
-        color: colorScheme.tertiary.withValues(alpha: 0.3),
-        width: 2,
-      ),
-      child: Stack(
+    return VSurfaceCard(
+      tone: VSurfaceTone.accent,
+      padding: const EdgeInsets.all(VerbumSpace.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Positioned(
-            top: -30,
-            right: -30,
-            child: Opacity(
-              opacity: 0.06,
-              child: Icon(Icons.book, size: 140, color: colorScheme.tertiary),
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: colorScheme.tertiary.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                    ),
-                    child: Icon(
-                      Icons.book,
-                      color: colorScheme.tertiary,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Text(
-                    'Versículo para ti',
-                    style: theme.textTheme.displaySmall?.copyWith(
-                      color: colorScheme.tertiary,
-                    ),
-                  ),
-                ],
+              VIcon(
+                VerbumIcons.bookOpenText,
+                weight: VIconWeight.duotone,
+                color: p.rubric,
+                size: 22,
               ),
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                verse.text,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontSize: 20,
-                  height: 1.8,
-                  fontStyle: FontStyle.italic,
-                ),
-                softWrap: true,
-                overflow: TextOverflow.visible,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                verse.reference,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: colorScheme.tertiary,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.right,
-              ),
+              const SizedBox(width: VerbumSpace.xs),
+              Text('Versículo para ti', style: type.rubric),
             ],
+          ),
+          const SizedBox(height: VerbumSpace.sm),
+          Text(verse.text, style: type.scriptureLarge),
+          const SizedBox(height: VerbumSpace.sm),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(verse.reference, style: type.citation),
           ),
         ],
       ),

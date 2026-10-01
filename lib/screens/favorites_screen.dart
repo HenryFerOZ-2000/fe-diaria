@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../features/sharing/domain/share_content.dart';
 import '../providers/app_provider.dart';
 import '../services/share_service.dart';
 import '../l10n/app_localizations.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 /// Pantalla de favoritos con animaciones suaves
 class FavoritesScreen extends StatelessWidget {
@@ -13,17 +13,12 @@ class FavoritesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text(
           AppLocalizations.of(context).favoritesTitle,
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: VerbumFonts.serif(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -51,8 +46,8 @@ class FavoritesScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.favorite_border,
+                        VIcon(
+                          VerbumIcons.heart,
                           size: 80,
                           color: Theme.of(
                             context,
@@ -61,7 +56,7 @@ class FavoritesScreen extends StatelessWidget {
                         const SizedBox(height: 24),
                         Text(
                           AppLocalizations.of(context).noFavorites,
-                          style: GoogleFonts.inter(
+                          style: VerbumFonts.sans(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
                             color: Theme.of(context).colorScheme.onSurface,
@@ -75,7 +70,7 @@ class FavoritesScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 40),
                           child: Text(
                             AppLocalizations.of(context).noFavoritesDescription,
-                            style: GoogleFonts.inter(
+                            style: VerbumFonts.sans(
                               fontSize: 14,
                               color: Theme.of(
                                 context,
@@ -184,9 +179,7 @@ class _FavoriteCardState extends State<_FavoriteCard>
       child: Card(
         margin: const EdgeInsets.only(bottom: 16),
         elevation: 2,
-        shadowColor: Theme.of(
-          context,
-        ).colorScheme.primary.withValues(alpha: 0.1),
+        shadowColor: VerbumShadows.tint(context.palette, .1),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         color: Theme.of(context).colorScheme.surface,
         surfaceTintColor: Colors.transparent,
@@ -214,7 +207,7 @@ class _FavoriteCardState extends State<_FavoriteCard>
                 // Texto del versículo
                 Text(
                   widget.verse.text,
-                  style: GoogleFonts.inter(
+                  style: VerbumFonts.sans(
                     fontSize: 16,
                     height: 1.7,
                     color: Theme.of(context).colorScheme.onSurface,
@@ -248,7 +241,7 @@ class _FavoriteCardState extends State<_FavoriteCard>
                     Expanded(
                       child: Text(
                         widget.verse.reference,
-                        style: GoogleFonts.playfairDisplay(
+                        style: VerbumFonts.serif(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.primary,
@@ -286,7 +279,7 @@ class _FavoriteCardState extends State<_FavoriteCard>
                               ),
                               child: Text(
                                 'Compartir',
-                                style: GoogleFonts.inter(
+                                style: VerbumFonts.sans(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                   color: Theme.of(context).colorScheme.primary,
@@ -304,8 +297,9 @@ class _FavoriteCardState extends State<_FavoriteCard>
                             borderRadius: BorderRadius.circular(20),
                             child: Padding(
                               padding: const EdgeInsets.all(8),
-                              child: Icon(
-                                Icons.favorite,
+                              child: VIcon(
+                                VerbumIcons.heart,
+                                weight: VIconWeight.fill,
                                 size: 20,
                                 color: Colors.red,
                               ),

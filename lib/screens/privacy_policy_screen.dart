@@ -1,100 +1,105 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:verbum/design_system/design_system.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
 
+  static const _sections = <(String, String)>[
+    (
+      'Información que recopilamos',
+      'Recopilamos información que nos proporcionas directamente, como tu nombre, email y foto de perfil cuando creas una cuenta.',
+    ),
+    (
+      'Cómo usamos tu información',
+      'Utilizamos tu información para proporcionar, mantener y mejorar nuestros servicios, personalizar tu experiencia y comunicarnos contigo.',
+    ),
+    (
+      'Protección de datos',
+      'Implementamos medidas de seguridad técnicas y organizativas para proteger tu información personal contra acceso no autorizado, alteración, divulgación o destrucción.',
+    ),
+    (
+      'Tus derechos',
+      'Tienes derecho a acceder, rectificar, eliminar o portar tus datos personales. También puedes oponerte al procesamiento de tus datos en ciertas circunstancias.',
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
+    final t = context.type;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Política de privacidad',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+      appBar: VAppBar(title: Text('Política de privacidad', style: t.heading)),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(
+          VerbumSpace.gutter,
+          8,
+          VerbumSpace.gutter,
+          40,
+        ),
+        children: [
+          Text('Última actualización: ${DateTime.now().year}', style: t.rubric),
+          const SizedBox(height: 10),
+          Text('Política de privacidad', style: t.title),
+          const SizedBox(height: 12),
+          Text(
+            'Respetamos tu privacidad y nos comprometemos a proteger tus datos personales. Esta política describe cómo recopilamos, usamos y protegemos tu información.',
+            style: t.body.copyWith(color: p.inkMuted, height: 1.6),
           ),
-        ),
-        centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Política de Privacidad',
-              style: GoogleFonts.inter(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+          const SizedBox(height: 20),
+          VSurfaceCard(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final (title, content) in _sections)
+                  _Section(title: title, content: content),
+              ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Última actualización: ${DateTime.now().year}',
-              style: GoogleFonts.inter(fontSize: 12, color: Colors.grey[600]),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Respetamos tu privacidad y nos comprometemos a proteger tus datos personales. Esta política describe cómo recopilamos, usamos y protegemos tu información.',
-              style: GoogleFonts.inter(fontSize: 14, height: 1.6),
-            ),
-            const SizedBox(height: 24),
-            _buildSection(
-              'Información que recopilamos',
-              'Recopilamos información que nos proporcionas directamente, como tu nombre, email y foto de perfil cuando creas una cuenta.',
-            ),
-            _buildSection(
-              'Cómo usamos tu información',
-              'Utilizamos tu información para proporcionar, mantener y mejorar nuestros servicios, personalizar tu experiencia y comunicarnos contigo.',
-            ),
-            _buildSection(
-              'Protección de datos',
-              'Implementamos medidas de seguridad técnicas y organizativas para proteger tu información personal contra acceso no autorizado, alteración, divulgación o destrucción.',
-            ),
-            _buildSection(
-              'Tus derechos',
-              'Tienes derecho a acceder, rectificar, eliminar o portar tus datos personales. También puedes oponerte al procesamiento de tus datos en ciertas circunstancias.',
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: () {
-                // Placeholder: mostrar mensaje
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Enlace a política completa próximamente'),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.open_in_new),
-              label: const Text('Ver política completa'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
+          ),
+          const SizedBox(height: 24),
+          VButton(
+            label: 'Ver política completa',
+            icon: VerbumIcons.arrowSquareOut,
+            variant: VButtonVariant.outlined,
+            expanded: true,
+            onPressed: () {
+              // Placeholder: mostrar mensaje
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Enlace a política completa próximamente'),
                 ),
-              ),
-            ),
-          ],
-        ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildSection(String title, String content) {
+class _Section extends StatelessWidget {
+  const _Section({required this.title, required this.content});
+
+  final String title;
+  final String content;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.type;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.only(bottom: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(title, style: t.bodyStrong.copyWith(fontSize: 16)),
+          const SizedBox(height: 6),
           Text(
-            title,
-            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700),
+            content,
+            style: t.body.copyWith(
+              color: context.palette.inkMuted,
+              height: 1.6,
+            ),
           ),
-          const SizedBox(height: 8),
-          Text(content, style: GoogleFonts.inter(fontSize: 14, height: 1.6)),
         ],
       ),
     );
