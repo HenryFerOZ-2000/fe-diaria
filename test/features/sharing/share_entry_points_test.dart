@@ -271,8 +271,7 @@ void main() {
     final step = TraditionalPrayersService().getNovenaStep(1, 1)!;
     await tester.pumpWidget(const MaterialApp(home: NovenaDayScreen(day: 1)));
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(find.text('Compartir'), 300);
-    await tester.tap(find.text('Compartir'));
+    await tester.tap(find.byTooltip('Compartir'));
     await _pumpRoute(tester);
 
     expect(find.byType(ShareComposerScreen), findsOneWidget);
