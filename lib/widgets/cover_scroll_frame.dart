@@ -7,8 +7,8 @@ import '../design_system/design_system.dart';
 ///
 /// Mientras la portada oscura está bajo la hora, la barra de estado va en
 /// claro y sin fondo. En cuanto la portada sale por arriba (se mide su alto
-/// real con [coverKey]), aparece una franja lavanda opaca que se difumina
-/// hacia abajo y la barra pasa a texto oscuro.
+/// real con [coverKey]), aparece una franja lavanda sólida con un filete
+/// fino y la barra pasa a texto oscuro.
 class CoverScrollFrame extends StatefulWidget {
   const CoverScrollFrame({
     super.key,
@@ -60,19 +60,12 @@ class _CoverScrollFrameState extends State<CoverScrollFrame> {
               child: AnimatedOpacity(
                 opacity: _pastCover ? 1 : 0,
                 duration: const Duration(milliseconds: 180),
+                // Franja sólida con filete fino: sin difuminados.
                 child: Container(
-                  height: top + 14,
+                  height: top,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        p.background,
-                        p.background,
-                        p.background.withValues(alpha: 0),
-                      ],
-                      stops: [0, top / (top + 14), 1],
-                    ),
+                    color: p.background,
+                    border: Border(bottom: BorderSide(color: p.lineSoft)),
                   ),
                 ),
               ),
