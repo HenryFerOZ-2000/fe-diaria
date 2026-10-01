@@ -67,7 +67,7 @@ void main() {
   ) async {
     await pump(tester, essentials: missions());
 
-    expect(find.text('PALABRA DEL DÍA'), findsOneWidget);
+    expect(find.text('Palabra del día'), findsOneWidget);
     expect(find.byType(VDropCapText), findsOneWidget);
     expect(find.text('Lucas 9, 62'), findsOneWidget);
     expect(find.text('0 de 3'), findsOneWidget);
@@ -83,7 +83,7 @@ void main() {
       VStepState.current,
       VStepState.upcoming,
     ]);
-    expect(find.text('TU SIGUIENTE PASO'), findsOneWidget);
+    expect(find.text('Tu siguiente paso'), findsOneWidget);
     expect(find.text('Hazla oración'), findsOneWidget);
   });
 

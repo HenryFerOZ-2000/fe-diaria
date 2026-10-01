@@ -1,16 +1,16 @@
 /// Radios con nombre de uso, no de tamaño.
 abstract final class VerbumRadius {
   /// Botones, inputs, chips rectangulares.
-  static const double control = 14;
+  static const double control = 16;
 
   /// Tiles pequeños (horas, categorías).
-  static const double tile = 16;
+  static const double tile = 20;
 
   /// Tarjetas principales.
-  static const double card = 22;
+  static const double card = 26;
 
   /// Hojas inferiores.
-  static const double sheet = 28;
+  static const double sheet = 30;
 }
 
 /// Escala de espaciado (múltiplos de 4).

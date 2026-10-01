@@ -154,7 +154,7 @@ void main() {
     await tester.pump();
 
     expect(find.byType(VCandle), findsOneWidget);
-    expect(find.text('ANTES DE DORMIR'), findsOneWidget);
+    expect(find.text('Antes de dormir'), findsOneWidget);
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
     expect(scaffold.backgroundColor, VerbumPalette.dark.background);
   });

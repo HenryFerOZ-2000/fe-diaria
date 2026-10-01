@@ -5,7 +5,7 @@ import '../theme/verbum_context.dart';
 import 'v_icon.dart';
 
 /// Etiqueta en versalitas espaciadas, como las rúbricas de un misal.
-/// Ej.: "PALABRA DEL DÍA", "CONTINÚA · DÍA 9 DE 9".
+/// Ej.: "Palabra del día", "Continúa · día 9 de 9".
 class VRubricLabel extends StatelessWidget {
   const VRubricLabel(this.text, {super.key, this.icon, this.color});
 
@@ -17,7 +17,7 @@ class VRubricLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = context.type.rubric.copyWith(color: color);
     final label = Text(
-      text.toUpperCase(),
+      text,
       style: style,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,

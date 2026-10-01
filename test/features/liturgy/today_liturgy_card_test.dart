@@ -67,7 +67,7 @@ void main() {
     );
 
     expect(tester.takeException(), isNull);
-    expect(find.text('HOY EN LA IGLESIA'), findsOneWidget);
+    expect(find.text('Hoy en la Iglesia'), findsOneWidget);
     expect(
       tester.getSize(find.byType(TodayLiturgyCard)).height,
       lessThanOrEqualTo(240),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../icons/verbum_icons.dart';
 import '../theme/verbum_context.dart';
 import '../tokens/verbum_radius.dart';
+import '../tokens/verbum_shadows.dart';
 import 'v_icon.dart';
 
 /// Opción única con título y descripción (tradición, plan, modo…).
@@ -37,8 +38,9 @@ class VRadioCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? p.accentSoft : p.surface,
           borderRadius: BorderRadius.circular(VerbumRadius.card - 2),
+          boxShadow: selected ? null : VerbumShadows.soft(p),
           border: Border.all(
-            color: selected ? p.rubric : p.line,
+            color: selected ? p.rubric : Colors.transparent,
             width: selected ? 1.6 : 1,
           ),
         ),

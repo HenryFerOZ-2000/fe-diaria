@@ -54,7 +54,7 @@ class VStepTile extends StatelessWidget {
         p.surface,
         p.ink,
         p.gold,
-        BorderSide(color: p.line),
+        BorderSide.none,
       ),
     };
     final stateLabel = switch (state) {
@@ -68,6 +68,8 @@ class VStepTile extends StatelessWidget {
       label: '$title, $stateLabel',
       excludeSemantics: true,
       child: Material(
+        elevation: state == VStepState.upcoming ? 6 : 0,
+        shadowColor: p.ink.withValues(alpha: .18),
         color: bg,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(VerbumRadius.tile),

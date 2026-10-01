@@ -178,11 +178,11 @@ ThemeData buildVerbumTheme({
       ),
     ),
     chipTheme: ChipThemeData(
-      backgroundColor: palette.surface,
+      backgroundColor: palette.surfaceMuted,
       selectedColor: palette.emphasis,
-      side: hairline,
+      side: BorderSide.none,
       // El seleccionado va sobre énfasis: su texto y check deben contrastar.
-      labelStyle: type.bodyStrong.copyWith(fontSize: 13, color: palette.ink),
+      labelStyle: type.bodyStrong.copyWith(fontSize: 13, color: palette.rubric),
       secondaryLabelStyle: type.bodyStrong.copyWith(
         fontSize: 13,
         color: palette.onEmphasis,

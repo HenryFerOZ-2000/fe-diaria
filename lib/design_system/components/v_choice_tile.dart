@@ -30,11 +30,13 @@ class VChoiceTile extends StatelessWidget {
       label: label,
       excludeSemantics: true,
       child: Material(
+        elevation: selected ? 0 : 6,
+        shadowColor: p.ink.withValues(alpha: .18),
         color: selected ? p.accentSoft : p.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(VerbumRadius.tile),
           side: BorderSide(
-            color: selected ? p.rubric : p.line,
+            color: selected ? p.rubric : Colors.transparent,
             width: selected ? 1.5 : 1,
           ),
         ),

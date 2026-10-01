@@ -49,7 +49,7 @@ class VFeatureCard extends StatelessWidget {
                   watermark,
                   weight: VIconWeight.duotone,
                   size: 132,
-                  color: p.gold.withValues(alpha: 0.14),
+                  color: fg.withValues(alpha: 0.14),
                 ),
               ),
             ),
@@ -58,10 +58,7 @@ class VFeatureCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    eyebrow.toUpperCase(),
-                    style: type.rubric.copyWith(color: p.gold),
-                  ),
+                  Text(eyebrow, style: type.rubric.copyWith(color: p.butter)),
                   const SizedBox(height: 8),
                   Text(
                     title,

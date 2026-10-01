@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../icons/verbum_icons.dart';
 import '../theme/verbum_context.dart';
 import '../tokens/verbum_radius.dart';
+import '../tokens/verbum_shadows.dart';
 import 'v_icon.dart';
 
 /// Fila de una [VListGroup]. Construida sobre [Material]/[InkWell], así el
@@ -150,30 +151,40 @@ class VListGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    return Material(
-      color: p.surface,
-      shape: RoundedRectangleBorder(
+    return DecoratedBox(
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(VerbumRadius.card - 4),
-        side: BorderSide(color: p.line),
+        boxShadow: VerbumShadows.soft(p),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (title != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
-              child: Text(
-                title!.toUpperCase(),
-                style: context.type.rubric.copyWith(fontSize: 9.5),
+      child: Material(
+        color: p.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(VerbumRadius.card - 4),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (title != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+                child: Text(
+                  title!,
+                  style: context.type.rubric.copyWith(fontSize: 9.5),
+                ),
               ),
-            ),
-          for (var i = 0; i < children.length; i++) ...[
-            if (i > 0)
-              Divider(height: 1, indent: 16, endIndent: 16, color: p.lineSoft),
-            children[i],
+            for (var i = 0; i < children.length; i++) ...[
+              if (i > 0)
+                Divider(
+                  height: 1,
+                  indent: 16,
+                  endIndent: 16,
+                  color: p.lineSoft,
+                ),
+              children[i],
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

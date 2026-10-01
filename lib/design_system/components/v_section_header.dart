@@ -48,10 +48,7 @@ class VSectionHeader extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (eyebrow != null) ...[
-                    Text(
-                      eyebrow!.toUpperCase(),
-                      style: type.rubric.copyWith(fontSize: 9.5),
-                    ),
+                    Text(eyebrow!, style: type.rubric.copyWith(fontSize: 9.5)),
                     const SizedBox(height: 3),
                   ],
                   Text(title, style: type.heading),

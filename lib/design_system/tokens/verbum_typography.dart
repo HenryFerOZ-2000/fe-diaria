@@ -5,8 +5,8 @@ import 'verbum_palette.dart';
 
 /// Las dos únicas familias de la app.
 ///
-/// * [serif] (Cormorant Garamond): la Palabra, títulos y citas.
-/// * [sans] (Figtree): interfaz, botones, metadatos.
+/// * [sans] (Plus Jakarta Sans): interfaz, titulares, botones y datos.
+/// * [serif] (Cormorant Garamond): solo la Escritura y sus citas.
 ///
 /// Aceptan los mismos parámetros que `GoogleFonts.*`, así sustituyen
 /// cualquier llamada directa.
@@ -45,8 +45,8 @@ abstract final class VerbumFonts {
     );
   }
 
-  static const sans = GoogleFonts.figtree;
-  static const sansTextTheme = GoogleFonts.figtreeTextTheme;
+  static const sans = GoogleFonts.plusJakartaSans;
+  static const sansTextTheme = GoogleFonts.plusJakartaSansTextTheme;
 }
 
 /// Estilos semánticos. Las pantallas usan estos nombres, nunca tamaños sueltos.
@@ -84,7 +84,7 @@ class VerbumTypography extends ThemeExtension<VerbumTypography> {
   /// Referencias bíblicas ("Lucas 9, 62").
   final TextStyle citation;
 
-  /// Etiquetas en versalitas espaciadas ("PALABRA DEL DÍA").
+  /// Etiquetas cortas en negrita ("Palabra del día").
   final TextStyle rubric;
 
   final TextStyle body;
@@ -94,71 +94,73 @@ class VerbumTypography extends ThemeExtension<VerbumTypography> {
 
   factory VerbumTypography.fromPalette(VerbumPalette p) {
     return VerbumTypography(
-      display: VerbumFonts.serif(
-        fontSize: 36,
-        fontWeight: FontWeight.w500,
-        height: 1.05,
-        letterSpacing: -0.3,
-        color: p.ink,
-      ),
-      title: VerbumFonts.serif(
-        fontSize: 28,
-        fontWeight: FontWeight.w500,
+      display: VerbumFonts.sans(
+        fontSize: 30,
+        fontWeight: FontWeight.w800,
         height: 1.1,
+        letterSpacing: -0.9,
         color: p.ink,
       ),
-      heading: VerbumFonts.serif(
-        fontSize: 21,
-        fontWeight: FontWeight.w600,
-        height: 1.2,
+      title: VerbumFonts.sans(
+        fontSize: 23,
+        fontWeight: FontWeight.w800,
+        height: 1.15,
+        letterSpacing: -0.6,
+        color: p.ink,
+      ),
+      heading: VerbumFonts.sans(
+        fontSize: 17,
+        fontWeight: FontWeight.w800,
+        height: 1.25,
+        letterSpacing: -0.2,
         color: p.ink,
       ),
       scripture: VerbumFonts.serif(
-        fontSize: 19,
-        fontWeight: FontWeight.w400,
+        fontSize: 19.5,
+        fontWeight: FontWeight.w500,
         height: 1.55,
         color: p.ink,
       ),
       scriptureLarge: VerbumFonts.serif(
-        fontSize: 22,
-        fontWeight: FontWeight.w500,
-        height: 1.27,
-        color: p.ink,
-      ),
-      citation: VerbumFonts.serif(
-        fontSize: 16,
+        fontSize: 23,
         fontWeight: FontWeight.w500,
         fontStyle: FontStyle.italic,
+        height: 1.3,
+        color: p.ink,
+      ),
+      citation: VerbumFonts.sans(
+        fontSize: 13,
+        fontWeight: FontWeight.w700,
         color: p.gold,
       ),
       rubric: VerbumFonts.sans(
-        fontSize: 10.5,
+        fontSize: 12,
         fontWeight: FontWeight.w700,
-        letterSpacing: 2.1,
+        letterSpacing: 0.1,
         color: p.rubric,
       ),
       body: VerbumFonts.sans(
         fontSize: 14,
         fontWeight: FontWeight.w500,
-        height: 1.45,
+        height: 1.5,
         color: p.inkMuted,
       ),
       bodyStrong: VerbumFonts.sans(
         fontSize: 14,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         height: 1.35,
         color: p.ink,
       ),
       caption: VerbumFonts.sans(
-        fontSize: 11.5,
+        fontSize: 12,
         fontWeight: FontWeight.w500,
-        height: 1.3,
+        height: 1.35,
         color: p.inkSubtle,
       ),
       button: VerbumFonts.sans(
         fontSize: 14.5,
-        fontWeight: FontWeight.w700,
-        letterSpacing: 0.1,
+        fontWeight: FontWeight.w800,
+        letterSpacing: -0.1,
       ),
     );
   }

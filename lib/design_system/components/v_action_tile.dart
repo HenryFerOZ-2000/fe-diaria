@@ -56,7 +56,7 @@ class VActionTile extends StatelessWidget {
               children: [
                 if (overline != null) ...[
                   Text(
-                    overline!.toUpperCase(),
+                    overline!,
                     style: type.rubric.copyWith(
                       color: accent,
                       fontSize: 9.5,

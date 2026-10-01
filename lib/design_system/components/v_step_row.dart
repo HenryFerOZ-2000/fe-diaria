@@ -47,11 +47,13 @@ class VStepRow extends StatelessWidget {
       child: Opacity(
         opacity: locked ? .6 : 1,
         child: Material(
+          elevation: current ? 0 : 6,
+          shadowColor: p.ink.withValues(alpha: .18),
           color: p.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(VerbumRadius.tile + 2),
             side: BorderSide(
-              color: current ? p.rubric : p.line,
+              color: current ? p.rubric : Colors.transparent,
               width: current ? 1.5 : 1,
             ),
           ),

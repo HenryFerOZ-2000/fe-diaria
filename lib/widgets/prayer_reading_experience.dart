@@ -288,7 +288,7 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
                 if (widget.nocturne) ...[
                   const Center(child: VCandle()),
                   Text(
-                    'ANTES DE DORMIR',
+                    'Antes de dormir',
                     textAlign: TextAlign.center,
                     style: type.rubric.copyWith(color: p.gold),
                   ),

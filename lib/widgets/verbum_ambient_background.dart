@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../design_system/design_system.dart';
 
-/// Fondo de Verbum: papel vitela plano con un resplandor tenue de vela.
+/// Fondo de Verbum: blanco que se funde en lavanda.
+///
+/// [glowAlignment] se conserva por compatibilidad; ya no hay resplandor.
 class VerbumAmbientBackground extends StatelessWidget {
   final Widget child;
   final Alignment glowAlignment;
@@ -21,35 +23,21 @@ class VerbumAmbientBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = context.palette;
     final dark = Theme.of(context).brightness == Brightness.dark;
+    // Blanco que se funde en lavanda (de noche, índigo profundo uniforme).
+    final fallback = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: dark
+          ? [p.background, p.background]
+          : [p.surface, p.background, p.surfaceMuted],
+      stops: dark ? null : const [0, .55, 1],
+    );
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: gradient == null ? (color ?? p.background) : null,
-        gradient: gradient,
+        color: color,
+        gradient: color == null ? (gradient ?? fallback) : null,
       ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          IgnorePointer(
-            child: Align(
-              alignment: glowAlignment,
-              child: Container(
-                width: 320,
-                height: 320,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      p.gold.withValues(alpha: dark ? .10 : .09),
-                      p.gold.withValues(alpha: 0),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          child,
-        ],
-      ),
+      child: child,
     );
   }
 }

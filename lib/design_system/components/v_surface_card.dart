@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/verbum_context.dart';
 import '../tokens/verbum_radius.dart';
+import '../tokens/verbum_shadows.dart';
 
 enum VSurfaceTone {
   /// Papel con filete (por defecto).
@@ -47,7 +48,7 @@ class VSurfaceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = context.palette;
     final (Color bg, Color? border) = switch (tone) {
-      VSurfaceTone.paper => (p.surface, p.line),
+      VSurfaceTone.paper => (p.surface, null),
       VSurfaceTone.muted => (p.surfaceMuted, null),
       VSurfaceTone.ink => (p.inverse, null),
       VSurfaceTone.accent => (p.accentSoft, null),
@@ -62,32 +63,25 @@ class VSurfaceCard extends StatelessWidget {
             ),
     );
 
-    Widget content = Padding(padding: padding, child: child);
-    if (framed) {
-      content = Stack(
-        children: [
-          Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.all(6),
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(radius - 5),
-                  border: Border.all(color: p.lineSoft),
-                ),
-              ),
-            ),
-          ),
-          content,
-        ],
-      );
-    }
+    // ponytail: [framed] se conserva por compatibilidad; en "Camino claro"
+    // la pieza principal se distingue por tamaño y sombra, no por marco.
+    final content = Padding(padding: padding, child: child);
 
-    final card = Material(
+    Widget card = Material(
       color: bg,
       shape: shape,
       clipBehavior: Clip.antiAlias,
       child: onTap == null ? content : InkWell(onTap: onTap, child: content),
     );
+    if (tone == VSurfaceTone.paper) {
+      card = DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(radius),
+          boxShadow: VerbumShadows.soft(p),
+        ),
+        child: card,
+      );
+    }
 
     // Dentro de una superficie en tinta, el texto e iconos pasan a claro.
     final themed = tone == VSurfaceTone.ink

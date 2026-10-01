@@ -43,9 +43,9 @@ class VIconButton extends StatelessWidget {
     final p = context.palette;
     final (Color bg, Color fg, BorderSide side) = switch (variant) {
       VIconButtonVariant.outlined => (
-        p.surface,
-        p.ink,
-        BorderSide(color: p.line),
+        p.surfaceMuted,
+        p.rubric,
+        BorderSide.none,
       ),
       VIconButtonVariant.ghost => (Colors.transparent, p.ink, BorderSide.none),
       VIconButtonVariant.solid => (p.emphasis, p.onEmphasis, BorderSide.none),
@@ -59,7 +59,11 @@ class VIconButton extends StatelessWidget {
         excludeFromSemantics: true,
         child: Material(
           color: bg,
-          shape: CircleBorder(side: side),
+          // Cuadrado redondeado, como los botones de la referencia.
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(size * .34),
+            side: side,
+          ),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onPressed,

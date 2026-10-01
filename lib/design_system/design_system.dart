@@ -39,4 +39,5 @@ export 'theme/verbum_context.dart';
 export 'theme/verbum_theme.dart';
 export 'tokens/verbum_palette.dart';
 export 'tokens/verbum_radius.dart';
+export 'tokens/verbum_shadows.dart';
 export 'tokens/verbum_typography.dart';

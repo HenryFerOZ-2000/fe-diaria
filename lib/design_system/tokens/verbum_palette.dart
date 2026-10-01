@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
-/// Paleta "Vitela y tinta": papel de libro litúrgico, tinta, rúbrica roja y
-/// pan de oro. El [accent] es el único color dinámico: lo decide el tiempo
-/// litúrgico (ver `LiturgicalAccentController`).
+/// Paleta "Camino claro": blanco que se funde en lavanda, índigo y
+/// periwinkle, con amarillo mantequilla como único acento cálido.
+///
+/// Los nombres de algunos tokens vienen de la primera dirección ("libro de
+/// horas") y se conservan para no tocar cada pantalla: [rubric] es el color
+/// de énfasis textual (índigo) y [gold] el color decorativo (periwinkle).
+/// El [accent] es el único color dinámico: lo decide el tiempo litúrgico
+/// (ver `LiturgicalAccentController`).
 @immutable
 class VerbumPalette extends ThemeExtension<VerbumPalette> {
   const VerbumPalette({
@@ -24,12 +29,14 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
     required this.onEmphasis,
     required this.inverse,
     required this.onInverse,
+    required this.butter,
+    required this.onButter,
   });
 
-  /// Fondo de página (vitela).
+  /// Fondo de página (lavanda muy clara).
   final Color background;
 
-  /// Tarjetas y superficies elevadas (papel).
+  /// Tarjetas y superficies elevadas (blanco).
   final Color surface;
 
   /// Superficies secundarias, bloques de apoyo.
@@ -40,10 +47,11 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
   final Color inkMuted;
   final Color inkSubtle;
 
-  /// Rojo de las rúbricas: etiquetas, capitulares, estado activo.
+  /// Énfasis textual (índigo): etiquetas, capitulares, estado activo.
   final Color rubric;
 
-  /// Pan de oro: citas, ornamentos, iconos decorativos.
+  /// Decorativo (periwinkle): citas, iconos duotono, progreso.
+  /// [goldSoft] es el fondo de resaltado (mantequilla suave).
   final Color gold;
   final Color goldSoft;
 
@@ -68,47 +76,55 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
   final Color inverse;
   final Color onInverse;
 
+  /// Acento cálido para la acción principal y la constancia.
+  final Color butter;
+  final Color onButter;
+
   static const light = VerbumPalette(
-    background: Color(0xFFF5EEE1),
-    surface: Color(0xFFFBF7EF),
-    surfaceMuted: Color(0xFFEDE3D1),
-    ink: Color(0xFF1E1915),
-    inkMuted: Color(0xFF5B5047),
-    inkSubtle: Color(0xFF8D8176),
-    rubric: Color(0xFF9C2A22),
-    gold: Color(0xFFB0823A),
-    goldSoft: Color(0xFFE8D5AE),
-    line: Color(0xFFDCCFB9),
-    lineSoft: Color(0xFFE8DDCB),
-    accent: Color(0xFFB0823A),
-    accentSoft: Color(0xFFF1E6CF),
-    onInk: Color(0xFFF5EEE1),
-    emphasis: Color(0xFF1E1915),
-    onEmphasis: Color(0xFFF5EEE1),
-    inverse: Color(0xFF1E1915),
-    onInverse: Color(0xFFF5EEE1),
+    background: Color(0xFFF4F5FC),
+    surface: Color(0xFFFFFFFF),
+    surfaceMuted: Color(0xFFE9EBF8),
+    ink: Color(0xFF22245A),
+    inkMuted: Color(0xFF5F6290),
+    inkSubtle: Color(0xFF9497C2),
+    rubric: Color(0xFF4A4EBB),
+    gold: Color(0xFF6F72D3),
+    goldSoft: Color(0xFFFBF2C6),
+    line: Color(0xFFE3E4F3),
+    lineSoft: Color(0xFFEEEFF8),
+    accent: Color(0xFF6F72D3),
+    accentSoft: Color(0xFFE9EBF8),
+    onInk: Color(0xFFFFFFFF),
+    emphasis: Color(0xFF3A3C8E),
+    onEmphasis: Color(0xFFFFFFFF),
+    inverse: Color(0xFF5D60C4),
+    onInverse: Color(0xFFFFFFFF),
+    butter: Color(0xFFF4DF7A),
+    onButter: Color(0xFF3A2F05),
   );
 
-  /// Modo noche ("Completas"): azul noche y luz de vela.
+  /// Modo noche: índigo profundo con la luz mantequilla como énfasis.
   static const dark = VerbumPalette(
-    background: Color(0xFF101219),
-    surface: Color(0xFF191C26),
-    surfaceMuted: Color(0xFF232734),
-    ink: Color(0xFFEDE6D8),
-    inkMuted: Color(0xFFA39C8E),
-    inkSubtle: Color(0xFF6F6A62),
-    rubric: Color(0xFFE08A7F),
-    gold: Color(0xFFE3B866),
-    goldSoft: Color(0xFF4A3D24),
-    line: Color(0xFF2B2F3C),
-    lineSoft: Color(0xFF232734),
-    accent: Color(0xFFE3B866),
-    accentSoft: Color(0xFF2E2A22),
-    onInk: Color(0xFF101219),
-    emphasis: Color(0xFFE3B866),
-    onEmphasis: Color(0xFF101219),
-    inverse: Color(0xFF252A38),
-    onInverse: Color(0xFFEDE6D8),
+    background: Color(0xFF10122A),
+    surface: Color(0xFF1A1D3A),
+    surfaceMuted: Color(0xFF24284A),
+    ink: Color(0xFFEEF0FB),
+    inkMuted: Color(0xFFA9ACD6),
+    inkSubtle: Color(0xFF6E72A0),
+    rubric: Color(0xFFA9ADF7),
+    gold: Color(0xFF959AEE),
+    goldSoft: Color(0xFF3B3622),
+    line: Color(0xFF2C3058),
+    lineSoft: Color(0xFF22264A),
+    accent: Color(0xFF959AEE),
+    accentSoft: Color(0xFF262B52),
+    onInk: Color(0xFF10122A),
+    emphasis: Color(0xFFF4DF7A),
+    onEmphasis: Color(0xFF22245A),
+    inverse: Color(0xFF2A2E5E),
+    onInverse: Color(0xFFEEF0FB),
+    butter: Color(0xFFF4DF7A),
+    onButter: Color(0xFF3A2F05),
   );
 
   static VerbumPalette of(BuildContext context) =>
@@ -149,6 +165,8 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
     Color? onEmphasis,
     Color? inverse,
     Color? onInverse,
+    Color? butter,
+    Color? onButter,
   }) {
     return VerbumPalette(
       background: background ?? this.background,
@@ -169,6 +187,8 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
       onEmphasis: onEmphasis ?? this.onEmphasis,
       inverse: inverse ?? this.inverse,
       onInverse: onInverse ?? this.onInverse,
+      butter: butter ?? this.butter,
+      onButter: onButter ?? this.onButter,
     );
   }
 
@@ -195,6 +215,8 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
       onEmphasis: l(onEmphasis, other.onEmphasis),
       inverse: l(inverse, other.inverse),
       onInverse: l(onInverse, other.onInverse),
+      butter: l(butter, other.butter),
+      onButter: l(onButter, other.onButter),
     );
   }
 }
