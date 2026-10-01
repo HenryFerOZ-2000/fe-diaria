@@ -249,78 +249,90 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 physics: const BouncingScrollPhysics(),
                 children: [
-                  ChangeNotifierProvider<StreakController>.value(
-                    value: _streakController,
-                    child: Consumer<StreakController>(
-                      builder: (context, streak, _) {
-                        _maybeShowStreakCelebration(streak);
-                        return TodayCover(
-                          now: now,
-                          night: isCoverNight(now),
-                          userName: auth.firebaseUser?.displayName,
-                          streakDays: streak.totalDays,
-                          verseText: verse?.text,
-                          verseReference: verse?.reference,
-                          onRead: verseMission == null
-                              ? null
-                              : () => _openMissionRead(
+                  // Portada y contenido en un mismo hijo: así la tarjeta del
+                  // siguiente paso, montada sobre la portada, recibe toques
+                  // también en la parte que se solapa.
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ChangeNotifierProvider<StreakController>.value(
+                        value: _streakController,
+                        child: Consumer<StreakController>(
+                          builder: (context, streak, _) {
+                            _maybeShowStreakCelebration(streak);
+                            return TodayCover(
+                              now: now,
+                              night: isCoverNight(now),
+                              userName: auth.firebaseUser?.displayName,
+                              streakDays: streak.totalDays,
+                              verseText: verse?.text,
+                              verseReference: verse?.reference,
+                              onRead: verseMission == null
+                                  ? null
+                                  : () => _openMissionRead(
+                                      context,
+                                      verseMission,
+                                      provider,
+                                    ),
+                              onShare: verse == null
+                                  ? null
+                                  : () => ShareService.openComposer(
+                                      context,
+                                      ShareContent(
+                                        title: 'Palabra de hoy',
+                                        body: verse.text,
+                                        reference:
+                                            '${verse.reference} · RV1909',
+                                        sourceLabel: 'RV1909',
+                                        kind: ShareContentKind.verse,
+                                      ),
+                                    ),
+                              onProfile: () =>
+                                  Navigator.of(context).pushNamed('/profile'),
+                              onStreak: () =>
+                                  Navigator.of(context).pushNamed('/streak'),
+                            );
+                          },
+                        ),
+                      ),
+                      // El siguiente paso se monta sobre el final de la portada.
+                      Transform.translate(
+                        offset: const Offset(0, -64),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: VerbumSpace.gutter,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              TodayJourney(
+                                missions: _missionsController.missions,
+                                nightAvailable: isNightPrayerAvailable(now),
+                                onOpen: (mission) => _openMissionRead(
                                   context,
-                                  verseMission,
+                                  mission,
                                   provider,
                                 ),
-                          onShare: verse == null
-                              ? null
-                              : () => ShareService.openComposer(
-                                  context,
-                                  ShareContent(
-                                    title: 'Palabra de hoy',
-                                    body: verse.text,
-                                    reference: '${verse.reference} · RV1909',
-                                    sourceLabel: 'RV1909',
-                                    kind: ShareContentKind.verse,
-                                  ),
-                                ),
-                          onProfile: () =>
-                              Navigator.of(context).pushNamed('/profile'),
-                          onStreak: () =>
-                              Navigator.of(context).pushNamed('/streak'),
-                        );
-                      },
-                    ),
-                  ),
-                  // El siguiente paso se monta sobre el final de la portada.
-                  Transform.translate(
-                    offset: const Offset(0, -64),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: VerbumSpace.gutter,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          TodayJourney(
-                            missions: _missionsController.missions,
-                            nightAvailable: isNightPrayerAvailable(now),
-                            onOpen: (mission) =>
-                                _openMissionRead(context, mission, provider),
+                              ),
+                              if (provider.isLoading) ...[
+                                const SizedBox(height: 12),
+                                const VProgressBar(value: 0.35, height: 3),
+                              ],
+                              const SizedBox(height: 26),
+                              // Solo para invitados; se oculta con sesión.
+                              const SignInPrompt(
+                                margin: EdgeInsets.only(bottom: 26),
+                              ),
+                              const SpiritualPathTodayCard(),
+                              const BibleContinueCard(),
+                              PrayNowCarousel(now: now),
+                              const SizedBox(height: 10),
+                              const TodayLiturgySection(),
+                            ],
                           ),
-                          if (provider.isLoading) ...[
-                            const SizedBox(height: 12),
-                            const VProgressBar(value: 0.35, height: 3),
-                          ],
-                          const SizedBox(height: 26),
-                          // Solo para invitados; se oculta con sesión.
-                          const SignInPrompt(
-                            margin: EdgeInsets.only(bottom: 26),
-                          ),
-                          const SpiritualPathTodayCard(),
-                          const BibleContinueCard(),
-                          PrayNowCarousel(now: now),
-                          const SizedBox(height: 10),
-                          const TodayLiturgySection(),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),

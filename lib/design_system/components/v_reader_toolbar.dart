@@ -21,8 +21,7 @@ class VReaderAction {
 
 /// Barra superior de toda pantalla de lectura (Biblia, oraciones, momentos):
 /// regreso a la izquierda, rótulo centrado y las acciones agrupadas en una
-/// sola cápsula a la derecha. El rótulo queda centrado en la pantalla sin
-/// importar cuántas acciones haya.
+/// sola cápsula a la derecha.
 class VReaderToolbar extends StatelessWidget {
   const VReaderToolbar({
     super.key,
@@ -44,69 +43,65 @@ class VReaderToolbar extends StatelessWidget {
       height: _height,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Stack(
-          alignment: Alignment.center,
+        child: Row(
           children: [
-            if (label != null)
-              Padding(
-                // Deja sitio a los botones de ambos lados.
-                padding: EdgeInsets.symmetric(
-                  horizontal: 44.0 * actions.length + 12,
-                ),
-                child: Text(
-                  label!.toUpperCase(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: context.type.rubric.copyWith(
-                    color: p.inkSubtle,
-                    letterSpacing: 1.4,
-                  ),
-                ),
-              ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: VBackButton(onPressed: onBack),
+            VBackButton(onPressed: onBack),
+            const SizedBox(width: 8),
+            // El rótulo ocupa el espacio libre entre ambos lados y se
+            // centra en él: con tres acciones no se corta.
+            Expanded(
+              child: label == null
+                  ? const SizedBox()
+                  : Text(
+                      label!.toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: context.type.rubric.copyWith(
+                        color: p.inkSubtle,
+                        letterSpacing: 1,
+                      ),
+                    ),
             ),
+            const SizedBox(width: 8),
             if (actions.isNotEmpty)
-              Align(
-                alignment: Alignment.centerRight,
-                child: Material(
-                  color: p.surfaceMuted,
-                  borderRadius: BorderRadius.circular(VerbumRadius.control),
-                  clipBehavior: Clip.antiAlias,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (final a in actions)
-                        Tooltip(
-                          message: a.label,
-                          child: Semantics(
-                            button: true,
-                            label: a.label,
-                            excludeSemantics: true,
-                            child: InkWell(
-                              onTap: a.onPressed,
-                              child: SizedBox(
-                                width: 44,
-                                height: 44,
-                                child: Center(
-                                  child: VIcon(
-                                    a.icon,
-                                    size: 20,
-                                    color: a.onPressed == null
-                                        ? p.inkSubtle
-                                        : p.rubric,
-                                  ),
+              Material(
+                color: p.surfaceMuted,
+                borderRadius: BorderRadius.circular(VerbumRadius.control),
+                clipBehavior: Clip.antiAlias,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (final a in actions)
+                      Tooltip(
+                        message: a.label,
+                        child: Semantics(
+                          button: true,
+                          label: a.label,
+                          excludeSemantics: true,
+                          child: InkWell(
+                            onTap: a.onPressed,
+                            child: SizedBox(
+                              width: 44,
+                              height: 44,
+                              child: Center(
+                                child: VIcon(
+                                  a.icon,
+                                  size: 20,
+                                  color: a.onPressed == null
+                                      ? p.inkSubtle
+                                      : p.rubric,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                    ],
-                  ),
+                      ),
+                  ],
                 ),
-              ),
+              )
+            else
+              const SizedBox(width: 44),
           ],
         ),
       ),
