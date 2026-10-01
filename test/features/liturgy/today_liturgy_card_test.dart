@@ -232,6 +232,11 @@ void main() {
     );
     await tester.pump();
     expect(tester.takeException(), isNull);
+    await tester.scrollUntilVisible(
+      find.text('Oración devocional sugerida para hoy'),
+      300,
+    );
+    expect(tester.takeException(), isNull);
     expect(find.text('Oración devocional sugerida para hoy'), findsOneWidget);
   });
 }

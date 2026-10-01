@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../domain/calendar_selection.dart';
 import '../domain/liturgical_day.dart';
@@ -16,139 +17,177 @@ class LiturgyDayScreen extends StatelessWidget {
   final LiturgicalDay day;
   final CalendarSelection selection;
 
+  /// Foto de portada según el tiempo litúrgico.
+  static VerbumPhotos _photoFor(LiturgicalSeason season) => switch (season) {
+    LiturgicalSeason.advent => VerbumPhotos.candle,
+    LiturgicalSeason.christmas => VerbumPhotos.marianWindow,
+    LiturgicalSeason.lent => VerbumPhotos.handsTogether,
+    LiturgicalSeason.triduum => VerbumPhotos.candle,
+    LiturgicalSeason.easter => VerbumPhotos.genesisLight,
+    LiturgicalSeason.ordinaryTime => VerbumPhotos.stainedGlass,
+  };
+
+  void _showSource(BuildContext context) =>
+      showLiturgySourceSheet(context, day: day, selection: selection);
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
+    final p = context.palette;
+    final type = context.type;
     final color = day.primary.colors.firstOrNull;
-    final accent = color == null
-        ? scheme.outline
-        : LiturgicalPalette.accent(color, theme.brightness);
+    final colorLabel = color == null
+        ? 'Sin color indicado'
+        : LiturgicalPalette.label(color);
 
-    return Scaffold(
-      appBar: VAppBar(
-        title: const Text('Liturgia de hoy'),
-        actions: [
-          IconButton(
-            tooltip: 'Fuente y alcance',
-            onPressed: () =>
-                showLiturgySourceSheet(context, day: day, selection: selection),
-            icon: const VIcon(VerbumIcons.info),
-          ),
-        ],
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _dateLabel(day.date),
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: accent,
-                  fontWeight: FontWeight.w700,
-                ),
+      child: Scaffold(
+        backgroundColor: p.background,
+        body: ListView(
+          padding: EdgeInsets.zero,
+          physics: const BouncingScrollPhysics(),
+          children: [
+            _Cover(
+              photo: _photoFor(day.season),
+              date: _dateLabel(day.date),
+              title: day.primary.name,
+              rank: _rankLabel(day.primary.rank),
+              color: color,
+              colorLabel: colorLabel,
+              onInfo: () => _showSource(context),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                VerbumSpace.gutter,
+                0,
+                VerbumSpace.gutter,
+                32,
               ),
-              const SizedBox(height: 10),
-              Text(
-                day.primary.name,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  height: 1.15,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: Color.alphaBlend(
-                    accent.withValues(alpha: 0.08),
-                    scheme.surface,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const VSectionHeader(
+                    'Sobre este día',
+                    padding: EdgeInsets.fromLTRB(2, 22, 2, 12),
                   ),
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: accent.withValues(alpha: 0.30)),
-                ),
-                child: Wrap(
-                  spacing: 20,
-                  runSpacing: 16,
-                  children: [
-                    _Fact(label: 'Tiempo', value: _seasonLabel(day.season)),
-                    _Fact(label: 'Rango', value: _rankLabel(day.primary.rank)),
-                    _Fact(
-                      label: 'Color',
-                      value: color == null
-                          ? 'Sin color indicado'
-                          : LiturgicalPalette.label(color),
-                    ),
-                    if (day.sundayCycle != null)
-                      _Fact(label: 'Ciclo dominical', value: day.sundayCycle!),
-                    if (day.weekdayCycle != null)
-                      _Fact(label: 'Ciclo ferial', value: day.weekdayCycle!),
-                    if (day.psalterWeek != null)
+                  VTileGrid(
+                    children: [
                       _Fact(
-                        label: 'Salterio',
-                        value: 'Semana ${day.psalterWeek}',
+                        icon: VerbumIcons.calendarDots,
+                        label: 'Tiempo',
+                        value: _seasonLabel(day.season),
                       ),
-                  ],
-                ),
-              ),
-              if (day.optional.isNotEmpty) ...[
-                const SizedBox(height: 26),
-                Text('Memorias opcionales', style: theme.textTheme.titleLarge),
-                const SizedBox(height: 10),
-                ...day.optional.map(
-                  (celebration) => ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: VIcon(VerbumIcons.sparkle, color: accent, size: 20),
-                    title: Text(celebration.name),
-                    subtitle: Text(_rankLabel(celebration.rank)),
+                      _Fact(
+                        icon: VerbumIcons.crown,
+                        label: 'Rango',
+                        value: _rankLabel(day.primary.rank),
+                      ),
+                      _Fact(
+                        icon: VerbumIcons.palette,
+                        label: 'Color',
+                        value: colorLabel,
+                        swatch: color == null
+                            ? null
+                            : LiturgicalPalette.swatch(color),
+                      ),
+                      if (day.sundayCycle != null)
+                        _Fact(
+                          icon: VerbumIcons.arrowsClockwise,
+                          label: 'Ciclo dominical',
+                          value: day.sundayCycle!,
+                        ),
+                      if (day.weekdayCycle != null)
+                        _Fact(
+                          icon: VerbumIcons.arrowsClockwise,
+                          label: 'Ciclo ferial',
+                          value: day.weekdayCycle!,
+                        ),
+                      if (day.psalterWeek != null)
+                        _Fact(
+                          icon: VerbumIcons.musicNote,
+                          label: 'Salterio',
+                          value: 'Semana ${day.psalterWeek}',
+                        ),
+                    ],
                   ),
-                ),
-              ],
-              const SizedBox(height: 26),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: scheme.surfaceContainerHighest.withValues(alpha: 0.52),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    VIcon(VerbumIcons.sun, color: accent),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Oración devocional sugerida para hoy',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                  if (day.optional.isNotEmpty) ...[
+                    const VSectionHeader(
+                      'Memorias opcionales',
+                      padding: EdgeInsets.fromLTRB(2, 26, 2, 12),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Tómate un momento para presentar este día a Dios con tus propias palabras.',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                        height: 1.45,
-                      ),
+                    VListGroup(
+                      children: [
+                        for (final celebration in day.optional)
+                          VListRow(
+                            leading: VerbumIcons.sparkle,
+                            title: celebration.name,
+                            subtitle: _rankLabel(celebration.rank),
+                          ),
+                      ],
                     ),
                   ],
-                ),
+                  const VSectionHeader(
+                    'Para orar hoy',
+                    padding: EdgeInsets.fromLTRB(2, 26, 2, 12),
+                  ),
+                  VSurfaceCard(
+                    radius: VerbumRadius.card,
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 46,
+                          height: 46,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: p.butter,
+                            borderRadius: BorderRadius.circular(
+                              VerbumRadius.control,
+                            ),
+                          ),
+                          child: VIcon(
+                            VerbumIcons.handsPraying,
+                            color: p.onButter,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Oración devocional sugerida para hoy',
+                                style: type.heading.copyWith(fontSize: 16),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Tómate un momento para presentar este día a '
+                                'Dios con tus propias palabras.',
+                                style: type.body.copyWith(color: p.inkMuted),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  VListGroup(
+                    children: [
+                      VListRow(
+                        leading: VerbumIcons.info,
+                        title: 'Fuente y alcance del calendario',
+                        onTap: () => _showSource(context),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              TextButton.icon(
-                onPressed: () => showLiturgySourceSheet(
-                  context,
-                  day: day,
-                  selection: selection,
-                ),
-                icon: const VIcon(VerbumIcons.info),
-                label: const Text('Fuente y alcance del calendario'),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -191,33 +230,244 @@ class LiturgyDayScreen extends StatelessWidget {
   };
 }
 
-class _Fact extends StatelessWidget {
-  const _Fact({required this.label, required this.value});
+/// Portada: foto del tiempo litúrgico con velo, la fecha, el nombre de la
+/// celebración y chips de rango y color.
+class _Cover extends StatelessWidget {
+  const _Cover({
+    required this.photo,
+    required this.date,
+    required this.title,
+    required this.rank,
+    required this.color,
+    required this.colorLabel,
+    required this.onInfo,
+  });
 
-  final String label;
-  final String value;
+  final VerbumPhotos photo;
+  final String date;
+  final String title;
+  final String rank;
+  final LiturgicalColor? color;
+  final String colorLabel;
+  final VoidCallback onInfo;
+
+  // Sobre la foto los tonos son fijos (Tinta de la paleta).
+  static const _tinta = Color(0xFF22245A);
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final p = context.palette;
+    final type = context.type;
     return ConstrainedBox(
-      constraints: const BoxConstraints(minWidth: 112, maxWidth: 180),
+      constraints: BoxConstraints(
+        minHeight: (MediaQuery.sizeOf(context).height * .5).clamp(380, 520),
+      ),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: ExcludeSemantics(
+              child: Image.asset(photo.asset, fit: BoxFit.cover),
+            ),
+          ),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    _tinta.withValues(alpha: .55),
+                    _tinta.withValues(alpha: .15),
+                    _tinta.withValues(alpha: .75),
+                    p.background,
+                  ],
+                  stops: const [0, .3, .78, 1],
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                VerbumSpace.gutter,
+                8,
+                VerbumSpace.gutter,
+                40,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const VBackButton(onColor: true),
+                      const Spacer(),
+                      Tooltip(
+                        message: 'Fuente y alcance',
+                        child: Material(
+                          color: Colors.white.withValues(alpha: .16),
+                          borderRadius: BorderRadius.circular(
+                            VerbumRadius.control,
+                          ),
+                          child: InkWell(
+                            onTap: onInfo,
+                            borderRadius: BorderRadius.circular(
+                              VerbumRadius.control,
+                            ),
+                            child: const SizedBox.square(
+                              dimension: 44,
+                              child: Center(
+                                child: VIcon(
+                                  VerbumIcons.info,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 120),
+                  Text(
+                    'HOY EN LA IGLESIA · ${date.toUpperCase()}',
+                    style: type.rubric.copyWith(
+                      color: p.butter,
+                      letterSpacing: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Semantics(
+                    header: true,
+                    child: Text(
+                      title,
+                      style: type.display.copyWith(
+                        color: Colors.white,
+                        fontSize: 30,
+                        height: 1.1,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _GlassChip(label: rank),
+                      _GlassChip(
+                        label: colorLabel,
+                        dot: color == null
+                            ? null
+                            : LiturgicalPalette.swatch(color!),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GlassChip extends StatelessWidget {
+  const _GlassChip({required this.label, this.dot});
+
+  final String label;
+  final Color? dot;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: .18),
+        borderRadius: BorderRadius.circular(99),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (dot != null) ...[
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color: dot,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 1.5),
+              ),
+            ),
+            const SizedBox(width: 7),
+          ],
+          Flexible(
+            child: Text(
+              label,
+              style: context.type.bodyStrong.copyWith(
+                color: Colors.white,
+                fontSize: 13,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Un dato del día en su tarjeta: icono, etiqueta y valor.
+class _Fact extends StatelessWidget {
+  const _Fact({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.swatch,
+  });
+
+  final VerbumIcons icon;
+  final String label;
+  final String value;
+  final Color? swatch;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final type = context.type;
+    return VSurfaceCard(
+      radius: VerbumRadius.tile,
+      padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+          Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: p.surfaceMuted,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: VIcon(icon, size: 18, color: p.rubric),
+              ),
+              const Spacer(),
+              if (swatch != null)
+                Container(
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: swatch,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: p.line, width: 1.5),
+                  ),
+                ),
+            ],
           ),
-          const SizedBox(height: 3),
-          Text(
-            value,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          const SizedBox(height: 10),
+          Text(label, style: type.caption),
+          Text(value, style: type.bodyStrong),
         ],
       ),
     );
