@@ -158,16 +158,16 @@ class _WeekDot extends StatelessWidget {
           width: 28,
           height: 28,
           decoration: BoxDecoration(
-            color: done ? p.emphasis : Colors.transparent,
+            color: done ? p.sage : Colors.transparent,
             shape: BoxShape.circle,
             border: Border.all(
-              color: done ? p.emphasis : (today ? p.rubric : p.line),
+              color: done ? p.sage : (today ? p.rubric : p.line),
               width: today && !done ? 1.5 : 1,
             ),
           ),
           alignment: Alignment.center,
           child: done
-              ? VIcon(VerbumIcons.check, size: 14, color: p.onEmphasis)
+              ? VIcon(VerbumIcons.check, size: 14, color: p.surface)
               : today
               ? Container(
                   width: 5,

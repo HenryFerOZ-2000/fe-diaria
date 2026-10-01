@@ -179,7 +179,7 @@ class _PathCard extends StatelessWidget {
                         VerbumIcons.sealCheck,
                         weight: VIconWeight.fill,
                         size: 18,
-                        color: p.accent,
+                        color: p.sage,
                       )
                     else if (active)
                       const VMetaChip(label: 'En curso'),

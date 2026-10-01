@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 /// Los nombres de algunos tokens vienen de la primera dirección ("libro de
 /// horas") y se conservan para no tocar cada pantalla: [rubric] es el color
 /// de énfasis textual (índigo) y [gold] el color decorativo (periwinkle).
-/// El [accent] es el único color dinámico: lo decide el tiempo litúrgico
-/// (ver `LiturgicalAccentController`).
+/// Todos los colores salen de la paleta de la propuesta: blanco, lavanda,
+/// lavanda 2, periwinkle, índigo, tinta, mantequilla y salvia.
 @immutable
 class VerbumPalette extends ThemeExtension<VerbumPalette> {
   const VerbumPalette({
@@ -31,6 +31,9 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
     required this.onInverse,
     required this.butter,
     required this.onButter,
+    required this.sage,
+    required this.sageSoft,
+    required this.sageInk,
   });
 
   /// Fondo de página (lavanda muy clara).
@@ -59,7 +62,7 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
   final Color line;
   final Color lineSoft;
 
-  /// Color del tiempo litúrgico.
+  /// Acento periwinkle y su fondo lavanda.
   final Color accent;
   final Color accentSoft;
 
@@ -71,8 +74,8 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
   final Color emphasis;
   final Color onEmphasis;
 
-  /// Superficies grandes invertidas (tarjeta destacada, barra de acciones).
-  /// Tinta de día; de noche una superficie elevada para no deslumbrar.
+  /// Superficies grandes invertidas (Hoy, tarjeta destacada, barra de
+  /// acciones). Periwinkle de día; de noche una superficie elevada.
   final Color inverse;
   final Color onInverse;
 
@@ -80,10 +83,16 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
   final Color butter;
   final Color onButter;
 
+  /// Salvia: lo completado ("Hecho", días cumplidos, pasos terminados).
+  /// [sageSoft] es su fondo y [sageInk] el texto sobre ese fondo.
+  final Color sage;
+  final Color sageSoft;
+  final Color sageInk;
+
   static const light = VerbumPalette(
-    background: Color(0xFFF4F5FC),
+    background: Color(0xFFF1F2FC),
     surface: Color(0xFFFFFFFF),
-    surfaceMuted: Color(0xFFE9EBF8),
+    surfaceMuted: Color(0xFFE5E7F8),
     ink: Color(0xFF22245A),
     inkMuted: Color(0xFF5F6290),
     inkSubtle: Color(0xFF9497C2),
@@ -93,14 +102,17 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
     line: Color(0xFFE3E4F3),
     lineSoft: Color(0xFFEEEFF8),
     accent: Color(0xFF6F72D3),
-    accentSoft: Color(0xFFE9EBF8),
+    accentSoft: Color(0xFFE5E7F8),
     onInk: Color(0xFFFFFFFF),
     emphasis: Color(0xFF3A3C8E),
     onEmphasis: Color(0xFFFFFFFF),
-    inverse: Color(0xFF5D60C4),
+    inverse: Color(0xFF6F72D3),
     onInverse: Color(0xFFFFFFFF),
     butter: Color(0xFFF4DF7A),
     onButter: Color(0xFF3A2F05),
+    sage: Color(0xFF5FA58A),
+    sageSoft: Color(0xFFE1F1EA),
+    sageInk: Color(0xFF2E6B55),
   );
 
   /// Modo noche: índigo profundo con la luz mantequilla como énfasis.
@@ -125,25 +137,14 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
     onInverse: Color(0xFFEEF0FB),
     butter: Color(0xFFF4DF7A),
     onButter: Color(0xFF3A2F05),
+    sage: Color(0xFF7CC0A4),
+    sageSoft: Color(0xFF1C3A31),
+    sageInk: Color(0xFF9FD8C0),
   );
 
   static VerbumPalette of(BuildContext context) =>
       Theme.of(context).extension<VerbumPalette>() ??
       (Theme.of(context).brightness == Brightness.dark ? dark : light);
-
-  /// Devuelve la paleta con el acento litúrgico aplicado.
-  VerbumPalette withAccent(Color? value) {
-    if (value == null) return this;
-    return copyWith(
-      accent: value,
-      accentSoft: Color.alphaBlend(
-        value.withValues(
-          alpha: background.computeLuminance() > 0.5 ? 0.14 : 0.18,
-        ),
-        background,
-      ),
-    );
-  }
 
   @override
   VerbumPalette copyWith({
@@ -167,6 +168,9 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
     Color? onInverse,
     Color? butter,
     Color? onButter,
+    Color? sage,
+    Color? sageSoft,
+    Color? sageInk,
   }) {
     return VerbumPalette(
       background: background ?? this.background,
@@ -189,6 +193,9 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
       onInverse: onInverse ?? this.onInverse,
       butter: butter ?? this.butter,
       onButter: onButter ?? this.onButter,
+      sage: sage ?? this.sage,
+      sageSoft: sageSoft ?? this.sageSoft,
+      sageInk: sageInk ?? this.sageInk,
     );
   }
 
@@ -217,6 +224,9 @@ class VerbumPalette extends ThemeExtension<VerbumPalette> {
       onInverse: l(onInverse, other.onInverse),
       butter: l(butter, other.butter),
       onButter: l(onButter, other.onButter),
+      sage: l(sage, other.sage),
+      sageSoft: l(sageSoft, other.sageSoft),
+      sageInk: l(sageInk, other.sageInk),
     );
   }
 }

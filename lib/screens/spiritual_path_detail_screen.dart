@@ -85,8 +85,8 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
                 'hecho' => _Badge(
                   label: 'Hecho',
                   icon: VerbumIcons.check,
-                  bg: p.surfaceMuted,
-                  fg: p.rubric,
+                  bg: p.sageSoft,
+                  fg: p.sageInk,
                 ),
                 'hoy' => _Badge(
                   label: 'Hoy',

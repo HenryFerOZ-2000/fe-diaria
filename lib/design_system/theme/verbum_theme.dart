@@ -6,16 +6,12 @@ import '../tokens/verbum_radius.dart';
 import '../tokens/verbum_typography.dart';
 
 /// Construye el [ThemeData] completo a partir de los tokens.
-///
-/// [accent] es el color del tiempo litúrgico; `null` mantiene el pan de oro.
 ThemeData buildVerbumTheme({
   required Brightness brightness,
-  Color? accent,
   PageTransitionsTheme? pageTransitionsTheme,
 }) {
   final isDark = brightness == Brightness.dark;
-  final palette = (isDark ? VerbumPalette.dark : VerbumPalette.light)
-      .withAccent(accent);
+  final palette = isDark ? VerbumPalette.dark : VerbumPalette.light;
   final type = VerbumTypography.fromPalette(palette);
 
   final scheme = ColorScheme(

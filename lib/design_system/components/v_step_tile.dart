@@ -39,9 +39,9 @@ class VStepTile extends StatelessWidget {
       BorderSide side,
     ) = switch (state) {
       VStepState.done => (
-        p.emphasis,
-        p.onEmphasis,
-        p.onEmphasis,
+        p.sageSoft,
+        p.sageInk,
+        p.sage,
         BorderSide.none,
       ),
       VStepState.current => (
@@ -92,7 +92,7 @@ class VStepTile extends StatelessWidget {
                         VerbumIcons.checkCircle,
                         weight: VIconWeight.fill,
                         size: 17,
-                        color: p.onEmphasis,
+                        color: p.sage,
                       )
                     else if (state == VStepState.current)
                       VIcon(VerbumIcons.circle, size: 17, color: p.rubric),
@@ -113,7 +113,7 @@ class VStepTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: type.caption.copyWith(
                       color: state == VStepState.done
-                          ? p.onEmphasis.withValues(alpha: 0.7)
+                          ? p.sageInk.withValues(alpha: 0.8)
                           : null,
                     ),
                   ),

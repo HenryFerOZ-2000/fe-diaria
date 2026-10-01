@@ -108,10 +108,10 @@ class VMonthCalendar extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: marked ? p.emphasis : Colors.transparent,
+                  color: marked ? p.sage : Colors.transparent,
                   border: Border.all(
                     color: marked
-                        ? p.emphasis
+                        ? p.sage
                         : isToday
                         ? p.rubric
                         : p.lineSoft,
@@ -119,7 +119,7 @@ class VMonthCalendar extends StatelessWidget {
                   ),
                 ),
                 child: marked
-                    ? VIcon(VerbumIcons.check, size: 15, color: p.onEmphasis)
+                    ? VIcon(VerbumIcons.check, size: 15, color: p.surface)
                     : Text(
                         '$dayNumber',
                         style: type.caption.copyWith(

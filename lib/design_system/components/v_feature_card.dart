@@ -101,7 +101,7 @@ class VFeatureCard extends StatelessWidget {
                       child: Text(
                         body!,
                         style: type.body.copyWith(
-                          color: fg.withValues(alpha: 0.74),
+                          color: fg.withValues(alpha: 0.92),
                         ),
                       ),
                     ),

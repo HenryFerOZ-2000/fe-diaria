@@ -63,7 +63,7 @@ class VNumberTile extends StatelessWidget {
                 done ? VerbumIcons.checkCircle : VerbumIcons.bookmarkSimple,
                 weight: VIconWeight.fill,
                 size: 12,
-                color: done ? p.gold : p.onButter,
+                color: done ? p.sage : p.onButter,
               ),
             ),
         ],

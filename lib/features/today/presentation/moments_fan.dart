@@ -166,8 +166,8 @@ class _MomentCard extends StatelessWidget {
                   left: 14,
                   child: CircleAvatar(
                     radius: 13,
-                    backgroundColor: p.accentSoft,
-                    child: VIcon(VerbumIcons.check, size: 14, color: p.rubric),
+                    backgroundColor: p.sage,
+                    child: VIcon(VerbumIcons.check, size: 14, color: p.surface),
                   ),
                 ),
               if (locked)

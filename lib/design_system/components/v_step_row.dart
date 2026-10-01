@@ -69,11 +69,11 @@ class VStepRow extends StatelessWidget {
                     height: 36,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: done ? p.emphasis : Colors.transparent,
+                      color: done ? p.sage : Colors.transparent,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: done
-                            ? p.emphasis
+                            ? p.sage
                             : current
                             ? p.rubric
                             : p.line,
@@ -83,7 +83,7 @@ class VStepRow extends StatelessWidget {
                         ? VIcon(
                             VerbumIcons.check,
                             size: 17,
-                            color: p.onEmphasis,
+                            color: p.surface,
                           )
                         : Text(
                             '$number',
