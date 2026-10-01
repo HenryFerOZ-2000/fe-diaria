@@ -4,6 +4,7 @@ import '../data/bible_db.dart';
 import '../domain/bible_book_info.dart';
 import '../services/bible_reading_preferences.dart';
 import 'bible_verses_screen.dart';
+import 'book_covers.dart';
 import '../../design_system/design_system.dart';
 
 class BibleChaptersScreen extends StatefulWidget {
@@ -54,14 +55,26 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
+    final book = bibleBookById(widget.bookId);
+    final tint = book == null
+        ? p.surfaceMuted
+        : coverStyleFor(book.section).background;
     return AppScaffold(
-      titleWidget: Text(
-        widget.bookName,
-        style: context.type.heading.copyWith(fontSize: 24),
-      ),
+      titleWidget: const SizedBox.shrink(),
       centerTitle: false,
       showBanner: false,
       showGuestNotice: false,
+      // El fondo toma el color de la portada del libro y se aclara.
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color.alphaBlend(tint.withValues(alpha: .28), p.background),
+          p.background,
+        ],
+        stops: const [0, .42],
+      ),
       body: FutureBuilder<List<int>>(
         future: _chaptersFuture,
         builder: (context, snapshot) {
@@ -78,18 +91,25 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
               ),
             );
           }
-          return _buildContent(context, snapshot.data!);
+          return _buildContent(context, snapshot.data!, book);
         },
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, List<int> chapters) {
-    final metadata = bibleBookById(widget.bookId);
+  Widget _buildContent(
+    BuildContext context,
+    List<int> chapters,
+    BibleBookInfo? book,
+  ) {
+    final p = context.palette;
+    final type = context.type;
     final lastHere = _lastPosition?.bookId == widget.bookId
         ? _lastPosition
         : null;
     final count = chapters.length;
+    final section = book?.section ?? 'Libro bíblico';
+
     return ListView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(
@@ -99,29 +119,70 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
         28,
       ),
       children: [
-        VFeatureCard(
-          eyebrow: metadata?.section ?? 'Libro bíblico',
-          title: widget.bookName,
-          body:
-              '$count ${count == 1 ? 'capítulo' : 'capítulos'} · Reina-Valera 1909',
-          photo: VerbumPhotos.coffeeBible,
-          footer: lastHere == null
-              ? null
-              : VButton(
-                  label: 'Continuar capítulo ${lastHere.chapter}',
-                  icon: VerbumIcons.bookmarkSimple,
-                  iconLeading: true,
-                  variant: VButtonVariant.inverse,
-                  compact: true,
-                  onPressed: () => _openChapter(
-                    lastHere.chapter,
-                    initialVerse: lastHere.verse,
-                  ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (book != null)
+              Transform.rotate(
+                angle: -0.05,
+                child: BibleBookCover(
+                  book: book,
+                  width: 112,
+                  onTap: () => _openChapter(lastHere?.chapter ?? 1),
                 ),
+              ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(section, style: type.rubric),
+                  const SizedBox(height: 4),
+                  Semantics(
+                    header: true,
+                    child: Text(widget.bookName, style: type.display),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    sectionBlurb(section),
+                    style: type.body.copyWith(color: p.inkMuted),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        const VSectionHeader(
-          'Elige un capítulo',
-          padding: EdgeInsets.fromLTRB(2, 24, 2, 12),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            VMetaChip(
+              icon: VerbumIcons.listBullets,
+              label: '$count ${count == 1 ? 'capítulo' : 'capítulos'}',
+              color: p.rubric,
+            ),
+            VMetaChip(label: 'Reina-Valera 1909', color: p.rubric),
+          ],
+        ),
+        const SizedBox(height: 18),
+        VButton(
+          label: lastHere == null
+              ? 'Empezar en el capítulo 1'
+              : 'Continuar en el capítulo ${lastHere.chapter}',
+          icon: lastHere == null
+              ? VerbumIcons.arrowRight
+              : VerbumIcons.bookmarkSimple,
+          iconLeading: lastHere != null,
+          expanded: true,
+          onPressed: () => lastHere == null
+              ? _openChapter(1)
+              : _openChapter(lastHere.chapter, initialVerse: lastHere.verse),
+        ),
+        VSectionHeader(
+          'Capítulos',
+          trailing: '$count',
+          padding: const EdgeInsets.fromLTRB(2, 28, 2, 12),
         ),
         LayoutBuilder(
           builder: (context, constraints) {
@@ -131,8 +192,8 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: columns,
-                mainAxisSpacing: 9,
-                crossAxisSpacing: 9,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
               ),
               itemCount: count,
               itemBuilder: (context, index) {

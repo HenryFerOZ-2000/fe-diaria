@@ -34,9 +34,9 @@ class VNumberTile extends StatelessWidget {
     final done = state == VStepState.done;
     return VSurfaceCard(
       onTap: onTap,
+      tone: current ? VSurfaceTone.butter : VSurfaceTone.paper,
       radius: VerbumRadius.tile,
       padding: EdgeInsets.zero,
-      borderColor: current ? p.rubric : null,
       semanticLabel: semanticLabel,
       child: Stack(
         alignment: Alignment.center,
@@ -50,7 +50,7 @@ class VNumberTile extends StatelessWidget {
                 '$number',
                 style: type.heading.copyWith(
                   fontSize: caption == null ? 21 : 28,
-                  color: current ? p.rubric : (done ? p.inkMuted : p.ink),
+                  color: current ? p.onButter : (done ? p.inkMuted : p.ink),
                 ),
               ),
             ],
@@ -63,7 +63,7 @@ class VNumberTile extends StatelessWidget {
                 done ? VerbumIcons.checkCircle : VerbumIcons.bookmarkSimple,
                 weight: VIconWeight.fill,
                 size: 12,
-                color: done ? p.gold : p.rubric,
+                color: done ? p.gold : p.onButter,
               ),
             ),
         ],

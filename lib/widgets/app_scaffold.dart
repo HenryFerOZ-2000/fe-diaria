@@ -141,6 +141,8 @@ class AppScaffold extends StatelessWidget {
 
     return Scaffold(
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+      // Con degradado propio, el fondo continúa bajo la barra superior.
+      extendBodyBehindAppBar: gradient != null,
       appBar: showAppBar
           ? AppBar(
               title:

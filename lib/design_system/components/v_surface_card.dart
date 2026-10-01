@@ -5,7 +5,7 @@ import '../tokens/verbum_radius.dart';
 import '../tokens/verbum_shadows.dart';
 
 enum VSurfaceTone {
-  /// Papel con filete (por defecto).
+  /// Papel blanco con sombra suave (por defecto).
   paper,
 
   /// Bloque de apoyo sin borde, un tono más oscuro que el fondo.
@@ -16,9 +16,12 @@ enum VSurfaceTone {
 
   /// Tinte del tiempo litúrgico.
   accent,
+
+  /// Mantequilla: lo que toca ahora (capítulo actual, día de hoy).
+  butter,
 }
 
-/// Superficie base de la app: plana, con filete fino, sin sombras.
+/// Superficie base de la app: papel con sombra suave o bloques de color.
 ///
 /// [framed] añade el doble filete interior de los libros litúrgicos; úsalo
 /// solo para la pieza principal de una pantalla (p. ej. la Palabra del día).
@@ -52,6 +55,7 @@ class VSurfaceCard extends StatelessWidget {
       VSurfaceTone.muted => (p.surfaceMuted, null),
       VSurfaceTone.ink => (p.inverse, null),
       VSurfaceTone.accent => (p.accentSoft, null),
+      VSurfaceTone.butter => (p.butter, null),
     };
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(radius),
