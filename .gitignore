@@ -141,3 +141,4 @@ lib/generated_plugin_registrant.dart
 
 # Secrets
 **/api/src/secrets/*
+test/**/failures/

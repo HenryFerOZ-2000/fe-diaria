@@ -50,8 +50,10 @@ class VSurfaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
+    // De noche las sombras no se ven: el papel lleva un filete fino.
+    final dark = Theme.of(context).brightness == Brightness.dark;
     final (Color bg, Color? border) = switch (tone) {
-      VSurfaceTone.paper => (p.surface, null),
+      VSurfaceTone.paper => (p.surface, dark ? p.line : null),
       VSurfaceTone.muted => (p.surfaceMuted, null),
       VSurfaceTone.ink => (p.inverse, null),
       VSurfaceTone.accent => (p.accentSoft, null),

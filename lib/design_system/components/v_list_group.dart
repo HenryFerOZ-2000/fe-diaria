@@ -134,7 +134,12 @@ class VSwitchRow extends StatelessWidget {
         onTap: onChanged == null ? null : () => onChanged!(!value),
         trailingWidget: Padding(
           padding: const EdgeInsets.only(left: 8),
-          child: Switch.adaptive(value: value, onChanged: onChanged),
+          // En iOS el adaptativo ignora el tema: el color va explícito.
+          child: Switch.adaptive(
+            value: value,
+            onChanged: onChanged,
+            activeTrackColor: context.palette.emphasis,
+          ),
         ),
       ),
     );
@@ -160,6 +165,10 @@ class VListGroup extends StatelessWidget {
         color: p.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(VerbumRadius.card - 4),
+          // De noche las sombras no se ven: filete fino.
+          side: Theme.of(context).brightness == Brightness.dark
+              ? BorderSide(color: p.line)
+              : BorderSide.none,
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(

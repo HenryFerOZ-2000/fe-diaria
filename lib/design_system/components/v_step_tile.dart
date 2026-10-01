@@ -56,7 +56,13 @@ class VStepTile extends StatelessWidget {
         elevation: current ? 0 : 5,
         shadowColor: p.ink.withValues(alpha: .16),
         color: bg,
-        borderRadius: BorderRadius.circular(VerbumRadius.tile - 2),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(VerbumRadius.tile - 2),
+          // De noche las sombras no se ven: filete fino.
+          side: !current && Theme.of(context).brightness == Brightness.dark
+              ? BorderSide(color: p.line)
+              : BorderSide.none,
+        ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,

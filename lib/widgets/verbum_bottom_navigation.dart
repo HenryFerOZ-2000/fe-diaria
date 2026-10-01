@@ -43,6 +43,10 @@ class VerbumBottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
+    // De noche la tinta se perdería en el fondo: un tono más claro y un
+    // filete la despegan.
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final capsule = dark ? p.surfaceMuted : _tinta;
     return SafeArea(
       top: false,
       minimum: const EdgeInsets.only(bottom: 10),
@@ -77,7 +81,15 @@ class VerbumBottomNavigation extends StatelessWidget {
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
                       child: Container(
-                        color: _tinta.withValues(alpha: .84),
+                        decoration: BoxDecoration(
+                          color: capsule.withValues(alpha: dark ? .94 : .84),
+                          borderRadius: BorderRadius.circular(_barHeight / 2),
+                          border: dark
+                              ? Border.all(
+                                  color: Colors.white.withValues(alpha: .08),
+                                )
+                              : null,
+                        ),
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Row(
                           children: [
