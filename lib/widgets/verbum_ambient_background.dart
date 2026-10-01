@@ -23,13 +23,14 @@ class VerbumAmbientBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = context.palette;
     final dark = Theme.of(context).brightness == Brightness.dark;
-    // Blanco que se funde en lavanda (de noche, índigo profundo uniforme).
+    // Lavanda que se hace más profunda hacia abajo (de noche, índigo profundo uniforme).
     final fallback = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       colors: dark
           ? [p.background, p.background]
-          : [p.surface, p.background, p.surfaceMuted],
+          // Empieza en el mismo lavanda del Scaffold: sin corte bajo la barra.
+          : [p.background, p.background, p.surfaceMuted],
       stops: dark ? null : const [0, .55, 1],
     );
     return DecoratedBox(

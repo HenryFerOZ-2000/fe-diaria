@@ -205,12 +205,7 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
           padding: const EdgeInsets.fromLTRB(8, 4, 8, 6),
           child: Row(
             children: [
-              VIconButton(
-                icon: VerbumIcons.arrowLeft,
-                semanticLabel: 'Volver',
-                variant: VIconButtonVariant.ghost,
-                onPressed: widget.onBack,
-              ),
+              VBackButton(onPressed: widget.onBack),
               Expanded(
                 child: showCategory
                     ? Text(

@@ -132,17 +132,12 @@ class _FaqScreenState extends State<FaqScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text(
           'Preguntas frecuentes',
-          style: VerbumFonts.serif(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: VerbumFonts.serif(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
       ),
       body: Column(
         children: [
@@ -179,7 +174,8 @@ class _FaqScreenState extends State<FaqScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        VIcon(VerbumIcons.magnifyingGlassMinus,
+                        VIcon(
+                          VerbumIcons.magnifyingGlassMinus,
                           size: 64,
                           color: Colors.grey[400],
                         ),

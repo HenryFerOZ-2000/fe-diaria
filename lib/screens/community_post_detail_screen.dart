@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../design_system/design_system.dart';
 
 import '../services/community_posts_social_service.dart';
 import '../services/post_social_service.dart';
 import '../widgets/community_post_interaction_row.dart';
 import 'comments_screen.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 /// Detalle de una publicación de [community_posts]: texto, likes y hilo de comentarios.
 class CommunityPostDetailScreen extends StatelessWidget {
@@ -30,17 +30,12 @@ class CommunityPostDetailScreen extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text(
           'Publicación',
-          style: VerbumFonts.serif(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: VerbumFonts.serif(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
       ),
       resizeToAvoidBottomInset: true,
       body: Column(

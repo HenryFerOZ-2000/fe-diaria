@@ -13,17 +13,12 @@ class FavoritesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text(
           AppLocalizations.of(context).favoritesTitle,
-          style: VerbumFonts.serif(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: VerbumFonts.serif(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -51,7 +46,8 @@ class FavoritesScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        VIcon(VerbumIcons.heart,
+                        VIcon(
+                          VerbumIcons.heart,
                           size: 80,
                           color: Theme.of(
                             context,
@@ -303,7 +299,9 @@ class _FavoriteCardState extends State<_FavoriteCard>
                             borderRadius: BorderRadius.circular(20),
                             child: Padding(
                               padding: const EdgeInsets.all(8),
-                              child: VIcon(VerbumIcons.heart, weight: VIconWeight.fill,
+                              child: VIcon(
+                                VerbumIcons.heart,
+                                weight: VIconWeight.fill,
                                 size: 20,
                                 color: Colors.red,
                               ),

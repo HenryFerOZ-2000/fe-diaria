@@ -76,7 +76,7 @@ class _MyPostsScreenState extends State<MyPostsScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis oraciones')),
+      appBar: VAppBar(title: const Text('Mis oraciones')),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: _firestore
             .collection('live_posts')

@@ -93,7 +93,7 @@ class _DailyVerseWidgetScreenState extends State<DailyVerseWidgetScreen>
     final strings = widget.localizations ?? AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text(
           strings.widgetScreenTitle,
           maxLines: 1,

@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../design_system/design_system.dart';
 import '../services/privacy_security_service.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class ReportContentScreen extends StatefulWidget {
   const ReportContentScreen({super.key});
@@ -84,17 +84,12 @@ class _ReportContentScreenState extends State<ReportContentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text(
           'Reportar contenido',
-          style: VerbumFonts.serif(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: VerbumFonts.serif(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
       ),
       body: Form(
         key: _formKey,

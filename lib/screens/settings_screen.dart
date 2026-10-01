@@ -262,7 +262,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text(localizations.settingsTitle, style: context.type.heading),
         centerTitle: true,
       ),

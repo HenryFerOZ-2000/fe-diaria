@@ -118,7 +118,7 @@ class _PersonalizationScreenState extends State<PersonalizationScreen> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text('Personalización', style: context.type.heading),
         centerTitle: true,
       ),

@@ -36,8 +36,7 @@ class CommunityScreen extends StatelessWidget {
       length: 2,
       child: Scaffold(
         extendBodyBehindAppBar: false,
-        appBar: AppBar(
-          backgroundColor: context.palette.background,
+        appBar: VAppBar(
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

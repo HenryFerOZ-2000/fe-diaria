@@ -117,15 +117,11 @@ class _ReadingChatScreenState extends State<ReadingChatScreen> {
                   padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
                   child: Row(
                     children: [
-                      IconButton(
-                        icon: const VIcon(VerbumIcons.caretLeft,
-                          color: Colors.white,
-                        ),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
+                      const VBackButton(onColor: true),
                       const Spacer(),
                       IconButton(
-                        icon: const VIcon(VerbumIcons.close,
+                        icon: const VIcon(
+                          VerbumIcons.close,
                           color: Colors.white,
                         ),
                         onPressed: () => Navigator.of(context).pop(),
@@ -304,7 +300,9 @@ class _ReadingChatScreenState extends State<ReadingChatScreen> {
                               ),
                             ],
                           ),
-                          child: const VIcon(VerbumIcons.paperPlaneRight, weight: VIconWeight.fill,
+                          child: const VIcon(
+                            VerbumIcons.paperPlaneRight,
+                            weight: VIconWeight.fill,
                             color: Colors.white,
                             size: 20,
                           ),

@@ -48,8 +48,8 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
+      appBar: VAppBar(
+        leading: VBackButton(
           onPressed: () {
             if (_mode == CommunityEntryMode.landing) {
               Navigator.pop(context);
@@ -61,7 +61,6 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
               });
             }
           },
-          icon: const VIcon(VerbumIcons.arrowLeft),
         ),
       ),
       body: VerbumAmbientBackground(
@@ -108,7 +107,9 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
               Positioned(
                 right: -18,
                 top: -20,
-                child: VIcon(VerbumIcons.usersThree, weight: VIconWeight.fill,
+                child: VIcon(
+                  VerbumIcons.usersThree,
+                  weight: VIconWeight.fill,
                   size: 190,
                   color: Colors.white.withValues(alpha: .07),
                 ),
@@ -260,7 +261,11 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: scheme.primaryContainer,
-                child: VIcon(VerbumIcons.church, weight: VIconWeight.fill, color: scheme.primary),
+                child: VIcon(
+                  VerbumIcons.church,
+                  weight: VIconWeight.fill,
+                  color: scheme.primary,
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -310,10 +315,7 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
             'Cuenta su historia',
             'Todo listo',
           ][_createStep],
-          style: VerbumFonts.serif(
-            fontSize: 32,
-            fontWeight: FontWeight.w700,
-          ),
+          style: VerbumFonts.serif(fontSize: 32, fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 8),
         LinearProgressIndicator(
@@ -328,7 +330,10 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
             textCapitalization: TextCapitalization.words,
             decoration: const InputDecoration(
               labelText: 'Nombre de la comunidad',
-              prefixIcon: VIcon(VerbumIcons.usersThree, weight: VIconWeight.fill),
+              prefixIcon: VIcon(
+                VerbumIcons.usersThree,
+                weight: VIconWeight.fill,
+              ),
             ),
           ),
           const SizedBox(height: 14),
@@ -366,7 +371,10 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
         ] else ...[
           _summaryRow(VerbumIcons.usersThree, _name.text),
           _summaryRow(VerbumIcons.mapPin, _city.text),
-          _summaryRow(VerbumIcons.lockSimpleOpen, 'Ingreso mediante invitación'),
+          _summaryRow(
+            VerbumIcons.lockSimpleOpen,
+            'Ingreso mediante invitación',
+          ),
           const SizedBox(height: 12),
           _note(
             VerbumIcons.info,
@@ -415,7 +423,9 @@ class _CommunityEntryScreenState extends State<CommunityEntryScreen> {
       padding: const EdgeInsets.all(28),
       children: [
         const SizedBox(height: 30),
-        VIcon(VerbumIcons.checkCircle, weight: VIconWeight.fill,
+        VIcon(
+          VerbumIcons.checkCircle,
+          weight: VIconWeight.fill,
           size: 78,
           color: Theme.of(context).colorScheme.tertiary,
         ),

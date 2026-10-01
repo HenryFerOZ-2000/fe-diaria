@@ -35,7 +35,7 @@ class AccountSettingsScreen extends StatelessWidget {
     void go(String route) => Navigator.of(context).pushNamed(route);
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text('Cuenta y seguridad', style: context.type.heading),
       ),
       body: ListView(

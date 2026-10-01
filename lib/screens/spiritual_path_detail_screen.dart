@@ -102,7 +102,7 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
 
               return Column(
                 children: [
-                  AppBar(
+                  VAppBar(
                     actions: [
                       _Badge(
                         label:

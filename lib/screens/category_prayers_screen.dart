@@ -83,17 +83,12 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text(
           'Oraciones para…',
-          style: VerbumFonts.serif(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          ),
+          style: VerbumFonts.serif(fontSize: 26, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -188,7 +183,11 @@ class _CategoryPrayersScreenState extends State<CategoryPrayersScreen> {
                     onPressed: () {
                       Navigator.of(context).pushNamed('/home');
                     },
-                    icon: const VIcon(VerbumIcons.house, weight: VIconWeight.fill, size: 24),
+                    icon: const VIcon(
+                      VerbumIcons.house,
+                      weight: VIconWeight.fill,
+                      size: 24,
+                    ),
                     label: Text(
                       'Regresar al inicio',
                       style: VerbumFonts.sans(
@@ -390,17 +389,12 @@ class _CategoryPrayerDetailScreenState
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text(
           title,
-          style: VerbumFonts.serif(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          ),
+          style: VerbumFonts.serif(fontSize: 26, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
       ),
       body: Stack(
         children: [
@@ -481,7 +475,11 @@ class _CategoryPrayerDetailScreenState
                 onPressed: () {
                   Navigator.of(context).pushNamed('/home');
                 },
-                icon: const VIcon(VerbumIcons.house, weight: VIconWeight.fill, size: 24),
+                icon: const VIcon(
+                  VerbumIcons.house,
+                  weight: VIconWeight.fill,
+                  size: 24,
+                ),
                 label: Text(
                   'Regresar al inicio',
                   style: VerbumFonts.sans(

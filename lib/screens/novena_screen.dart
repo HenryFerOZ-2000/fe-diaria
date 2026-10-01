@@ -86,7 +86,7 @@ class _NovenaScreenState extends State<NovenaScreen> {
     }
     final lastDay = StorageService().getNovenaLastDay();
     return Scaffold(
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text('Novena de Navidad', style: context.type.heading),
         centerTitle: true,
       ),
@@ -289,7 +289,7 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
     final isLast = _currentStep >= _totalSteps;
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text('Día ${widget.day}', style: type.heading),
         centerTitle: true,
         actions: [

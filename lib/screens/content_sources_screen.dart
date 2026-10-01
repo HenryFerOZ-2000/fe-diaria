@@ -7,7 +7,7 @@ class ContentSourcesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Nuestra biblioteca y sus fuentes')),
+    appBar: VAppBar(title: const Text('Nuestra biblioteca y sus fuentes')),
     body: ListView(
       padding: const EdgeInsets.all(20),
       children: [

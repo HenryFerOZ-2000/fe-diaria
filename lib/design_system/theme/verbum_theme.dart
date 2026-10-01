@@ -90,6 +90,7 @@ ThemeData buildVerbumTheme({
     dividerTheme: DividerThemeData(color: palette.line, thickness: 1, space: 1),
     appBarTheme: AppBarTheme(
       backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
       foregroundColor: palette.ink,
       elevation: 0,
       scrolledUnderElevation: 0,

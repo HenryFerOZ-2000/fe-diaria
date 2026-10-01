@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide AuthProvider;
@@ -216,74 +217,80 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    return Scaffold(
-      backgroundColor: p.inverse,
-      body: Consumer<AppProvider>(
-        builder: (context, provider, child) => FadeTransition(
-          opacity: _fadeAnimation,
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              SliverSafeArea(
-                bottom: false,
-                sliver: SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 12, bottom: 28),
-                    child: ChangeNotifierProvider<StreakController>.value(
-                      value: _streakController,
-                      child: Consumer<StreakController>(
-                        builder: (context, streak, _) {
-                          _maybeShowStreakCelebration(streak);
-                          return TodayHero(
-                            now: DateTime.now(),
-                            missions: _missionsController.missions,
-                            streakDays: streak.totalDays,
-                            verseText: provider.todayVerse?.text,
-                            onOpen: (mission) =>
-                                _openMissionRead(context, mission, provider),
-                            onProfile: () =>
-                                Navigator.of(context).pushNamed('/profile'),
-                            onStreak: () =>
-                                Navigator.of(context).pushNamed('/streak'),
-                          );
-                        },
+    // Sobre periwinkle, hora y batería en claro.
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+      child: Scaffold(
+        backgroundColor: p.inverse,
+        body: Consumer<AppProvider>(
+          builder: (context, provider, child) => FadeTransition(
+            opacity: _fadeAnimation,
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverSafeArea(
+                  bottom: false,
+                  sliver: SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 12, bottom: 28),
+                      child: ChangeNotifierProvider<StreakController>.value(
+                        value: _streakController,
+                        child: Consumer<StreakController>(
+                          builder: (context, streak, _) {
+                            _maybeShowStreakCelebration(streak);
+                            return TodayHero(
+                              now: DateTime.now(),
+                              missions: _missionsController.missions,
+                              streakDays: streak.totalDays,
+                              verseText: provider.todayVerse?.text,
+                              onOpen: (mission) =>
+                                  _openMissionRead(context, mission, provider),
+                              onProfile: () =>
+                                  Navigator.of(context).pushNamed('/profile'),
+                              onStreak: () =>
+                                  Navigator.of(context).pushNamed('/streak'),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              // Hoja clara con el resto del día.
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: p.background,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(VerbumRadius.sheet),
+                // Hoja clara con el resto del día.
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: p.background,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(VerbumRadius.sheet),
+                      ),
                     ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      VerbumSpace.gutter,
-                      22,
-                      VerbumSpace.gutter,
-                      24,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        if (provider.isLoading) ...[
-                          const VProgressBar(value: 0.35, height: 3),
-                          const SizedBox(height: 12),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        VerbumSpace.gutter,
+                        22,
+                        VerbumSpace.gutter,
+                        24,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (provider.isLoading) ...[
+                            const VProgressBar(value: 0.35, height: 3),
+                            const SizedBox(height: 12),
+                          ],
+                          const SpiritualPathTodayCard(),
+                          const TodayLiturgySection(),
                         ],
-                        const SpiritualPathTodayCard(),
-                        const TodayLiturgySection(),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

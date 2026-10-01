@@ -112,12 +112,8 @@ class _StreakScreenState extends State<StreakScreen> {
               : CustomScrollView(
                   physics: const BouncingScrollPhysics(),
                   slivers: [
-                    SliverAppBar(
-                      pinned: true,
-                      backgroundColor: context.palette.background.withValues(
-                        alpha: .96,
-                      ),
-                      surfaceTintColor: Colors.transparent,
+                    VAppBar.sliver(
+                      context,
                       title: Text('Mi constancia', style: context.type.heading),
                     ),
                     SliverPadding(

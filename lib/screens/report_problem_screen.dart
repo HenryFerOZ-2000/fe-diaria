@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../design_system/design_system.dart';
 import '../services/help_support_service.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
 
 class ReportProblemScreen extends StatefulWidget {
   const ReportProblemScreen({super.key});
@@ -69,17 +69,12 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text(
           'Reportar un problema',
-          style: VerbumFonts.serif(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: VerbumFonts.serif(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
       ),
       body: Form(
         key: _formKey,

@@ -88,7 +88,7 @@ class _RosaryGuideScreenState extends State<RosaryGuideScreen> {
     final isLast = _currentStep >= steps.length - 1;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Santo Rosario', style: type.heading)),
+      appBar: VAppBar(title: Text('Santo Rosario', style: type.heading)),
       body: SafeArea(
         child: Column(
           children: [

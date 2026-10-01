@@ -16,12 +16,7 @@ class OnboardingHeader extends StatelessWidget {
     return Row(
       children: [
         if (onBack != null)
-          VIconButton(
-            icon: VerbumIcons.arrowLeft,
-            semanticLabel: 'Volver',
-            variant: VIconButtonVariant.ghost,
-            onPressed: onBack,
-          )
+          VBackButton(onPressed: onBack)
         else
           Container(
             width: 42,

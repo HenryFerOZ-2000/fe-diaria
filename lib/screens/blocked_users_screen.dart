@@ -93,17 +93,12 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text(
           'Usuarios bloqueados',
-          style: VerbumFonts.serif(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: VerbumFonts.serif(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -112,7 +107,11 @@ class _BlockedUsersScreenState extends State<BlockedUsersScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  VIcon(VerbumIcons.prohibit, size: 64, color: Colors.grey[400]),
+                  VIcon(
+                    VerbumIcons.prohibit,
+                    size: 64,
+                    color: Colors.grey[400],
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'No hay usuarios bloqueados',

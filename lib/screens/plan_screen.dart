@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:verbum/design_system/tokens/verbum_typography.dart';
+import '../design_system/design_system.dart';
 
 class PlanScreen extends StatelessWidget {
   const PlanScreen({super.key});
@@ -7,7 +7,7 @@ class PlanScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Mi plan')),
+      appBar: VAppBar(title: const Text('Mi plan')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

@@ -151,7 +151,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
     if (_error != null) {
       return Scaffold(
-        appBar: AppBar(),
+        appBar: VAppBar(),
         body: Center(child: Text(_error!)),
       );
     }
@@ -169,7 +169,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           bottom: false,
           child: Column(
             children: [
-              AppBar(
+              VAppBar(
                 title: Text(
                   'Editar perfil',
                   style: VerbumFonts.serif(
@@ -210,7 +210,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     backgroundColor: scheme.primaryContainer,
                                     backgroundImage: image,
                                     child: image == null
-                                        ? VIcon(VerbumIcons.user,
+                                        ? VIcon(
+                                            VerbumIcons.user,
                                             size: 42,
                                             color: scheme.primary,
                                           )
@@ -242,7 +243,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                               color: Colors.white,
                                             ),
                                           )
-                                        : const VIcon(VerbumIcons.camera,
+                                        : const VIcon(
+                                            VerbumIcons.camera,
                                             size: 19,
                                           ),
                                   ),
@@ -295,7 +297,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               decoration: const InputDecoration(
                                 labelText: 'Nombre visible',
                                 hintText: '¿Cómo quieres que te llamemos?',
-                                prefixIcon: VIcon(VerbumIcons.identificationBadge),
+                                prefixIcon: VIcon(
+                                  VerbumIcons.identificationBadge,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -307,8 +311,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 labelText: 'Nombre de usuario',
                                 hintText: 'tu.usuario',
                                 prefixText: '@',
-                                prefixIcon: const VIcon(VerbumIcons.at,
-                                ),
+                                prefixIcon: const VIcon(VerbumIcons.at),
                                 errorText: usernameValid
                                     ? null
                                     : 'Usa entre 3 y 20 letras, números, punto o _',
@@ -319,7 +322,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                VIcon(VerbumIcons.info,
+                                VIcon(
+                                  VerbumIcons.info,
                                   size: 15,
                                   color: scheme.onSurfaceVariant,
                                 ),

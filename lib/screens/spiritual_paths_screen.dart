@@ -54,7 +54,7 @@ class _SpiritualPathsScreenState extends State<SpiritualPathsScreen> {
           bottom: false,
           child: Column(
             children: [
-              AppBar(title: Text('Caminos', style: context.type.display)),
+              VAppBar(title: Text('Caminos', style: context.type.display)),
               Expanded(
                 child: FutureBuilder<_PathsState>(
                   future: _state,

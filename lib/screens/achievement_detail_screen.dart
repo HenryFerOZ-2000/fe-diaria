@@ -38,7 +38,7 @@ class AchievementDetailScreen extends StatelessWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text('Logro', style: context.type.heading)),
+      appBar: VAppBar(title: Text('Logro', style: context.type.heading)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(
           VerbumSpace.gutter,

@@ -82,7 +82,7 @@ class _SpiritualStatsScreenState extends State<SpiritualStatsScreen> {
   Widget build(BuildContext context) {
     final p = context.palette;
     return Scaffold(
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text('Datos espirituales', style: context.type.heading),
       ),
       body: _isLoading

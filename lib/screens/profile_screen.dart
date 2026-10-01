@@ -44,7 +44,7 @@ class _MySocialProfileScreenState extends State<MySocialProfileScreen> {
           bottom: false,
           child: Column(
             children: [
-              AppBar(
+              VAppBar(
                 title: Text(
                   'Mis publicaciones',
                   style: VerbumFonts.serif(
@@ -301,7 +301,8 @@ class _PostsListState extends State<_PostsList> {
                       IconButton(
                         tooltip: 'Eliminar publicación',
                         onPressed: () => _deletePost(doc.id, text),
-                        icon: VIcon(VerbumIcons.dotsThree,
+                        icon: VIcon(
+                          VerbumIcons.dotsThree,
                           color: scheme.onSurfaceVariant,
                         ),
                       ),
@@ -319,7 +320,8 @@ class _PostsListState extends State<_PostsList> {
                   const SizedBox(height: 14),
                   Row(
                     children: [
-                      VIcon(VerbumIcons.globe,
+                      VIcon(
+                        VerbumIcons.globe,
                         size: 14,
                         color: scheme.onSurfaceVariant,
                       ),

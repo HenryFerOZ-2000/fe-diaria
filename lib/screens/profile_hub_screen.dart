@@ -143,12 +143,9 @@ class _ProfileContent extends StatelessWidget {
     return CustomScrollView(
       physics: const BouncingScrollPhysics(),
       slivers: [
-        SliverAppBar(
-          pinned: true,
-          backgroundColor: context.palette.background.withValues(alpha: .96),
-          surfaceTintColor: Colors.transparent,
+        VAppBar.sliver(
+          context,
           title: Text('Tu espacio', style: context.type.display),
-          centerTitle: false,
           actions: const [VerbumHeaderActions(showProfile: false)],
         ),
         SliverPadding(

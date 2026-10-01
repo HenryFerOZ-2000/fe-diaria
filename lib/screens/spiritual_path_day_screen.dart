@@ -119,12 +119,7 @@ class _SpiritualPathDayScreenState extends State<SpiritualPathDayScreen> {
               padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
               child: Row(
                 children: [
-                  VIconButton(
-                    icon: VerbumIcons.arrowLeft,
-                    semanticLabel: 'Volver',
-                    variant: VIconButtonVariant.ghost,
-                    onPressed: () => Navigator.pop(context),
-                  ),
+                  const VBackButton(),
                   Expanded(
                     child: Column(
                       children: [

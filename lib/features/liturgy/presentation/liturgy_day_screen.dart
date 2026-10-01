@@ -26,7 +26,7 @@ class LiturgyDayScreen extends StatelessWidget {
         : LiturgicalPalette.accent(color, theme.brightness);
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: VAppBar(
         title: const Text('Liturgia de hoy'),
         actions: [
           IconButton(

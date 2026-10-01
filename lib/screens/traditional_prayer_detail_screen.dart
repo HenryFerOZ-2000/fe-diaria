@@ -160,21 +160,18 @@ class _TraditionalPrayerDetailScreenState
                         padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
                         child: Row(
                           children: [
-                            IconButton(
-                              icon: const VIcon(VerbumIcons.caretLeft,
-                                color: Colors.white,
-                              ),
-                              onPressed: () => Navigator.of(context).pop(),
-                            ),
+                            const VBackButton(onColor: true),
                             const Spacer(),
                             IconButton(
-                              icon: const VIcon(VerbumIcons.close,
+                              icon: const VIcon(
+                                VerbumIcons.close,
                                 color: Colors.white,
                               ),
                               onPressed: () => Navigator.of(context).pop(),
                             ),
                             IconButton(
-                              icon: const VIcon(VerbumIcons.shareNetwork,
+                              icon: const VIcon(
+                                VerbumIcons.shareNetwork,
                                 color: Colors.white,
                               ),
                               onPressed: _share,
@@ -242,7 +239,11 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const VIcon(VerbumIcons.warningCircle, color: Colors.white70, size: 44),
+            const VIcon(
+              VerbumIcons.warningCircle,
+              color: Colors.white70,
+              size: 44,
+            ),
             const SizedBox(height: 12),
             Text(
               message,

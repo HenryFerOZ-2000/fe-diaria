@@ -144,16 +144,13 @@ class AppScaffold extends StatelessWidget {
       // Con degradado propio, el fondo continúa bajo la barra superior.
       extendBodyBehindAppBar: gradient != null,
       appBar: showAppBar
-          ? AppBar(
+          ? VAppBar(
               title:
                   titleWidget ??
                   (title != null
                       ? Text(title!, style: theme.textTheme.titleLarge)
                       : null),
               centerTitle: centerTitle,
-              backgroundColor: Colors.transparent,
-              elevation: appBarElevation ?? 0,
-              scrolledUnderElevation: 0,
               actions: actions,
               bottom: bottom,
             )

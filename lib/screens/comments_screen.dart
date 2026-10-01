@@ -188,7 +188,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      VIcon(VerbumIcons.chatCircle,
+                      VIcon(
+                        VerbumIcons.chatCircle,
                         size: 64,
                         color: Colors.grey[400],
                       ),
@@ -312,7 +313,10 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const VIcon(VerbumIcons.paperPlaneRight, weight: VIconWeight.fill),
+                            : const VIcon(
+                                VerbumIcons.paperPlaneRight,
+                                weight: VIconWeight.fill,
+                              ),
                         style: IconButton.styleFrom(
                           backgroundColor: Theme.of(
                             context,
@@ -339,17 +343,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
     }
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
+      appBar: VAppBar(
         title: Text(
           'Comentarios',
-          style: VerbumFonts.serif(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: VerbumFonts.serif(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
       ),
       body: body,
     );
