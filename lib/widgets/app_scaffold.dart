@@ -10,6 +10,9 @@ class AppScaffold extends StatelessWidget {
   final Widget body;
   final String? title;
   final Widget? titleWidget;
+
+  /// A la izquierda de la barra (p. ej. [VerbumSettingsButton]).
+  final Widget? leading;
   final List<Widget>? actions;
   final bool centerTitle;
   final bool resizeToAvoidBottomInset;
@@ -32,6 +35,7 @@ class AppScaffold extends StatelessWidget {
     required this.body,
     this.title,
     this.titleWidget,
+    this.leading,
     this.actions,
     this.centerTitle = true,
     this.resizeToAvoidBottomInset = true,
@@ -145,6 +149,7 @@ class AppScaffold extends StatelessWidget {
       extendBodyBehindAppBar: gradient != null,
       appBar: showAppBar
           ? VAppBar(
+              leading: leading,
               title:
                   titleWidget ??
                   (title != null

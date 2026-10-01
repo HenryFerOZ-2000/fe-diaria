@@ -78,3 +78,18 @@ class VerbumHeaderButton extends StatelessWidget {
     );
   }
 }
+
+/// Configuración a la izquierda de la barra en las pestañas principales
+/// (el perfil queda a la derecha), como en las portadas con foto.
+class VerbumSettingsButton extends StatelessWidget {
+  const VerbumSettingsButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return VerbumHeaderButton(
+      icon: VerbumIcons.slidersHorizontal,
+      tooltip: 'Configuración',
+      onPressed: () => Navigator.of(context).pushNamed('/settings'),
+    );
+  }
+}

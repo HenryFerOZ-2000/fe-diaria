@@ -21,6 +21,8 @@ import '../widgets/verbum_ambient_background.dart';
 import '../data/spiritual_paths_catalog.dart';
 import '../models/spiritual_path.dart';
 import 'spiritual_path_detail_screen.dart';
+import '../features/paths/presentation/path_photos.dart';
+import '../services/spiritual_path_service.dart';
 import 'package:verbum/design_system/design_system.dart';
 import '../features/community/presentation/community_cover.dart';
 
@@ -676,6 +678,35 @@ class _CommunityBasicView extends StatelessWidget {
                   communityService: communityService,
                 ),
               ],
+              const SizedBox(height: 12),
+              _CommunityQuickActions(
+                onPublish: canPublish
+                    ? () => _CommunityComposerCard(
+                        communityId: communityId,
+                        currentUid: currentUid,
+                        currentUserData: currentUserData,
+                        communityService: communityService,
+                      )._openCreatePostDialog(context)
+                    : null,
+                onMembers: () => _CommunityMembersButton(
+                  communityId: communityId,
+                  currentUid: currentUid,
+                  communityService: communityService,
+                  adminIds: ((data['adminIds'] as List?) ?? const [])
+                      .map((id) => id?.toString() ?? '')
+                      .where((id) => id.isNotEmpty)
+                      .toSet(),
+                  createdBy: ((data['createdBy'] as String?) ?? '').trim(),
+                )._openMembersSheet(context),
+                onInvite: isAdmin && inviteCode.isNotEmpty
+                    ? () => SharePlus.instance.share(
+                        ShareParams(
+                          text:
+                              'Te invito a unirte a $title en Verbum. Usa el código $inviteCode.',
+                        ),
+                      )
+                    : null,
+              ),
               const SizedBox(height: 18),
               Row(
                 children: [
@@ -763,18 +794,6 @@ class _CommunityBasicView extends StatelessWidget {
                           communityService: communityService,
                         ),
                       ],
-                      const SizedBox(height: 8),
-                      _CommunityMembersButton(
-                        communityId: communityId,
-                        currentUid: currentUid,
-                        communityService: communityService,
-                        adminIds: ((data['adminIds'] as List?) ?? const [])
-                            .map((id) => id?.toString() ?? '')
-                            .where((id) => id.isNotEmpty)
-                            .toSet(),
-                        createdBy: ((data['createdBy'] as String?) ?? '')
-                            .trim(),
-                      ),
                       if (city != null && city.isNotEmpty) ...[
                         const SizedBox(height: 6),
                         Row(
@@ -919,16 +938,7 @@ class _CommunityBasicView extends StatelessWidget {
                   ),
                 ),
               ),
-              if (canPublish) ...[
-                const SizedBox(height: 12),
-                _CommunityComposerCard(
-                  communityId: communityId,
-                  currentUid: currentUid,
-                  currentUserData: currentUserData,
-                  communityService: communityService,
-                ),
-                const SizedBox(height: 12),
-              ] else if (!isAdmin && !membersCanPost) ...[
+              if (!canPublish) ...[
                 const SizedBox(height: 12),
                 Card(
                   elevation: 0,
@@ -1066,6 +1076,86 @@ class _CommunityBasicView extends StatelessWidget {
   }
 }
 
+/// Accesos directos de "Mi comunidad": publicar, miembros e invitar.
+class _CommunityQuickActions extends StatelessWidget {
+  const _CommunityQuickActions({
+    required this.onMembers,
+    this.onPublish,
+    this.onInvite,
+  });
+
+  final VoidCallback onMembers;
+  final VoidCallback? onPublish;
+  final VoidCallback? onInvite;
+
+  @override
+  Widget build(BuildContext context) {
+    final actions = [
+      if (onPublish != null) (VerbumIcons.notePencil, 'Publicar', onPublish!),
+      (VerbumIcons.usersThree, 'Miembros', onMembers),
+      if (onInvite != null) (VerbumIcons.userPlus, 'Invitar', onInvite!),
+    ];
+    return Row(
+      children: [
+        for (var i = 0; i < actions.length; i++) ...[
+          if (i > 0) const SizedBox(width: 10),
+          Expanded(
+            child: _QuickAction(
+              icon: actions[i].$1,
+              label: actions[i].$2,
+              onTap: actions[i].$3,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _QuickAction extends StatelessWidget {
+  const _QuickAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final VerbumIcons icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return VSurfaceCard(
+      onTap: onTap,
+      radius: VerbumRadius.tile,
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
+      semanticLabel: label,
+      child: Column(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: p.surfaceMuted,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: VIcon(icon, size: 19, color: p.rubric),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: context.type.bodyStrong.copyWith(fontSize: 12.5),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _CommunityPathCard extends StatelessWidget {
   final String communityId;
   final String currentUid;
@@ -1095,28 +1185,23 @@ class _CommunityPathCard extends StatelessWidget {
             children: [
               Text(
                 'Camino de la comunidad',
-                style: VerbumFonts.serif(
-                  fontSize: 23,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: context.type.title.copyWith(fontSize: 22),
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 4),
               Text(
                 'Elige un recorrido que todos puedan realizar juntos.',
-                style: VerbumFonts.sans(
-                  fontSize: 12,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                style: context.type.body.copyWith(
+                  color: context.palette.inkMuted,
                 ),
               ),
               const SizedBox(height: 14),
               ...SpiritualPathsCatalog.paths.map(
                 (path) => ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: VIcon(
-                    path.icon,
-                    weight: VIconWeight.duotone,
-                    size: 28,
-                    color: context.palette.gold,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 4),
+                  leading: VPhotoFrame(
+                    photoForPath(path.id),
+                    width: 50,
+                    aspectRatio: 1,
                   ),
                   title: Text(path.title),
                   subtitle: Text(path.subtitle),
@@ -1151,92 +1236,115 @@ class _CommunityPathCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final p = context.palette;
+    final type = context.type;
     final hasPath = pathId?.isNotEmpty == true;
     final path = hasPath ? SpiritualPathsCatalog.byId(pathId!) : null;
-    final accent = context.palette.gold;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: path != null
-            ? () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => SpiritualPathDetailScreen(path: path),
-                ),
-              )
-            : () => _choose(context),
-        borderRadius: BorderRadius.circular(23),
-        child: Ink(
-          padding: const EdgeInsets.all(17),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color.alphaBlend(accent.withValues(alpha: .14), scheme.surface),
-                scheme.surface,
-              ],
-            ),
-            borderRadius: BorderRadius.circular(23),
-            border: Border.all(color: accent.withValues(alpha: .28)),
-          ),
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        VSectionHeader(
+          'Camino de la comunidad',
+          trailing: isAdmin ? (path == null ? 'Elegir' : 'Cambiar') : null,
+          onTrailingTap: isAdmin ? () => _choose(context) : null,
+          padding: const EdgeInsets.fromLTRB(2, 4, 2, 10),
+        ),
+        VSurfaceCard(
+          radius: VerbumRadius.card,
+          padding: const EdgeInsets.all(12),
+          onTap: path != null
+              ? () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => SpiritualPathDetailScreen(path: path),
+                  ),
+                )
+              : () => _choose(context),
           child: Row(
             children: [
-              Container(
-                width: 45,
-                height: 45,
-                decoration: BoxDecoration(
-                  color: accent.withValues(alpha: .12),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: VIcon(
-                  path?.icon ?? VerbumIcons.usersFour,
-                  color: accent,
-                ),
-              ),
-              const SizedBox(width: 12),
+              path == null
+                  ? Container(
+                      width: 62,
+                      height: 62,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: p.surfaceMuted,
+                        borderRadius: BorderRadius.circular(VerbumRadius.tile),
+                      ),
+                      child: VIcon(VerbumIcons.path, color: p.rubric),
+                    )
+                  : VPhotoFrame(
+                      photoForPath(path.id),
+                      width: 62,
+                      aspectRatio: 1,
+                    ),
+              const SizedBox(width: 14),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'CAMINO DE LA COMUNIDAD',
-                      style: VerbumFonts.sans(
-                        color: accent,
-                        fontSize: 8,
-                        letterSpacing: 1.1,
-                        fontWeight: FontWeight.w800,
+                child: path == null
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isAdmin
+                                ? 'Elijan un camino para recorrer juntos'
+                                : 'Aún no hay un camino elegido',
+                            style: type.heading.copyWith(fontSize: 15.5),
+                          ),
+                          Text(
+                            isAdmin
+                                ? 'Toca para elegirlo'
+                                : 'Quien guía la comunidad lo elegirá',
+                            style: type.caption,
+                          ),
+                        ],
+                      )
+                    : FutureBuilder<SpiritualPathProgress>(
+                        future: SpiritualPathService().progressFor(path.id),
+                        builder: (context, snapshot) {
+                          final progress = snapshot.data;
+                          final done = progress?.completedDays.length ?? 0;
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                done == 0
+                                    ? 'Para recorrer juntos'
+                                    : 'Tu avance · día $done de ${path.days.length}',
+                                style: type.caption.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                path.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: type.heading.copyWith(fontSize: 16),
+                              ),
+                              const SizedBox(height: 8),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(99),
+                                child: LinearProgressIndicator(
+                                  value:
+                                      progress?.progressFor(path.days.length) ??
+                                      0,
+                                  minHeight: 6,
+                                  color: p.sage,
+                                  backgroundColor: p.surfaceMuted,
+                                  semanticsLabel: 'Tu avance en el camino',
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      path?.title ?? 'Elijan un camino para recorrer juntos',
-                      style: VerbumFonts.serif(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    if (path != null)
-                      Text(
-                        path.subtitle,
-                        style: VerbumFonts.sans(
-                          fontSize: 10.5,
-                          color: scheme.onSurfaceVariant,
-                        ),
-                      ),
-                  ],
-                ),
               ),
-              if (isAdmin)
-                IconButton(
-                  tooltip: 'Cambiar camino',
-                  onPressed: () => _choose(context),
-                  icon: const VIcon(VerbumIcons.slidersHorizontal),
-                )
-              else
-                const VIcon(VerbumIcons.caretRight),
+              const SizedBox(width: 8),
+              VIcon(VerbumIcons.caretRight, size: 18, color: p.inkSubtle),
             ],
           ),
         ),
-      ),
+      ],
     );
   }
 }

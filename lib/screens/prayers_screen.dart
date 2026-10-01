@@ -41,7 +41,8 @@ class PrayersScreen extends StatelessWidget {
       showBanner: false,
       centerTitle: false,
       titleWidget: const SizedBox.shrink(),
-      actions: const [VerbumHeaderActions()],
+      leading: const VerbumSettingsButton(),
+      actions: const [VerbumHeaderActions(showSettings: false)],
       body: ListView(
         padding: const EdgeInsets.only(bottom: 28),
         children: [

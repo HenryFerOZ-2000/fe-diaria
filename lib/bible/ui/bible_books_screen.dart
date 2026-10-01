@@ -153,7 +153,8 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
     return AppScaffold(
       titleWidget: const SizedBox.shrink(),
       centerTitle: false,
-      actions: const [VerbumHeaderActions()],
+      leading: const VerbumSettingsButton(),
+      actions: const [VerbumHeaderActions(showSettings: false)],
       showBanner: false,
       showGuestNotice: false,
       body: _loading
