@@ -391,7 +391,10 @@ class _LiveScreenState extends State<LiveScreen> {
           color: colorScheme.primary,
           child: ListView.builder(
             controller: _scrollController,
-            padding: EdgeInsets.only(top: cover == null ? 10 : 0, bottom: 28),
+            padding: EdgeInsets.only(
+              top: cover == null ? 10 : 0,
+              bottom: 28 + MediaQuery.paddingOf(context).bottom,
+            ),
             itemCount: visiblePosts.isEmpty ? 2 : visiblePosts.length + 1,
             itemBuilder: (context, index) {
               if (index == 0) {

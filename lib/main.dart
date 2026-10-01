@@ -389,6 +389,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // La barra flota sobre el contenido.
+      extendBody: true,
       body: IndexedStack(
         index: _currentIndex,
         children: List.generate(

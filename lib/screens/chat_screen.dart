@@ -343,16 +343,20 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildInput(BuildContext context, {required bool signedIn}) {
     final p = context.palette;
     final type = context.type;
+    // El campo queda por encima de la barra flotante (o del teclado).
+    final bottom = MediaQuery.viewInsetsOf(context).bottom > 0
+        ? 10.0
+        : MediaQuery.paddingOf(context).bottom + 6;
     return Material(
       color: p.surface,
       elevation: 8,
       shadowColor: p.ink.withValues(alpha: .2),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(
+        padding: EdgeInsets.fromLTRB(
           VerbumSpace.gutter,
           10,
           VerbumSpace.gutter,
-          10,
+          bottom,
         ),
         child: signedIn
             ? Row(

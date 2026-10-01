@@ -44,25 +44,27 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('el destino activo va relleno', (tester) async {
+  testWidgets('el destino activo va relleno; Oraciones siempre destaca', (
+    tester,
+  ) async {
     await pumpNavigation(tester, size: const Size(390, 844), selectedIndex: 1);
 
     final filled = tester
         .widgetList<VIcon>(find.byType(VIcon))
         .where((i) => i.weight == VIconWeight.fill)
-        .map((i) => i.icon);
-    expect(filled, [VerbumIcons.bookOpenText]);
+        .map((i) => i.icon)
+        .toSet();
+    expect(filled, {VerbumIcons.bookOpenText, VerbumIcons.handsPraying});
   });
 
-  testWidgets('en Hoy, Oraciones es el botón central destacado', (
-    tester,
-  ) async {
-    await pumpNavigation(tester, size: const Size(390, 844));
-
-    final filled = tester
-        .widgetList<VIcon>(find.byType(VIcon))
-        .where((i) => i.weight == VIconWeight.fill)
-        .map((i) => i.icon);
-    expect(filled, [VerbumIcons.house, VerbumIcons.handsPraying]);
+  testWidgets('el botón central abre Oraciones', (tester) async {
+    int? tapped;
+    await pumpNavigation(
+      tester,
+      size: const Size(390, 844),
+      onSelected: (i) => tapped = i,
+    );
+    await tester.tap(find.byTooltip('Oraciones'));
+    expect(tapped, 2);
   });
 }

@@ -254,7 +254,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       return false;
                     },
                     child: ListView(
-                      padding: EdgeInsets.zero,
+                      // Deja ver el final por encima de la barra flotante.
+                      padding: EdgeInsets.only(
+                        bottom: MediaQuery.paddingOf(context).bottom,
+                      ),
                       physics: const BouncingScrollPhysics(),
                       children: [
                         ChangeNotifierProvider<StreakController>.value(

@@ -527,7 +527,9 @@ class _MyCommunityEmptyView extends StatelessWidget {
     final p = context.palette;
     final type = context.type;
     return ListView(
-      padding: const EdgeInsets.only(bottom: 28),
+      padding: EdgeInsets.only(
+        bottom: 28 + MediaQuery.paddingOf(context).bottom,
+      ),
       children: [
         cover,
         Padding(
@@ -629,7 +631,9 @@ class _CommunityBasicView extends StatelessWidget {
 
     final title = name?.isNotEmpty == true ? name! : 'Mi comunidad';
     return ListView(
-      padding: const EdgeInsets.only(bottom: 28),
+      padding: EdgeInsets.only(
+        bottom: 28 + MediaQuery.paddingOf(context).bottom,
+      ),
       children: [
         cover(
           title: title,
