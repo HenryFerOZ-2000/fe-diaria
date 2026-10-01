@@ -187,6 +187,22 @@ ThemeData buildVerbumTheme({
       checkmarkColor: palette.onEmphasis,
       shape: const StadiumBorder(),
     ),
+    // Menús emergentes como tarjetas de la app.
+    popupMenuTheme: PopupMenuThemeData(
+      color: palette.surface,
+      surfaceTintColor: Colors.transparent,
+      elevation: isDark ? 0 : 8,
+      shadowColor: const Color(0xFF22245A).withValues(alpha: .18),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(VerbumRadius.tile),
+        side: isDark ? BorderSide(color: palette.line) : BorderSide.none,
+      ),
+      textStyle: type.bodyStrong.copyWith(color: palette.ink),
+      labelTextStyle: WidgetStatePropertyAll(
+        type.bodyStrong.copyWith(color: palette.ink),
+      ),
+      menuPadding: const EdgeInsets.symmetric(vertical: 6),
+    ),
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith(
         (s) => s.contains(WidgetState.selected)

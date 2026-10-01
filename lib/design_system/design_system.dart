@@ -30,6 +30,7 @@ export 'components/v_notice.dart';
 export 'components/v_photo_card.dart';
 export 'components/v_photo_cover.dart';
 export 'components/v_photo_frame.dart';
+export 'components/v_reader_toolbar.dart';
 export 'components/v_number_tile.dart';
 export 'components/v_progress_bar.dart';
 export 'components/v_radio_card.dart';

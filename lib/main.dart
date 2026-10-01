@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -207,7 +208,16 @@ class MyApp extends StatelessWidget {
             themeMode: provider.darkMode ? ThemeMode.dark : ThemeMode.light,
             builder: (context, child) {
               SystemUiService.applyFromContext(context);
-              return child ?? const SizedBox.shrink();
+              // Barra de estado por defecto según el tema; las portadas con
+              // foto la sobrescriben con la suya. Sin esto, una pantalla sin
+              // región propia heredaba la de la anterior (hora blanca sobre
+              // fondo claro).
+              return AnnotatedRegion<SystemUiOverlayStyle>(
+                value: SystemUiService.overlayForBrightness(
+                  Theme.of(context).brightness,
+                ),
+                child: child ?? const SizedBox.shrink(),
+              );
             },
             home: startScreen,
             routes: {

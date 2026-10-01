@@ -197,51 +197,26 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
   }
 
   Widget _topBar(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final textScale = MediaQuery.textScalerOf(context).scale(1);
-        final showCategory = constraints.maxWidth >= 360 || textScale <= 1.3;
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(8, 4, 8, 6),
-          child: Row(
-            children: [
-              VBackButton(onPressed: widget.onBack),
-              Expanded(
-                child: showCategory
-                    ? Text(
-                        widget.category.toUpperCase(),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: context.type.rubric.copyWith(
-                          color: context.palette.inkSubtle,
-                          fontSize: 9.5,
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-              ),
-              VIconButton(
-                icon: _speaking ? VerbumIcons.stop : VerbumIcons.headphones,
-                semanticLabel: _speaking ? 'Detener audio' : 'Escuchar',
-                variant: VIconButtonVariant.ghost,
-                onPressed: _toggleReadAloud,
-              ),
-              VIconButton(
-                icon: VerbumIcons.textAa,
-                semanticLabel: 'Ajustes de lectura',
-                variant: VIconButtonVariant.ghost,
-                onPressed: _showReadingSettings,
-              ),
-              VIconButton(
-                icon: VerbumIcons.shareNetwork,
-                semanticLabel: 'Compartir',
-                variant: VIconButtonVariant.ghost,
-                onPressed: widget.onShare,
-              ),
-            ],
-          ),
-        );
-      },
+    return VReaderToolbar(
+      label: widget.category,
+      onBack: widget.onBack,
+      actions: [
+        VReaderAction(
+          icon: _speaking ? VerbumIcons.stop : VerbumIcons.headphones,
+          label: _speaking ? 'Detener audio' : 'Escuchar',
+          onPressed: _toggleReadAloud,
+        ),
+        VReaderAction(
+          icon: VerbumIcons.textAa,
+          label: 'Ajustes de lectura',
+          onPressed: _showReadingSettings,
+        ),
+        VReaderAction(
+          icon: VerbumIcons.shareNetwork,
+          label: 'Compartir',
+          onPressed: widget.onShare,
+        ),
+      ],
     );
   }
 
@@ -257,7 +232,7 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
       fontSize: _fontSize,
       height: 1.62,
     );
-    final align = _centerText ? TextAlign.center : TextAlign.left;
+    final align = _centerText ? TextAlign.center : TextAlign.justify;
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 380),

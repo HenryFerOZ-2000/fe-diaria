@@ -554,10 +554,23 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
               tooltip: 'Más opciones',
               enabled: !_busy,
               onSelected: (_) => _export(_ExportAction.copy),
-              itemBuilder: (_) => [
-                const PopupMenuItem(
+              // Se abre por encima de la barra, alineado a la derecha.
+              position: PopupMenuPosition.over,
+              offset: const Offset(0, -62),
+              itemBuilder: (context) => [
+                PopupMenuItem(
                   value: 'copy',
-                  child: Text('Copiar texto y enlace'),
+                  child: Row(
+                    children: [
+                      VIcon(
+                        VerbumIcons.copy,
+                        size: 18,
+                        color: context.palette.rubric,
+                      ),
+                      const SizedBox(width: 12),
+                      const Flexible(child: Text('Copiar texto y enlace')),
+                    ],
+                  ),
                 ),
               ],
               icon: const VIcon(VerbumIcons.dotsThree),

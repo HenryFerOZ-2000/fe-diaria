@@ -268,23 +268,9 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
   Widget build(BuildContext context) {
     final colors = ReaderColors.of(context, _tone);
     return AppScaffold(
-      titleWidget: const SizedBox.shrink(),
-      centerTitle: false,
+      showAppBar: false,
       showBanner: false,
       backgroundColor: colors.page,
-      actions: [
-        VIconButton(
-          icon: _speaking ? VerbumIcons.stop : VerbumIcons.headphones,
-          semanticLabel: _speaking ? 'Detener audio' : 'Escuchar capítulo',
-          onPressed: _toggleReadAloud,
-        ),
-        VIconButton(
-          icon: VerbumIcons.textAa,
-          semanticLabel: 'Ajustes de lectura',
-          onPressed: _showReaderSettings,
-        ),
-        const SizedBox(width: 12),
-      ],
       bottomNavigationBar: _selected.isNotEmpty
           ? SafeArea(
               top: false,
@@ -324,23 +310,44 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
               lastChapter: _maxChapter,
               onOpen: _openChapter,
             ),
-      body: FutureBuilder<List<Verse>>(
-        future: _versesFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError || snapshot.data?.isEmpty != false) {
-            return Center(
-              child: Text(
-                'No se pudo cargar este capítulo.',
-                style: context.type.body,
+      body: Column(
+        children: [
+          VReaderToolbar(
+            label: '${widget.bookName} ${widget.chapter}',
+            actions: [
+              VReaderAction(
+                icon: _speaking ? VerbumIcons.stop : VerbumIcons.headphones,
+                label: _speaking ? 'Detener audio' : 'Escuchar capítulo',
+                onPressed: _toggleReadAloud,
               ),
-            );
-          }
-          _scrollToInitialVerse();
-          return _buildReader(context, snapshot.data!, colors);
-        },
+              VReaderAction(
+                icon: VerbumIcons.textAa,
+                label: 'Ajustes de lectura',
+                onPressed: _showReaderSettings,
+              ),
+            ],
+          ),
+          Expanded(
+            child: FutureBuilder<List<Verse>>(
+              future: _versesFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError || snapshot.data?.isEmpty != false) {
+                  return Center(
+                    child: Text(
+                      'No se pudo cargar este capítulo.',
+                      style: context.type.body,
+                    ),
+                  );
+                }
+                _scrollToInitialVerse();
+                return _buildReader(context, snapshot.data!, colors);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

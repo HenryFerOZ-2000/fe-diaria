@@ -17,8 +17,7 @@ class BibleContinueCard extends StatefulWidget {
 
 class _BibleContinueCardState extends State<BibleContinueCard> {
   final _preferences = BibleReadingPreferences();
-  late Future<BibleReadingPosition?> _position = _preferences
-      .getLastPosition();
+  late Future<BibleReadingPosition?> _position = _preferences.getLastPosition();
 
   Future<void> _open(BibleReadingPosition position) async {
     await Navigator.of(context).push(

@@ -241,12 +241,14 @@ class ChapterTextState extends State<ChapterText> {
           TextSpan(children: parts[1]),
           key: _paragraphKeys[1],
           style: style,
+          textAlign: TextAlign.justify,
         );
         if (!dropCap) {
           return Text.rich(
             TextSpan(children: parts[0]),
             key: _paragraphKeys[0],
             style: style,
+            textAlign: TextAlign.justify,
           );
         }
         return Column(
@@ -270,6 +272,7 @@ class ChapterTextState extends State<ChapterText> {
                     TextSpan(children: parts[0]),
                     key: _paragraphKeys[0],
                     style: style,
+                    textAlign: TextAlign.justify,
                   ),
                 ),
               ],
