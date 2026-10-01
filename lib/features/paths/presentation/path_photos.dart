@@ -8,3 +8,17 @@ VerbumPhotos photoForPath(String id) => switch (id) {
   'dormir_en_paz' => VerbumPhotos.night,
   _ => VerbumPhotos.clouds,
 };
+
+const _dayPhotos = [
+  VerbumPhotos.windowReading,
+  VerbumPhotos.handsOnBible,
+  VerbumPhotos.journaling,
+  VerbumPhotos.sunset,
+  VerbumPhotos.elderReading,
+  VerbumPhotos.lake,
+  VerbumPhotos.morning,
+];
+
+/// Foto de cada día del sendero (se repite si hay más de siete).
+VerbumPhotos photoForPathDay(int number) =>
+    _dayPhotos[(number - 1) % _dayPhotos.length];

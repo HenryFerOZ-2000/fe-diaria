@@ -5,13 +5,21 @@ enum VerbumPhotos {
   candle,
   clouds,
   coffeeBible,
+  elderReading,
+  handsOnBible,
+  handsTogether,
+  journaling,
   lake,
+  marianWindow,
   morning,
   night,
   pathFlowers,
   prayingHands,
   rosary,
-  sunset;
+  stainedGlass,
+  sunrisePrayer,
+  sunset,
+  windowReading;
 
   String get asset {
     final snake = name.replaceAllMapped(

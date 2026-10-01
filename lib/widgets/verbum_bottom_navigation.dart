@@ -93,7 +93,7 @@ class _NavButton extends StatelessWidget {
             selected ? p.butter : p.onInverse,
           )
         : selected
-        ? (p.accentSoft, p.rubric)
+        ? (p.surfaceMuted, p.rubric)
         : (Colors.transparent, p.inkSubtle);
     final size = butter ? 60.0 : 50.0;
 

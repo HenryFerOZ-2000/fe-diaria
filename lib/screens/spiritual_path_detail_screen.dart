@@ -73,21 +73,52 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
               final next = progress.nextDay(path.days.length);
               final started = progress.startedAt != null;
               final complete = progress.isComplete(path.days.length);
+              final p = context.palette;
+              String status(int day) {
+                if (progress.completedDays.contains(day)) return 'hecho';
+                if (day == next && !complete) return 'hoy';
+                if (day == next + 1 && !complete) return 'mañana';
+                return 'pronto';
+              }
+
+              Widget badge(String s) => switch (s) {
+                'hecho' => _Badge(
+                  label: 'Hecho',
+                  icon: VerbumIcons.check,
+                  bg: p.surfaceMuted,
+                  fg: p.rubric,
+                ),
+                'hoy' => _Badge(
+                  label: 'Hoy',
+                  icon: VerbumIcons.play,
+                  bg: p.butter,
+                  fg: p.onButter,
+                ),
+                _ => Text(
+                  s == 'mañana' ? 'Mañana' : 'Pronto',
+                  style: context.type.caption,
+                ),
+              };
+
               return Column(
                 children: [
                   AppBar(
-                    title: Text(
-                      'Camino espiritual',
-                      style: context.type.heading,
-                    ),
                     actions: [
+                      _Badge(
+                        label:
+                            '${path.days.length} días · ${path.minutesPerDay} min',
+                        icon: VerbumIcons.calendarBlank,
+                        bg: p.surfaceMuted,
+                        fg: p.rubric,
+                        large: true,
+                      ),
+                      const SizedBox(width: 8),
                       VIconButton(
                         icon: VerbumIcons.shareNetwork,
                         semanticLabel: 'Invitar a alguien',
-                        variant: VIconButtonVariant.ghost,
                         onPressed: _share,
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 12),
                     ],
                   ),
                   Expanded(
@@ -100,33 +131,46 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
                         24,
                       ),
                       children: [
-                        _PathHero(path: path, progress: progress),
-                        VSectionHeader(
-                          '${path.days.length} pasos, a tu propio ritmo',
-                          eyebrow: 'Lo que vas a recorrer',
-                          padding: const EdgeInsets.fromLTRB(2, 26, 2, 12),
+                        VTwoToneTitle(
+                          path.title,
+                          'Camino ·',
+                          accentFirst: true,
                         ),
-                        VDashedPath(
-                          gap: 16,
-                          children: [
+                        const SizedBox(height: 8),
+                        Text(
+                          path.description,
+                          style: context.type.body.copyWith(color: p.inkMuted),
+                        ),
+                        if (progress.completedDays.isNotEmpty) ...[
+                          const SizedBox(height: 14),
+                          VProgressBar(
+                            value: progress.progressFor(path.days.length),
+                            semanticLabel: 'Avance del camino',
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            '${progress.completedDays.length} de ${path.days.length} días completados',
+                            style: context.type.caption,
+                          ),
+                        ],
+                        const SizedBox(height: 22),
+                        VWindingPath(
+                          steps: [
                             for (final day in path.days)
-                              VStepRow(
-                                number: day.number,
-                                title: day.title,
-                                subtitle: day.subtitle,
-                                state:
-                                    progress.completedDays.contains(day.number)
-                                    ? VStepState.done
-                                    : day.number == next && !complete
-                                    ? VStepState.current
-                                    : VStepState.upcoming,
-                                locked:
-                                    !(day.number <= next ||
+                              VWindingStep(
+                                photo: photoForPathDay(day.number),
+                                title: 'Día ${day.number} · ${day.title}',
+                                semanticLabel:
+                                    'Día ${day.number}, ${day.title}, ${status(day.number)}',
+                                badge: badge(status(day.number)),
+                                onTap:
+                                    day.number <= next ||
                                         progress.completedDays.contains(
                                           day.number,
                                         ) ||
-                                        complete),
-                                onTap: () => _openDay(day.number),
+                                        complete
+                                    ? () => _openDay(day.number)
+                                    : null,
                               ),
                           ],
                         ),
@@ -159,50 +203,44 @@ class _SpiritualPathDetailScreenState extends State<SpiritualPathDetailScreen> {
   }
 }
 
-class _PathHero extends StatelessWidget {
-  final SpiritualPath path;
-  final SpiritualPathProgress progress;
-  const _PathHero({required this.path, required this.progress});
+class _Badge extends StatelessWidget {
+  const _Badge({
+    required this.label,
+    required this.icon,
+    required this.bg,
+    required this.fg,
+    this.large = false,
+  });
+
+  final String label;
+  final VerbumIcons icon;
+  final Color bg;
+  final Color fg;
+  final bool large;
 
   @override
   Widget build(BuildContext context) {
-    final p = context.palette;
-    final value = progress.progressFor(path.days.length);
-    return VFeatureCard(
-      eyebrow: path.category,
-      title: path.title,
-      body: path.description,
-      photo: photoForPath(path.id),
-      footer: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: large ? 14 : 10,
+        vertical: large ? 10 : 5,
+      ),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(large ? 16 : 99),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              VMetaChip(
-                icon: VerbumIcons.calendarBlank,
-                label: '${path.days.length} días',
-                color: p.butter,
-              ),
-              VMetaChip(
-                icon: VerbumIcons.clock,
-                label: '${path.minutesPerDay} min diarios',
-                color: p.butter,
-              ),
-            ],
-          ),
-          if (value > 0) ...[
-            const SizedBox(height: 16),
-            VProgressBar(value: value, semanticLabel: 'Avance del camino'),
-            const SizedBox(height: 6),
-            Text(
-              '${progress.completedDays.length} de ${path.days.length} días completados',
-              style: context.type.caption.copyWith(
-                color: p.onInverse.withValues(alpha: .7),
-              ),
+          VIcon(icon, size: large ? 16 : 12, color: fg),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: context.type.caption.copyWith(
+              color: fg,
+              fontWeight: FontWeight.w700,
             ),
-          ],
+          ),
         ],
       ),
     );

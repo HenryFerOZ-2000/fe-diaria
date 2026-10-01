@@ -32,65 +32,140 @@ class PrayersScreen extends StatelessWidget {
 
   Widget _buildFor(BuildContext context, FaithTradition tradition) {
     final p = context.palette;
-    final sectionColors = {
-      'emotion': p.rubric,
-      'intention': p.gold,
-      // Con acento neutro (pan de oro) se usa tinta para no repetir el dorado.
-      'traditional': p.accent == p.gold ? p.ink : p.accent,
-    };
+    final sections = {for (final s in prayerSectionsFor(tradition)) s.id: s};
+    final emotions = sections['emotion']!;
+    final intentions = sections['intention']!;
+    final traditional = sections['traditional']!;
 
     return AppScaffold(
       showBanner: false,
       centerTitle: false,
-      titleWidget: Text('Oraciones', style: context.type.display),
+      titleWidget: const SizedBox.shrink(),
       actions: const [VerbumHeaderActions()],
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(
-          VerbumSpace.gutter,
-          4,
-          VerbumSpace.gutter,
-          28,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            VFeatureCard(
-              eyebrow: 'Un momento para ti',
-              title: 'Respira. Dios está aquí.',
-              body: usesBiblicalPrayers(tradition)
-                  ? 'Encuentra una oración nacida de la Palabra.'
-                  : 'Encuentra palabras para lo que hoy lleva tu corazón.',
-              photo: VerbumPhotos.prayingHands,
+      body: ListView(
+        padding: const EdgeInsets.only(bottom: 28),
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(
+              VerbumSpace.gutter,
+              14,
+              VerbumSpace.gutter,
+              0,
             ),
-            for (final section in prayerSectionsFor(tradition)) ...[
-              VSectionHeader(
-                section.title,
-                trailing: '${section.entries.length}',
-                padding: const EdgeInsets.fromLTRB(2, 26, 2, 12),
+            child: VTwoToneTitle(
+              'lo que vives hoy',
+              'Ora por',
+              accentFirst: true,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              VerbumSpace.gutter,
+              6,
+              VerbumSpace.gutter,
+              16,
+            ),
+            child: Text(
+              usesBiblicalPrayers(tradition)
+                  ? 'Oraciones nacidas de la Palabra para cada emoción e intención'
+                  : 'Oraciones para cada emoción e intención',
+              style: context.type.body.copyWith(color: p.inkMuted),
+            ),
+          ),
+          // Intenciones como chips: un toque y a orar.
+          SizedBox(
+            height: 44,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(
+                horizontal: VerbumSpace.gutter,
               ),
-              VTileGrid(
-                children: [
-                  for (final entry in section.entries)
-                    VCategoryTile(
-                      icon: iconForPrayerEntry(entry),
-                      title: entry.title,
-                      subtitle: entry.subtitle,
-                      iconColor: sectionColors[section.id],
-                      onTap: () => _push(context, screenForPrayerEntry(entry)),
-                    ),
-                ],
+              itemCount: intentions.entries.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
+              itemBuilder: (context, i) {
+                final entry = intentions.entries[i];
+                return ActionChip(
+                  avatar: VIcon(
+                    iconForPrayerEntry(entry),
+                    size: 16,
+                    color: p.rubric,
+                  ),
+                  label: Text(entry.title),
+                  tooltip: 'Orar por ${entry.title.toLowerCase()}',
+                  onPressed: () => _push(context, screenForPrayerEntry(entry)),
+                );
+              },
+            ),
+          ),
+          VSectionHeader(
+            traditional.title,
+            padding: const EdgeInsets.fromLTRB(
+              VerbumSpace.gutter + 2,
+              24,
+              VerbumSpace.gutter + 2,
+              12,
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.textScalerOf(context).scale(68) + 214,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              clipBehavior: Clip.none,
+              padding: const EdgeInsets.symmetric(
+                horizontal: VerbumSpace.gutter,
               ),
-            ],
-            const SizedBox(height: 26),
-            VActionTile(
+              itemCount: traditional.entries.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 14),
+              itemBuilder: (context, i) {
+                final entry = traditional.entries[i];
+                return VPhotoCard(
+                  photo: photoForPrayerEntry(entry),
+                  title: entry.title,
+                  caption: entry.subtitle,
+                  onTap: () => _push(context, screenForPrayerEntry(entry)),
+                );
+              },
+            ),
+          ),
+          VSectionHeader(
+            '¿Cómo te sientes?',
+            padding: const EdgeInsets.fromLTRB(
+              VerbumSpace.gutter + 2,
+              20,
+              VerbumSpace.gutter + 2,
+              12,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: VerbumSpace.gutter),
+            child: VTileGrid(
+              children: [
+                for (final entry in emotions.entries)
+                  VCategoryTile(
+                    icon: iconForPrayerEntry(entry),
+                    title: entry.title,
+                    subtitle: entry.subtitle,
+                    onTap: () => _push(context, screenForPrayerEntry(entry)),
+                  ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              VerbumSpace.gutter,
+              26,
+              VerbumSpace.gutter,
+              0,
+            ),
+            child: VActionTile(
               icon: VerbumIcons.books,
               title: 'Tradiciones y fuentes',
               subtitle: 'Conoce el origen de lo que lees',
               iconColor: p.gold,
               onTap: () => _push(context, const ContentSourcesScreen()),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

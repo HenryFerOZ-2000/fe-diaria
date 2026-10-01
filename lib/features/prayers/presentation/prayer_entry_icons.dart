@@ -1,4 +1,5 @@
 import '../../../design_system/icons/verbum_icons.dart';
+import '../../../design_system/photos/verbum_photos.dart';
 import '../domain/prayer_catalog.dart';
 
 VerbumIcons iconForPrayerEntry(PrayerEntry entry) => switch (entry.key) {
@@ -28,4 +29,20 @@ VerbumIcons iconForPrayerEntry(PrayerEntry entry) => switch (entry.key) {
   'promesas' => VerbumIcons.scroll,
   'otras' => VerbumIcons.handHeart,
   _ => VerbumIcons.handsPraying,
+};
+
+/// Foto de las oraciones que se muestran como tarjeta con imagen.
+VerbumPhotos photoForPrayerEntry(PrayerEntry entry) => switch (entry.key) {
+  'rosario' => VerbumPhotos.rosary,
+  'novena_navidad' => VerbumPhotos.candle,
+  'padre_nuestro' => VerbumPhotos.sunrisePrayer,
+  'ave_maria' => VerbumPhotos.marianWindow,
+  'credo' => VerbumPhotos.stainedGlass,
+  'espiritu_santo' => VerbumPhotos.clouds,
+  'sanacion' => VerbumPhotos.handsTogether,
+  'consagracion' => VerbumPhotos.prayingHands,
+  'biblicas' => VerbumPhotos.coffeeBible,
+  'promesas' => VerbumPhotos.sunset,
+  'otras' => VerbumPhotos.journaling,
+  _ => VerbumPhotos.windowReading,
 };
