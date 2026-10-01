@@ -3,6 +3,10 @@ bible_hills.jpg  https://unsplash.com/photos/yLrWrIeqk64
 candle.jpg  https://unsplash.com/photos/3CA_-xcpulY
 clouds.jpg  https://unsplash.com/photos/6sFJ3j15AjY
 coffee_bible.jpg  https://unsplash.com/photos/WWD93Icc30Y
+cover_forest.jpg  https://unsplash.com/photos/SQplbKFxpgE
+cover_mountains.jpg  https://unsplash.com/photos/7_RkP7SUSAs
+cover_night.jpg  https://unsplash.com/photos/R802s3oe82M
+cover_sky.jpg  https://unsplash.com/photos/AvxepAuLG34
 elder_reading.jpg  https://unsplash.com/photos/zuLrqcc4Hu0
 genesis_light.jpg  https://unsplash.com/photos/4sEI2_5gB0A
 hands_on_bible.jpg  https://unsplash.com/photos/iIzZ0Fw8wSQ

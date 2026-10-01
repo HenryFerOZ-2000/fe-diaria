@@ -5,8 +5,8 @@ import '../design_system/design_system.dart';
 /// Barra inferior: cinco botones cuadrados redondeados, sin texto (el
 /// nombre va en tooltip y semántica). El activo se rellena en lavanda.
 ///
-/// En "Hoy" (índice 0) la barra se funde con el fondo periwinkle y
-/// Oraciones aparece como botón central en mantequilla.
+/// En "Hoy" (índice 0) Oraciones aparece como botón central en
+/// mantequilla: una invitación a orar desde la portada.
 class VerbumBottomNavigation extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onDestinationSelected;
@@ -31,8 +31,8 @@ class VerbumBottomNavigation extends StatelessWidget {
     final onHome = selectedIndex == 0;
 
     return Material(
-      color: onHome ? p.inverse : p.surface,
-      elevation: onHome ? 0 : 8,
+      color: p.surface,
+      elevation: 8,
       shadowColor: p.ink.withValues(alpha: 0.2),
       child: SafeArea(
         top: false,
@@ -49,7 +49,6 @@ class VerbumBottomNavigation extends StatelessWidget {
                       icon: _destinations[i].$1,
                       label: _destinations[i].$2,
                       selected: i == selectedIndex,
-                      onHome: onHome,
                       butter: onHome && i == 2,
                       onTap: () => onDestinationSelected(i),
                     ),
@@ -68,7 +67,6 @@ class _NavButton extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.selected,
-    required this.onHome,
     required this.butter,
     required this.onTap,
   });
@@ -76,7 +74,6 @@ class _NavButton extends StatelessWidget {
   final VerbumIcons icon;
   final String label;
   final bool selected;
-  final bool onHome;
 
   /// Botón central destacado (solo en "Hoy").
   final bool butter;
@@ -87,11 +84,6 @@ class _NavButton extends StatelessWidget {
     final p = context.palette;
     final (Color bg, Color fg) = butter
         ? (p.butter, p.onButter)
-        : onHome
-        ? (
-            p.onInverse.withValues(alpha: 0.14),
-            selected ? p.butter : p.onInverse,
-          )
         : selected
         ? (p.surfaceMuted, p.rubric)
         : (Colors.transparent, p.inkSubtle);

@@ -7,7 +7,12 @@ import 'dart:async';
 import '../providers/app_provider.dart';
 import '../design_system/design_system.dart';
 import '../features/today/application/today_schedule.dart';
-import '../features/today/presentation/today_hero.dart';
+import '../features/today/presentation/cover_photos.dart';
+import '../features/today/presentation/today_cover.dart';
+import '../features/today/presentation/today_journey.dart';
+import '../services/share_service.dart';
+import '../features/sharing/domain/share_content.dart';
+import '../providers/auth_provider.dart';
 import '../controllers/missions_controller.dart';
 import '../controllers/streak_controller.dart';
 import 'daily_missions_flow_screen.dart';
@@ -217,81 +222,97 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
-    // Sobre periwinkle, hora y batería en claro.
+    final auth = context.watch<AuthProvider>();
+    final now = DateTime.now();
+    // Sobre la foto, hora y batería en claro.
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
       ),
       child: Scaffold(
-        backgroundColor: p.inverse,
+        backgroundColor: p.background,
         body: Consumer<AppProvider>(
-          builder: (context, provider, child) => FadeTransition(
-            opacity: _fadeAnimation,
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                SliverSafeArea(
-                  bottom: false,
-                  sliver: SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 12, bottom: 28),
-                      child: ChangeNotifierProvider<StreakController>.value(
-                        value: _streakController,
-                        child: Consumer<StreakController>(
-                          builder: (context, streak, _) {
-                            _maybeShowStreakCelebration(streak);
-                            return TodayHero(
-                              now: DateTime.now(),
-                              missions: _missionsController.missions,
-                              streakDays: streak.totalDays,
-                              verseText: provider.todayVerse?.text,
-                              onOpen: (mission) =>
-                                  _openMissionRead(context, mission, provider),
-                              onProfile: () =>
-                                  Navigator.of(context).pushNamed('/profile'),
-                              onStreak: () =>
-                                  Navigator.of(context).pushNamed('/streak'),
-                            );
-                          },
-                        ),
-                      ),
+          builder: (context, provider, child) {
+            final verse = provider.todayVerse;
+            final verseMission = _missionsController.missions
+                .where((m) => m.id == 'verse')
+                .firstOrNull;
+            return FadeTransition(
+              opacity: _fadeAnimation,
+              child: ListView(
+                padding: EdgeInsets.zero,
+                physics: const BouncingScrollPhysics(),
+                children: [
+                  ChangeNotifierProvider<StreakController>.value(
+                    value: _streakController,
+                    child: Consumer<StreakController>(
+                      builder: (context, streak, _) {
+                        _maybeShowStreakCelebration(streak);
+                        return TodayCover(
+                          now: now,
+                          photo: coverPhotoFor(now),
+                          userName: auth.firebaseUser?.displayName,
+                          streakDays: streak.totalDays,
+                          verseText: verse?.text,
+                          verseReference: verse?.reference,
+                          onRead: verseMission == null
+                              ? null
+                              : () => _openMissionRead(
+                                  context,
+                                  verseMission,
+                                  provider,
+                                ),
+                          onShare: verse == null
+                              ? null
+                              : () => ShareService.openComposer(
+                                  context,
+                                  ShareContent(
+                                    title: 'Palabra de hoy',
+                                    body: verse.text,
+                                    reference: '${verse.reference} · RV1909',
+                                    sourceLabel: 'RV1909',
+                                    kind: ShareContentKind.verse,
+                                  ),
+                                ),
+                          onProfile: () =>
+                              Navigator.of(context).pushNamed('/profile'),
+                          onStreak: () =>
+                              Navigator.of(context).pushNamed('/streak'),
+                        );
+                      },
                     ),
                   ),
-                ),
-                // Hoja clara con el resto del día.
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: p.background,
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(VerbumRadius.sheet),
-                      ),
-                    ),
+                  // El siguiente paso se monta sobre el final de la portada.
+                  Transform.translate(
+                    offset: const Offset(0, -64),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        VerbumSpace.gutter,
-                        22,
-                        VerbumSpace.gutter,
-                        24,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: VerbumSpace.gutter,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          TodayJourney(
+                            missions: _missionsController.missions,
+                            nightAvailable: isNightPrayerAvailable(now),
+                            onOpen: (mission) =>
+                                _openMissionRead(context, mission, provider),
+                          ),
                           if (provider.isLoading) ...[
-                            const VProgressBar(value: 0.35, height: 3),
                             const SizedBox(height: 12),
+                            const VProgressBar(value: 0.35, height: 3),
                           ],
+                          const SizedBox(height: 22),
                           const SpiritualPathTodayCard(),
                           const TodayLiturgySection(),
                         ],
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );

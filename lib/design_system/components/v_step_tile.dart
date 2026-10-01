@@ -45,10 +45,10 @@ class VStepTile extends StatelessWidget {
         BorderSide.none,
       ),
       VStepState.current => (
-        p.surface,
-        p.ink,
-        p.rubric,
-        BorderSide(color: p.rubric, width: 1.5),
+        p.butter,
+        p.onButter,
+        p.onButter,
+        BorderSide.none,
       ),
       VStepState.upcoming => (p.surface, p.ink, p.gold, BorderSide.none),
     };
@@ -95,7 +95,7 @@ class VStepTile extends StatelessWidget {
                         color: p.sage,
                       )
                     else if (state == VStepState.current)
-                      VIcon(VerbumIcons.circle, size: 17, color: p.rubric),
+                      VIcon(VerbumIcons.circle, size: 17, color: p.onButter),
                   ],
                 ),
                 const SizedBox(height: 10),
