@@ -307,6 +307,13 @@ class _LiveScreenState extends State<LiveScreen> {
   }
 
   Future<void> _createPost() async {
+    if (_auth.currentUser == null) {
+      await SignInPrompt.ask(
+        context,
+        title: 'Inicia sesión para pedir oración',
+      );
+      return;
+    }
     final didPublish = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -1137,8 +1144,7 @@ class _ModernPostAction extends StatelessWidget {
   }
 }
 
-// TODO: retirar tras verificar la migración visual en todos los dispositivos.
-// ignore: unused_element
+/// Hoja para pedir oración a la comunidad.
 class _CreatePostModal extends StatefulWidget {
   final Future<bool> Function(String text, String category) onPost;
 
@@ -1178,349 +1184,272 @@ class _CreatePostModalState extends State<_CreatePostModal> {
     super.dispose();
   }
 
+  static const _categories = ['Salud', 'Familia', 'Fortaleza', 'Gratitud'];
+  static const _minChars = 10;
+
+  Future<void> _submit() async {
+    setState(() => _isSubmitting = true);
+    final didPublish = await widget.onPost(
+      _textController.text.trim(),
+      _selectedCategory,
+    );
+    if (!mounted) return;
+    if (didPublish) {
+      Navigator.of(context).pop(true);
+    } else {
+      setState(() => _isSubmitting = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final mediaQuery = MediaQuery.of(context);
-    final bottomInset = mediaQuery.viewInsets.bottom;
-    final bottomSafeArea = mediaQuery.viewPadding.bottom;
-    final modalBottomPadding = bottomInset > 0
-        ? bottomInset + 8
-        : bottomSafeArea + 8;
-    final text = _textController.text.trim();
-    final canPost = text.length >= 10 && !_isSubmitting;
+    final p = context.palette;
+    final type = context.type;
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    final ready = _textController.text.trim().length >= _minChars;
+    final canPost = ready && !_isSubmitting;
 
     return AnimatedPadding(
       duration: const Duration(milliseconds: 180),
       curve: Curves.easeOut,
-      padding: EdgeInsets.only(bottom: modalBottomPadding),
-      child: SingleChildScrollView(
-        child: Container(
-          decoration: BoxDecoration(
-            color: isDark ? colorScheme.surface : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 20,
-                offset: const Offset(0, -5),
-              ),
-            ],
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: Container(
+        decoration: BoxDecoration(
+          color: p.background,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(VerbumRadius.sheet),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Handle bar
-              Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 8),
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: colorScheme.outline.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(2),
+        ),
+        child: SafeArea(
+          top: false,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(
+              VerbumSpace.gutter,
+              10,
+              VerbumSpace.gutter,
+              16,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: p.line,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
                   ),
                 ),
-              ),
-              // Header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
-                child: Row(
+                const SizedBox(height: 18),
+                Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      width: 48,
+                      height: 48,
+                      alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        color: p.butter,
+                        borderRadius: BorderRadius.circular(
+                          VerbumRadius.control,
+                        ),
                       ),
                       child: VIcon(
-                        VerbumIcons.notePencil,
-                        color: colorScheme.primary,
-                        size: 24,
+                        VerbumIcons.handsPraying,
+                        weight: VIconWeight.fill,
+                        color: p.onButter,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Nueva oración',
-                            style: VerbumFonts.sans(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onSurface,
+                          Semantics(
+                            header: true,
+                            child: Text(
+                              'Pide oración',
+                              style: type.title.copyWith(fontSize: 22),
                             ),
                           ),
-                          const SizedBox(height: 2),
                           Text(
-                            'Comparte tu petición con la comunidad',
-                            style: VerbumFonts.sans(
-                              fontSize: 13,
-                              color: colorScheme.onSurface.withValues(
-                                alpha: 0.6,
-                              ),
-                            ),
+                            'La comunidad orará contigo.',
+                            style: type.body.copyWith(color: p.inkMuted),
                           ),
                         ],
                       ),
                     ),
+                    IconButton(
+                      tooltip: 'Cerrar',
+                      onPressed: () => Navigator.pop(context, false),
+                      icon: VIcon(VerbumIcons.close, color: p.inkMuted),
+                    ),
                   ],
                 ),
-              ),
-              // Content
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 20),
+                Text('¿Por qué oramos?', style: type.bodyStrong),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
-                    // Text Field
-                    Container(
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? colorScheme.surfaceContainerHighest
-                            : Colors.grey[50],
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: _focusNode.hasFocus
-                              ? colorScheme.primary
-                              : colorScheme.outline.withValues(alpha: 0.2),
-                          width: _focusNode.hasFocus ? 2 : 1,
-                        ),
+                    for (final category in _categories)
+                      _CategoryChip(
+                        label: category,
+                        icon: categoryIconFor(category)!,
+                        selected: category == _selectedCategory,
+                        onTap: () =>
+                            setState(() => _selectedCategory = category),
                       ),
-                      child: TextField(
+                  ],
+                ),
+                const SizedBox(height: 18),
+                VSurfaceCard(
+                  radius: VerbumRadius.card,
+                  padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextField(
                         controller: _textController,
                         focusNode: _focusNode,
-                        decoration: InputDecoration(
-                          hintText: 'Escribe tu petición aquí...',
-                          hintStyle: VerbumFonts.sans(
-                            color: colorScheme.onSurface.withValues(alpha: 0.4),
-                            fontSize: 15,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.all(16),
-                        ),
-                        style: VerbumFonts.sans(
-                          fontSize: 15,
-                          height: 1.5,
-                          color: colorScheme.onSurface,
-                        ),
-                        maxLines: 5,
-                        minLines: 3,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    // Character counter
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          '$_charCount / 10 caracteres mínimos',
-                          style: VerbumFonts.sans(
-                            fontSize: 12,
-                            color: canPost
-                                ? Colors.green[600]
-                                : colorScheme.onSurface.withValues(alpha: 0.5),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    // Category selector
-                    Text(
-                      'Categoría',
-                      style: VerbumFonts.sans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.onSurface.withValues(alpha: 0.8),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? colorScheme.surfaceContainerHighest
-                            : Colors.grey[50],
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: colorScheme.outline.withValues(alpha: 0.2),
-                        ),
-                      ),
-                      child: DropdownButtonFormField<String>(
-                        initialValue: _selectedCategory,
-                        isExpanded: true,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                        ),
-                        style: VerbumFonts.sans(
-                          fontSize: 15,
-                          color: colorScheme.onSurface,
+                        autofocus: true,
+                        minLines: 4,
+                        maxLines: 7,
+                        maxLength: 500,
+                        textCapitalization: TextCapitalization.sentences,
+                        style: VerbumFonts.serif(
+                          color: p.ink,
+                          fontSize: 19,
+                          height: 1.35,
                           fontWeight: FontWeight.w500,
                         ),
-                        icon: VIcon(
-                          VerbumIcons.caretDown,
-                          color: colorScheme.primary,
+                        decoration: InputDecoration(
+                          hintText:
+                              'Por la salud de mi mamá, por un trabajo, '
+                              'por paz en mi familia…',
+                          hintStyle: VerbumFonts.serif(
+                            color: p.inkSubtle,
+                            fontSize: 18,
+                          ),
+                          filled: false,
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                          ),
+                          counterText: '',
                         ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'Salud',
-                            child: Row(
-                              children: [
-                                Text('🏥'),
-                                SizedBox(width: 12),
-                                Text('Salud'),
-                              ],
+                      ),
+                      Divider(height: 1, color: p.lineSoft),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          VIcon(
+                            ready ? VerbumIcons.checkCircle : VerbumIcons.info,
+                            size: 15,
+                            weight: ready
+                                ? VIconWeight.fill
+                                : VIconWeight.regular,
+                            color: ready ? p.sage : p.inkSubtle,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              ready
+                                  ? 'Lista para compartir'
+                                  : 'Escribe al menos $_minChars caracteres',
+                              style: type.caption.copyWith(
+                                color: ready ? p.sageInk : null,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
-                          DropdownMenuItem(
-                            value: 'Familia',
-                            child: Row(
-                              children: [
-                                Text('👨‍👩‍👧‍👦'),
-                                SizedBox(width: 12),
-                                Text('Familia'),
-                              ],
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'Fortaleza',
-                            child: Row(
-                              children: [
-                                Text('🚨'),
-                                SizedBox(width: 12),
-                                Text('Fortaleza'),
-                              ],
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'Gratitud',
-                            child: Row(
-                              children: [
-                                Text('🙏'),
-                                SizedBox(width: 12),
-                                Text('Gratitud'),
-                              ],
-                            ),
-                          ),
+                          Text('$_charCount/500', style: type.caption),
                         ],
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              _selectedCategory = value;
-                            });
-                          }
-                        },
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              // Action buttons
-              Container(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                child: Row(
+                const SizedBox(height: 10),
+                Row(
                   children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          side: BorderSide(
-                            color: colorScheme.outline.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Text(
-                          'Cancelar',
-                          style: VerbumFonts.sans(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
+                    VIcon(
+                      VerbumIcons.shieldCheck,
+                      size: 15,
+                      color: p.inkSubtle,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 6),
                     Expanded(
-                      flex: 2,
-                      child: ElevatedButton(
-                        onPressed: canPost
-                            ? () async {
-                                setState(() => _isSubmitting = true);
-                                final didPublish = await widget.onPost(
-                                  text,
-                                  _selectedCategory,
-                                );
-                                if (!context.mounted) return;
-                                if (didPublish) {
-                                  Navigator.of(context).pop(true);
-                                } else {
-                                  setState(() => _isSubmitting = false);
-                                }
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                          disabledBackgroundColor:
-                              colorScheme.surfaceContainerHighest,
-                          disabledForegroundColor: colorScheme.onSurface
-                              .withValues(alpha: 0.4),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          elevation: canPost ? 2 : 0,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (_isSubmitting)
-                              SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: colorScheme.onPrimary,
-                                ),
-                              )
-                            else ...[
-                              VIcon(
-                                VerbumIcons.paperPlaneRight,
-                                weight: VIconWeight.fill,
-                                size: 20,
-                                color: canPost
-                                    ? colorScheme.onPrimary
-                                    : colorScheme.onSurface.withValues(
-                                        alpha: 0.4,
-                                      ),
-                              ),
-                              const SizedBox(width: 8),
-                            ],
-                            Text(
-                              _isSubmitting ? 'Publicando...' : 'Publicar',
-                              style: VerbumFonts.sans(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
+                      child: Text(
+                        'Se publica con tu nombre. Evita datos privados de otras personas.',
+                        style: type.caption,
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 18),
+                VButton(
+                  label: 'Pedir oración',
+                  icon: VerbumIcons.paperPlaneRight,
+                  expanded: true,
+                  loading: _isSubmitting,
+                  onPressed: canPost ? _submit : null,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CategoryChip extends StatelessWidget {
+  const _CategoryChip({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final VerbumIcons icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final fg = selected ? p.onEmphasis : p.rubric;
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: Material(
+        color: selected ? p.emphasis : p.surfaceMuted,
+        borderRadius: BorderRadius.circular(99),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(99),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                VIcon(icon, size: 15, color: fg),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: context.type.bodyStrong.copyWith(
+                    color: fg,
+                    fontSize: 13.5,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
