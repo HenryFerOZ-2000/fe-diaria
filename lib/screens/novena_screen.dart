@@ -7,6 +7,7 @@ import '../services/storage_service.dart';
 import '../services/share_service.dart';
 import '../faith/tradition_guard.dart';
 import 'package:verbum/design_system/design_system.dart';
+import '../features/novena/presentation/novena_themes.dart';
 
 /// Pantalla principal de la Novena - Selección de día
 class NovenaScreen extends StatefulWidget {
@@ -92,7 +93,8 @@ class _NovenaScreenState extends State<NovenaScreen> {
                     title: 'Preparar el corazón para la Navidad',
                     body:
                         'Una tradición de nueve días de oración para celebrar el nacimiento de Jesús.',
-                    photo: VerbumPhotos.candle,
+                    // La foto acompaña la virtud del día que toca.
+                    photo: novenaThemeFor(lastDay ?? 1).photo,
                     footer: VButton(
                       label: lastDay == null
                           ? 'Comenzar el día 1'
@@ -107,7 +109,7 @@ class _NovenaScreenState extends State<NovenaScreen> {
                     ),
                   ),
                   const VSectionHeader(
-                    'Selecciona un día',
+                    'Nueve días, nueve virtudes',
                     padding: EdgeInsets.fromLTRB(2, 24, 2, 12),
                   ),
                   GridView.count(
@@ -116,17 +118,13 @@ class _NovenaScreenState extends State<NovenaScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
+                    childAspectRatio: .78,
                     children: [
                       for (var day = 1; day <= 9; day++)
-                        VNumberTile(
-                          number: day,
-                          caption: 'Día',
-                          state: lastDay != null && day < lastDay
-                              ? VStepState.done
-                              : lastDay == day
-                              ? VStepState.current
-                              : VStepState.upcoming,
-                          semanticLabel: 'Día $day',
+                        _NovenaDayTile(
+                          day: day,
+                          done: lastDay != null && day < lastDay,
+                          current: lastDay == day,
                           onTap: () => _openDay(day),
                         ),
                     ],
@@ -241,6 +239,22 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
     }
   }
 
+  /// Marca el día como hecho (el siguiente queda para continuar) y vuelve.
+  void _completeDay() {
+    StorageService().saveNovenaProgress(widget.day < 9 ? widget.day + 1 : 9, 1);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          widget.day < 9
+              ? 'Día ${widget.day} completado. Mañana: ${novenaThemeFor(widget.day + 1).name.toLowerCase()}.'
+              : '¡Terminaste la Novena! Feliz Navidad.',
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+    Navigator.of(context).pop();
+  }
+
   void _previousStep() {
     if (_currentStep > 1) {
       setState(() {
@@ -282,7 +296,10 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
 
     return Scaffold(
       appBar: VAppBar(
-        title: Text('Día ${widget.day}', style: type.heading),
+        title: Text(
+          'Día ${widget.day} · ${novenaThemeFor(widget.day).name}',
+          style: type.heading,
+        ),
         centerTitle: true,
         actions: [
           if (stepData != null && !isCarol)
@@ -339,20 +356,22 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 26),
-                        Align(
-                          alignment: AlignmentDirectional.centerStart,
-                          child: VIcon(
-                            isCarol
-                                ? VerbumIcons.musicNote
-                                : VerbumIcons.bookOpenText,
-                            weight: VIconWeight.duotone,
-                            size: 32,
-                            color: p.gold,
-                          ),
+                        const SizedBox(height: 18),
+                        _NovenaThemeBanner(day: widget.day),
+                        const SizedBox(height: 22),
+                        Row(
+                          children: [
+                            VIcon(
+                              isCarol
+                                  ? VerbumIcons.musicNote
+                                  : VerbumIcons.bookOpenText,
+                              size: 18,
+                              color: p.rubric,
+                            ),
+                            const SizedBox(width: 8),
+                            VRubricLabel('Paso $_currentStep de $_totalSteps'),
+                          ],
                         ),
-                        const SizedBox(height: 12),
-                        VRubricLabel('Paso $_currentStep de $_totalSteps'),
                         const SizedBox(height: 6),
                         Text(title, style: type.display.copyWith(fontSize: 30)),
                         const SizedBox(height: 20),
@@ -360,17 +379,6 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                           VDropCapText(text, style: type.scripture)
                         else
                           Text(text, style: type.scripture),
-                        const SizedBox(height: 24),
-                        Center(
-                          child: VButton(
-                            label: 'Regresar al inicio',
-                            icon: VerbumIcons.house,
-                            iconLeading: true,
-                            variant: VButtonVariant.text,
-                            onPressed: () =>
-                                Navigator.of(context).pushNamed('/home'),
-                          ),
-                        ),
                       ],
                     ),
             ),
@@ -389,12 +397,12 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
                     ],
                     Expanded(
                       child: VButton(
-                        label: isLast ? 'Día completado' : 'Siguiente',
+                        label: isLast ? 'Terminar el día' : 'Siguiente',
                         icon: isLast
                             ? VerbumIcons.check
                             : VerbumIcons.arrowRight,
                         expanded: true,
-                        onPressed: isLast ? null : _nextStep,
+                        onPressed: isLast ? _completeDay : _nextStep,
                       ),
                     ),
                   ],
@@ -419,6 +427,129 @@ class _NovenaDayScreenState extends State<NovenaDayScreen> {
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Un día de la novena: su icono, el número y la virtud del día.
+class _NovenaDayTile extends StatelessWidget {
+  const _NovenaDayTile({
+    required this.day,
+    required this.done,
+    required this.current,
+    required this.onTap,
+  });
+
+  final int day;
+  final bool done;
+  final bool current;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final type = context.type;
+    final theme = novenaThemeFor(day);
+    final (Color box, Color fg) = done
+        ? (p.sage, p.surface)
+        : current
+        ? (Colors.white.withValues(alpha: .6), p.onButter)
+        : (p.surfaceMuted, p.rubric);
+    final state = done
+        ? ', hecho'
+        : current
+        ? ', para continuar'
+        : '';
+    return VSurfaceCard(
+      tone: current ? VSurfaceTone.butter : VSurfaceTone.paper,
+      radius: VerbumRadius.tile,
+      padding: const EdgeInsets.fromLTRB(6, 12, 6, 10),
+      onTap: onTap,
+      semanticLabel: 'Día $day, ${theme.name}$state',
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: box,
+              borderRadius: BorderRadius.circular(13),
+            ),
+            child: VIcon(
+              done ? VerbumIcons.check : theme.icon,
+              size: 20,
+              weight: done ? VIconWeight.regular : VIconWeight.duotone,
+              color: fg,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Día $day',
+            style: type.bodyStrong.copyWith(
+              color: current ? p.onButter : p.ink,
+            ),
+          ),
+          Text(
+            theme.name.replaceFirst(RegExp(r'^(La|El) '), ''),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: type.caption.copyWith(
+              color: current ? p.onButter : p.inkMuted,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Cabecera de un día: foto de la temática, la virtud y una línea.
+class _NovenaThemeBanner extends StatelessWidget {
+  const _NovenaThemeBanner({required this.day});
+
+  final int day;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final type = context.type;
+    final theme = novenaThemeFor(day);
+    return VSurfaceCard(
+      radius: VerbumRadius.card,
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          VPhotoFrame(theme.photo, width: 72, aspectRatio: 1),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    VIcon(theme.icon, size: 15, color: p.rubric),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Día $day de 9',
+                      style: type.caption.copyWith(
+                        color: p.rubric,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(theme.name, style: type.heading.copyWith(fontSize: 18)),
+                Text(theme.line, style: type.caption),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
