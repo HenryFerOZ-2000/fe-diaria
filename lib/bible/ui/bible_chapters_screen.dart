@@ -55,6 +55,15 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
         .then((_) => _loadLastPosition());
   }
 
+  /// Pide un número de capítulo y lo abre; útil en libros largos.
+  Future<void> _askChapter(int count) async {
+    final chapter = await showDialog<int>(
+      context: context,
+      builder: (_) => _GoToChapterDialog(count: count),
+    );
+    if (chapter != null && mounted) _openChapter(chapter);
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
@@ -182,8 +191,9 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
               : _openChapter(lastHere.chapter, initialVerse: lastHere.verse),
         ),
         VSectionHeader(
-          'Capítulos',
-          trailing: '$count',
+          '$count ${count == 1 ? 'capítulo' : 'capítulos'}',
+          trailing: count > 1 ? 'Ir al capítulo…' : null,
+          onTrailingTap: count > 1 ? () => _askChapter(count) : null,
           padding: const EdgeInsets.fromLTRB(2, 28, 2, 12),
         ),
         for (final summary in chapters)
@@ -199,6 +209,60 @@ class _BibleChaptersScreenState extends State<BibleChaptersScreen> {
                   : _openChapter(summary.chapter),
             ),
           ),
+      ],
+    );
+  }
+}
+
+class _GoToChapterDialog extends StatefulWidget {
+  const _GoToChapterDialog({required this.count});
+
+  final int count;
+
+  @override
+  State<_GoToChapterDialog> createState() => _GoToChapterDialogState();
+}
+
+class _GoToChapterDialogState extends State<_GoToChapterDialog> {
+  final _controller = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final value = int.tryParse(_controller.text.trim());
+    if (value == null || value < 1 || value > widget.count) {
+      setState(() => _error = 'Escribe un número del 1 al ${widget.count}');
+      return;
+    }
+    Navigator.of(context).pop(value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Ir al capítulo'),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        keyboardType: TextInputType.number,
+        textInputAction: TextInputAction.go,
+        onSubmitted: (_) => _submit(),
+        decoration: InputDecoration(
+          hintText: '1 – ${widget.count}',
+          errorText: _error,
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(onPressed: _submit, child: const Text('Abrir')),
       ],
     );
   }

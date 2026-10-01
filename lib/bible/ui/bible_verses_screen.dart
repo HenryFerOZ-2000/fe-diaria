@@ -375,12 +375,18 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
                   lastChapter: _maxChapter,
                   textColor: colors.text,
                 ),
-                const SizedBox(height: 22),
+                const SizedBox(height: 26),
                 ChapterText(
                   key: _chapterKey,
                   verses: [
                     for (final verse in verses)
-                      (number: verse.verse, text: _sanitize(verse.text)),
+                      (
+                        number: verse.verse,
+                        // La capitular pide el texto sin versales.
+                        text: verse.verse == 1
+                            ? softenOpeningCaps(_sanitize(verse.text))
+                            : _sanitize(verse.text),
+                      ),
                   ],
                   fontSize: _fontSize,
                   lineHeight: _lineHeight,

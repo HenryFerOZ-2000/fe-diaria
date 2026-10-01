@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../../design_system/design_system.dart';
 
-/// Encabezado del capítulo: "Lucas 9" en dos tonos y la versión y el
-/// avance del libro como chips.
+/// Encabezado del capítulo, centrado como en un libro: el libro en
+/// versalitas, "Capítulo 9" en serif, un ornamento con cruz y, debajo, la
+/// versión y el avance.
 class ChapterHeading extends StatelessWidget {
   const ChapterHeading({
     super.key,
@@ -21,27 +22,57 @@ class ChapterHeading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
+    final type = context.type;
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Semantics(
+          header: true,
           label: '$bookName, capítulo $chapter',
           excludeSemantics: true,
-          child: VTwoToneTitle(
-            '$chapter',
-            bookName,
-            accentFirst: true,
-            style: context.type.display.copyWith(color: textColor),
+          child: Column(
+            children: [
+              Text(
+                bookName.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: type.rubric.copyWith(letterSpacing: 2.4),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Capítulo $chapter',
+                textAlign: TextAlign.center,
+                style: VerbumFonts.serif(
+                  color: textColor,
+                  fontSize: 44,
+                  fontWeight: FontWeight.w600,
+                  height: 1.1,
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            VMetaChip(label: 'Reina-Valera 1909', color: p.rubric),
-            VMetaChip(label: '$chapter de $lastChapter', color: p.rubric),
-          ],
+        const SizedBox(height: 10),
+        ExcludeSemantics(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(width: 44, height: 1.5, color: p.gold),
+              const SizedBox(width: 10),
+              VIcon(
+                VerbumIcons.cross,
+                weight: VIconWeight.fill,
+                size: 14,
+                color: p.gold,
+              ),
+              const SizedBox(width: 10),
+              Container(width: 44, height: 1.5, color: p.gold),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          'Reina-Valera 1909 · $chapter de $lastChapter',
+          textAlign: TextAlign.center,
+          style: type.caption.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );
