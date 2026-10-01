@@ -9,10 +9,14 @@ class VSectionHeader extends StatelessWidget {
     super.key,
     this.trailing,
     this.onTrailingTap,
+    this.eyebrow,
     this.padding = const EdgeInsets.fromLTRB(2, 20, 2, 10),
   });
 
   final String title;
+
+  /// Rúbrica breve sobre el título ("TU HUELLA").
+  final String? eyebrow;
 
   /// Texto corto a la derecha ("1 de 3", "Ver todo").
   final String? trailing;
@@ -40,7 +44,19 @@ class VSectionHeader extends StatelessWidget {
           Expanded(
             child: Semantics(
               header: true,
-              child: Text(title, style: type.heading),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (eyebrow != null) ...[
+                    Text(
+                      eyebrow!.toUpperCase(),
+                      style: type.rubric.copyWith(fontSize: 9.5),
+                    ),
+                    const SizedBox(height: 3),
+                  ],
+                  Text(title, style: type.heading),
+                ],
+              ),
             ),
           ),
           if (meta != null)

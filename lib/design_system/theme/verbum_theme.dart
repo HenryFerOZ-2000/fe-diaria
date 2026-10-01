@@ -181,7 +181,13 @@ ThemeData buildVerbumTheme({
       backgroundColor: palette.surface,
       selectedColor: palette.emphasis,
       side: hairline,
-      labelStyle: type.bodyStrong.copyWith(fontSize: 13),
+      // El seleccionado va sobre énfasis: su texto y check deben contrastar.
+      labelStyle: type.bodyStrong.copyWith(fontSize: 13, color: palette.ink),
+      secondaryLabelStyle: type.bodyStrong.copyWith(
+        fontSize: 13,
+        color: palette.onEmphasis,
+      ),
+      checkmarkColor: palette.onEmphasis,
       shape: const StadiumBorder(),
     ),
     switchTheme: SwitchThemeData(

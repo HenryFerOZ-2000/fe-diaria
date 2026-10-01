@@ -14,7 +14,10 @@ class VListRow extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.leading,
+    this.leadingColor,
     this.trailing = VerbumIcons.caretRight,
+    this.trailingWidget,
+    this.value,
     this.onTap,
     this.semanticHint,
   });
@@ -22,7 +25,14 @@ class VListRow extends StatelessWidget {
   final String title;
   final String? subtitle;
   final VerbumIcons? leading;
+  final Color? leadingColor;
   final VerbumIcons? trailing;
+
+  /// Sustituye al icono final (interruptor, botones − / +…).
+  final Widget? trailingWidget;
+
+  /// Valor actual a la derecha, antes de la flecha ("Español").
+  final String? value;
   final VoidCallback? onTap;
 
   /// Qué ocurre al tocar, para lectores de pantalla ("Abre el navegador").
@@ -48,7 +58,7 @@ class VListRow extends StatelessWidget {
                     leading!,
                     weight: VIconWeight.duotone,
                     size: 22,
-                    color: p.gold,
+                    color: leadingColor ?? p.gold,
                   ),
                   const SizedBox(width: 12),
                 ],
@@ -65,13 +75,65 @@ class VListRow extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (trailing != null) ...[
+                if (value != null) ...[
+                  const SizedBox(width: 8),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 150),
+                    child: Text(
+                      value!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                      style: type.body.copyWith(color: p.inkMuted),
+                    ),
+                  ),
+                ],
+                if (trailingWidget != null)
+                  trailingWidget!
+                else if (trailing != null) ...[
                   const SizedBox(width: 8),
                   VIcon(trailing!, size: 16, color: p.inkSubtle),
                 ],
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Fila con interruptor: toda la fila alterna el valor.
+class VSwitchRow extends StatelessWidget {
+  const VSwitchRow({
+    super.key,
+    required this.title,
+    required this.value,
+    required this.onChanged,
+    this.subtitle,
+    this.leading,
+    this.leadingColor,
+  });
+
+  final String title;
+  final String? subtitle;
+  final VerbumIcons? leading;
+  final Color? leadingColor;
+  final bool value;
+  final ValueChanged<bool>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return MergeSemantics(
+      child: VListRow(
+        title: title,
+        subtitle: subtitle,
+        leading: leading,
+        leadingColor: leadingColor,
+        onTap: onChanged == null ? null : () => onChanged!(!value),
+        trailingWidget: Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: Switch.adaptive(value: value, onChanged: onChanged),
         ),
       ),
     );

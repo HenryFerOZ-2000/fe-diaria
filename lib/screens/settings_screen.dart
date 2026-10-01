@@ -13,6 +13,7 @@ import '../features/liturgy/application/calendar_region_resolver.dart';
 import '../features/liturgy/presentation/catholic_calendar_settings_tile.dart';
 import 'traditional_prayers_religion_selection_screen.dart';
 import 'package:verbum/design_system/design_system.dart';
+import '../features/personalization/domain/profile_emotions.dart';
 
 /// Pantalla de configuración con todas las opciones de la aplicación
 class SettingsScreen extends StatefulWidget {
@@ -242,7 +243,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               if (isSelected)
-                VIcon(VerbumIcons.checkCircle, weight: VIconWeight.fill,
+                VIcon(
+                  VerbumIcons.checkCircle,
+                  weight: VIconWeight.fill,
                   color: Theme.of(context).colorScheme.primary,
                 ),
             ],
@@ -255,173 +258,109 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
+    final p = context.palette;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text(
-          localizations.settingsTitle,
-          style: VerbumFonts.serif(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text(localizations.settingsTitle, style: context.type.heading),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).scaffoldBackgroundColor,
-              Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.05),
-              Theme.of(context).scaffoldBackgroundColor,
-            ],
-          ),
-        ),
-        child: Consumer<AppProvider>(
-          builder: (context, provider, child) {
-            final storage = StorageService();
-            final tradition = faithTraditionFromStorageString(
-              storage.getValidatedTraditionalPrayersReligion(),
-            );
-            final calendarProfile = CalendarRegionResolver(
-              readStoredCountry: storage.getCatholicCalendarCountry,
-            ).resolve(tradition);
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                // Sección de idioma
-                _buildSectionHeader(localizations.language, context),
-                const SizedBox(height: 8),
-                _buildSettingsCard(
-                  children: [
-                    ListTile(
-                      title: Text(
-                        localizations.language,
-                        style: VerbumFonts.sans(fontSize: 16),
-                      ),
-                      subtitle: Text(
-                        LanguageService.getLanguageNameTranslated(
-                          LanguageService.getLanguage(),
-                          LanguageService.getLanguage(),
-                        ),
-                        style: VerbumFonts.sans(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      leading: VIcon(VerbumIcons.globe,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      trailing: const VIcon(VerbumIcons.caretRight),
-                      onTap: () => _showLanguageSelector(context, provider),
+      body: Consumer<AppProvider>(
+        builder: (context, provider, child) {
+          final storage = StorageService();
+          final tradition = faithTraditionFromStorageString(
+            storage.getValidatedTraditionalPrayersReligion(),
+          );
+          final calendarProfile = CalendarRegionResolver(
+            readStoredCountry: storage.getCatholicCalendarCountry,
+          ).resolve(tradition);
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(
+              VerbumSpace.gutter,
+              0,
+              VerbumSpace.gutter,
+              32,
+            ),
+            children: [
+              _section(localizations.language),
+              VListGroup(
+                children: [
+                  VListRow(
+                    leading: VerbumIcons.globe,
+                    title: localizations.language,
+                    value: LanguageService.getLanguageNameTranslated(
+                      LanguageService.getLanguage(),
+                      LanguageService.getLanguage(),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                // Sección de personalización
-                _buildSectionHeader('Personalización', context),
-                const SizedBox(height: 8),
-                _buildSettingsCard(
-                  children: [
-                    ListTile(
-                      title: Text(
-                        'Personalizar Experiencia',
-                        style: VerbumFonts.sans(fontSize: 16),
-                      ),
-                      subtitle: Text(
+                    onTap: () => _showLanguageSelector(context, provider),
+                  ),
+                ],
+              ),
+              _section('Personalización'),
+              VListGroup(
+                children: [
+                  VListRow(
+                    leading: VerbumIcons.user,
+                    title: 'Personalizar experiencia',
+                    subtitle:
                         provider.userName.isNotEmpty ||
-                                provider.userEmotion.isNotEmpty
-                            ? provider.userName.isNotEmpty
-                                  ? '${provider.userName} - ${_getEmotionDisplayName(provider.userEmotion)}'
-                                  : _getEmotionDisplayName(provider.userEmotion)
-                            : 'Configura tu nombre y emoción',
-                        style: VerbumFonts.sans(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
+                            provider.userEmotion.isNotEmpty
+                        ? provider.userName.isNotEmpty
+                              ? '${provider.userName} · ${_getEmotionDisplayName(provider.userEmotion)}'
+                              : _getEmotionDisplayName(provider.userEmotion)
+                        : 'Configura tu nombre y cómo te sientes',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PersonalizationScreen(),
                         ),
-                      ),
-                      leading: VIcon(VerbumIcons.user, weight: VIconWeight.fill,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      trailing: const VIcon(VerbumIcons.caretRight),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const PersonalizationScreen(),
-                          ),
-                        ).then((_) {
-                          // Recargar datos después de personalizar
-                          provider.loadTodayVerse();
-                          provider.loadTodayPrayers();
-                        });
-                      },
+                      ).then((_) {
+                        // Recargar datos después de personalizar
+                        provider.loadTodayVerse();
+                        provider.loadTodayPrayers();
+                      });
+                    },
+                  ),
+                ],
+              ),
+              _section('Tradición'),
+              VListGroup(
+                children: [
+                  VListRow(
+                    leading: VerbumIcons.church,
+                    title: 'Tradición cristiana',
+                    value: _getReligionDisplayName(
+                      storage.getValidatedTraditionalPrayersReligion(),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                // Sección de Oraciones Tradicionales
-                _buildSectionHeader('Oraciones Tradicionales', context),
-                const SizedBox(height: 8),
-                _buildSettingsCard(
-                  children: [
-                    ListTile(
-                      title: Text(
-                        'Tradición cristiana',
-                        style: VerbumFonts.sans(fontSize: 16),
-                      ),
-                      subtitle: Text(
-                        _getReligionDisplayName(
+                    onTap: () async {
+                      final result = await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const TraditionalPrayersReligionSelectionScreen(),
+                        ),
+                      );
+                      if (!mounted || !context.mounted) return;
+                      if (result == true) {
+                        setState(() {});
+                        if (!mounted) return;
+                        final displayName = _getReligionDisplayName(
                           StorageService()
                               .getValidatedTraditionalPrayersReligion(),
-                        ),
-                        style: VerbumFonts.sans(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      leading: VIcon(VerbumIcons.church, weight: VIconWeight.fill,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      trailing: const VIcon(VerbumIcons.caretRight),
-                      onTap: () async {
-                        final result = await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                const TraditionalPrayersReligionSelectionScreen(),
+                        );
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Tu tradición fue actualizada a $displayName.',
+                            ),
+                            duration: const Duration(seconds: 2),
                           ),
                         );
-                        if (!mounted || !context.mounted) return;
-                        if (result == true) {
-                          setState(() {});
-                          if (!mounted) return;
-                          final selectedReligion = StorageService()
-                              .getValidatedTraditionalPrayersReligion();
-                          final displayName = _getReligionDisplayName(
-                            selectedReligion,
-                          );
-                          ScaffoldMessenger.of(this.context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Tu tradición fue actualizada a $displayName.',
-                              ),
-                              duration: const Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                    if (tradition == FaithTradition.catholic)
-                      const Divider(height: 1),
+                      }
+                    },
+                  ),
+                  if (tradition == FaithTradition.catholic)
                     CatholicCalendarSettingsTile(
                       tradition: tradition,
                       selection: calendarProfile.selection,
@@ -436,447 +375,230 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ? 'Usaremos Ecuador cuando haya contenido local verificado.'
                                   : 'Ahora usas el Calendario Romano General.',
                             ),
-                            behavior: SnackBarBehavior.floating,
                           ),
                         );
                       },
                     ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                // Sección de apariencia
-                _buildSectionHeader(localizations.appearance, context),
-                const SizedBox(height: 8),
-                _buildSettingsCard(
-                  children: [
-                    SwitchListTile(
-                      title: Text(
-                        localizations.darkMode,
-                        style: VerbumFonts.sans(fontSize: 16),
-                      ),
-                      subtitle: Text(
-                        localizations.darkModeDescription,
-                        style: VerbumFonts.sans(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      value: provider.darkMode,
-                      onChanged: (value) => provider.setDarkMode(value),
-                      secondary: VIcon(
-                        provider.darkMode ? VerbumIcons.moon : VerbumIcons.sun,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                ],
+              ),
+              _section(localizations.appearance),
+              VListGroup(
+                children: [
+                  VSwitchRow(
+                    leading: provider.darkMode
+                        ? VerbumIcons.moonStars
+                        : VerbumIcons.sun,
+                    title: localizations.darkMode,
+                    subtitle: localizations.darkModeDescription,
+                    value: provider.darkMode,
+                    onChanged: provider.setDarkMode,
+                  ),
+                  VListRow(
+                    leading: VerbumIcons.textAa,
+                    title: localizations.fontSize,
+                    subtitle: _getFontSizeLabel(
+                      provider.fontSize,
+                      localizations,
                     ),
-                    const Divider(height: 1),
-                    // Tamaño de fuente
-                    ListTile(
-                      title: Text(
-                        localizations.fontSize,
-                        style: VerbumFonts.sans(fontSize: 16),
-                      ),
-                      subtitle: Text(
-                        _getFontSizeLabel(provider.fontSize, localizations),
-                        style: VerbumFonts.sans(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
+                    trailingWidget: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        VIconButton(
+                          icon: VerbumIcons.minus,
+                          semanticLabel: 'Reducir tamaño de letra',
+                          variant: VIconButtonVariant.outlined,
+                          size: 36,
+                          onPressed: provider.fontSize > 0.8
+                              ? () => provider.setFontSize(
+                                  provider.fontSize - 0.1,
+                                )
+                              : null,
                         ),
-                      ),
-                      leading: VIcon(VerbumIcons.textAa,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const VIcon(VerbumIcons.minusCircle),
-                            onPressed: provider.fontSize > 0.8
-                                ? () => provider.setFontSize(
-                                    provider.fontSize - 0.1,
-                                  )
-                                : null,
+                        const SizedBox(width: 6),
+                        VIconButton(
+                          icon: VerbumIcons.plus,
+                          semanticLabel: 'Aumentar tamaño de letra',
+                          variant: VIconButtonVariant.outlined,
+                          size: 36,
+                          onPressed: provider.fontSize < 1.4
+                              ? () => provider.setFontSize(
+                                  provider.fontSize + 0.1,
+                                )
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ),
+                  VSwitchRow(
+                    leading: VerbumIcons.bookOpen,
+                    title: localizations.readingMode,
+                    subtitle: localizations.readingModeDescription,
+                    value: provider.readingMode,
+                    onChanged: provider.setReadingMode,
+                  ),
+                  VSwitchRow(
+                    leading: VerbumIcons.speakerHigh,
+                    title: localizations.soundEnabled,
+                    subtitle: localizations.soundEnabledDescription,
+                    value: provider.soundEnabled,
+                    onChanged: provider.setSoundEnabled,
+                  ),
+                ],
+              ),
+              _section(localizations.onYourScreen),
+              VListGroup(
+                children: [
+                  VListRow(
+                    leading: VerbumIcons.squaresFour,
+                    title: localizations.widgetScreenTitle,
+                    subtitle: localizations.widgetSettingsSubtitle,
+                    onTap: () =>
+                        Navigator.pushNamed(context, '/daily-verse-widget'),
+                  ),
+                ],
+              ),
+              _section(localizations.notifications),
+              VListGroup(
+                children: [
+                  VSwitchRow(
+                    leading: VerbumIcons.bell,
+                    title: localizations.dailyNotifications,
+                    subtitle: localizations.dailyNotificationsDescription,
+                    value: provider.notificationEnabled,
+                    onChanged: (value) async {
+                      if (!value) {
+                        provider.setNotificationEnabled(false);
+                        return;
+                      }
+                      // Al activar, pedir permisos primero.
+                      final granted = await NotificationService()
+                          .requestPermissions();
+                      if (granted) {
+                        provider.setNotificationEnabled(true);
+                      } else if (mounted) {
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Se necesitan permisos de notificaciones para activar esta función',
+                            ),
+                            duration: Duration(seconds: 3),
                           ),
-                          IconButton(
-                            icon: const VIcon(VerbumIcons.plusCircle),
-                            onPressed: provider.fontSize < 1.4
-                                ? () => provider.setFontSize(
-                                    provider.fontSize + 0.1,
-                                  )
-                                : null,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Divider(height: 1),
-                    // Modo lectura
-                    SwitchListTile(
-                      title: Text(
-                        localizations.readingMode,
-                        style: VerbumFonts.sans(fontSize: 16),
-                      ),
-                      subtitle: Text(
-                        localizations.readingModeDescription,
-                        style: VerbumFonts.sans(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      value: provider.readingMode,
-                      onChanged: (value) => provider.setReadingMode(value),
-                      secondary: VIcon(VerbumIcons.book, weight: VIconWeight.fill,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const Divider(height: 1),
-                    // Sonido
-                    SwitchListTile(
-                      title: Text(
-                        localizations.soundEnabled,
-                        style: VerbumFonts.sans(fontSize: 16),
-                      ),
-                      subtitle: Text(
-                        localizations.soundEnabledDescription,
-                        style: VerbumFonts.sans(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      value: provider.soundEnabled,
-                      onChanged: (value) => provider.setSoundEnabled(value),
-                      secondary: VIcon(VerbumIcons.speakerHigh, weight: VIconWeight.fill,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                _buildSectionHeader(localizations.onYourScreen, context),
-                const SizedBox(height: 8),
-                _buildSettingsCard(
-                  children: [
-                    ListTile(
-                      title: Text(
-                        localizations.widgetScreenTitle,
-                        style: VerbumFonts.sans(fontSize: 16),
-                      ),
-                      subtitle: Text(
-                        localizations.widgetSettingsSubtitle,
-                        style: VerbumFonts.sans(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      leading: VIcon(VerbumIcons.squaresFour,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      trailing: const VIcon(VerbumIcons.caretRight),
-                      onTap: () =>
-                          Navigator.pushNamed(context, '/daily-verse-widget'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                // Sección de notificaciones
-                _buildSectionHeader(localizations.notifications, context),
-                const SizedBox(height: 8),
-                _buildSettingsCard(
-                  children: [
-                    // Toggle general de notificaciones
-                    SwitchListTile(
-                      title: Text(
-                        localizations.dailyNotifications,
-                        style: VerbumFonts.sans(fontSize: 16),
-                      ),
-                      subtitle: Text(
-                        localizations.dailyNotificationsDescription,
-                        style: VerbumFonts.sans(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      value: provider.notificationEnabled,
-                      onChanged: (value) async {
-                        if (value) {
-                          // Si se activa, solicitar permisos primero
-                          final notificationService = NotificationService();
-                          final granted = await notificationService
-                              .requestPermissions();
-                          if (granted) {
-                            provider.setNotificationEnabled(true);
-                          } else {
-                            // Si no se conceden permisos, mostrar mensaje
-                            if (mounted) {
-                              ScaffoldMessenger.of(this.context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Se necesitan permisos de notificaciones para activar esta función',
-                                  ),
-                                  duration: Duration(seconds: 3),
-                                ),
-                              );
-                            }
-                          }
-                        } else {
-                          provider.setNotificationEnabled(false);
-                        }
-                      },
-                      secondary: VIcon(VerbumIcons.bell, weight: VIconWeight.fill,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    if (provider.notificationEnabled) ...[
-                      const Divider(height: 1),
-                      // Toggle de notificación de la mañana
-                      SwitchListTile(
-                        title: Text(
-                          'Notificación de la mañana',
-                          style: VerbumFonts.sans(fontSize: 16),
-                        ),
-                        subtitle: Text(
+                        );
+                      }
+                    },
+                  ),
+                  if (provider.notificationEnabled) ...[
+                    VSwitchRow(
+                      leading: VerbumIcons.sunHorizon,
+                      title: 'Notificación de la mañana',
+                      subtitle:
                           'Versículo del día a las ${provider.morningVerseNotificationTime}',
-                          style: VerbumFonts.sans(
-                            fontSize: 14,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        value: provider.morningNotificationEnabled,
-                        onChanged: (value) =>
-                            provider.setMorningNotificationEnabled(value),
-                        secondary: const VIcon(VerbumIcons.sun, weight: VIconWeight.fill,
-                          color: Colors.orange,
+                      value: provider.morningNotificationEnabled,
+                      onChanged: provider.setMorningNotificationEnabled,
+                    ),
+                    if (provider.morningNotificationEnabled)
+                      VListRow(
+                        leading: VerbumIcons.clock,
+                        title: 'Hora de la mañana',
+                        value: provider.morningVerseNotificationTime,
+                        onTap: () => _selectTime(
+                          context,
+                          provider.morningVerseNotificationTime,
+                          provider.setMorningVerseNotificationTime,
                         ),
                       ),
-                      if (provider.morningNotificationEnabled) ...[
-                        const Divider(height: 1),
-                        ListTile(
-                          title: Text(
-                            'Hora de la notificación matutina',
-                            style: VerbumFonts.sans(fontSize: 16),
-                          ),
-                          subtitle: Text(
-                            provider.morningVerseNotificationTime,
-                            style: VerbumFonts.sans(
-                              fontSize: 14,
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          leading: const VIcon(VerbumIcons.clock,
-                            color: Colors.orange,
-                          ),
-                          trailing: const VIcon(VerbumIcons.caretRight),
-                          onTap: () => _selectTime(
-                            context,
-                            provider.morningVerseNotificationTime,
-                            (time) =>
-                                provider.setMorningVerseNotificationTime(time),
-                          ),
-                        ),
-                      ],
-                      const Divider(height: 1),
-                      // Toggle de notificación de la noche
-                      SwitchListTile(
-                        title: Text(
-                          'Notificación de la noche',
-                          style: VerbumFonts.sans(fontSize: 16),
-                        ),
-                        subtitle: Text(
+                    VSwitchRow(
+                      leading: VerbumIcons.moonStars,
+                      title: 'Notificación de la noche',
+                      subtitle:
                           'Oración de la noche a las ${provider.eveningPrayerNotificationTime}',
-                          style: VerbumFonts.sans(
-                            fontSize: 14,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        value: provider.eveningNotificationEnabled,
-                        onChanged: (value) =>
-                            provider.setEveningNotificationEnabled(value),
-                        secondary: const VIcon(VerbumIcons.moon, weight: VIconWeight.fill,
-                          color: Colors.indigo,
-                        ),
-                      ),
-                      if (provider.eveningNotificationEnabled) ...[
-                        const Divider(height: 1),
-                        ListTile(
-                          title: Text(
-                            'Hora de la notificación nocturna',
-                            style: VerbumFonts.sans(fontSize: 16),
-                          ),
-                          subtitle: Text(
-                            provider.eveningPrayerNotificationTime,
-                            style: VerbumFonts.sans(
-                              fontSize: 14,
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          leading: const VIcon(VerbumIcons.clock,
-                            color: Colors.indigo,
-                          ),
-                          trailing: const VIcon(VerbumIcons.caretRight),
-                          onTap: () => _selectTime(
-                            context,
-                            provider.eveningPrayerNotificationTime,
-                            (time) =>
-                                provider.setEveningPrayerNotificationTime(time),
-                          ),
-                        ),
-                      ],
-                      const Divider(height: 1),
-                      // Toggle de recordatorios cada 3 horas
-                      SwitchListTile(
-                        title: Text(
-                          'Recordatorios cada 3 horas',
-                          style: VerbumFonts.sans(fontSize: 16),
-                        ),
-                        subtitle: Text(
-                          'Recordatorios de oración de 9:00 a 21:00',
-                          style: VerbumFonts.sans(
-                            fontSize: 14,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        value: provider.hourlyRemindersEnabled,
-                        onChanged: (value) =>
-                            provider.setHourlyRemindersEnabled(value),
-                        secondary: VIcon(VerbumIcons.clock,
-                          color: Theme.of(context).colorScheme.primary,
+                      value: provider.eveningNotificationEnabled,
+                      onChanged: provider.setEveningNotificationEnabled,
+                    ),
+                    if (provider.eveningNotificationEnabled)
+                      VListRow(
+                        leading: VerbumIcons.clock,
+                        title: 'Hora de la noche',
+                        value: provider.eveningPrayerNotificationTime,
+                        onTap: () => _selectTime(
+                          context,
+                          provider.eveningPrayerNotificationTime,
+                          provider.setEveningPrayerNotificationTime,
                         ),
                       ),
-                      const Divider(height: 1),
-                      ListTile(
-                        title: Text(
-                          localizations.testNotification,
-                          style: VerbumFonts.sans(fontSize: 16),
-                        ),
-                        subtitle: Text(
-                          localizations.testNotificationDescription,
-                          style: VerbumFonts.sans(
-                            fontSize: 14,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        trailing: const VIcon(VerbumIcons.paperPlaneRight, weight: VIconWeight.fill),
-                        onTap: _testNotification,
-                      ),
-                      if (kDebugMode) ...[
-                        const Divider(height: 1),
-                        ListTile(
-                          title: Text(
-                            'Diagnóstico de notificaciones (dev)',
-                            style: VerbumFonts.sans(fontSize: 16),
-                          ),
-                          subtitle: Text(
+                    VSwitchRow(
+                      leading: VerbumIcons.hourglass,
+                      title: 'Recordatorios cada 3 horas',
+                      subtitle: 'Recordatorios de oración de 9:00 a 21:00',
+                      value: provider.hourlyRemindersEnabled,
+                      onChanged: provider.setHourlyRemindersEnabled,
+                    ),
+                    VListRow(
+                      leading: VerbumIcons.paperPlaneRight,
+                      title: localizations.testNotification,
+                      subtitle: localizations.testNotificationDescription,
+                      trailing: null,
+                      onTap: _testNotification,
+                    ),
+                    if (kDebugMode)
+                      VListRow(
+                        leading: VerbumIcons.bug,
+                        leadingColor: p.inkSubtle,
+                        title: 'Diagnóstico de notificaciones (dev)',
+                        subtitle:
                             'Imprime estado en consola (FCM no está integrado)',
-                            style: VerbumFonts.sans(
-                              fontSize: 14,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          trailing: const VIcon(VerbumIcons.bug),
-                          onTap: () async {
-                            await NotificationService()
-                                .printDiagnosticsToConsole();
-                            await PushMessagingService()
-                                .printDiagnosticsToConsole();
-                            if (!context.mounted) return;
-                            final token = await PushMessagingService()
-                                .getTokenForDiagnostics();
-                            if (!context.mounted) return;
-                            final preview = token != null && token.length > 36
-                                ? '${token.substring(0, 36)}…'
-                                : (token ?? 'null');
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Logs en consola. FCM token (preview): $preview',
-                                ),
+                        trailing: null,
+                        onTap: () async {
+                          await NotificationService()
+                              .printDiagnosticsToConsole();
+                          await PushMessagingService()
+                              .printDiagnosticsToConsole();
+                          if (!context.mounted) return;
+                          final token = await PushMessagingService()
+                              .getTokenForDiagnostics();
+                          if (!context.mounted) return;
+                          final preview = token != null && token.length > 36
+                              ? '${token.substring(0, 36)}…'
+                              : (token ?? 'null');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Logs en consola. FCM token (preview): $preview',
                               ),
-                            );
-                          },
-                        ),
-                      ],
-                    ],
+                            ),
+                          );
+                        },
+                      ),
                   ],
-                ),
-                const SizedBox(height: 32),
-                // Información de la app
-                _buildSectionHeader(localizations.about, context),
-                const SizedBox(height: 8),
-                _buildSettingsCard(
-                  children: [
-                    ListTile(
-                      title: Text(
-                        localizations.appTitle,
-                        style: VerbumFonts.sans(fontSize: 16),
-                      ),
-                      subtitle: Text(
-                        localizations.appVersion,
-                        style: VerbumFonts.sans(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      leading: VIcon(VerbumIcons.info,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const Divider(height: 1),
-                    ListTile(
-                      title: Text(
-                        'Biblia',
-                        style: VerbumFonts.sans(fontSize: 16),
-                      ),
-                      subtitle: Text(
+                ],
+              ),
+              _section(localizations.about),
+              VListGroup(
+                children: [
+                  VListRow(
+                    leading: VerbumIcons.info,
+                    title: localizations.appTitle,
+                    subtitle: localizations.appVersion,
+                    trailing: null,
+                  ),
+                  const VListRow(
+                    leading: VerbumIcons.bookOpenText,
+                    title: 'Biblia',
+                    subtitle:
                         'Texto bíblico: Reina-Valera 1909 (Dominio Público). Fuente: eBible.org.',
-                        style: VerbumFonts.sans(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      leading: VIcon(VerbumIcons.bookOpenText,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-              ],
-            );
-          },
-        ),
+                    trailing: null,
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title, BuildContext context) {
-    return Text(
-      title,
-      style: VerbumFonts.sans(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Theme.of(context).colorScheme.primary,
-      ),
-    );
-  }
-
-  Widget _buildSettingsCard({required List<Widget> children}) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Column(children: children),
-    );
-  }
+  Widget _section(String title) =>
+      VSectionHeader(title, padding: const EdgeInsets.fromLTRB(2, 24, 2, 10));
 
   String _getFontSizeLabel(double size, AppLocalizations localizations) {
     if (size <= 0.9) return localizations.fontSizeSmall;
@@ -885,20 +607,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return localizations.fontSizeVeryLarge;
   }
 
-  String _getEmotionDisplayName(String emotion) {
-    final emotionMap = {
-      'ansioso': 'Ansioso',
-      'triste': 'Triste',
-      'agradecido': 'Agradecido',
-      'motivado': 'Motivado',
-      'preocupado': 'Preocupado',
-      'feliz': 'Feliz',
-      'desanimado': 'Desanimado',
-      'enojado': 'Enojado',
-      'tranquilo': 'Tranquilo',
-    };
-    return emotionMap[emotion] ?? emotion;
-  }
+  String _getEmotionDisplayName(String emotion) => profileEmotionLabel(emotion);
 
   String _getReligionDisplayName(String religion) {
     if (religion.isEmpty) {

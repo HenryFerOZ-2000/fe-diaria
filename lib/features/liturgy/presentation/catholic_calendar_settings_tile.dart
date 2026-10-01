@@ -22,65 +22,28 @@ class CatholicCalendarSettingsTile extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final theme = Theme.of(context);
     final isEcuador = selection.countryCode == 'EC';
-    return Semantics(
-      button: true,
-      label: 'Calendario católico',
-      child: InkWell(
-        onTap: () => _showSelection(context),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 2),
-                child: VIcon(VerbumIcons.globe,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Calendario católico',
-                      style: theme.textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      isEcuador
-                          ? 'Ecuador · recomendado para ti'
-                          : 'Calendario Romano General',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    if (isEcuador) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        'Contenido local aún no disponible; se usa el Calendario Romano General.',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                          height: 1.35,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Padding(
-                padding: EdgeInsets.only(top: 2),
-                child: VIcon(VerbumIcons.caretRight),
-              ),
-            ],
+    final row = VListRow(
+      leading: VerbumIcons.calendarDots,
+      title: 'Calendario católico',
+      subtitle: isEcuador
+          ? 'Ecuador · recomendado para ti'
+          : 'Calendario Romano General',
+      onTap: () => _showSelection(context),
+    );
+    if (!isEcuador) return row;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        row,
+        Padding(
+          padding: const EdgeInsets.fromLTRB(50, 0, 16, 12),
+          child: Text(
+            'Contenido local aún no disponible; se usa el Calendario Romano General.',
+            style: context.type.caption,
           ),
         ),
-      ),
+      ],
     );
   }
 

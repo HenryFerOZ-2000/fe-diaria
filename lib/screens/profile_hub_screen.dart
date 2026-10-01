@@ -14,6 +14,8 @@ import 'favorites_screen.dart';
 import 'traditional_prayers_religion_selection_screen.dart';
 import 'welcome_auth_screen.dart';
 import 'package:verbum/design_system/design_system.dart';
+import '../features/today/application/constancy_progress.dart';
+import '../features/today/presentation/constancy_card.dart';
 
 class ProfileHubScreen extends StatefulWidget {
   const ProfileHubScreen({super.key});
@@ -142,24 +144,17 @@ class _ProfileContent extends StatelessWidget {
       slivers: [
         SliverAppBar(
           pinned: true,
-          backgroundColor: Theme.of(
-            context,
-          ).scaffoldBackgroundColor.withValues(alpha: .94),
+          backgroundColor: context.palette.background.withValues(alpha: .96),
           surfaceTintColor: Colors.transparent,
-          title: Text(
-            'Tu espacio',
-            style: VerbumFonts.serif(
-              fontSize: 25,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+          title: Text('Tu espacio', style: context.type.display),
+          centerTitle: false,
           actions: const [VerbumHeaderActions(showProfile: false)],
         ),
         SliverPadding(
           padding: EdgeInsets.fromLTRB(
-            16,
-            10,
-            16,
+            VerbumSpace.gutter,
+            6,
+            VerbumSpace.gutter,
             MediaQuery.paddingOf(context).bottom + 28,
           ),
           sliver: SliverList.list(
@@ -172,66 +167,70 @@ class _ProfileContent extends StatelessWidget {
               ),
               if (!complete) ...[
                 const SizedBox(height: 12),
-                _CompletionCard(
+                VActionTile(
+                  tone: VSurfaceTone.accent,
+                  icon: VerbumIcons.userPlus,
+                  title: 'Completa tu perfil',
+                  subtitle:
+                      'Tu nombre y usuario ayudan a que la comunidad te reconozca.',
+                  iconColor: context.palette.accent,
                   onTap: () => Navigator.pushNamed(context, '/edit-profile'),
                 ),
               ],
               const SizedBox(height: 16),
-              _WeeklyJourneyCard(stats: stats),
-              const SizedBox(height: 14),
+              _weekCard(context),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
-                    child: _MetricCard(
+                    child: VStatTile(
                       value: '${stats.prayersCompleted}',
                       label: 'Oraciones',
-                      icon: VerbumIcons.heart,
-                      tint: const Color(0xFF9B5C62),
+                      icon: VerbumIcons.handsPraying,
+                      iconColor: context.palette.rubric,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _MetricCard(
+                    child: VStatTile(
                       value: '${stats.versesRead}',
                       label: 'Lecturas',
                       icon: VerbumIcons.bookOpenText,
-                      tint: const Color(0xFF6B7398),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: _MetricCard(
+                    child: VStatTile(
                       value: '${stats.activeDaysLast30}',
                       label: 'Días activos',
                       icon: VerbumIcons.sun,
-                      tint: const Color(0xFF9A783D),
+                      iconColor: context.palette.accent,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 28),
-              const _SectionTitle(
-                eyebrow: 'TU HUELLA',
-                title: 'Lo que has ido cultivando',
+              const VSectionHeader(
+                'Lo que has ido cultivando',
+                eyebrow: 'Tu huella',
+                padding: EdgeInsets.fromLTRB(2, 26, 2, 12),
               ),
-              const SizedBox(height: 12),
-              _ActionGroup(
+              VListGroup(
                 children: [
-                  _ProfileAction(
-                    icon: VerbumIcons.path,
+                  VListRow(
+                    leading: VerbumIcons.path,
                     title: 'Caminos espirituales',
                     subtitle: 'Procesos guiados para lo que hoy necesitas',
                     onTap: () =>
                         Navigator.pushNamed(context, '/spiritual-paths'),
                   ),
-                  _ProfileAction(
-                    icon: VerbumIcons.chatsCircle,
+                  VListRow(
+                    leading: VerbumIcons.chatsCircle,
                     title: 'Mis publicaciones',
                     subtitle: '${stats.postsCreated} compartidas en comunidad',
                     onTap: () => Navigator.pushNamed(context, '/my-profile'),
                   ),
-                  _ProfileAction(
-                    icon: VerbumIcons.bookmarkSimple,
+                  VListRow(
+                    leading: VerbumIcons.bookmarkSimple,
                     title: 'Contenido guardado',
                     subtitle: 'Vuelve a los versículos que te hablaron',
                     onTap: () => Navigator.of(context).push(
@@ -240,8 +239,8 @@ class _ProfileContent extends StatelessWidget {
                       ),
                     ),
                   ),
-                  _ProfileAction(
-                    icon: VerbumIcons.chartLineUp,
+                  VListRow(
+                    leading: VerbumIcons.chartLineUp,
                     title: 'Datos espirituales',
                     subtitle: 'Métricas, hitos y logros de tu camino',
                     onTap: () =>
@@ -249,58 +248,56 @@ class _ProfileContent extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 26),
-              const _SectionTitle(
-                eyebrow: 'A TU MANERA',
-                title: 'Personaliza tu experiencia',
+              const VSectionHeader(
+                'Personaliza tu experiencia',
+                eyebrow: 'A tu manera',
+                padding: EdgeInsets.fromLTRB(2, 26, 2, 12),
               ),
-              const SizedBox(height: 12),
-              _ActionGroup(
+              VListGroup(
                 children: [
-                  _ProfileAction(
-                    icon: VerbumIcons.sparkle,
+                  VListRow(
+                    leading: VerbumIcons.church,
                     title: 'Tradición cristiana',
-                    subtitle: tradition,
+                    value: tradition,
                     onTap: onTraditionTap,
                   ),
-                  _ProfileAction(
-                    icon: VerbumIcons.slidersHorizontal,
+                  VListRow(
+                    leading: VerbumIcons.slidersHorizontal,
                     title: 'Mi ritmo espiritual',
                     subtitle: 'Tiempo, emoción y momento preferido',
                     onTap: () =>
                         Navigator.pushNamed(context, '/personalization'),
                   ),
-                  _ProfileAction(
-                    icon: VerbumIcons.bell,
+                  VListRow(
+                    leading: VerbumIcons.bell,
                     title: 'Recordatorios y preferencias',
                     subtitle: 'Horarios, contenido, idioma y apariencia',
                     onTap: () => Navigator.pushNamed(context, '/settings'),
                   ),
                 ],
               ),
-              const SizedBox(height: 26),
-              const _SectionTitle(
-                eyebrow: 'VERBUM',
-                title: 'Cuenta y aplicación',
+              const VSectionHeader(
+                'Cuenta y aplicación',
+                eyebrow: 'Verbum',
+                padding: EdgeInsets.fromLTRB(2, 26, 2, 12),
               ),
-              const SizedBox(height: 12),
-              _ActionGroup(
+              VListGroup(
                 children: [
-                  _ProfileAction(
-                    icon: VerbumIcons.userGear,
+                  VListRow(
+                    leading: VerbumIcons.userGear,
                     title: 'Cuenta y seguridad',
                     subtitle: 'Sesiones, privacidad y datos de la cuenta',
                     onTap: () =>
                         Navigator.pushNamed(context, '/account-settings'),
                   ),
-                  _ProfileAction(
-                    icon: VerbumIcons.medal,
+                  VListRow(
+                    leading: VerbumIcons.medal,
                     title: 'Plan de Verbum',
                     subtitle: 'Consulta los beneficios de tu plan',
                     onTap: () => Navigator.pushNamed(context, '/plan'),
                   ),
-                  _ProfileAction(
-                    icon: VerbumIcons.question,
+                  VListRow(
+                    leading: VerbumIcons.question,
                     title: 'Ayuda y soporte',
                     subtitle: 'Preguntas frecuentes y contacto',
                     onTap: () => Navigator.pushNamed(context, '/help-support'),
@@ -309,30 +306,52 @@ class _ProfileContent extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               Center(
-                child: TextButton.icon(
+                child: VButton(
+                  label: 'Cerrar sesión',
+                  icon: VerbumIcons.signOut,
+                  iconLeading: true,
+                  variant: VButtonVariant.text,
                   onPressed: onLogout,
-                  icon: const VIcon(VerbumIcons.signOut, size: 18),
-                  label: const Text('Cerrar sesión'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(
-                      context,
-                    ).colorScheme.onSurfaceVariant,
-                  ),
                 ),
               ),
               Center(
                 child: Text(
                   'Tu actividad se sincroniza de forma segura',
-                  style: VerbumFonts.sans(
-                    fontSize: 11,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                  style: context.type.caption,
                 ),
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  static String _dateKey(DateTime date) =>
+      '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+  /// La misma tarjeta de constancia de "Hoy", con los datos de la semana.
+  Widget _weekCard(BuildContext context) {
+    final now = DateTime.now();
+    final monday = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(Duration(days: now.weekday - 1));
+    final week = [
+      for (var i = 0; i < 7; i++)
+        stats.activeDaysMap[_dateKey(monday.add(Duration(days: i)))] == true,
+    ];
+    return ConstancyCard(
+      progress: ConstancyProgress.from(
+        totalDays: stats.currentStreak,
+        completedMoments: week[now.weekday - 1] ? 1 : 0,
+        totalMoments: 1,
+      ),
+      weekLabels: const ['L', 'M', 'X', 'J', 'V', 'S', 'D'],
+      weekCompleted: week,
+      todayIndex: now.weekday - 1,
+      onTap: () => Navigator.pushNamed(context, '/streak'),
     );
   }
 }
@@ -352,498 +371,70 @@ class _IdentityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF2B2345), Color(0xFF493878), Color(0xFF594675)],
-        ),
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF33264F).withValues(alpha: .25),
-            blurRadius: 28,
-            offset: const Offset(0, 14),
-          ),
-        ],
-      ),
-      child: Stack(
+    final p = context.palette;
+    final type = context.type;
+    final hasPhoto = photoUrl?.isNotEmpty == true;
+    return VSurfaceCard(
+      tone: VSurfaceTone.ink,
+      padding: const EdgeInsets.fromLTRB(18, 18, 12, 18),
+      child: Row(
         children: [
-          Positioned(
-            right: -35,
-            top: -55,
-            child: Container(
-              width: 150,
-              height: 150,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFFD7B36A).withValues(alpha: .13),
-              ),
+          Container(
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: p.gold, width: 1.4),
+            ),
+            child: CircleAvatar(
+              radius: 32,
+              backgroundColor: p.onInverse.withValues(alpha: .1),
+              backgroundImage: hasPhoto ? NetworkImage(photoUrl!) : null,
+              child: hasPhoto
+                  ? null
+                  : Text(
+                      name.characters.first.toUpperCase(),
+                      style: type.title.copyWith(color: p.onInverse),
+                    ),
             ),
           ),
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFFE4C682).withValues(alpha: .8),
-                    width: 1.4,
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: type.title.copyWith(color: p.onInverse, fontSize: 25),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  username.isEmpty ? 'Tu camino en Verbum' : '@$username',
+                  style: type.body.copyWith(
+                    color: p.onInverse.withValues(alpha: .7),
                   ),
                 ),
-                child: CircleAvatar(
-                  radius: 34,
-                  backgroundColor: Colors.white.withValues(alpha: .12),
-                  backgroundImage: photoUrl?.isNotEmpty == true
-                      ? NetworkImage(photoUrl!)
-                      : null,
-                  child: photoUrl?.isNotEmpty == true
-                      ? null
-                      : Text(
-                          name.characters.first.toUpperCase(),
-                          style: VerbumFonts.serif(
-                            color: Colors.white,
-                            fontSize: 29,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                const SizedBox(height: 10),
+                VMetaChip(
+                  icon: VerbumIcons.church,
+                  label: tradition,
+                  color: p.gold,
                 ),
-              ),
-              const SizedBox(width: 15),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: VerbumFonts.serif(
-                        color: Colors.white,
-                        fontSize: 23,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      username.isEmpty ? 'Tu camino en Verbum' : '@$username',
-                      style: VerbumFonts.sans(
-                        color: Colors.white.withValues(alpha: .72),
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 11),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: .11),
-                        borderRadius: BorderRadius.circular(99),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: .12),
-                        ),
-                      ),
-                      child: Text(
-                        tradition,
-                        style: VerbumFonts.sans(
-                          color: const Color(0xFFF1DDAA),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              IconButton.filledTonal(
-                tooltip: 'Editar perfil',
-                onPressed: () => Navigator.pushNamed(context, '/edit-profile'),
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.white.withValues(alpha: .12),
-                  foregroundColor: Colors.white,
-                ),
-                icon: const VIcon(VerbumIcons.pencilSimple, size: 19),
-              ),
-            ],
+              ],
+            ),
+          ),
+          VIconButton(
+            icon: VerbumIcons.pencilSimple,
+            semanticLabel: 'Editar perfil',
+            variant: VIconButtonVariant.ghost,
+            color: p.onInverse,
+            onPressed: () => Navigator.pushNamed(context, '/edit-profile'),
           ),
         ],
       ),
     );
   }
-}
-
-class _WeeklyJourneyCard extends StatelessWidget {
-  final SpiritualStats stats;
-  const _WeeklyJourneyCard({required this.stats});
-
-  static String _dateKey(DateTime date) =>
-      '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-
-  @override
-  Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final start = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    ).subtract(Duration(days: now.weekday - 1));
-    final days = List.generate(7, (i) => start.add(Duration(days: i)));
-    final completed = days
-        .where((day) => stats.activeDaysMap[_dateKey(day)] == true)
-        .length;
-    final todayDone = stats.activeDaysMap[_dateKey(now)] == true;
-    final labels = const ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-    final scheme = Theme.of(context).colorScheme;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => Navigator.pushNamed(context, '/streak'),
-        borderRadius: BorderRadius.circular(25),
-        child: Ink(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: scheme.surface.withValues(alpha: .92),
-            borderRadius: BorderRadius.circular(25),
-            border: Border.all(
-              color: scheme.outlineVariant.withValues(alpha: .8),
-            ),
-          ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      color: scheme.secondaryContainer,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: VIcon(VerbumIcons.flame, weight: VIconWeight.fill,
-                      color: scheme.secondary,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Tu semana con Dios',
-                          style: VerbumFonts.serif(
-                            fontSize: 19,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        Text(
-                          todayDone
-                              ? 'Hoy ya diste tu paso'
-                              : 'Aún puedes dedicarte un momento',
-                          style: VerbumFonts.sans(
-                            fontSize: 12,
-                            color: scheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text(
-                    '${stats.currentStreak}',
-                    style: VerbumFonts.serif(
-                      fontSize: 27,
-                      fontWeight: FontWeight.w700,
-                      color: scheme.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'días',
-                    style: VerbumFonts.sans(
-                      fontSize: 11,
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 17),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(7, (index) {
-                  final active =
-                      stats.activeDaysMap[_dateKey(days[index])] == true;
-                  final isToday = index == now.weekday - 1;
-                  return Column(
-                    children: [
-                      Text(
-                        labels[index],
-                        style: VerbumFonts.sans(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: scheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 250),
-                        width: 29,
-                        height: 29,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: active
-                              ? scheme.primary
-                              : scheme.surfaceContainerHighest.withValues(
-                                  alpha: .65,
-                                ),
-                          border: isToday
-                              ? Border.all(color: scheme.secondary, width: 2)
-                              : null,
-                        ),
-                        child: VIcon(
-                          active ? VerbumIcons.check : VerbumIcons.circle,
-                          size: active ? 16 : 5,
-                          color: active ? Colors.white : scheme.outline,
-                        ),
-                      ),
-                    ],
-                  );
-                }),
-              ),
-              const SizedBox(height: 13),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      '$completed de 7 días esta semana',
-                      style: VerbumFonts.sans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    'Ver constancia',
-                    style: VerbumFonts.sans(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: scheme.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 2),
-                  VIcon(VerbumIcons.arrowRight,
-                    size: 16,
-                    color: scheme.primary,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MetricCard extends StatelessWidget {
-  final String value;
-  final String label;
-  final VerbumIcons icon;
-  final Color tint;
-  const _MetricCard({
-    required this.value,
-    required this.label,
-    required this.icon,
-    required this.tint,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 13),
-      decoration: BoxDecoration(
-        color: scheme.surface.withValues(alpha: .86),
-        borderRadius: BorderRadius.circular(19),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: .75)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          VIcon(icon, size: 19, color: tint),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: VerbumFonts.serif(
-              fontSize: 21,
-              fontWeight: FontWeight.w700,
-              color: scheme.onSurface,
-            ),
-          ),
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: VerbumFonts.sans(
-              fontSize: 10.5,
-              color: scheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
-  final String eyebrow;
-  final String title;
-  const _SectionTitle({required this.eyebrow, required this.title});
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        eyebrow,
-        style: VerbumFonts.sans(
-          fontSize: 10,
-          letterSpacing: 1.5,
-          fontWeight: FontWeight.w700,
-          color: Theme.of(context).colorScheme.secondary,
-        ),
-      ),
-      const SizedBox(height: 3),
-      Text(
-        title,
-        style: VerbumFonts.serif(
-          fontSize: 21,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    ],
-  );
-}
-
-class _ActionGroup extends StatelessWidget {
-  final List<_ProfileAction> children;
-  const _ActionGroup({required this.children});
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.surface.withValues(alpha: .9),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: .85)),
-      ),
-      child: Column(
-        children: List.generate(
-          children.length,
-          (index) => Column(
-            children: [
-              children[index],
-              if (index < children.length - 1)
-                Divider(
-                  height: 1,
-                  indent: 66,
-                  endIndent: 16,
-                  color: scheme.outlineVariant.withValues(alpha: .7),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ProfileAction extends StatelessWidget {
-  final VerbumIcons icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-  const _ProfileAction({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return ListTile(
-      onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-      leading: Container(
-        width: 39,
-        height: 39,
-        decoration: BoxDecoration(
-          color: scheme.primaryContainer.withValues(alpha: .7),
-          borderRadius: BorderRadius.circular(13),
-        ),
-        child: VIcon(icon, size: 20, color: scheme.primary),
-      ),
-      title: Text(
-        title,
-        style: VerbumFonts.sans(fontSize: 14, fontWeight: FontWeight.w700),
-      ),
-      subtitle: Text(
-        subtitle,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: VerbumFonts.sans(fontSize: 11, color: scheme.onSurfaceVariant),
-      ),
-      trailing: VIcon(VerbumIcons.caretRight,
-        size: 20,
-        color: scheme.outline,
-      ),
-    );
-  }
-}
-
-class _CompletionCard extends StatelessWidget {
-  final VoidCallback onTap;
-  const _CompletionCard({required this.onTap});
-  @override
-  Widget build(BuildContext context) => Material(
-    color: Colors.transparent,
-    child: InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Ink(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Theme.of(
-            context,
-          ).colorScheme.secondaryContainer.withValues(alpha: .7),
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Row(
-          children: [
-            VIcon(VerbumIcons.userPlus,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-            const SizedBox(width: 11),
-            Expanded(
-              child: Text(
-                'Completa tu nombre y usuario para que la comunidad pueda reconocerte.',
-                style: VerbumFonts.sans(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            const VIcon(VerbumIcons.arrowRight, size: 18),
-          ],
-        ),
-      ),
-    ),
-  );
 }
 
 class _SignOutSheet extends StatelessWidget {
@@ -852,7 +443,7 @@ class _SignOutSheet extends StatelessWidget {
   const _SignOutSheet({required this.onCancel, required this.onConfirm});
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final p = context.palette;
     return Container(
       padding: EdgeInsets.fromLTRB(
         22,
@@ -861,8 +452,10 @@ class _SignOutSheet extends StatelessWidget {
         MediaQuery.paddingOf(context).bottom + 20,
       ),
       decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        color: p.background,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(VerbumRadius.sheet),
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -871,41 +464,35 @@ class _SignOutSheet extends StatelessWidget {
             width: 42,
             height: 4,
             decoration: BoxDecoration(
-              color: scheme.outlineVariant,
+              color: p.line,
               borderRadius: BorderRadius.circular(99),
             ),
           ),
           const SizedBox(height: 20),
-          Text(
-            '¿Cerrar sesión?',
-            style: VerbumFonts.serif(
-              fontSize: 23,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+          Text('¿Cerrar sesión?', style: context.type.title),
           const SizedBox(height: 7),
           Text(
             'Tu camino y tus datos permanecerán guardados para cuando regreses.',
             textAlign: TextAlign.center,
-            style: VerbumFonts.sans(
-              fontSize: 13,
-              color: scheme.onSurfaceVariant,
-            ),
+            style: context.type.body,
           ),
           const SizedBox(height: 22),
           Row(
             children: [
               Expanded(
-                child: OutlinedButton(
+                child: VButton(
+                  label: 'Cancelar',
+                  variant: VButtonVariant.outlined,
+                  expanded: true,
                   onPressed: onCancel,
-                  child: const Text('Cancelar'),
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: FilledButton(
+                child: VButton(
+                  label: 'Cerrar sesión',
+                  expanded: true,
                   onPressed: onConfirm,
-                  child: const Text('Cerrar sesión'),
                 ),
               ),
             ],
@@ -919,6 +506,7 @@ class _SignOutSheet extends StatelessWidget {
 class _ProfileLoading extends StatelessWidget {
   const _ProfileLoading();
   @override
-  Widget build(BuildContext context) =>
-      const Center(child: CircularProgressIndicator());
+  Widget build(BuildContext context) => const Center(
+    child: VEmptyState(loading: true, title: 'Cargando tu espacio…'),
+  );
 }
