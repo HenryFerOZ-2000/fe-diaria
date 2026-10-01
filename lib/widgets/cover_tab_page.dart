@@ -32,6 +32,7 @@ class _CoverTabPageState extends State<CoverTabPage> {
           physics: const BouncingScrollPhysics(),
           children: [
             KeyedSubtree(key: _coverKey, child: widget.cover),
+            const SizedBox(height: 18),
             ...widget.children,
           ],
         ),

@@ -262,111 +262,116 @@ class _Cover extends StatelessWidget {
       constraints: BoxConstraints(
         minHeight: (MediaQuery.sizeOf(context).height * .5).clamp(380, 520),
       ),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: ExcludeSemantics(
-              child: Image.asset(photo.asset, fit: BoxFit.cover),
+      child: ClipRRect(
+        // Corte limpio: la foto termina en esquinas redondeadas.
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(VerbumRadius.sheet),
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: ExcludeSemantics(
+                child: Image.asset(photo.asset, fit: BoxFit.cover),
+              ),
             ),
-          ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    _tinta.withValues(alpha: .55),
-                    _tinta.withValues(alpha: .15),
-                    _tinta.withValues(alpha: .75),
-                    p.background,
-                  ],
-                  stops: const [0, .3, .78, 1],
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      _tinta.withValues(alpha: .55),
+                      _tinta.withValues(alpha: .15),
+                      _tinta.withValues(alpha: .8),
+                    ],
+                    stops: const [0, .32, 1],
+                  ),
                 ),
               ),
             ),
-          ),
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                VerbumSpace.gutter,
-                8,
-                VerbumSpace.gutter,
-                40,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const VBackButton(onColor: true),
-                      const Spacer(),
-                      Tooltip(
-                        message: 'Fuente y alcance',
-                        child: Material(
-                          color: Colors.white.withValues(alpha: .16),
-                          borderRadius: BorderRadius.circular(
-                            VerbumRadius.control,
-                          ),
-                          child: InkWell(
-                            onTap: onInfo,
+            SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  VerbumSpace.gutter,
+                  8,
+                  VerbumSpace.gutter,
+                  40,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const VBackButton(onColor: true),
+                        const Spacer(),
+                        Tooltip(
+                          message: 'Fuente y alcance',
+                          child: Material(
+                            color: Colors.white.withValues(alpha: .16),
                             borderRadius: BorderRadius.circular(
                               VerbumRadius.control,
                             ),
-                            child: const SizedBox.square(
-                              dimension: 44,
-                              child: Center(
-                                child: VIcon(
-                                  VerbumIcons.info,
-                                  color: Colors.white,
+                            child: InkWell(
+                              onTap: onInfo,
+                              borderRadius: BorderRadius.circular(
+                                VerbumRadius.control,
+                              ),
+                              child: const SizedBox.square(
+                                dimension: 44,
+                                child: Center(
+                                  child: VIcon(
+                                    VerbumIcons.info,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 120),
-                  Text(
-                    'HOY EN LA IGLESIA · ${date.toUpperCase()}',
-                    style: type.rubric.copyWith(
-                      color: p.butter,
-                      letterSpacing: 1.4,
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Semantics(
-                    header: true,
-                    child: Text(
-                      title,
-                      style: type.display.copyWith(
-                        color: Colors.white,
-                        fontSize: 30,
-                        height: 1.1,
+                    const SizedBox(height: 120),
+                    Text(
+                      'HOY EN LA IGLESIA · ${date.toUpperCase()}',
+                      style: type.rubric.copyWith(
+                        color: p.butter,
+                        letterSpacing: 1.4,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 14),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      _GlassChip(label: rank),
-                      _GlassChip(
-                        label: colorLabel,
-                        dot: color == null
-                            ? null
-                            : LiturgicalPalette.swatch(color!),
+                    const SizedBox(height: 8),
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        title,
+                        style: type.display.copyWith(
+                          color: Colors.white,
+                          fontSize: 30,
+                          height: 1.1,
+                        ),
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 14),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _GlassChip(label: rank),
+                        _GlassChip(
+                          label: colorLabel,
+                          dot: color == null
+                              ? null
+                              : LiturgicalPalette.swatch(color!),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
