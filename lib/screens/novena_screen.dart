@@ -26,7 +26,6 @@ class _NovenaScreenState extends State<NovenaScreen> {
     super.initState();
     if (_blockIfEvangelical()) return;
     _loadData();
-    _loadSavedProgress();
   }
 
   bool _blockIfEvangelical() {
@@ -39,30 +38,12 @@ class _NovenaScreenState extends State<NovenaScreen> {
     return blocked;
   }
 
-  void _loadSavedProgress() {
-    final lastDay = StorageService().getNovenaLastDay();
-    if (lastDay != null && lastDay >= 1 && lastDay <= 9) {
-      // Mostrar indicador de continuación si hay progreso guardado
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Puedes continuar desde el Día $lastDay'),
-              action: SnackBarAction(
-                label: 'Continuar',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => NovenaDayScreen(day: lastDay),
-                    ),
-                  );
-                },
-              ),
-            ),
-          );
-        }
-      });
-    }
+  /// Abre un día y, al volver, refresca el avance (último día).
+  Future<void> _openDay(int day) async {
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => NovenaDayScreen(day: day)));
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadData() async {
@@ -84,7 +65,8 @@ class _NovenaScreenState extends State<NovenaScreen> {
     if (_blockedByTradition) {
       return const SizedBox.shrink();
     }
-    final lastDay = StorageService().getNovenaLastDay();
+    final saved = StorageService().getNovenaLastDay();
+    final lastDay = saved != null && saved >= 1 && saved <= 9 ? saved : null;
     return Scaffold(
       appBar: VAppBar(
         title: Text('Novena de Navidad', style: context.type.heading),
@@ -103,12 +85,26 @@ class _NovenaScreenState extends State<NovenaScreen> {
                   28,
                 ),
                 children: [
-                  const VFeatureCard(
+                  // El avance se ofrece aquí, en la propia tarjeta: un aviso
+                  // flotante seguía visible al entrar a los días.
+                  VFeatureCard(
                     eyebrow: 'Nueve días',
                     title: 'Preparar el corazón para la Navidad',
                     body:
                         'Una tradición de nueve días de oración para celebrar el nacimiento de Jesús.',
                     photo: VerbumPhotos.candle,
+                    footer: VButton(
+                      label: lastDay == null
+                          ? 'Comenzar el día 1'
+                          : 'Continuar en el día $lastDay',
+                      icon: lastDay == null
+                          ? VerbumIcons.arrowRight
+                          : VerbumIcons.bookmarkSimple,
+                      iconLeading: lastDay != null,
+                      variant: VButtonVariant.inverse,
+                      compact: true,
+                      onPressed: () => _openDay(lastDay ?? 1),
+                    ),
                   ),
                   const VSectionHeader(
                     'Selecciona un día',
@@ -131,11 +127,7 @@ class _NovenaScreenState extends State<NovenaScreen> {
                               ? VStepState.current
                               : VStepState.upcoming,
                           semanticLabel: 'Día $day',
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => NovenaDayScreen(day: day),
-                            ),
-                          ),
+                          onTap: () => _openDay(day),
                         ),
                     ],
                   ),
