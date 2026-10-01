@@ -52,6 +52,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
   double _fontSize = 18;
   double _lineHeight = 1.65;
   ReaderTone _tone = ReaderTone.system;
+  bool _justify = false;
   int _maxChapter = 1;
   bool _didScrollToInitial = false;
   Timer? _positionDebounce;
@@ -129,6 +130,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
       _preferences.getLineHeight(),
       _preferences.getTone(),
       _preferences.getHighlights(),
+      _preferences.getJustify(),
     ]);
     if (!mounted) return;
     setState(() {
@@ -136,6 +138,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
       _lineHeight = values[1] as double;
       _tone = ReaderTone.parse(values[2] as String);
       _highlights = values[3] as Set<String>;
+      _justify = values[4] as bool;
     });
   }
 
@@ -410,6 +413,7 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
                         verse.verse,
                   },
                   onTap: _toggleSelection,
+                  justify: _justify,
                 ),
                 const SizedBox(height: 24),
                 Center(
@@ -445,6 +449,11 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
         onTone: (tone) {
           setState(() => _tone = tone);
           _preferences.setTone(tone.name);
+        },
+        justify: _justify,
+        onJustify: (v) {
+          setState(() => _justify = v);
+          _preferences.setJustify(v);
         },
       ),
     );

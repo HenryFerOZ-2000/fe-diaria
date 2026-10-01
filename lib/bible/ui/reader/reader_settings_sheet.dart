@@ -17,6 +17,8 @@ class ReaderSettingsSheet extends StatefulWidget {
     required this.onLineHeight,
     required this.onLineHeightEnd,
     required this.onTone,
+    this.justify = false,
+    this.onJustify,
   });
 
   final double fontSize;
@@ -27,6 +29,8 @@ class ReaderSettingsSheet extends StatefulWidget {
   final ValueChanged<double> onLineHeight;
   final ValueChanged<double> onLineHeightEnd;
   final ValueChanged<ReaderTone> onTone;
+  final bool justify;
+  final ValueChanged<bool>? onJustify;
 
   static const minFont = 15.0, maxFont = 25.0;
   static const minLine = 1.35, maxLine = 1.95;
@@ -39,6 +43,7 @@ class _ReaderSettingsSheetState extends State<ReaderSettingsSheet> {
   late double _font = widget.fontSize;
   late double _line = widget.lineHeight;
   late ReaderTone _tone = widget.tone;
+  late bool _justify = widget.justify;
 
   @override
   Widget build(BuildContext context) {
@@ -120,6 +125,24 @@ class _ReaderSettingsSheetState extends State<ReaderSettingsSheet> {
               ],
             ],
           ),
+          if (widget.onJustify != null) ...[
+            const SizedBox(height: 8),
+            SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              title: Text('Justificar texto', style: type.bodyStrong),
+              subtitle: Text(
+                'Aspecto de libro impreso. Sin justificar se lee mejor en '
+                'pantallas pequeñas.',
+                style: type.caption,
+              ),
+              activeTrackColor: p.emphasis,
+              value: _justify,
+              onChanged: (v) {
+                setState(() => _justify = v);
+                widget.onJustify!(v);
+              },
+            ),
+          ],
         ],
       ),
     );

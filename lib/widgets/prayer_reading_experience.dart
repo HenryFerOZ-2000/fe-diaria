@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../bible/services/bible_reading_preferences.dart';
 import 'package:flutter/services.dart';
 
 import '../design_system/design_system.dart';
@@ -68,6 +70,8 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
   double _progress = 0;
   double _fontSize = 19;
   bool _centerText = false;
+  bool _justify = false;
+  final _preferences = BibleReadingPreferences();
   bool _completed = false;
   final _readAloud = ReadAloudService();
   bool _speaking = false;
@@ -77,6 +81,9 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
     super.initState();
     _completed = widget.initiallyCompleted;
     _scroll.addListener(_updateProgress);
+    _preferences.getJustify().then((v) {
+      if (mounted) setState(() => _justify = v);
+    });
   }
 
   @override
@@ -232,7 +239,11 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
       fontSize: _fontSize,
       height: 1.62,
     );
-    final align = _centerText ? TextAlign.center : TextAlign.justify;
+    final align = _centerText
+        ? TextAlign.center
+        : _justify
+        ? TextAlign.justify
+        : TextAlign.start;
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 380),
@@ -471,6 +482,25 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
                   setState(() => _centerText = value);
                   setSheetState(() {});
                 },
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(
+                  'Justificar texto',
+                  style: sheetContext.type.bodyStrong,
+                ),
+                subtitle: Text(
+                  'Aspecto de libro impreso',
+                  style: sheetContext.type.caption,
+                ),
+                value: _justify && !_centerText,
+                onChanged: _centerText
+                    ? null
+                    : (value) {
+                        setState(() => _justify = value);
+                        setSheetState(() {});
+                        _preferences.setJustify(value);
+                      },
               ),
             ],
           ),

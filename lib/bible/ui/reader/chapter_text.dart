@@ -34,6 +34,7 @@ class ChapterText extends StatefulWidget {
     required this.selected,
     required this.highlighted,
     required this.onTap,
+    this.justify = false,
   });
 
   final List<ChapterVerse> verses;
@@ -43,6 +44,9 @@ class ChapterText extends StatefulWidget {
   final Set<int> selected;
   final Set<int> highlighted;
   final ValueChanged<int> onTap;
+
+  /// Justificado opcional; por defecto alineado a la izquierda.
+  final bool justify;
 
   @override
   State<ChapterText> createState() => ChapterTextState();
@@ -241,14 +245,14 @@ class ChapterTextState extends State<ChapterText> {
           TextSpan(children: parts[1]),
           key: _paragraphKeys[1],
           style: style,
-          textAlign: TextAlign.justify,
+          textAlign: widget.justify ? TextAlign.justify : TextAlign.start,
         );
         if (!dropCap) {
           return Text.rich(
             TextSpan(children: parts[0]),
             key: _paragraphKeys[0],
             style: style,
-            textAlign: TextAlign.justify,
+            textAlign: widget.justify ? TextAlign.justify : TextAlign.start,
           );
         }
         return Column(
@@ -272,7 +276,9 @@ class ChapterTextState extends State<ChapterText> {
                     TextSpan(children: parts[0]),
                     key: _paragraphKeys[0],
                     style: style,
-                    textAlign: TextAlign.justify,
+                    textAlign: widget.justify
+                        ? TextAlign.justify
+                        : TextAlign.start,
                   ),
                 ),
               ],
