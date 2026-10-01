@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../services/system_ui_service.dart';
 import '../../features/sharing/domain/share_content.dart';
 import '../../screens/reading_chat_screen.dart';
 import '../../services/share_service.dart';
@@ -270,87 +271,95 @@ class _BibleVersesScreenState extends State<BibleVersesScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = ReaderColors.of(context, _tone);
-    return AppScaffold(
-      showAppBar: false,
-      showBanner: false,
-      backgroundColor: colors.page,
-      bottomNavigationBar: _selected.isNotEmpty
-          ? SafeArea(
-              top: false,
-              minimum: const EdgeInsets.fromLTRB(14, 0, 14, 10),
-              child: VActionBar(
-                leading: _selected.length == 1
-                    ? '1 versículo'
-                    : '${_selected.length} versículos',
-                onClose: () => setState(() => _selected = {}),
-                items: [
-                  VActionBarItem(
-                    icon: VerbumIcons.pencilSimple,
-                    label: 'Resaltar',
-                    onPressed: _toggleHighlights,
-                  ),
-                  VActionBarItem(
-                    icon: VerbumIcons.copy,
-                    label: 'Copiar',
-                    onPressed: _copySelection,
-                  ),
-                  VActionBarItem(
-                    icon: VerbumIcons.shareNetwork,
-                    label: 'Compartir',
-                    onPressed: _shareSelection,
-                  ),
-                  VActionBarItem(
-                    icon: VerbumIcons.sparkle,
-                    label: 'Reflexionar',
-                    emphasized: true,
-                    onPressed: _reflectOnSelection,
-                  ),
-                ],
-              ),
-            )
-          : ChapterNavBar(
-              chapter: widget.chapter,
-              lastChapter: _maxChapter,
-              onOpen: _openChapter,
-            ),
-      body: Column(
-        children: [
-          VReaderToolbar(
-            label: '${widget.bookName} ${widget.chapter}',
-            actions: [
-              VReaderAction(
-                icon: _speaking ? VerbumIcons.stop : VerbumIcons.headphones,
-                label: _speaking ? 'Detener audio' : 'Escuchar capítulo',
-                onPressed: _toggleReadAloud,
-              ),
-              VReaderAction(
-                icon: VerbumIcons.textAa,
-                label: 'Ajustes de lectura',
-                onPressed: _showReaderSettings,
-              ),
-            ],
-          ),
-          Expanded(
-            child: FutureBuilder<List<Verse>>(
-              future: _versesFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError || snapshot.data?.isEmpty != false) {
-                  return Center(
-                    child: Text(
-                      'No se pudo cargar este capítulo.',
-                      style: context.type.body,
+    // El tono de página puede ser oscuro con la app en claro (o al revés):
+    // la barra de estado sigue a la página.
+    final pageIsDark = colors.page.computeLuminance() < .4;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiService.overlayForBrightness(
+        pageIsDark ? Brightness.dark : Brightness.light,
+      ),
+      child: AppScaffold(
+        showAppBar: false,
+        showBanner: false,
+        backgroundColor: colors.page,
+        bottomNavigationBar: _selected.isNotEmpty
+            ? SafeArea(
+                top: false,
+                minimum: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+                child: VActionBar(
+                  leading: _selected.length == 1
+                      ? '1 versículo'
+                      : '${_selected.length} versículos',
+                  onClose: () => setState(() => _selected = {}),
+                  items: [
+                    VActionBarItem(
+                      icon: VerbumIcons.pencilSimple,
+                      label: 'Resaltar',
+                      onPressed: _toggleHighlights,
                     ),
-                  );
-                }
-                _scrollToInitialVerse();
-                return _buildReader(context, snapshot.data!, colors);
-              },
+                    VActionBarItem(
+                      icon: VerbumIcons.copy,
+                      label: 'Copiar',
+                      onPressed: _copySelection,
+                    ),
+                    VActionBarItem(
+                      icon: VerbumIcons.shareNetwork,
+                      label: 'Compartir',
+                      onPressed: _shareSelection,
+                    ),
+                    VActionBarItem(
+                      icon: VerbumIcons.sparkle,
+                      label: 'Reflexionar',
+                      emphasized: true,
+                      onPressed: _reflectOnSelection,
+                    ),
+                  ],
+                ),
+              )
+            : ChapterNavBar(
+                chapter: widget.chapter,
+                lastChapter: _maxChapter,
+                onOpen: _openChapter,
+              ),
+        body: Column(
+          children: [
+            VReaderToolbar(
+              label: '${widget.bookName} ${widget.chapter}',
+              actions: [
+                VReaderAction(
+                  icon: _speaking ? VerbumIcons.stop : VerbumIcons.headphones,
+                  label: _speaking ? 'Detener audio' : 'Escuchar capítulo',
+                  onPressed: _toggleReadAloud,
+                ),
+                VReaderAction(
+                  icon: VerbumIcons.textAa,
+                  label: 'Ajustes de lectura',
+                  onPressed: _showReaderSettings,
+                ),
+              ],
             ),
-          ),
-        ],
+            Expanded(
+              child: FutureBuilder<List<Verse>>(
+                future: _versesFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError || snapshot.data?.isEmpty != false) {
+                    return Center(
+                      child: Text(
+                        'No se pudo cargar este capítulo.',
+                        style: context.type.body,
+                      ),
+                    );
+                  }
+                  _scrollToInitialVerse();
+                  return _buildReader(context, snapshot.data!, colors);
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

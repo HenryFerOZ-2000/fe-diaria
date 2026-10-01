@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../services/system_ui_service.dart';
 
 import '../bible/services/bible_reading_preferences.dart';
-import 'package:flutter/services.dart';
 
 import '../design_system/design_system.dart';
 import '../faith/content_provenance.dart';
@@ -153,12 +155,17 @@ class _PrayerReadingExperienceState extends State<PrayerReadingExperience> {
     final page = Builder(builder: _buildPage);
     if (!widget.nocturne) return page;
     // La noche se lee siempre en la paleta "Completas".
-    return Theme(
-      data: buildVerbumTheme(
-        brightness: Brightness.dark,
-        pageTransitionsTheme: Theme.of(context).pageTransitionsTheme,
+    // Hora y batería en claro sobre la página oscura, aunque la app esté
+    // en modo claro.
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiService.overlayForBrightness(Brightness.dark),
+      child: Theme(
+        data: buildVerbumTheme(
+          brightness: Brightness.dark,
+          pageTransitionsTheme: Theme.of(context).pageTransitionsTheme,
+        ),
+        child: page,
       ),
-      child: page,
     );
   }
 
