@@ -31,6 +31,7 @@ class VButton extends StatelessWidget {
     this.variant = VButtonVariant.solid,
     this.expanded = false,
     this.compact = false,
+    this.loading = false,
   });
 
   final String label;
@@ -44,6 +45,9 @@ class VButton extends StatelessWidget {
 
   /// Altura reducida para usar dentro de tarjetas.
   final bool compact;
+
+  /// Muestra un indicador de progreso y desactiva el botón.
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -59,8 +63,8 @@ class VButton extends StatelessWidget {
       VButtonVariant.text => (Colors.transparent, p.rubric, BorderSide.none),
       VButtonVariant.inverse => (p.onInverse, p.inverse, BorderSide.none),
     };
-    final enabled = onPressed != null;
-    final color = enabled ? fg : p.inkSubtle;
+    final enabled = onPressed != null && !loading;
+    final color = enabled || loading ? fg : p.inkSubtle;
 
     final children = <Widget>[
       Flexible(
@@ -74,7 +78,13 @@ class VButton extends StatelessWidget {
           ),
         ),
       ),
-      if (icon != null) ...[
+      if (loading) ...[
+        const SizedBox(width: 10),
+        SizedBox.square(
+          dimension: compact ? 14 : 16,
+          child: CircularProgressIndicator(strokeWidth: 2, color: color),
+        ),
+      ] else if (icon != null) ...[
         const SizedBox(width: 8),
         VIcon(icon!, size: compact ? 16 : 18, color: color),
       ],
@@ -90,7 +100,9 @@ class VButton extends StatelessWidget {
       button: true,
       enabled: enabled,
       child: Material(
-        color: enabled || variant != VButtonVariant.solid ? bg : p.surfaceMuted,
+        color: enabled || loading || variant != VButtonVariant.solid
+            ? bg
+            : p.surfaceMuted,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(
             compact ? 99 : VerbumRadius.control,
@@ -99,7 +111,7 @@ class VButton extends StatelessWidget {
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: onPressed,
+          onTap: enabled ? onPressed : null,
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: compact ? 40 : 50),
             child: Padding(
