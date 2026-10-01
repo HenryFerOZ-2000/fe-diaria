@@ -182,12 +182,12 @@ class _BibleBooksScreenState extends State<BibleBooksScreen> {
 
   /// Libros para empezar, con su foto y una línea que invita.
   static const _starters = [
-    ('JHN', 'El amor hecho carne', VerbumPhotos.handsOnBible),
-    ('PSA', 'Oración y alabanza', VerbumPhotos.lake),
-    ('MAT', 'Las bienaventuranzas', VerbumPhotos.sunrisePrayer),
-    ('PRO', 'Sabiduría para el día', VerbumPhotos.journaling),
-    ('GEN', 'En el principio', VerbumPhotos.morning),
-    ('ROM', 'La fe que justifica', VerbumPhotos.windowReading),
+    ('JHN', 'Yo soy la vid', VerbumPhotos.johnVine),
+    ('PSA', 'El Señor es mi pastor', VerbumPhotos.psalmShepherd),
+    ('MAT', 'El mar de Galilea', VerbumPhotos.matthewGalilee),
+    ('PRO', 'Sabiduría para el día', VerbumPhotos.proverbsLamp),
+    ('GEN', 'Sea la luz', VerbumPhotos.genesisLight),
+    ('ROM', 'Carta a Roma', VerbumPhotos.romansForum),
   ];
 
   static const _gutter = EdgeInsets.symmetric(horizontal: VerbumSpace.gutter);
