@@ -34,54 +34,48 @@ class VPhotoCover extends StatelessWidget {
     final p = context.palette;
     return ConstrainedBox(
       constraints: BoxConstraints(minHeight: minHeight),
-      child: ClipRRect(
-        // Corte limpio: la foto termina en esquinas redondeadas, sin
-        // fundirse con el fondo.
-        borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(VerbumRadius.sheet),
-        ),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: ExcludeSemantics(
-                child: Image(
-                  image: image,
-                  fit: BoxFit.cover,
-                  alignment: alignment,
-                  errorBuilder: (_, _, _) => ColoredBox(color: p.inverse),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: ExcludeSemantics(
+              child: Image(
+                image: image,
+                fit: BoxFit.cover,
+                alignment: alignment,
+                errorBuilder: (_, _, _) => ColoredBox(color: p.inverse),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    _tinta.withValues(alpha: .55),
+                    _tinta.withValues(alpha: .15),
+                    _tinta.withValues(alpha: .72),
+                    p.background,
+                  ],
+                  stops: const [0, .32, .8, 1],
                 ),
               ),
             ),
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      _tinta.withValues(alpha: .55),
-                      _tinta.withValues(alpha: .15),
-                      _tinta.withValues(alpha: .78),
-                    ],
-                    stops: const [0, .34, 1],
-                  ),
-                ),
+          ),
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                VerbumSpace.gutter,
+                8,
+                VerbumSpace.gutter,
+                bottomPadding,
               ),
+              child: child,
             ),
-            SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  VerbumSpace.gutter,
-                  8,
-                  VerbumSpace.gutter,
-                  bottomPadding,
-                ),
-                child: child,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

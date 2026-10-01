@@ -63,158 +63,150 @@ class TodayCover extends StatelessWidget {
 
     return ConstrainedBox(
       constraints: BoxConstraints(minHeight: minHeight),
-      child: ClipRRect(
-        // Corte limpio: la foto termina en esquinas redondeadas.
-        borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(VerbumRadius.sheet),
-        ),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: ExcludeSemantics(
-                child: Image.asset(coverPhoto.asset, fit: BoxFit.cover),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: ExcludeSemantics(
+              child: Image.asset(coverPhoto.asset, fit: BoxFit.cover),
+            ),
+          ),
+          // Velo: legible arriba (saludo) y abajo (versículo); la foto
+          // respira en el centro y se funde con el lavanda de la página.
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    _tinta.withValues(alpha: night ? .8 : .45),
+                    _indigo.withValues(alpha: night ? .55 : .05),
+                    _tinta.withValues(alpha: night ? .62 : .35),
+                    _tinta.withValues(alpha: night ? .88 : .78),
+                    p.background,
+                  ],
+                  stops: const [0, .28, .52, .8, 1],
+                ),
               ),
             ),
-            // Velo: legible arriba (saludo) y abajo (versículo); la foto
-            // respira en el centro y se funde con el lavanda de la página.
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      _tinta.withValues(alpha: night ? .8 : .45),
-                      _indigo.withValues(alpha: night ? .55 : .05),
-                      _tinta.withValues(alpha: night ? .62 : .35),
-                      _tinta.withValues(alpha: night ? .9 : .82),
+          ),
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                VerbumSpace.gutter,
+                10,
+                VerbumSpace.gutter,
+                92,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      VGlassButton(
+                        icon: VerbumIcons.user,
+                        tooltip: 'Mi perfil',
+                        onPressed: onProfile,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: _StreakChip(days: streakDays, onTap: onStreak),
+                        ),
+                      ),
                     ],
-                    stops: const [0, .28, .55, 1],
                   ),
-                ),
-              ),
-            ),
-            SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  VerbumSpace.gutter,
-                  10,
-                  VerbumSpace.gutter,
-                  92,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        VGlassButton(
-                          icon: VerbumIcons.user,
-                          tooltip: 'Mi perfil',
-                          onPressed: onProfile,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: _StreakChip(
-                              days: streakDays,
-                              onTap: onStreak,
-                            ),
-                          ),
-                        ),
-                      ],
+                  const SizedBox(height: 22),
+                  Text(
+                    longSpanishDate(now).toUpperCase(),
+                    style: type.rubric.copyWith(
+                      color: Colors.white.withValues(alpha: .9),
+                      letterSpacing: 1.6,
                     ),
-                    const SizedBox(height: 22),
-                    Text(
-                      longSpanishDate(now).toUpperCase(),
-                      style: type.rubric.copyWith(
-                        color: Colors.white.withValues(alpha: .9),
-                        letterSpacing: 1.6,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Semantics(
-                      header: true,
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text: name == null
-                                  ? greeting
-                                  : greeting.substring(0, comma + 1),
-                            ),
-                            if (name != null)
-                              TextSpan(
-                                text: ' $name',
-                                style: TextStyle(color: p.butter),
-                              ),
-                          ],
-                        ),
-                        style: type.heading.copyWith(
-                          color: Colors.white,
-                          fontSize: 19,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: verse.isEmpty ? 0 : 96),
-                    if (verse.isNotEmpty) ...[
-                      Text(
-                        'PALABRA DE HOY',
-                        style: type.rubric.copyWith(
-                          color: p.butter,
-                          letterSpacing: 1.6,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        '«$verse»',
-                        maxLines: 7,
-                        overflow: TextOverflow.ellipsis,
-                        style: VerbumFonts.serif(
-                          color: Colors.white,
-                          fontSize: _verseSize(verse),
-                          fontWeight: FontWeight.w500,
-                          height: 1.1,
-                        ),
-                      ),
-                      if (verseReference != null) ...[
-                        const SizedBox(height: 10),
-                        Text(
-                          verseReference!,
-                          style: type.bodyStrong.copyWith(
-                            color: Colors.white.withValues(alpha: .9),
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 16),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
+                  ),
+                  const SizedBox(height: 4),
+                  Semantics(
+                    header: true,
+                    child: Text.rich(
+                      TextSpan(
                         children: [
-                          if (onRead != null)
-                            _Pill(
-                              label: 'Leer y meditar',
-                              icon: VerbumIcons.bookOpen,
-                              solid: true,
-                              onTap: onRead!,
-                            ),
-                          if (onShare != null)
-                            _Pill(
-                              label: 'Compartir',
-                              icon: VerbumIcons.shareNetwork,
-                              onTap: onShare!,
+                          TextSpan(
+                            text: name == null
+                                ? greeting
+                                : greeting.substring(0, comma + 1),
+                          ),
+                          if (name != null)
+                            TextSpan(
+                              text: ' $name',
+                              style: TextStyle(color: p.butter),
                             ),
                         ],
                       ),
+                      style: type.heading.copyWith(
+                        color: Colors.white,
+                        fontSize: 19,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: verse.isEmpty ? 0 : 96),
+                  if (verse.isNotEmpty) ...[
+                    Text(
+                      'PALABRA DE HOY',
+                      style: type.rubric.copyWith(
+                        color: p.butter,
+                        letterSpacing: 1.6,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      '«$verse»',
+                      maxLines: 7,
+                      overflow: TextOverflow.ellipsis,
+                      style: VerbumFonts.serif(
+                        color: Colors.white,
+                        fontSize: _verseSize(verse),
+                        fontWeight: FontWeight.w500,
+                        height: 1.1,
+                      ),
+                    ),
+                    if (verseReference != null) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        verseReference!,
+                        style: type.bodyStrong.copyWith(
+                          color: Colors.white.withValues(alpha: .9),
+                          fontSize: 13,
+                        ),
+                      ),
                     ],
+                    const SizedBox(height: 16),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        if (onRead != null)
+                          _Pill(
+                            label: 'Leer y meditar',
+                            icon: VerbumIcons.bookOpen,
+                            solid: true,
+                            onTap: onRead!,
+                          ),
+                        if (onShare != null)
+                          _Pill(
+                            label: 'Compartir',
+                            icon: VerbumIcons.shareNetwork,
+                            onTap: onShare!,
+                          ),
+                      ],
+                    ),
                   ],
-                ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
