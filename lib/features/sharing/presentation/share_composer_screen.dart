@@ -327,22 +327,27 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Fuentes incluidas en la app (como la tarjeta): sin descargas.
               Text(
                 'CREA Y COMPARTE',
                 style: TextStyle(
                   fontFamily: 'VerbumInter',
-                  fontSize: 10,
-                  letterSpacing: 2.5,
-                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.5,
+                  color: context.palette.rubric,
                 ),
               ),
-              const SizedBox(height: 8),
-              const Text(
+              const SizedBox(height: 4),
+              Text(
                 'Comparte la Palabra',
                 style: TextStyle(
-                  fontFamily: 'VerbumPlayfair',
-                  fontSize: 26,
+                  fontFamily: 'VerbumInter',
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.6,
                   height: 1.15,
+                  color: context.palette.ink,
                 ),
               ),
             ],
@@ -441,52 +446,21 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
                   padding: const EdgeInsets.all(4),
                   child: Column(
                     children: [
-                      Container(
-                        height: 42,
-                        width: 64,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: _style == style
-                                ? Theme.of(context).colorScheme.secondary
-                                : Colors.transparent,
-                            width: 2,
-                          ),
-                          gradient: LinearGradient(
-                            colors: switch (style) {
-                              ShareVisualStyle.sereneLight => const [
-                                Color(0xFFFFFFFF),
-                                Color(0xFFE5E7F8),
-                              ],
-                              ShareVisualStyle.contemplativeNight => const [
-                                Color(0xFF10122A),
-                                Color(0xFF1A1D3A),
-                              ],
-                              ShareVisualStyle.livingTradition => const [
-                                Color(0xFF3A3C8E),
-                                Color(0xFF6F72D3),
-                              ],
-                            },
-                          ),
-                        ),
-                        child: VIcon(
-                          _style == style
-                              ? VerbumIcons.check
-                              : VerbumIcons.sparkle,
-                          size: 20,
-                          color: style == ShareVisualStyle.sereneLight
-                              ? const Color(0xFF3A3C8E)
-                              : const Color(0xFFF4DF7A),
-                        ),
-                      ),
+                      _StyleSwatch(style: style, selected: _style == style),
                       const SizedBox(height: 6),
                       ExcludeSemantics(
                         child: Text(
                           _styleLabel(style),
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'VerbumInter',
-                            fontSize: 11,
+                            fontSize: 11.5,
+                            fontWeight: _style == style
+                                ? FontWeight.w800
+                                : FontWeight.w600,
+                            color: _style == style
+                                ? context.palette.ink
+                                : context.palette.inkMuted,
                           ),
                         ),
                       ),
@@ -593,4 +567,84 @@ class _ShareComposerScreenState extends State<ShareComposerScreen> {
       ),
     ),
   );
+}
+
+/// Muestra de un estilo de tarjeta: sus colores, un icono que lo evoca
+/// (sol, luna, cruz) y una marca cuando está elegido.
+class _StyleSwatch extends StatelessWidget {
+  const _StyleSwatch({required this.style, required this.selected});
+
+  final ShareVisualStyle style;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final (List<Color> colors, VerbumIcons icon, Color fg) = switch (style) {
+      ShareVisualStyle.sereneLight => (
+        const [Color(0xFFFFFFFF), Color(0xFFE5E7F8)],
+        VerbumIcons.sunHorizon,
+        const Color(0xFF4A4EBB),
+      ),
+      ShareVisualStyle.contemplativeNight => (
+        const [Color(0xFF10122A), Color(0xFF1A1D3A)],
+        VerbumIcons.moonStars,
+        const Color(0xFFF4DF7A),
+      ),
+      ShareVisualStyle.livingTradition => (
+        const [Color(0xFF3A3C8E), Color(0xFF6F72D3)],
+        VerbumIcons.cross,
+        const Color(0xFFF4DF7A),
+      ),
+    };
+    return SizedBox(
+      width: 72,
+      height: 58,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            width: 72,
+            height: 58,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(VerbumRadius.control),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: colors,
+              ),
+              border: Border.all(
+                color: selected ? p.rubric : p.line,
+                width: selected ? 2.5 : 1,
+              ),
+            ),
+            child: VIcon(
+              icon,
+              size: 24,
+              weight: VIconWeight.duotone,
+              color: fg,
+            ),
+          ),
+          if (selected)
+            Positioned(
+              right: -6,
+              top: -6,
+              child: Container(
+                width: 22,
+                height: 22,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: p.rubric,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: p.background, width: 2),
+                ),
+                child: VIcon(VerbumIcons.check, size: 12, color: p.onEmphasis),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }
